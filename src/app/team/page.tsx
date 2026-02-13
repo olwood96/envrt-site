@@ -4,24 +4,39 @@ import { Container } from "@/components/ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "@/components/ui/Motion";
 import { teamMembers } from "@/lib/config";
 
-function MemberCard({ name, role, bio }: { name: string; role: string; bio: string }) {
+function MemberCard({ member }: { member: (typeof teamMembers)[number] }) {
   return (
-    <div className="group overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg">
-      <div className="flex items-center justify-center aspect-[4/3] bg-gradient-to-br from-envrt-green/5 to-envrt-teal/10">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-envrt-green/10 text-2xl font-bold text-envrt-green">
-          {name.split(" ").map((n) => n[0]).join("")}
-        </div>
+    <div className="flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white p-6 sm:p-8 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg">
+      <div>
+        <h3 className="text-xl font-bold text-envrt-charcoal">{member.name}</h3>
+        <p className="mt-1 text-sm font-semibold text-envrt-teal">{member.role}</p>
       </div>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-envrt-charcoal">{name}</h3>
-        <p className="mt-0.5 text-sm font-medium text-envrt-teal">{role}</p>
-        <p className="mt-2 text-sm text-envrt-muted">{bio}</p>
-      </div>
+
+      <ul className="mt-5 flex-1 space-y-3">
+        {member.bullets.map((b) => (
+          <li key={b} className="flex items-start gap-2.5 text-sm leading-relaxed text-envrt-muted">
+            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-envrt-teal/50" />
+            {b}
+          </li>
+        ))}
+      </ul>
+
+      {member.email && (
+        <a
+          href={`mailto:${member.email}`}
+          className="mt-6 inline-block text-sm font-medium text-envrt-charcoal underline decoration-envrt-teal/40 underline-offset-4 transition-colors hover:text-envrt-teal"
+        >
+          {member.email}
+        </a>
+      )}
     </div>
   );
 }
 
 export default function TeamPage() {
+  const founders = teamMembers.filter((m) => m.type === "founder");
+  const advisors = teamMembers.filter((m) => m.type === "advisor");
+
   return (
     <div className="pt-28 pb-16">
       <Container>
@@ -36,10 +51,23 @@ export default function TeamPage() {
           </div>
         </FadeUp>
 
-        <StaggerChildren className="mx-auto mt-14 grid max-w-3xl gap-6 sm:grid-cols-2">
-          {teamMembers.map((member) => (
+        <StaggerChildren className="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-2">
+          {founders.map((member) => (
             <StaggerItem key={member.name}>
-              <MemberCard name={member.name} role={member.role} bio={member.bio} />
+              <MemberCard member={member} />
+            </StaggerItem>
+          ))}
+        </StaggerChildren>
+
+        <FadeUp delay={0.15}>
+          <p className="mx-auto mt-16 max-w-4xl text-xs font-medium uppercase tracking-widest text-envrt-teal">
+            Advisors
+          </p>
+        </FadeUp>
+        <StaggerChildren className="mx-auto mt-4 grid max-w-4xl gap-6 sm:grid-cols-2">
+          {advisors.map((member) => (
+            <StaggerItem key={member.name}>
+              <MemberCard member={member} />
             </StaggerItem>
           ))}
         </StaggerChildren>

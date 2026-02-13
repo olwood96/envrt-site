@@ -89,9 +89,8 @@ const pricingComparison = {
     {
       name: "DPP creation",
       features: [
-        { name: "Digital Product Passports (allocation)", starter: "Limited", growth: "Expanded", pro: "Unlimited" },
+        { name: "Digital Product Passports (allocation)", starter: "Up to 25", growth: "Up to 100", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
-        { name: "Verification-grade DPPs", starter: false, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
       ],
     },
@@ -115,7 +114,7 @@ const pricingComparison = {
     {
       name: "Dashboard & insights",
       features: [
-        { name: "Product dashboard", starter: false, growth: true, pro: true },
+        { name: "Product dashboard", starter: true, growth: true, pro: true },
         { name: "Hotspot detection", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
         { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true },

@@ -6,12 +6,37 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 
+const FORM_NAME = "contact";
+
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(false);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData as unknown as Record<string, string>).toString(),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -47,7 +72,22 @@ export default function ContactPage() {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form
+                  name={FORM_NAME}
+                  method="POST"
+                  data-netlify="true"
+                  netlify-honeypot="bot-field"
+                  onSubmit={handleSubmit}
+                  className="space-y-5"
+                >
+                  {/* Netlify hidden fields */}
+                  <input type="hidden" name="form-name" value={FORM_NAME} />
+                  <p className="hidden">
+                    <label>
+                      Don&apos;t fill this out: <input name="bot-field" />
+                    </label>
+                  </p>
+
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div>
                       <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
@@ -55,6 +95,7 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        name="first-name"
                         required
                         className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
                         placeholder="Jane"
@@ -66,6 +107,7 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        name="last-name"
                         required
                         className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
                         placeholder="Smith"
@@ -78,6 +120,7 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="email"
+                      name="email"
                       required
                       className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
                       placeholder="jane@yourbrand.com"
@@ -89,6 +132,7 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="text"
+                      name="company"
                       required
                       className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
                       placeholder="Your brand name"
@@ -100,14 +144,26 @@ export default function ContactPage() {
                       <span className="text-envrt-muted font-normal">(optional)</span>
                     </label>
                     <textarea
+                      name="message"
                       rows={3}
                       className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20 resize-none"
                       placeholder="Tell us about your sustainability goals..."
                     />
                   </div>
-                  <Button type="submit" className="w-full" size="lg">
-                    Request a demo
-                    <span className="ml-2">→</span>
+
+                  {error && (
+                    <p className="text-center text-sm text-red-600">
+                      Something went wrong. Please try again or email us directly at hello@envrt.com.
+                    </p>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className={`w-full ${submitting ? "pointer-events-none opacity-60" : ""}`}
+                    size="lg"
+                  >
+                    {submitting ? "Sending..." : "Request a demo"}
+                    {!submitting && <span className="ml-2">→</span>}
                   </Button>
                   <p className="text-center text-xs text-envrt-muted">
                     No commitment. We&apos;ll walk you through the platform with your data.

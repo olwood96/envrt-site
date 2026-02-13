@@ -268,6 +268,22 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
     }
   }, [expanded, crumbling, drag, size]);
 
+  /* ---- MINIMIZE (yellow button) â€" snap back to spawn position ---- */
+  const handleMinimize = useCallback(() => {
+    if (crumbling) return;
+    if (expanded) {
+      // Exit expanded mode and reset to origin
+      setExpanded(false);
+      setDrag({ x: 0, y: 0 });
+      setSize({ dw: 0, dh: 0, dx: 0, dy: 0 });
+      preExpand.current = { drag: { x: 0, y: 0 }, size: { dw: 0, dh: 0, dx: 0, dy: 0 } };
+    } else {
+      // Already in normal mode â€" just reset to origin
+      setDrag({ x: 0, y: 0 });
+      setSize({ dw: 0, dh: 0, dx: 0, dy: 0 });
+    }
+  }, [expanded, crumbling]);
+
   if (!basePos || !ready) return null;
 
   /* ---- POSITION CALC ---- */
@@ -293,9 +309,12 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
       w = maxW;
       contentH = idealContentH;
     }
+    const totalH = contentH + chromeBarH;
     // Use fixed positioning when expanded so scroll lock doesn't affect placement
     useFixed = true;
-    top = NAV_H + pad;
+    // Center vertically within the available viewport space (below nav)
+    const viewportAvail = window.innerHeight - NAV_H;
+    top = NAV_H + Math.max(pad, Math.round((viewportAvail - totalH) / 2));
     left = Math.round((window.innerWidth - w) / 2);
   } else {
     w = Math.max(220, basePos.width + size.dw);
@@ -314,7 +333,11 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
       ) : (
         <span className="h-3 w-3 rounded-full bg-[#ff605c]" />
       )}
-      <span className="h-3 w-3 rounded-full bg-[#ffbd44]" />
+      {interactive ? (
+        <button onPointerDown={e => e.stopPropagation()} onClick={handleMinimize} className="h-3 w-3 rounded-full bg-[#ffbd44] transition-transform hover:scale-125 active:scale-95 cursor-pointer" />
+      ) : (
+        <span className="h-3 w-3 rounded-full bg-[#ffbd44]" />
+      )}
       {interactive ? (
         <button onPointerDown={e => e.stopPropagation()} onClick={handleExpand} className="h-3 w-3 rounded-full bg-[#00ca4e] transition-transform hover:scale-125 active:scale-95 cursor-pointer" />
       ) : (
