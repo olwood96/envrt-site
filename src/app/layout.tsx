@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased">
+      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased overflow-x-hidden">
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
