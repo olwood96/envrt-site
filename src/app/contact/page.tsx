@@ -21,7 +21,7 @@ export default function ContactPage() {
     formData.append("form-name", "contact");
 
     try {
-      const res = await fetch("/", {
+      const res = await fetch("/netlify-form.html", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(formData as unknown as Record<string, string>).toString(),

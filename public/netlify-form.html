@@ -1,13 +1,8 @@
-<!-- 
-  Hidden form for Netlify Forms detection.
-  Netlify's build bots scan static HTML for data-netlify="true" forms.
-  This file must exist so the "contact" form is registered during deploy.
-  The actual form submission happens via JS fetch in contact/page.tsx.
--->
+<!DOCTYPE html>
 <html>
-<head><title>Form placeholder</title></head>
+<head><title>Form</title></head>
 <body>
-  <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+  <form name="contact" netlify netlify-honeypot="bot-field">
     <input name="form-name" type="hidden" value="contact" />
     <input name="bot-field" />
     <input name="first-name" />
