@@ -110,6 +110,14 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const dragLive = useRef({ active: false, startX: 0, startY: 0, origX: 0, origY: 0, curX: 0, curY: 0 });
   const resizeLive = useRef({ active: false, edge: null as Edge | null, startX: 0, startY: 0, origSize: { dw: 0, dh: 0, dx: 0, dy: 0 } });
   const preExpand = useRef({ drag: { x: 0, y: 0 }, size: { dw: 0, dh: 0, dx: 0, dy: 0 } });
@@ -172,11 +180,11 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
   }, [basePos, drag, size.dy]);
 
   const barDown = useCallback((e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest("button") || expanded) return;
+    if ((e.target as HTMLElement).closest("button") || expanded || isMobile) return;
     dragLive.current = { active: true, startX: e.clientX, startY: e.clientY, origX: drag.x, origY: drag.y, curX: drag.x, curY: drag.y };
     if (containerRef.current) containerRef.current.style.transition = "none";
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  }, [drag, expanded]);
+  }, [drag, expanded, isMobile]);
 
   /* ---- RESIZE ---- */
   useEffect(() => {
@@ -199,10 +207,10 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
   }, []);
 
   const edgeDown = useCallback((edge: Edge) => (e: React.PointerEvent) => {
-    if (expanded) return;
+    if (expanded || isMobile) return;
     e.stopPropagation(); e.preventDefault();
     resizeLive.current = { active: true, edge, startX: e.clientX, startY: e.clientY, origSize: { ...size } };
-  }, [size, expanded]);
+  }, [size, expanded, isMobile]);
 
   /* ---- SNAPSHOT ---- */
   const captureSnapshot = useCallback((): string | null => {
@@ -262,9 +270,12 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
 
   if (expanded) {
     // Fit within viewport: nav + padding top, padding bottom
-    const availH = window.innerHeight - NAV_H - EXPAND_PAD * 2;
+    const pad = isMobile ? 8 : EXPAND_PAD;
+    const availH = window.innerHeight - NAV_H - pad * 2;
     const chromeBarH = 40;
-    const maxW = Math.round(window.innerWidth * 0.75);
+    const maxW = isMobile
+      ? Math.round(window.innerWidth - pad * 2)
+      : Math.round(window.innerWidth * 0.75);
     const idealContentH = Math.round(maxW * 10 / 16);
     const totalIdealH = idealContentH + chromeBarH;
 
@@ -278,7 +289,7 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
     }
     // Use fixed positioning when expanded so scroll lock doesn't affect placement
     useFixed = true;
-    top = NAV_H + EXPAND_PAD;
+    top = NAV_H + pad;
     left = Math.round((window.innerWidth - w) / 2);
   } else {
     w = Math.max(220, basePos.width + size.dw);
@@ -289,7 +300,7 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
 
   const chromeBar = (interactive: boolean) => (
     <div
-      className={`flex items-center gap-1.5 border-b border-envrt-charcoal/5 bg-envrt-cream/60 px-4 py-2.5 select-none ${!expanded && interactive ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
+      className={`flex items-center gap-1.5 border-b border-envrt-charcoal/5 bg-envrt-cream/60 px-4 py-2.5 select-none ${!expanded && interactive && !isMobile ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
       {...(interactive ? { onPointerDown: barDown } : {})}
     >
       {interactive ? (
@@ -371,7 +382,7 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
               </div>
             </div>
           </motion.div>
-          {!crumbling && !expanded && (
+          {!crumbling && !expanded && !isMobile && (
             <>
               <div onPointerDown={edgeDown("n")} className="absolute -top-1 left-3 right-3 h-2 cursor-ns-resize" />
               <div onPointerDown={edgeDown("s")} className="absolute -bottom-1 left-3 right-3 h-2 cursor-ns-resize" />
@@ -394,6 +405,17 @@ export function HowItWorksSection() {
   const [active, setActive] = useState(0);
   const step = howItWorksSteps[active];
   const anchorRef = useRef<HTMLDivElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    const container = tabsRef.current;
+    const btn = tabRefs.current[active];
+    if (!container || !btn) return;
+    const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+    container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+  }, [active]);
+
   usePreloadMedia();
   useInjectCrumbleCSS();
 
@@ -408,13 +430,15 @@ export function HowItWorksSection() {
             </div>
           </FadeUp>
           <FadeUp delay={0.1}>
-            <div className="mx-auto mt-12 flex max-w-lg justify-center gap-2">
+            <div ref={tabsRef} className="mx-auto mt-12 max-w-lg overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+              <div className="flex justify-center gap-2 px-4 sm:px-0" style={{ minWidth: "max-content" }}>
               {howItWorksSteps.map((s, i) => (
-                <button key={s.id} onClick={() => setActive(i)} className={`relative rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ${active === i ? "bg-envrt-green text-white shadow-md" : "text-envrt-charcoal/60 hover:bg-envrt-charcoal/5"}`}>
+                <button ref={el => { tabRefs.current[i] = el; }} key={s.id} onClick={() => setActive(i)} className={`relative rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ${active === i ? "bg-envrt-green text-white shadow-md" : "text-envrt-charcoal/60 hover:bg-envrt-charcoal/5"}`}>
                   {s.verb}
                   {active === i && <motion.div layoutId="activeTab" className="absolute inset-0 rounded-xl bg-envrt-green" style={{ zIndex: -1 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} />}
                 </button>
               ))}
+              </div>
             </div>
           </FadeUp>
           <div className="mt-12 grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
