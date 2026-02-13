@@ -233,7 +233,8 @@ export default function PricingPage() {
         </FadeUp>
 
         <FadeUp delay={0.2}>
-          <SectionCard className="mx-auto mt-10 max-w-5xl overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+          <SectionCard className="mx-auto mt-10 max-w-5xl">
+            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
             <table className="w-full min-w-[600px] text-left text-sm">
               <thead>
                 <tr className="border-b border-envrt-charcoal/8">
@@ -263,6 +264,7 @@ export default function PricingPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </SectionCard>
         </FadeUp>
       </Container>
