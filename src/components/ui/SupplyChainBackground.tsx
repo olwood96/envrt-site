@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 function makeRng(seed: number) {
   let s = seed;
@@ -132,9 +132,6 @@ function hexPts(cx: number, cy: number, r: number): string {
 
 export function SupplyChainBackground({ children }: { children: React.ReactNode }) {
   const [dims, setDims] = useState({ w: 0, h: 0 });
-  const [scrollY, setScrollY] = useState(0);
-  const raf = useRef(0);
-
   useEffect(() => {
     const measure = () => setDims({ w: window.innerWidth, h: document.documentElement.scrollHeight });
     measure();
@@ -142,15 +139,6 @@ export function SupplyChainBackground({ children }: { children: React.ReactNode 
     const mo = new MutationObserver(measure);
     mo.observe(document.body, { childList: true, subtree: true });
     return () => { window.removeEventListener("resize", measure); mo.disconnect(); };
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (raf.current) cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => setScrollY(window.scrollY));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const pattern = useMemo(() => {
@@ -166,7 +154,7 @@ export function SupplyChainBackground({ children }: { children: React.ReactNode 
 
   return (
     <div className="relative">
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
         {/* Dot grid */}
         <svg className="absolute inset-0 h-full w-full opacity-[0.05]">
           <defs>
@@ -183,8 +171,6 @@ export function SupplyChainBackground({ children }: { children: React.ReactNode 
           style={{
             width: dims.w,
             height: dims.h,
-            transform: `translateY(${-scrollY}px)`,
-            willChange: "transform",
           }}
           viewBox={`0 0 ${dims.w} ${dims.h}`}
           fill="none"

@@ -1,5 +1,6 @@
 import { HeroSection } from "@/components/sections/HeroSection";
 import { WhyNowSection } from "@/components/sections/WhyNowSection";
+import { SupplyChainFlowSection } from "@/components/sections/SupplyChainFlowSection";
 import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { TrustedBySection } from "@/components/sections/TrustedBySection";
@@ -13,6 +14,7 @@ export default function HomePage() {
     <SupplyChainBackground>
       <HeroSection />
       <WhyNowSection />
+      <SupplyChainFlowSection />
       <HowItWorksSection />
       <OutcomesSection />
       <TrustedBySection />
