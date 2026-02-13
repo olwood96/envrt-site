@@ -233,30 +233,30 @@ export default function PricingPage() {
         </FadeUp>
 
         <FadeUp delay={0.2}>
-          <SectionCard className="mx-auto mt-10 max-w-5xl overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <SectionCard className="mx-auto mt-10 max-w-5xl overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+            <table className="w-full min-w-[600px] text-left text-sm">
               <thead>
                 <tr className="border-b border-envrt-charcoal/8">
-                  <th className="px-6 py-4 text-envrt-muted font-medium">Feature</th>
-                  <th className="px-6 py-4 text-center font-semibold text-envrt-charcoal">Starter</th>
-                  <th className="px-6 py-4 text-center font-semibold text-envrt-teal">Growth</th>
-                  <th className="px-6 py-4 text-center font-semibold text-envrt-charcoal">Pro</th>
+                  <th className="px-3 sm:px-6 py-4 text-envrt-muted font-medium">Feature</th>
+                  <th className="px-2 sm:px-6 py-4 text-center font-semibold text-envrt-charcoal">Starter</th>
+                  <th className="px-2 sm:px-6 py-4 text-center font-semibold text-envrt-teal">Growth</th>
+                  <th className="px-2 sm:px-6 py-4 text-center font-semibold text-envrt-charcoal">Pro</th>
                 </tr>
               </thead>
               <tbody>
                 {pricingComparison.categories.map((cat) => (
                   <React.Fragment key={cat.name}>
                     <tr>
-                      <td colSpan={4} className="bg-envrt-charcoal/[0.02] px-6 py-3 text-xs font-semibold uppercase tracking-widest text-envrt-muted">
+                      <td colSpan={4} className="bg-envrt-charcoal/[0.02] px-3 sm:px-6 py-3 text-xs font-semibold uppercase tracking-widest text-envrt-muted">
                         {cat.name}
                       </td>
                     </tr>
                     {cat.features.map((feat) => (
                       <tr key={feat.name} className="border-b border-envrt-charcoal/4 last:border-0">
-                        <td className="px-6 py-3.5 text-envrt-charcoal/70">{feat.name}</td>
-                        <td className="px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.starter} /></span></td>
-                        <td className="px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.growth} /></span></td>
-                        <td className="px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.pro} /></span></td>
+                        <td className="px-3 sm:px-6 py-3.5 text-envrt-charcoal/70">{feat.name}</td>
+                        <td className="px-2 sm:px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.starter} /></span></td>
+                        <td className="px-2 sm:px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.growth} /></span></td>
+                        <td className="px-2 sm:px-6 py-3.5 text-center"><span className="inline-flex justify-center"><FeatureValue value={feat.pro} /></span></td>
                       </tr>
                     ))}
                   </React.Fragment>

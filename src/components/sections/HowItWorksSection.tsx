@@ -9,9 +9,10 @@ import { FadeUp } from "../ui/Motion";
 import { howItWorksSteps } from "@/lib/config";
 
 const SCREEN_Z = 30;
-const PIECE_COUNT = 69;
-const COLS = 9;
-const ROWS = Math.ceil(PIECE_COUNT / COLS);
+const DESKTOP_PIECE_COUNT = 69;
+const MOBILE_PIECE_COUNT = 20;
+const DESKTOP_COLS = 9;
+const MOBILE_COLS = 5;
 const NAV_H = 72;
 const EXPAND_PAD = 24;
 
@@ -30,29 +31,34 @@ function usePreloadMedia() {
   }, []);
 }
 
+function buildCrumbleCSS(pieceCount: number, cols: number, prefix: string) {
+  const rows = Math.ceil(pieceCount / cols);
+  let css = "";
+  for (let i = 0; i < pieceCount; i++) {
+    const c = i % cols;
+    const r = Math.floor(i / cols);
+    const x1 = (c / cols) * 100;
+    const y1 = (r / rows) * 100;
+    const x2 = Math.min(((c + 1) / cols) * 100, 100);
+    const y2 = Math.min(((r + 1) / rows) * 100, 100);
+    const cx = (c + 0.5) / cols - 0.5;
+    const xD = Math.round(cx * 350 + (Math.random() - 0.5) * 120);
+    const yD = Math.round(700 + Math.random() * 700);
+    const rot = Math.round((Math.random() - 0.5) * 140);
+    const sc = (0.04 + Math.random() * 0.25).toFixed(2);
+    const del = (r * 0.02 + c * 0.005 + Math.random() * 0.025).toFixed(3);
+    css += `.crumble-go .${prefix}-${i}{clip-path:polygon(${x1}% ${y1}%,${x2}% ${y1}%,${x2}% ${y2}%,${x1}% ${y2}%);animation:${prefix}f-${i} 1.15s ${del}s cubic-bezier(0.35,0,1,0.4) forwards}`;
+    css += `@keyframes ${prefix}f-${i}{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}8%{opacity:1}100%{transform:translate(${xD}px,${yD}px) rotate(${rot}deg) scale(${sc});opacity:0}}`;
+  }
+  return css;
+}
+
 function useInjectCrumbleCSS() {
   useEffect(() => {
-    if (document.getElementById("crumble-69")) return;
+    if (document.getElementById("crumble-all")) return;
     const el = document.createElement("style");
-    el.id = "crumble-69";
-    let css = "";
-    for (let i = 0; i < PIECE_COUNT; i++) {
-      const c = i % COLS;
-      const r = Math.floor(i / COLS);
-      const x1 = (c / COLS) * 100;
-      const y1 = (r / ROWS) * 100;
-      const x2 = Math.min(((c + 1) / COLS) * 100, 100);
-      const y2 = Math.min(((r + 1) / ROWS) * 100, 100);
-      const cx = (c + 0.5) / COLS - 0.5;
-      const xD = Math.round(cx * 350 + (Math.random() - 0.5) * 120);
-      const yD = Math.round(700 + Math.random() * 700);
-      const rot = Math.round((Math.random() - 0.5) * 140);
-      const sc = (0.04 + Math.random() * 0.25).toFixed(2);
-      const del = (r * 0.02 + c * 0.005 + Math.random() * 0.025).toFixed(3);
-      css += `.crumble-go .cp-${i}{clip-path:polygon(${x1}% ${y1}%,${x2}% ${y1}%,${x2}% ${y2}%,${x1}% ${y2}%);animation:cf-${i} 1.15s ${del}s cubic-bezier(0.35,0,1,0.4) forwards}`;
-      css += `@keyframes cf-${i}{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}8%{opacity:1}100%{transform:translate(${xD}px,${yD}px) rotate(${rot}deg) scale(${sc});opacity:0}}`;
-    }
-    el.textContent = css;
+    el.id = "crumble-all";
+    el.textContent = buildCrumbleCSS(DESKTOP_PIECE_COUNT, DESKTOP_COLS, "cp") + buildCrumbleCSS(MOBILE_PIECE_COUNT, MOBILE_COLS, "mp");
     document.head.appendChild(el);
   }, []);
 }
@@ -351,8 +357,8 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
           className={crumbling ? "crumble-go" : ""}
           style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none", display: crumbling ? "block" : "none" }}
         >
-          {Array.from({ length: PIECE_COUNT }, (_, i) => (
-            <div key={i} className={`cp-${i} absolute inset-0`} style={{ willChange: "transform, opacity" }}>
+          {Array.from({ length: isMobile ? MOBILE_PIECE_COUNT : DESKTOP_PIECE_COUNT }, (_, i) => (
+            <div key={i} className={`${isMobile ? "mp" : "cp"}-${i} absolute inset-0`} style={isMobile ? undefined : { willChange: "transform, opacity" }}>
               <div className="overflow-hidden rounded-xl border border-envrt-charcoal/8 bg-white shadow-xl shadow-envrt-green/[0.06]" style={{ width: w }}>
                 {chromeBar(false)}
                 <div className="bg-white overflow-hidden" style={{ height: contentH }}>

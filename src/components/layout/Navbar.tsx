@@ -25,7 +25,7 @@ export function Navbar() {
     <>
       <header
         className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-          showGlass ? "glass-nav py-3" : "bg-transparent py-5"
+          showGlass ? "glass-nav py-2 sm:py-3" : "bg-transparent py-3 sm:py-5"
         }`}
       >
         <Container>
@@ -35,12 +35,12 @@ export function Navbar() {
               href="/"
               className="flex items-center gap-2 text-xl font-bold tracking-tight text-envrt-charcoal"
             >
-              <div className="relative flex h-8 items-center">
+              <div className="relative flex h-6 sm:h-8 items-center">
                 <picture>
                   <img
                     src="/brand/envrt-logo.png"
                     alt={siteConfig.name}
-                    className="h-8 w-auto"
+                    className="h-6 sm:h-8 w-auto"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                       const parent = (e.target as HTMLImageElement).parentElement?.parentElement;
@@ -106,7 +106,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="glass-nav fixed inset-x-0 top-[60px] z-40 md:hidden"
+            className="glass-nav fixed inset-x-0 top-[48px] sm:top-[60px] z-40 md:hidden"
           >
             <Container>
               <div className="flex flex-col gap-1 py-4">
