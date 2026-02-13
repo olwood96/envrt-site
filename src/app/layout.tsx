@@ -20,6 +20,17 @@ export default function RootLayout({
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
+
+        {/* Hidden form for Netlify Forms bot detection — must be in server-rendered HTML */}
+        <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+          <input name="form-name" type="hidden" value="contact" />
+          <input name="bot-field" />
+          <input name="first-name" />
+          <input name="last-name" />
+          <input name="email" />
+          <input name="company" />
+          <textarea name="message" />
+        </form>
       </body>
     </html>
   );

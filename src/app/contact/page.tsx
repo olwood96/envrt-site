@@ -6,8 +6,6 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 
-const FORM_NAME = "contact";
-
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
@@ -20,6 +18,7 @@ export default function ContactPage() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.append("form-name", "contact");
 
     try {
       const res = await fetch("/", {
@@ -72,16 +71,7 @@ export default function ContactPage() {
                   </p>
                 </div>
               ) : (
-                <form
-                  name={FORM_NAME}
-                  method="POST"
-                  data-netlify="true"
-                  netlify-honeypot="bot-field"
-                  onSubmit={handleSubmit}
-                  className="space-y-5"
-                >
-                  {/* Netlify hidden fields */}
-                  <input type="hidden" name="form-name" value={FORM_NAME} />
+                <form onSubmit={handleSubmit} className="space-y-5">
                   <p className="hidden">
                     <label>
                       Don&apos;t fill this out: <input name="bot-field" />
