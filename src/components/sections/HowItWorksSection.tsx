@@ -246,14 +246,43 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
   useEffect(() => {
     if (!crumbling) return;
     const t = setTimeout(() => {
+      // Capture target position before resetting state
+      const targetTop = basePos ? basePos.top : 0;
+
       setCrumbling(false);
       setExpanded(false);
       setDrag({ x: 0, y: 0 });
       setSize({ dw: 0, dh: 0, dx: 0, dy: 0 });
       setSnapshotUrl(null);
+
+      // Whiz down: start above viewport, fly to resting position
+      const el = containerRef.current;
+      if (el) {
+        const scrollY = window.scrollY;
+        const startTop = scrollY - 200; // above the visible viewport
+        // Jump to start position with no transition
+        el.style.transition = "none";
+        el.style.top = `${startTop}px`;
+        el.style.opacity = "0";
+        el.style.transform = "scale(0.88) rotate(-2deg)";
+        // Force reflow so the jump is applied before the animation
+        void el.offsetHeight;
+        // Animate to resting position
+        el.style.transition = "top 0.65s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.35s ease-out, transform 0.65s cubic-bezier(0.22, 1.2, 0.36, 1)";
+        el.style.top = `${targetTop}px`;
+        el.style.opacity = "1";
+        el.style.transform = "scale(1) rotate(0deg)";
+        // Clean up inline styles after animation
+        const cleanup = setTimeout(() => {
+          el.style.transition = "";
+          el.style.opacity = "";
+          el.style.transform = "";
+        }, 700);
+        return () => clearTimeout(cleanup);
+      }
     }, 1800);
     return () => clearTimeout(t);
-  }, [crumbling]);
+  }, [crumbling, basePos]);
 
   /* ---- EXPAND ---- */
   const handleExpand = useCallback(() => {

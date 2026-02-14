@@ -23,7 +23,6 @@ export const heroContent = {
   subheadline:
     "Create regulation-ready Digital Product Passports, calculate CO₂e and water scarcity metrics and share sustainability data with your customers, all in one place.",
   ctaPrimary: { label: "Book a demo", href: "/contact" },
-  ctaSecondary: { label: "View example DPP", href: "/demo" },
   videoLabel: "Example Digital Product Passport",
   videoSrc: "/videos/dpp-demo.mp4",
 };
