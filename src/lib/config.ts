@@ -67,7 +67,7 @@ export const howItWorksSteps = [
       "Support for complex multi-material garments",
       "Bulk upload for large collections",
     ],
-    mockImage: "/mock/howitworks-collect.mp4",
+    mockImage: "/mock/howitworks-collect.png",
   },
   {
     id: "assess",
@@ -93,7 +93,7 @@ export const howItWorksSteps = [
       "Water scarcity (AWARE method)",
       "Comparison against category benchmarks",
     ],
-    mockImage: "/mock/howitworks-calculate.mp4",
+    mockImage: "/mock/howitworks-calculate.png",
   },
   {
     id: "publish",
