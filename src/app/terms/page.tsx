@@ -370,7 +370,7 @@ export default function TermsPage() {
                   connection with these terms is limited to the fees paid by you in
                   the{" "}
                   <strong>
-                    [12&nbsp;months / amount specified in order form]
+                    12&nbsp;months
                   </strong>{" "}
                   preceding the event giving rise to the claim.
                 </li>
@@ -419,8 +419,7 @@ export default function TermsPage() {
                 </li>
                 <li>
                   On termination, your access to the dashboard will be removed. We
-                  will provide a reasonable window for you to export your data.{" "}
-                  <strong>[Placeholder: specify export period, e.g. 30 days.]</strong>
+                  will provide a reasonable window (30 days) for you to export your data.{" "}
                 </li>
                 <li>
                   After the export window, we will delete or anonymise your data in
