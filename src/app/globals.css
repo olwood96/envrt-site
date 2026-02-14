@@ -140,9 +140,6 @@ body {
 
 /* ── Liquid Glass navbar (iOS 26 — bottom-edge refraction) ── */
 .glass-nav {
-  /* SVG bottom-edge refraction → heavy blur → colour boost.
-     On browsers/devices that don't support url() in backdrop-filter,
-     the @supports fallback below kicks in. */
   backdrop-filter:
     url(#liquid-glass-refract)
     blur(28px)
@@ -156,7 +153,6 @@ body {
     brightness(1.08)
     contrast(1.05);
 
-  /* Layered glass: bright specular top → translucent body */
   background:
     linear-gradient(
       180deg,
@@ -165,13 +161,11 @@ body {
       rgba(248, 247, 244, 0.22) 100%
     );
 
-  /* Specular top rim + soft side/bottom borders */
   border-top: 1.5px solid rgba(255, 255, 255, 0.85);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   border-left: 1px solid rgba(255, 255, 255, 0.4);
   border-right: 1px solid rgba(255, 255, 255, 0.4);
 
-  /* Inset specular + prismatic glow + depth */
   box-shadow:
     0 1.5px 0 0 rgba(255, 255, 255, 0.7) inset,
     0 -1px 0 0 rgba(0, 0, 0, 0.04) inset,
@@ -180,27 +174,10 @@ body {
     0 8px 32px -4px rgba(0, 0, 0, 0.1),
     0 2px 6px 0 rgba(0, 0, 0, 0.04);
 
-  /* Animated prismatic shimmer */
   animation: glass-shimmer 6s ease-in-out infinite;
 }
 
-/* Mobile: SVG url() in backdrop-filter is unreliable on iOS Safari / Android.
-   Use heavier blur + more opaque background to compensate for missing refraction. */
-@media (max-width: 767px) {
-  .glass-nav {
-    backdrop-filter: blur(32px) saturate(1.8) brightness(1.06);
-    -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.06);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.6) 0%,
-        rgba(255, 255, 255, 0.2) 45%,
-        rgba(248, 247, 244, 0.3) 100%
-      );
-  }
-}
-
-/* Fallback for browsers that don't support url() in backdrop-filter */
+/* Fallback: browsers that don't support url() in backdrop-filter */
 @supports not (backdrop-filter: url(#x) blur(1px)) {
   .glass-nav {
     backdrop-filter: blur(32px) saturate(1.8) brightness(1.08);
@@ -208,30 +185,26 @@ body {
   }
 }
 
-/* ── Mobile menu — higher opacity for readability ── */
+/* ── Solid header — used when mobile menu is open ── */
+.glass-nav-solid {
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(248, 247, 244, 0.97);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ── Mobile dropdown menu — opaque for readability ── */
 .glass-nav-menu {
-  backdrop-filter: blur(32px) saturate(1.6) brightness(1.04);
-  -webkit-backdrop-filter: blur(32px) saturate(1.6) brightness(1.04);
-
-  /* Much more opaque so menu items are easily readable */
-  background:
-    linear-gradient(
-      180deg,
-      rgba(248, 247, 244, 0.92) 0%,
-      rgba(248, 247, 244, 0.88) 100%
-    );
-
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(248, 247, 244, 0.97);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
-
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
     0 8px 32px -4px rgba(0, 0, 0, 0.1),
     0 2px 6px 0 rgba(0, 0, 0, 0.04);
 }
 
-/* Prismatic shimmer — cycles glow colours like light through a prism */
+/* Prismatic shimmer keyframes */
 @keyframes glass-shimmer {
   0%, 100% {
     box-shadow:
