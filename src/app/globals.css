@@ -184,19 +184,12 @@ body {
   animation: glass-shimmer 6s ease-in-out infinite;
 }
 
-/* Mobile: SVG url() in backdrop-filter is unreliable on iOS Safari / Android.
-   Use heavier blur + more opaque background to compensate for missing refraction. */
+/* Mobile: near-fully opaque navbar for readability */
 @media (max-width: 767px) {
   .glass-nav {
     backdrop-filter: blur(32px) saturate(1.8) brightness(1.06);
     -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.06);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.6) 0%,
-        rgba(255, 255, 255, 0.2) 45%,
-        rgba(248, 247, 244, 0.3) 100%
-      );
+    background: rgba(248, 247, 244, 0.95);
   }
 }
 
@@ -213,13 +206,8 @@ body {
   backdrop-filter: blur(32px) saturate(1.6) brightness(1.04);
   -webkit-backdrop-filter: blur(32px) saturate(1.6) brightness(1.04);
 
-  /* Much more opaque so menu items are easily readable */
-  background:
-    linear-gradient(
-      180deg,
-      rgba(248, 247, 244, 0.92) 0%,
-      rgba(248, 247, 244, 0.88) 100%
-    );
+  /* Near-fully opaque so menu items are easily readable */
+  background: rgba(248, 247, 244, 0.97);
 
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   border-left: 1px solid rgba(255, 255, 255, 0.3);
