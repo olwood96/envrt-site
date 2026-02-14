@@ -106,7 +106,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="glass-nav fixed inset-x-0 top-[48px] sm:top-[60px] z-40 md:hidden"
+            className="glass-nav-menu fixed inset-x-0 top-[48px] sm:top-[60px] z-40 md:hidden"
           >
             <Container>
               <div className="flex flex-col gap-1 py-4">
