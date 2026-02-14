@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
@@ -27,19 +27,92 @@ function FeatureValue({ value }: { value: boolean | string }) {
   return <span className="text-sm text-envrt-charcoal">{value}</span>;
 }
 
+function useNudge(intervalMs = 3500) {
+  const [nudge, setNudge] = useState(false);
+  const hoveredRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      if (hoveredRef.current) return;
+      setNudge(true);
+      setTimeout(() => setNudge(false), 700);
+    }, intervalMs);
+    return () => clearInterval(timerRef.current);
+  }, [intervalMs]);
+
+  const onEnter = () => {
+    hoveredRef.current = true;
+    setNudge(false);
+  };
+  const onLeave = () => {
+    hoveredRef.current = false;
+  };
+
+  return { nudge, onEnter, onLeave };
+}
+
+const GBP_TO_EUR = 1.18;
+const ANNUAL_DISCOUNT = 0.15;
+
+type Currency = "GBP" | "EUR";
+type Interval = "monthly" | "annual";
+
+function formatPrice(amount: number, currency: Currency): string {
+  const symbol = currency === "GBP" ? "\u00A3" : "\u20AC";
+  return `${symbol}${Math.round(amount).toLocaleString("en-GB")}`;
+}
+
+function Toggle({
+  options,
+  active,
+  onChange,
+  badge,
+}: {
+  options: [string, string];
+  active: 0 | 1;
+  onChange: (i: 0 | 1) => void;
+  badge?: string;
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-envrt-charcoal/8 bg-envrt-cream/60 p-1">
+      {options.map((label, i) => (
+        <button
+          key={label}
+          onClick={() => onChange(i as 0 | 1)}
+          className={`relative rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+            active === i
+              ? "bg-white text-envrt-charcoal shadow-sm"
+              : "text-envrt-muted hover:text-envrt-charcoal/70"
+          }`}
+        >
+          {label}
+          {i === 1 && badge && active === 1 && (
+            <span className="ml-1.5 inline-block rounded-full bg-envrt-teal/10 px-1.5 py-0.5 text-[9px] font-semibold text-envrt-teal">
+              {badge}
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const pricingPlans = [
   {
     name: "Starter",
     subheading: "Your DPP Hub",
-    price: "£149",
-    period: " / month",
-    description: "Ideal for brands needing fast, compliant Digital Product Passports.",
+    priceGBP: 149,
+    description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
-      "Digital Product Passports: Limited Allocation",
-      "AI-assisted reconstruction of primary fibre-to-assembly stages",
-      "CO₂e and AWARE water scarcity impact indicators mapped for DPP compliance",
+      "Up to 25 DPP pages",
       "QR-ready passport pages",
-      "Optional ENVRT Marketplace onboarding",
+      "Traceability score per product",
+      "Evidence uploads and product documentation",
+      "Auto-generated disclosures and templates",
+      "CO\u2082e and AWARE water scarcity indicators",
+      "Fibre-to-assembly supply chain reconstruction",
+      "Email support with onboarding call",
     ],
     cta: "Get Started",
     highlighted: false,
@@ -47,17 +120,19 @@ const pricingPlans = [
   {
     name: "Growth",
     subheading: "Your Impact Analyst",
-    price: "£495",
-    period: " / month",
+    priceGBP: 495,
     description:
-      "For brands ready to measure, compare and improve their environmental impact with richer data and deeper visibility.",
+      "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
-      "Digital Product Passports: Expanded Allocation",
-      "Enhanced supply-chain modelling with detailed process-level reconstruction",
-      "CO₂e, AWARE water scarcity and core LCA metrics",
-      "Verification-grade DPPs with expanded product data",
-      "Product dashboard with hotspot detection and comparisons",
-      "Entry-level decarbonisation strategies",
+      "Up to 100 DPP pages",
+      "Expanded product data in DPP",
+      "Core LCA metrics beyond indicators",
+      "Process-level supply chain reconstruction",
+      "Hotspot detection across lifecycle stages",
+      "Product comparisons",
+      "Entry-level decarbonisation guidance",
+      "Stage-linked evidence library",
+      "Hotspot insights with reduction opportunities",
       "Priority support",
     ],
     cta: "Get Started",
@@ -66,18 +141,18 @@ const pricingPlans = [
   {
     name: "Pro",
     subheading: "Your Sustainability Team",
-    price: "£1,295",
-    period: " / month",
+    priceGBP: 1295,
     description:
-      "Full-scale environmental intelligence, advanced modelling and strategic decarbonisation support for low-impact collections.",
+      "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
-      "Digital Product Passports: Unlimited",
-      "Unlimited full LCAs + complete PEF-aligned metrics",
+      "Custom DPP allocation",
+      "Complete PEF-aligned metrics",
+      "Advanced modelling and optimisation frameworks",
       "Seasonal product-line impact reports",
-      "Design-stage eco-modelling and material pathway evaluation",
-      "Supplier, logistics and process optimisation frameworks",
-      "Eco-design strategy and compliant sustainability claims support",
+      "Eco-design strategy and claims support",
       "Dedicated account specialist",
+      "Supplier follow-up and data-chasing assistance",
+      "Fast-response SLA with weekly reviews",
     ],
     cta: "Get Started",
     highlighted: false,
@@ -87,58 +162,76 @@ const pricingPlans = [
 const pricingComparison = {
   categories: [
     {
-      name: "DPP creation",
+      name: "DPP Creation",
       features: [
-        { name: "Digital Product Passports (allocation)", starter: "Up to 25", growth: "Up to 100", pro: "Custom" },
+        { name: "DPP page allocation", starter: "Up to 25", growth: "Up to 100", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
+        { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
       ],
     },
     {
-      name: "Supply chain modelling",
+      name: "Traceability and Evidence",
       features: [
-        { name: "AI-assisted reconstruction (fibre-to-assembly)", starter: true, growth: true, pro: true },
-        { name: "Detailed process-level reconstruction", starter: false, growth: true, pro: true },
-        { name: "Advanced modelling + optimisation frameworks", starter: false, growth: false, pro: true },
+        { name: "Traceability score per product", starter: true, growth: true, pro: true },
+        { name: "Evidence uploads and product documentation", starter: true, growth: true, pro: true },
+        { name: "Stage-linked evidence library", starter: false, growth: true, pro: true },
+      ],
+    },
+    {
+      name: "Supply Chain Modelling",
+      features: [
+        { name: "Fibre-to-assembly supply chain reconstruction", starter: true, growth: true, pro: true },
+        { name: "Process-level supply chain reconstruction", starter: false, growth: true, pro: true },
+        { name: "Advanced modelling and optimisation frameworks", starter: false, growth: false, pro: true },
       ],
     },
     {
       name: "Metrics",
       features: [
-        { name: "CO₂e indicators", starter: true, growth: true, pro: true },
+        { name: "CO\u2082e indicators", starter: true, growth: true, pro: true },
         { name: "AWARE water scarcity indicators", starter: true, growth: true, pro: true },
-        { name: "Core LCA metrics (beyond indicators)", starter: false, growth: true, pro: true },
+        { name: "Core LCA metrics beyond indicators", starter: false, growth: true, pro: true },
         { name: "Complete PEF-aligned metrics", starter: false, growth: false, pro: true },
       ],
     },
     {
-      name: "Dashboard & insights",
+      name: "Dashboard and Insights",
       features: [
-        { name: "Product dashboard", starter: true, growth: true, pro: true },
-        { name: "Hotspot detection", starter: false, growth: true, pro: true },
+        { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
+        { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
+        { name: "Collection summaries with CSV/PDF exports", starter: false, growth: true, pro: true },
         { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true },
       ],
     },
     {
-      name: "Strategy & support",
+      name: "Strategy and Decarbonisation",
       features: [
-        { name: "Priority support", starter: false, growth: true, pro: true },
-        { name: "Entry-level decarbonisation strategies", starter: false, growth: true, pro: true },
-        { name: "Eco-design strategy + claims support", starter: false, growth: false, pro: true },
-        { name: "Dedicated account specialist", starter: false, growth: false, pro: true },
+        { name: "Entry-level decarbonisation guidance", starter: false, growth: true, pro: true },
+        { name: "Eco-design strategy and claims support", starter: false, growth: false, pro: true },
       ],
     },
     {
-      name: "Marketplace",
+      name: "Support",
       features: [
-        { name: "Optional ENVRT Marketplace onboarding", starter: true, growth: true, pro: true },
+        { name: "Email support", starter: true, growth: true, pro: true },
+        { name: "Onboarding call", starter: true, growth: true, pro: true },
+        { name: "Priority support", starter: false, growth: true, pro: true },
+        { name: "Supplier follow-up and data-chasing assistance", starter: false, growth: false, pro: true },
+        { name: "Dedicated account specialist", starter: false, growth: false, pro: true },
+        { name: "Weekly reviews", starter: false, growth: false, pro: true },
+        { name: "Fast-response SLA", starter: false, growth: false, pro: true },
       ],
     },
   ],
 } as const;
 
 export default function PricingPage() {
+  const { nudge, onEnter, onLeave } = useNudge(3500);
+  const [currency, setCurrency] = useState<Currency>("GBP");
+  const [interval, setInterval_] = useState<Interval>("monthly");
+
   return (
     <div className="pt-28 pb-16">
       <Container>
@@ -154,16 +247,39 @@ export default function PricingPage() {
           </div>
         </FadeUp>
 
-        {/* Plan cards — subheading inside card, matching preview section */}
+        <FadeUp delay={0.05}>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Toggle
+              options={["GBP", "EUR"]}
+              active={currency === "GBP" ? 0 : 1}
+              onChange={(i) => setCurrency(i === 0 ? "GBP" : "EUR")}
+            />
+            <Toggle
+              options={["Monthly", "Annual"]}
+              active={interval === "monthly" ? 0 : 1}
+              onChange={(i) => setInterval_(i === 0 ? "monthly" : "annual")}
+              badge="Save 15%"
+            />
+          </div>
+        </FadeUp>
+
+        {/* Plan cards */}
         <StaggerChildren className="mt-14 grid gap-5 lg:grid-cols-3">
-          {pricingPlans.map((plan) => (
+          {pricingPlans.map((plan) => {
+              let price = plan.priceGBP;
+              if (currency === "EUR") price = price * GBP_TO_EUR;
+              if (interval === "annual") price = price * (1 - ANNUAL_DISCOUNT);
+
+              return (
             <StaggerItem key={plan.name}>
               <div
+                onMouseEnter={plan.highlighted ? onEnter : undefined}
+                onMouseLeave={plan.highlighted ? onLeave : undefined}
                 className={`relative flex flex-col rounded-2xl border p-8 transition-all duration-300 ${
                   plan.highlighted
                     ? "border-envrt-teal/30 bg-white shadow-xl shadow-envrt-teal/5"
                     : "border-envrt-charcoal/5 bg-white hover:border-envrt-charcoal/10"
-                }`}
+                } ${plan.highlighted && nudge ? "animate-nudge" : ""}`}
               >
                 {plan.highlighted && (
                   <div className="absolute -top-3 left-6 rounded-full bg-envrt-teal px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
@@ -179,10 +295,12 @@ export default function PricingPage() {
                 </div>
 
                 <div className="mt-5">
-                  <span className="text-3xl font-bold text-envrt-charcoal">
-                    {plan.price}
+                  <span className="text-3xl font-bold text-envrt-charcoal transition-all duration-300">
+                    {formatPrice(interval === "annual" ? price * 12 : price, currency)}
                   </span>
-                  <span className="text-sm text-envrt-muted">{plan.period}</span>
+                  <span className="text-sm text-envrt-muted">
+                    {interval === "annual" ? " / year" : " / month"}
+                  </span>
                 </div>
 
                 <p className="mt-3 text-sm text-envrt-muted">{plan.description}</p>
@@ -210,7 +328,8 @@ export default function PricingPage() {
                 </div>
               </div>
             </StaggerItem>
-          ))}
+              );
+            })}
         </StaggerChildren>
 
         <FadeUp delay={0.12}>
@@ -267,6 +386,43 @@ export default function PricingPage() {
           </SectionCard>
         </FadeUp>
       </Container>
+
+      {/* Nudge keyframes */}
+      <style jsx global>{`
+        @keyframes nudge {
+          0%,
+          100% {
+            transform: translateX(0) rotate(0deg);
+          }
+          10% {
+            transform: translateX(-4px) rotate(-0.7deg);
+          }
+          20% {
+            transform: translateX(4px) rotate(0.7deg);
+          }
+          30% {
+            transform: translateX(-4px) rotate(-0.7deg);
+          }
+          40% {
+            transform: translateX(4px) rotate(0.7deg);
+          }
+          50% {
+            transform: translateX(-3px) rotate(-0.5deg);
+          }
+          60% {
+            transform: translateX(3px) rotate(0.5deg);
+          }
+          70% {
+            transform: translateX(-2px) rotate(-0.3deg);
+          }
+          80% {
+            transform: translateX(1px) rotate(0);
+          }
+        }
+        .animate-nudge {
+          animation: nudge 0.6s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
