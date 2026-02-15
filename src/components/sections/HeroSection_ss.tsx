@@ -4,9 +4,87 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
-import { VideoFrame } from "../ui/VideoFrame";
 import { FadeUp } from "../ui/Motion";
 import { heroContent } from "@/lib/config";
+
+function PhoneMockup({ src }: { src: string }) {
+  const screenRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const update = () => {
+      if (screenRef.current) {
+        setScale(screenRef.current.offsetWidth / 375);
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    if (screenRef.current) observer.observe(screenRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
+      {/* Phone outer shell */}
+      <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-2xl">
+        {/* Status bar — white with black text */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5" style={{ height: 22 }}>
+          <span className="text-[9px] font-semibold leading-none text-envrt-charcoal">21:37</span>
+          <div className="w-[72px]" />
+          <div className="flex items-center gap-[4px]">
+            <svg width="12" height="9" viewBox="0 0 14 10" fill="none" className="text-envrt-charcoal">
+              <rect x="0" y="7" width="2.5" height="3" rx="0.5" fill="currentColor" />
+              <rect x="3.5" y="5" width="2.5" height="5" rx="0.5" fill="currentColor" />
+              <rect x="7" y="2.5" width="2.5" height="7.5" rx="0.5" fill="currentColor" />
+              <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" />
+            </svg>
+            <svg width="11" height="9" viewBox="0 0 13 10" fill="none" className="text-envrt-charcoal">
+              <path d="M6.5 8.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" fill="currentColor" />
+              <path d="M4 7.2a3.5 3.5 0 0 1 5 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              <path d="M1.8 4.8a6.5 6.5 0 0 1 9.4 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+            <span className="text-[8px] font-medium leading-none text-envrt-charcoal">69</span>
+            <div className="flex items-center gap-[1px]">
+              <div className="relative h-[8px] w-[17px] rounded-[2px] border border-envrt-charcoal/80">
+                <div className="absolute inset-[1px] rounded-[1px] bg-envrt-charcoal" style={{ width: "69%" }} />
+              </div>
+              <div className="h-[3px] w-[1px] rounded-r-full bg-envrt-charcoal/80" />
+            </div>
+          </div>
+        </div>
+        {/* Notch / dynamic island */}
+        <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
+        {/* Full-screen iframe area — content starts below status bar, scrolls up behind it */}
+        <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem]" style={{ aspectRatio: "9 / 19" }}>
+          <div className="absolute inset-0 overflow-hidden">
+            <iframe
+              src={src}
+              title="Digital Product Passport"
+              className="absolute border-0"
+              style={{
+                top: 0,
+                left: 0,
+                width: "375px",
+                height: "812px",
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                overflow: "auto",
+                WebkitOverflowScrolling: "touch",
+                paddingTop: "22px",
+              }}
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-popups"
+            />
+          </div>
+        </div>
+      </div>
+      {/* Try it out note */}
+      <p className="mt-3 text-center text-xs text-envrt-muted/60">
+        ↕ Scroll to explore the live DPP
+      </p>
+    </div>
+  );
+}
 
 export function HeroSection() {
   const phoneRef = useRef<HTMLDivElement>(null);
@@ -46,14 +124,14 @@ export function HeroSection() {
           <FadeUp delay={0.3}>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={heroContent.ctaPrimary.href} size="lg">{heroContent.ctaPrimary.label}<span className="ml-2">→</span></Button>
-              <Button href={heroContent.ctaSecondary.href} variant="secondary" size="lg">{heroContent.ctaSecondary.label}</Button>
+
             </div>
           </FadeUp>
         </div>
         <FadeUp delay={0.2}>
           {/* Outer wrapper handles full-bleed on mobile */}
           <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-[100vw] px-6 pb-12 sm:px-10 sm:pb-14 lg:static lg:ml-0 lg:mr-0 lg:w-auto lg:px-0 lg:pb-0 lg:pl-4">
-            {/* Inner wrapper — this is the positioning anchor for all elements */}
+            {/* Inner wrapper — positioning anchor for all elements */}
             <div ref={phoneRef} className="relative mx-auto max-w-md lg:max-w-none">
               {/* Jacket image — 70% of phone height, top-left */}
               {phoneHeight > 0 && (
@@ -94,9 +172,9 @@ export function HeroSection() {
                   />
                 </div>
               )}
-              {/* Phone mockup on top */}
+              {/* Live DPP in phone mockup */}
               <div className="relative z-10">
-                <VideoFrame src={heroContent.videoSrc} />
+                <PhoneMockup src="https://dpp.envrt.com/dpp/angry_pablo/40-00-06-03" />
               </div>
             </div>
           </div>

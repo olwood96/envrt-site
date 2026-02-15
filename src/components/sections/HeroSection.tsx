@@ -89,6 +89,8 @@ function PhoneMockup({ src }: { src: string }) {
 export function HeroSection() {
   const phoneRef = useRef<HTMLDivElement>(null);
   const [phoneHeight, setPhoneHeight] = useState(0);
+  const [nudge, setNudge] = useState(false);
+  const hoverRef = useRef(false);
 
   const updateHeight = useCallback(() => {
     if (phoneRef.current) {
@@ -102,6 +104,17 @@ export function HeroSection() {
     if (phoneRef.current) observer.observe(phoneRef.current);
     return () => observer.disconnect();
   }, [updateHeight]);
+
+  // Periodic wiggle on the QR code
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!hoverRef.current) {
+        setNudge(true);
+        setTimeout(() => setNudge(false), 600);
+      }
+    }, 3500);
+    return () => clearInterval(id);
+  }, []);
 
   const jacketHeight = phoneHeight * 0.7;
   const qrHeight = phoneHeight * 0.3;
@@ -155,22 +168,29 @@ export function HeroSection() {
               )}
               {/* QR code — 30% of phone height, bottom-right */}
               {phoneHeight > 0 && (
-                <div
-                  className="absolute z-[1] rotate-[12deg]"
+                <a
+                  href="https://dpp.envrt.com/dpp/angry_pablo/40-00-06-03"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`absolute z-20 cursor-pointer qr-link ${nudge ? "animate-qr-nudge" : ""}`}
                   style={{
+                    width: qrHeight,
                     height: qrHeight,
                     bottom: "2%",
                     right: "-8%",
+                    transform: "rotate(12deg)",
                   }}
+                  onMouseEnter={() => { hoverRef.current = true; setNudge(false); }}
+                  onMouseLeave={() => { hoverRef.current = false; }}
                 >
                   <Image
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     width={320}
                     height={320}
-                    className="h-full w-auto object-contain drop-shadow-lg"
+                    className="h-full w-full object-contain drop-shadow-lg"
                   />
-                </div>
+                </a>
               )}
               {/* Live DPP in phone mockup */}
               <div className="relative z-10">
@@ -180,6 +200,30 @@ export function HeroSection() {
           </div>
         </FadeUp>
       </div>
+
+      {/* QR wiggle keyframes — matches Growth card nudge */}
+      <style jsx global>{`
+        @keyframes qr-nudge {
+          0%, 100% { transform: translateX(0) rotate(12deg); }
+          10% { transform: translateX(-4px) rotate(11.3deg); }
+          20% { transform: translateX(4px) rotate(12.7deg); }
+          30% { transform: translateX(-4px) rotate(11.3deg); }
+          40% { transform: translateX(4px) rotate(12.7deg); }
+          50% { transform: translateX(-3px) rotate(11.5deg); }
+          60% { transform: translateX(3px) rotate(12.5deg); }
+          70% { transform: translateX(-2px) rotate(11.7deg); }
+          80% { transform: translateX(1px) rotate(12deg); }
+        }
+        .animate-qr-nudge {
+          animation: qr-nudge 0.6s ease-in-out;
+        }
+        .qr-link {
+          transition: transform 0.2s ease;
+        }
+        .qr-link:hover {
+          transform: rotate(12deg) scale(1.1) !important;
+        }
+      `}</style>
     </section>
   );
 }
