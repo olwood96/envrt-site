@@ -9,6 +9,7 @@ import { FadeUp } from "../ui/Motion";
 import { howItWorksSteps } from "@/lib/config";
 
 const SCREEN_Z = 30;
+const ANIM_DURATION = 1200; // ms — unified runtime for all verb animations
 const DESKTOP_PIECE_COUNT = 69;
 const MOBILE_PIECE_COUNT = 20;
 const DESKTOP_COLS = 9;
@@ -83,17 +84,446 @@ function useScrollLock(locked: boolean) {
   }, [locked]);
 }
 
+/* =====================================================
+   VERB BUTTON ANIMATIONS
+   ===================================================== */
+
+// --- COLLECT: fragments scatter then reassemble ---
+function CollectAnimation({ btnRect, onDone }: { btnRect: DOMRect; onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d")!;
+    const cx = btnRect.left + btnRect.width / 2;
+    const cy = btnRect.top + btnRect.height / 2;
+
+    // Create fragments that start at screen edges and fly inward
+    const FRAG_COUNT = 28;
+    const W = canvas.width;
+    const H = canvas.height;
+    const frags = Array.from({ length: FRAG_COUNT }, () => {
+      // Pick a random screen edge: 0=top, 1=right, 2=bottom, 3=left
+      const edge = Math.floor(Math.random() * 4);
+      let startX: number, startY: number;
+      switch (edge) {
+        case 0: startX = Math.random() * W; startY = -10; break;       // top
+        case 1: startX = W + 10; startY = Math.random() * H; break;    // right
+        case 2: startX = Math.random() * W; startY = H + 10; break;    // bottom
+        default: startX = -10; startY = Math.random() * H; break;      // left
+      }
+      return {
+        startX,
+        startY,
+        endX: cx + (Math.random() - 0.5) * btnRect.width * 0.6,
+        endY: cy + (Math.random() - 0.5) * btnRect.height * 0.6,
+        size: 3 + Math.random() * 6,
+        delay: Math.random() * 0.3,
+        hue: 150 + Math.random() * 30, // envrt green-teal range
+      };
+    });
+
+    const start = performance.now();
+    let raf: number;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / ANIM_DURATION, 1);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      frags.forEach((f) => {
+        const ft = Math.max(0, Math.min((t - f.delay) / (1 - f.delay), 1));
+        // Ease in with overshoot at end
+        const ease = ft < 0.7
+          ? Math.pow(ft / 0.7, 0.4)
+          : 1 + Math.sin((ft - 0.7) / 0.3 * Math.PI) * 0.08;
+        const x = f.startX + (f.endX - f.startX) * ease;
+        const y = f.startY + (f.endY - f.startY) * ease;
+        const alpha = ft < 0.1 ? ft / 0.1 : ft > 0.85 ? Math.max(0, (1 - ft) / 0.15) : 1;
+        const scale = ft > 0.8 ? 1 - (ft - 0.8) / 0.2 * 0.5 : 1;
+
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.translate(x, y);
+        ctx.rotate((1 - ft) * (f.delay > 0.15 ? 2 : -2));
+        // Draw rounded rect fragment
+        const s = f.size * scale;
+        ctx.beginPath();
+        ctx.roundRect(-s / 2, -s / 2, s, s, 1.5);
+        ctx.fillStyle = `hsla(${f.hue}, 60%, 50%, 1)`;
+        ctx.fill();
+        // Glow trail
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = `hsla(${f.hue}, 70%, 60%, 0.5)`;
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Flash at end when all pieces "click" together
+      if (t > 0.7 && t < 0.85) {
+        const flashT = (t - 0.7) / 0.15;
+        ctx.save();
+        ctx.globalAlpha = (1 - flashT) * 0.25;
+        ctx.beginPath();
+        ctx.arc(cx, cy, btnRect.width * 0.6 * flashT + 10, 0, Math.PI * 2);
+        ctx.fillStyle = "#2dd4a0";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (t < 1) raf = requestAnimationFrame(animate);
+      else onDone();
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [btnRect, onDone]);
+
+  return createPortal(
+    <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />,
+    document.body
+  );
+}
+
+// --- ASSESS: magnifying glass scans over the button ---
+function AssessAnimation({ btnRect, onDone }: { btnRect: DOMRect; onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d")!;
+    const cx = btnRect.left + btnRect.width / 2;
+    const cy = btnRect.top + btnRect.height / 2;
+    const glassRadius = Math.max(btnRect.width, btnRect.height) * 0.7;
+
+    const start = performance.now();
+    let raf: number;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / ANIM_DURATION, 1);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Glass enters from left, sweeps across, exits right
+      const enterExit = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+      const sweepX = cx + (t - 0.5) * btnRect.width * 0.5;
+      const sweepY = cy + Math.sin(t * Math.PI * 2) * 4;
+      const alpha = Math.min(enterExit, 1);
+      const pulse = 1 + Math.sin(t * Math.PI * 4) * 0.06;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Magnified distortion ring
+      const r = glassRadius * pulse;
+      ctx.beginPath();
+      ctx.arc(sweepX, sweepY, r, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(45, 212, 160, 0.35)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Inner lens
+      ctx.beginPath();
+      ctx.arc(sweepX, sweepY, r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(45, 212, 160, 0.06)";
+      ctx.fill();
+
+      // Glass rim with shine
+      ctx.beginPath();
+      ctx.arc(sweepX, sweepY, r, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Handle
+      const handleAngle = Math.PI * 0.25;
+      const hx1 = sweepX + Math.cos(handleAngle) * r;
+      const hy1 = sweepY + Math.sin(handleAngle) * r;
+      const hx2 = hx1 + Math.cos(handleAngle) * (r * 0.6);
+      const hy2 = hy1 + Math.sin(handleAngle) * (r * 0.6);
+      ctx.beginPath();
+      ctx.moveTo(hx1, hy1);
+      ctx.lineTo(hx2, hy2);
+      ctx.strokeStyle = "rgba(45, 212, 160, 0.6)";
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Scanning grid lines inside lens
+      const gridCount = 5;
+      ctx.globalAlpha = alpha * 0.2;
+      for (let i = 0; i < gridCount; i++) {
+        const offset = ((t * 200 + i * (r * 2 / gridCount)) % (r * 2)) - r;
+        ctx.beginPath();
+        ctx.moveTo(sweepX - r, sweepY + offset);
+        ctx.lineTo(sweepX + r, sweepY + offset);
+        ctx.strokeStyle = "#2dd4a0";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Pulse rings
+      ctx.globalAlpha = alpha;
+      for (let p = 0; p < 3; p++) {
+        const pt = (t * 3 + p * 0.33) % 1;
+        const pr = r * (1 + pt * 0.4);
+        ctx.beginPath();
+        ctx.arc(sweepX, sweepY, pr, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(45, 212, 160, ${(1 - pt) * 0.15})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      if (t < 1) raf = requestAnimationFrame(animate);
+      else onDone();
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [btnRect, onDone]);
+
+  return createPortal(
+    <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />,
+    document.body
+  );
+}
+
+// --- CALCULATE: Matrix-style number rain ---
+function CalculateAnimation({ onDone }: { btnRect: DOMRect; onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+    const ctx = canvas.getContext("2d")!;
+    ctx.scale(dpr, dpr);
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const fontSize = 14;
+    const cols = Math.ceil(W / fontSize);
+    const chars = "01234567890ABCDEFΣΔπ∫∂√±×÷=≈≠∞%#{}[];".split("");
+    const drops = Array.from({ length: cols }, () => -Math.random() * 30);
+    const speeds = Array.from({ length: cols }, () => 0.3 + Math.random() * 0.7);
+
+    const start = performance.now();
+    let raf: number;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / ANIM_DURATION, 1);
+
+      // Fade in/out
+      const fadeAlpha = t < 0.1 ? t / 0.1 : t > 0.75 ? (1 - t) / 0.25 : 1;
+
+      // Clear fully each frame for transparency
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.font = `bold ${fontSize}px monospace`;
+      for (let i = 0; i < cols; i++) {
+        const x = i * fontSize;
+
+        // Draw a fading trail of characters above the head
+        const trailLen = 12;
+        for (let tr = trailLen; tr >= 0; tr--) {
+          const trY = (drops[i] - tr) * fontSize;
+          if (trY < 0 || trY > H) continue;
+          const trailChar = chars[Math.floor(Math.random() * chars.length)];
+          const trAlpha = fadeAlpha * ((trailLen - tr) / trailLen) * (tr === 0 ? 0.95 : 0.35);
+          ctx.fillStyle = tr === 0
+            ? `rgba(45, 212, 160, ${trAlpha})`
+            : `rgba(20, 140, 100, ${trAlpha})`;
+          ctx.fillText(trailChar, x, trY);
+        }
+
+        drops[i] += speeds[i];
+        if (drops[i] * fontSize > H && Math.random() > 0.98) {
+          drops[i] = 0;
+        }
+      }
+
+      if (t < 1) raf = requestAnimationFrame(animate);
+      else onDone();
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [onDone]);
+
+  return createPortal(
+    <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />,
+    document.body
+  );
+}
+
+// --- PUBLISH: button becomes a send icon and flies up ---
+function PublishAnimation({ btnRect, onDone }: { btnRect: DOMRect; onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d")!;
+    const cx = btnRect.left + btnRect.width / 2;
+    const startY = btnRect.top + btnRect.height / 2;
+    const endY = -80;
+
+    const start = performance.now();
+    let raf: number;
+
+    // Particle trail buffer
+    const particles: { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number }[] = [];
+
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / ANIM_DURATION, 1);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Phase 1 (0-0.2): morph pulse at button position
+      // Phase 2 (0.2-0.65): fly upward with trail
+      // Phase 3 (0.65-1.0): fade & sparkle
+
+      let iconY: number;
+      let iconAlpha: number;
+      let iconScale: number;
+
+      if (t < 0.2) {
+        // Pulse/morph phase
+        const pt = t / 0.2;
+        iconY = startY;
+        iconAlpha = 1;
+        iconScale = 1 + Math.sin(pt * Math.PI) * 0.15;
+      } else if (t < 0.65) {
+        // Fly phase
+        const ft = (t - 0.2) / 0.45;
+        const ease = 1 - Math.pow(1 - ft, 3); // ease-out cubic
+        iconY = startY + (endY - startY) * ease;
+        iconAlpha = 1;
+        iconScale = 1 + ft * 0.2;
+
+        // Emit trail particles
+        if (Math.random() > 0.3) {
+          particles.push({
+            x: cx + (Math.random() - 0.5) * 10,
+            y: iconY + 15,
+            vx: (Math.random() - 0.5) * 2,
+            vy: Math.random() * 3 + 1,
+            life: 1,
+            maxLife: 0.4 + Math.random() * 0.3,
+            size: 2 + Math.random() * 3,
+          });
+        }
+      } else {
+        iconY = endY;
+        iconAlpha = 0;
+        iconScale = 1.2;
+      }
+
+      // Update & draw trail particles
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.02;
+        if (p.life <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = p.life * 0.7;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${155 + Math.random() * 20}, 60%, 60%, 1)`;
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Draw paper plane / send icon
+      if (iconAlpha > 0) {
+        ctx.save();
+        ctx.translate(cx, iconY);
+        ctx.scale(iconScale, iconScale);
+        ctx.globalAlpha = iconAlpha;
+
+        // Paper plane shape
+        const s = 18;
+        ctx.beginPath();
+        ctx.moveTo(0, -s);        // tip (top)
+        ctx.lineTo(s * 0.8, s * 0.3);   // right wing
+        ctx.lineTo(0, s * 0.05);         // center notch
+        ctx.lineTo(-s * 0.8, s * 0.3);  // left wing
+        ctx.closePath();
+        ctx.fillStyle = "#2dd4a0";
+        ctx.fill();
+
+        // Wing fold line
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.lineTo(0, s * 0.3);
+        ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Glow
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "rgba(45, 212, 160, 0.6)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(45, 212, 160, 0.3)";
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // Sparkle phase at end
+      if (t > 0.65) {
+        const sp = (t - 0.65) / 0.35;
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2 + sp * 2;
+          const dist = 30 * sp;
+          const sx = cx + Math.cos(angle) * dist;
+          const sy = btnRect.top - 20 + Math.sin(angle) * dist;
+          ctx.save();
+          ctx.globalAlpha = (1 - sp) * 0.6;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+          ctx.fillStyle = "#2dd4a0";
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      if (t < 1) raf = requestAnimationFrame(animate);
+      else onDone();
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [btnRect, onDone]);
+
+  return createPortal(
+    <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />,
+    document.body
+  );
+}
+
+type VerbAnimation = { verb: string; rect: DOMRect } | null;
+
 function ScreenContent({ src, verb }: { src: string; verb: string }) {
   const isVideoExt = /\.(mp4|mov|webm|m4v)$/i.test(src);
   const [mode, setMode] = useState<"video" | "image" | "fallback">(isVideoExt ? "video" : "image");
   useEffect(() => { setMode(isVideoExt ? "video" : "image"); }, [src, isVideoExt]);
 
   if (mode === "video") {
-    return <video key={src + "-v"} src={src} autoPlay muted loop playsInline className="h-full w-full object-cover" onError={() => setMode("image")} />;
+    return <video key={src + "-v"} src={src} autoPlay muted loop playsInline className="h-full w-full object-contain" onError={() => setMode("image")} />;
   }
   if (mode === "image") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img key={src + "-i"} src={src} alt={`${verb} step`} className="h-full w-full object-cover" onError={() => setMode("fallback")} />;
+    return <img key={src + "-i"} src={src} alt={`${verb} step`} className="h-full w-full object-contain" onError={() => setMode("fallback")} />;
   }
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-envrt-green/[0.02] to-envrt-teal/[0.06]">
@@ -461,10 +891,21 @@ function FloatingScreen({ src, verb, anchorRef }: { src: string; verb: string; a
 
 export function HowItWorksSection() {
   const [active, setActive] = useState(0);
+  const [verbAnim, setVerbAnim] = useState<VerbAnimation>(null);
   const step = howItWorksSteps[active];
   const anchorRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleTabClick = useCallback((i: number, verb: string, btnEl: HTMLButtonElement | null) => {
+    setActive(i);
+    if (btnEl && !verbAnim) {
+      const rect = btnEl.getBoundingClientRect();
+      setVerbAnim({ verb: verb.toLowerCase(), rect });
+    }
+  }, [verbAnim]);
+
+  const clearVerbAnim = useCallback(() => setVerbAnim(null), []);
 
   useEffect(() => {
     const container = tabsRef.current;
@@ -491,7 +932,7 @@ export function HowItWorksSection() {
             <div ref={tabsRef} className="mx-auto mt-12 max-w-lg overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
               <div className="flex justify-center gap-2 px-4 sm:px-0" style={{ minWidth: "max-content" }}>
               {howItWorksSteps.map((s, i) => (
-                <button ref={el => { tabRefs.current[i] = el; }} key={s.id} onClick={() => setActive(i)} className={`relative rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ${active === i ? "bg-envrt-green text-white shadow-md" : "text-envrt-charcoal/60 hover:bg-envrt-charcoal/5"}`}>
+                <button ref={el => { tabRefs.current[i] = el; }} key={s.id} onClick={(e) => handleTabClick(i, s.verb, e.currentTarget)} className={`relative rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ${active === i ? "bg-envrt-green text-white shadow-md" : "text-envrt-charcoal/60 hover:bg-envrt-charcoal/5"}`}>
                   {s.verb}
                   {active === i && <motion.div layoutId="activeTab" className="absolute inset-0 rounded-xl bg-envrt-green" style={{ zIndex: -1 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} />}
                 </button>
@@ -517,6 +958,12 @@ export function HowItWorksSection() {
             <div ref={anchorRef} className="w-full" style={{ aspectRatio: "16 / 10" }} />
           </div>
           <FloatingScreen key={step.id} src={step.mockImage} verb={step.verb} anchorRef={anchorRef} />
+
+          {/* Verb button animations */}
+          {verbAnim?.verb === "collect" && <CollectAnimation btnRect={verbAnim.rect} onDone={clearVerbAnim} />}
+          {verbAnim?.verb === "assess" && <AssessAnimation btnRect={verbAnim.rect} onDone={clearVerbAnim} />}
+          {verbAnim?.verb === "calculate" && <CalculateAnimation btnRect={verbAnim.rect} onDone={clearVerbAnim} />}
+          {verbAnim?.verb === "publish" && <PublishAnimation btnRect={verbAnim.rect} onDone={clearVerbAnim} />}
         </Container>
       </SectionCard>
     </div>
