@@ -5,7 +5,7 @@ export const siteConfig = {
     "Digital Product Passports, lifecycle metrics and sustainability analytics, all in one place. Fast and simple.",
   url: "https://envrt.com",
   contact: {
-    email: "hello@envrt.com",
+    email: "info@envrt.com",
   },
 };
 
