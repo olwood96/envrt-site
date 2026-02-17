@@ -12,6 +12,7 @@ export const siteConfig = {
 export const navLinks = [
   { label: "How it works", href: "/#how-it-works" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Insights", href: "/insights" },
   // { label: "Demo", href: "/demo" },  // temporarily hidden
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/contact" },
