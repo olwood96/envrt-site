@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
@@ -61,7 +62,11 @@ export default function RootLayout({
           </defs>
         </svg>
 
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-screen">
+          <SupplyChainBackground>
+            {children}
+          </SupplyChainBackground>
+        </main>
         <Footer />
 
         {/* Hidden form for Netlify Forms bot detection — must be in server-rendered HTML */}

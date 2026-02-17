@@ -7,11 +7,10 @@ import { TrustedBySection } from "@/components/sections/TrustedBySection";
 import { PricingPreviewSection } from "@/components/sections/PricingPreviewSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
-import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
 
 export default function HomePage() {
   return (
-    <SupplyChainBackground>
+    <>
       <HeroSection />
       <WhyNowSection />
       <SupplyChainFlowSection />
@@ -22,6 +21,6 @@ export default function HomePage() {
       <FAQSection />
       <FinalCTASection />
       <div className="h-12" />
-    </SupplyChainBackground>
+    </>
   );
 }
