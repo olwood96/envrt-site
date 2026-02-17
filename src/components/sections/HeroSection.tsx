@@ -54,7 +54,7 @@ function PhoneMockup({ src }: { src: string }) {
         </div>
         {/* Notch / dynamic island */}
         <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
-        {/* Full-screen iframe area — content starts below status bar, scrolls up behind it */}
+        {/* Full-screen iframe area */}
         <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem]" style={{ aspectRatio: "9 / 19" }}>
           <div className="absolute inset-0 overflow-hidden">
             <iframe
@@ -89,8 +89,6 @@ function PhoneMockup({ src }: { src: string }) {
 export function HeroSection() {
   const phoneRef = useRef<HTMLDivElement>(null);
   const [phoneHeight, setPhoneHeight] = useState(0);
-  const [nudge, setNudge] = useState(false);
-  const hoverRef = useRef(false);
 
   const updateHeight = useCallback(() => {
     if (phoneRef.current) {
@@ -104,17 +102,6 @@ export function HeroSection() {
     if (phoneRef.current) observer.observe(phoneRef.current);
     return () => observer.disconnect();
   }, [updateHeight]);
-
-  // Periodic wiggle on the QR code
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (!hoverRef.current) {
-        setNudge(true);
-        setTimeout(() => setNudge(false), 600);
-      }
-    }, 3500);
-    return () => clearInterval(id);
-  }, []);
 
   const jacketHeight = phoneHeight * 0.7;
   const qrHeight = phoneHeight * 0.3;
@@ -137,14 +124,11 @@ export function HeroSection() {
           <FadeUp delay={0.3}>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={heroContent.ctaPrimary.href} size="lg">{heroContent.ctaPrimary.label}<span className="ml-2">→</span></Button>
-
             </div>
           </FadeUp>
         </div>
         <FadeUp delay={0.2}>
-          {/* Outer wrapper handles full-bleed on mobile */}
           <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-[100vw] px-6 pb-12 sm:px-10 sm:pb-14 lg:static lg:ml-0 lg:mr-0 lg:w-auto lg:px-0 lg:pb-0 lg:pl-4">
-            {/* Inner wrapper — positioning anchor for all elements */}
             <div ref={phoneRef} className="relative mx-auto max-w-md lg:max-w-none">
               {/* Jacket image — 70% of phone height, top-left */}
               {phoneHeight > 0 && (
@@ -166,13 +150,10 @@ export function HeroSection() {
                   />
                 </div>
               )}
-              {/* QR code — 30% of phone height, bottom-right */}
+              {/* QR code — 30% of phone height, bottom-right, behind phone (z-0) */}
               {phoneHeight > 0 && (
-                <a
-                  href="https://dpp.envrt.com/dpp/angry_pablo/40-00-06-03"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`absolute z-20 cursor-pointer qr-link ${nudge ? "animate-qr-nudge" : ""}`}
+                <div
+                  className="absolute z-0 pointer-events-none"
                   style={{
                     width: qrHeight,
                     height: qrHeight,
@@ -180,8 +161,6 @@ export function HeroSection() {
                     right: "-8%",
                     transform: "rotate(12deg)",
                   }}
-                  onMouseEnter={() => { hoverRef.current = true; setNudge(false); }}
-                  onMouseLeave={() => { hoverRef.current = false; }}
                 >
                   <Image
                     src="/qr-code.png"
@@ -190,7 +169,7 @@ export function HeroSection() {
                     height={320}
                     className="h-full w-full object-contain drop-shadow-lg"
                   />
-                </a>
+                </div>
               )}
               {/* Live DPP in phone mockup */}
               <div className="relative z-10">
@@ -200,30 +179,6 @@ export function HeroSection() {
           </div>
         </FadeUp>
       </div>
-
-      {/* QR wiggle keyframes — matches Growth card nudge */}
-      <style jsx global>{`
-        @keyframes qr-nudge {
-          0%, 100% { transform: translateX(0) rotate(12deg); }
-          10% { transform: translateX(-4px) rotate(11.3deg); }
-          20% { transform: translateX(4px) rotate(12.7deg); }
-          30% { transform: translateX(-4px) rotate(11.3deg); }
-          40% { transform: translateX(4px) rotate(12.7deg); }
-          50% { transform: translateX(-3px) rotate(11.5deg); }
-          60% { transform: translateX(3px) rotate(12.5deg); }
-          70% { transform: translateX(-2px) rotate(11.7deg); }
-          80% { transform: translateX(1px) rotate(12deg); }
-        }
-        .animate-qr-nudge {
-          animation: qr-nudge 0.6s ease-in-out;
-        }
-        .qr-link {
-          transition: transform 0.2s ease;
-        }
-        .qr-link:hover {
-          transform: rotate(12deg) scale(1.1) !important;
-        }
-      `}</style>
     </section>
   );
 }
