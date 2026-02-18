@@ -10,6 +10,31 @@ import { heroContent } from "@/lib/config";
 function PhoneMockup({ src }: { src: string }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [typedText, setTypedText] = useState("");
+  const [minDisplayDone, setMinDisplayDone] = useState(false);
+
+  useEffect(() => {
+    const fullText = "WANT DPPs?";
+    let i = 0;
+    let firstCycleDone = false;
+    const interval = setInterval(() => {
+      if (i <= fullText.length) {
+        setTypedText(fullText.slice(0, i));
+        i++;
+      } else if (!firstCycleDone) {
+        // First full cycle complete — hold for a beat then allow transition
+        firstCycleDone = true;
+        setTimeout(() => setMinDisplayDone(true), 600);
+      } else {
+        // Keep looping in case iframe is still loading
+        setTimeout(() => { i = 0; }, 800);
+      }
+    }, 120);
+    return () => clearInterval(interval);
+  }, []);
+
+  const showContent = iframeLoaded && minDisplayDone;
 
   useEffect(() => {
     const update = () => {
@@ -55,12 +80,27 @@ function PhoneMockup({ src }: { src: string }) {
         {/* Notch / dynamic island */}
         <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
         {/* Full-screen iframe area */}
-        <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem]" style={{ aspectRatio: "9 / 19" }}>
+        <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ aspectRatio: "9 / 19" }}>
+          {/* Typewriter loading screen */}
+          {!showContent && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white">
+              <div className="flex items-center">
+                <span
+                  className="font-mono text-xl font-bold tracking-[0.25em] text-envrt-charcoal uppercase"
+                  style={{ letterSpacing: "0.25em" }}
+                >
+                  {typedText}
+                </span>
+                <span className="ml-[2px] inline-block h-6 w-[3px] animate-pulse bg-envrt-charcoal" />
+              </div>
+            </div>
+          )}
           <div className="absolute inset-0 overflow-hidden">
             <iframe
               src={src}
               title="Digital Product Passport"
-              className="absolute border-0"
+              onLoad={() => setIframeLoaded(true)}
+              className={`absolute border-0 transition-opacity duration-500 ${showContent ? "opacity-100" : "opacity-0"}`}
               style={{
                 top: 0,
                 left: 0,
@@ -72,7 +112,6 @@ function PhoneMockup({ src }: { src: string }) {
                 WebkitOverflowScrolling: "touch",
                 paddingTop: "22px",
               }}
-              loading="lazy"
               sandbox="allow-scripts allow-same-origin allow-popups"
             />
           </div>

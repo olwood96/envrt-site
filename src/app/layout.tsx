@@ -17,6 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth overflow-x-hidden">
+      <head>
+        <link rel="preconnect" href="https://dashboard.envrt.com" />
+        <link rel="dns-prefetch" href="https://dashboard.envrt.com" />
+      </head>
       <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased overflow-x-hidden">
         <Navbar />
 
