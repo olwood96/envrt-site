@@ -13,8 +13,29 @@ function PhoneMockup({ src }: { src: string }) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [minDisplayDone, setMinDisplayDone] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const phoneContainerRef = useRef<HTMLDivElement>(null);
 
+  // Detect when phone enters viewport
   useEffect(() => {
+    const el = phoneContainerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.6 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Typewriter starts only once visible
+  useEffect(() => {
+    if (!isVisible) return;
     const fullText = "WANT DPPs?";
     let i = 0;
     let firstCycleDone = false;
@@ -23,16 +44,14 @@ function PhoneMockup({ src }: { src: string }) {
         setTypedText(fullText.slice(0, i));
         i++;
       } else if (!firstCycleDone) {
-        // First full cycle complete — hold for a beat then allow transition
         firstCycleDone = true;
         setTimeout(() => setMinDisplayDone(true), 600);
       } else {
-        // Keep looping in case iframe is still loading
         setTimeout(() => { i = 0; }, 800);
       }
     }, 120);
     return () => clearInterval(interval);
-  }, []);
+  }, [isVisible]);
 
   const showContent = iframeLoaded && minDisplayDone;
 
@@ -49,7 +68,7 @@ function PhoneMockup({ src }: { src: string }) {
   }, []);
 
   return (
-    <div className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
+    <div ref={phoneContainerRef} className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
       {/* Phone outer shell */}
       <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
         {/* Status bar — white with black text */}
