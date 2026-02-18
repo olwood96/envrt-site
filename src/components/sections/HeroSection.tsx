@@ -26,7 +26,7 @@ function PhoneMockup({ src }: { src: string }) {
   return (
     <div className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
       {/* Phone outer shell */}
-      <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-2xl">
+      <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
         {/* Status bar — white with black text */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5" style={{ height: 22 }}>
           <span className="text-[9px] font-semibold leading-none text-envrt-charcoal">21:37</span>
@@ -103,7 +103,7 @@ export function HeroSection() {
     return () => observer.disconnect();
   }, [updateHeight]);
 
-  const jacketHeight = phoneHeight * 0.7;
+  const jacketHeight = phoneHeight * 1.183;
   const qrHeight = phoneHeight * 0.3;
 
   return (
@@ -133,11 +133,11 @@ export function HeroSection() {
               {/* Jacket image — 70% of phone height, top-left */}
               {phoneHeight > 0 && (
                 <div
-                  className="absolute z-0 -rotate-[8deg]"
+                  className="absolute z-0 -rotate-[18deg]"
                   style={{
                     height: jacketHeight,
-                    top: "-3%",
-                    left: "-15%",
+                    top: "-25%",
+                    left: "-28%",
                   }}
                 >
                   <Image
@@ -145,7 +145,7 @@ export function HeroSection() {
                     alt="Sustainable jacket"
                     width={480}
                     height={560}
-                    className="h-full w-auto object-contain drop-shadow-xl"
+                    className="h-full w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
                     priority
                   />
                 </div>
@@ -167,13 +167,13 @@ export function HeroSection() {
                     alt="Digital Product Passport QR code"
                     width={320}
                     height={320}
-                    className="h-full w-full object-contain drop-shadow-lg"
+                    className="h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.25)]"
                   />
                 </div>
               )}
               {/* Live DPP in phone mockup */}
               <div className="relative z-10">
-                <PhoneMockup src="https://dpp.envrt.com/dpp/angry_pablo/40-00-06-03" />
+                <PhoneMockup src="https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882" />
               </div>
             </div>
           </div>
