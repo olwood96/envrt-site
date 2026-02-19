@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "ENVRT",
-  tagline: "Sustainability intelligence for fashion.",
+  tagline: "The Infrastructure Layer For Product Transparency.",
   description:
     "Digital Product Passports, lifecycle metrics and sustainability analytics, all in one place. Fast and simple.",
   url: "https://envrt.com",
@@ -14,8 +14,9 @@ export const navLinks = [
   { label: "Pricing", href: "/pricing" },
   // { label: "Demo", href: "/demo" },  // temporarily hidden
   { label: "Team", href: "/team" },
-  { label: "Contact", href: "/contact" },
   { label: "Insights", href: "/insights" },
+  { label: "Contact", href: "/contact" }
+,
 ];
 
 export const heroContent = {
