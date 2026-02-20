@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
 import { siteConfig } from "@/lib/config";
+import WebsiteBeacon from "@/components/WebsiteBeacon";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -83,6 +84,9 @@ export default function RootLayout({
           <input name="company" />
           <textarea name="message" />
         </form>
+
+        {/* Anonymous website analytics beacon */}
+        <WebsiteBeacon />
       </body>
     </html>
   );
