@@ -60,7 +60,9 @@ export function Footer() {
           <div>
             <FooterLogo />
             <p className="mt-4 text-sm leading-relaxed text-envrt-muted">{siteConfig.tagline}</p>
-            <p className="mt-2 text-xs text-envrt-muted/60">{siteConfig.contact.email}</p>
+            <a href={`mailto:${siteConfig.contact.email}`} data-cta="footer-email" className="mt-2 block text-xs text-envrt-muted/60 hover:text-envrt-muted transition-colors">
+              {siteConfig.contact.email}
+            </a>
           </div>
           {footerLinks.map((col) => (
             <div key={col.heading}>

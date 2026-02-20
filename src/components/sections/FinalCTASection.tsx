@@ -22,6 +22,7 @@ export function FinalCTASection() {
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   href="/contact"
+                  data-cta="footer-cta-book-demo"
                   className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-envrt-green transition-all duration-300 hover:bg-envrt-cream shadow-sm hover:shadow-md"
                 >
                   Book a demo
@@ -29,6 +30,7 @@ export function FinalCTASection() {
                 </Link>
                 <Link
                   href="/pricing"
+                  data-cta="footer-cta-view-pricing"
                   className="inline-flex items-center justify-center rounded-xl border border-white/30 px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
                 >
                   View pricing

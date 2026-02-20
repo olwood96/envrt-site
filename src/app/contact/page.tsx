@@ -149,6 +149,7 @@ export default function ContactPage() {
 
                   <Button
                     type="submit"
+                    data-cta="contact-form-submit"
                     className={`w-full ${submitting ? "pointer-events-none opacity-60" : ""}`}
                     size="lg"
                   >

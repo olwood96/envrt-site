@@ -101,10 +101,10 @@ export function Navbar() {
                 <GlitchLink key={link.href} href={link.href} label={link.label} />
               ))}
               <div className="flex items-center gap-2.5 ml-1">
-                <Button href="https://dashboard.envrt.com" variant="secondary" size="sm">
+                <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" data-cta="nav-login">
                   Login
                 </Button>
-                <Button href="/contact" size="sm">
+                <Button href="/contact" size="sm" data-cta="nav-book-demo">
                   Book a demo
                 </Button>
               </div>
@@ -208,10 +208,10 @@ export function Navbar() {
                     transition: { duration: 0.15 },
                   }}
                 >
-                  <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" className="w-full">
+                  <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" className="w-full" data-cta="mobile-nav-dashboard">
                     Dashboard
                   </Button>
-                  <Button href="/contact" size="sm" className="w-full">
+                  <Button href="/contact" size="sm" className="w-full" data-cta="mobile-nav-book-demo">
                     Book a demo
                   </Button>
                 </motion.div>

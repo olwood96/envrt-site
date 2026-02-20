@@ -181,7 +181,7 @@ export function HeroSection() {
           </FadeUp>
           <FadeUp delay={0.3}>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button href={heroContent.ctaPrimary.href} size="lg">{heroContent.ctaPrimary.label}<span className="ml-2">→</span></Button>
+              <Button href={heroContent.ctaPrimary.href} size="lg" data-cta="hero-book-demo">{heroContent.ctaPrimary.label}<span className="ml-2">→</span></Button>
             </div>
           </FadeUp>
         </div>
