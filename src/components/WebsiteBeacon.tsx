@@ -240,13 +240,13 @@ export default function WebsiteBeacon() {
     function buildEnrichPayload(): Record<string, unknown> {
       const now = Date.now();
       const dwellSnapshot: Record<string, number> = {};
-      for (const [sec, total] of sectionDwellRef.current) {
+      Array.from(sectionDwellRef.current.entries()).forEach(([sec, total]) => {
         dwellSnapshot[sec] = Math.round(total);
-      }
-      for (const [sec, enteredAt] of sectionEntryRef.current) {
+      });
+      Array.from(sectionEntryRef.current.entries()).forEach(([sec, enteredAt]) => {
         const elapsed = (now - enteredAt) / 1000;
         dwellSnapshot[sec] = Math.round((dwellSnapshot[sec] ?? 0) + elapsed);
-      }
+      });
 
       return {
         action: "enrich",
@@ -255,9 +255,9 @@ export default function WebsiteBeacon() {
         scrollDepth: maxScrollRef.current,
         ctaClicks: ctaClicksRef.current,
         sessionPageCount,
-        sectionsViewed: [...sectionsSeenRef.current],
+        sectionsViewed: Array.from(sectionsSeenRef.current),
         sectionDwellTimes: Object.keys(dwellSnapshot).length > 0 ? dwellSnapshot : null,
-        formFieldsTouched: formFieldsTouchedRef.current.size > 0 ? [...formFieldsTouchedRef.current] : null,
+        formFieldsTouched: formFieldsTouchedRef.current.size > 0 ? Array.from(formFieldsTouchedRef.current) : null,
         formSubmitted: formSubmittedRef.current || null,
         contentReadDepth: contentReadDepthRef.current > 0 ? contentReadDepthRef.current : null,
         timeToFirstCtaMs: firstCtaTimeRef.current,
