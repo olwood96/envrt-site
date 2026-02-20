@@ -1,6 +1,14 @@
 // components/WebsiteBeacon.tsx
 // Drop this into envrt.com's root layout.
-// Tracks: page views, scroll depth, duration, CTA clicks, device, referrer, UTMs.
+//
+// Tracks automatically:
+//   - Page views, scroll depth, duration, device, referrer, UTMs
+//   - Homepage section visibility + dwell times (via data-section attributes)
+//   - CTA clicks (via data-cta attributes)
+//   - Time to first CTA click
+//   - Form field interactions + abandonment (on pages with data-track-form)
+//   - Blog content read depth (on pages with [data-article-body])
+//
 // Privacy-first: no cookies, no localStorage, no PII.
 "use client";
 
@@ -26,7 +34,6 @@ function getReferrerDomain(): string | null {
     if (!ref) return null;
     const url = new URL(ref);
     const host = url.hostname.replace(/^www\./, "");
-    // Don't count self-referrals
     if (host === "envrt.com" || host === "www.envrt.com") return null;
     if (host === "localhost" || host === "127.0.0.1") return null;
     return host;
@@ -66,11 +73,11 @@ async function send(payload: Record<string, unknown>): Promise<Record<string, un
       keepalive: true,
     });
     if (res.ok) return res.json();
-  } catch {}
+  } catch { /* swallow */ }
   return null;
 }
 
-// ── Session page count (in-memory, resets on tab close) ──
+// Session page count (in-memory, resets on tab close)
 let sessionPageCount = 0;
 
 export default function WebsiteBeacon() {
@@ -81,6 +88,21 @@ export default function WebsiteBeacon() {
   const ctaClicksRef = useRef<{ cta: string; href: string; ts: number }[]>([]);
   const sentRef = useRef(false);
 
+  // Section tracking
+  const sectionsSeenRef = useRef<Set<string>>(new Set());
+  const sectionDwellRef = useRef<Map<string, number>>(new Map());
+  const sectionEntryRef = useRef<Map<string, number>>(new Map());
+
+  // Form tracking
+  const formFieldsTouchedRef = useRef<Set<string>>(new Set());
+  const formSubmittedRef = useRef(false);
+
+  // Blog read depth
+  const contentReadDepthRef = useRef(0);
+
+  // Time to first CTA
+  const firstCtaTimeRef = useRef<number | null>(null);
+
   useEffect(() => {
     // Reset on each page navigation
     viewIdRef.current = null;
@@ -88,6 +110,13 @@ export default function WebsiteBeacon() {
     maxScrollRef.current = 0;
     ctaClicksRef.current = [];
     sentRef.current = false;
+    sectionsSeenRef.current = new Set();
+    sectionDwellRef.current = new Map();
+    sectionEntryRef.current = new Map();
+    formFieldsTouchedRef.current = new Set();
+    formSubmittedRef.current = false;
+    contentReadDepthRef.current = 0;
+    firstCtaTimeRef.current = null;
     sessionPageCount++;
 
     // ── Log initial view ──
@@ -123,8 +152,56 @@ export default function WebsiteBeacon() {
       );
       const pct = Math.min(100, Math.round((scrollTop / docHeight) * 100));
       if (pct > maxScrollRef.current) maxScrollRef.current = pct;
+
+      // Blog content read depth
+      const articleBody = document.querySelector("[data-article-body]");
+      if (articleBody) {
+        const rect = articleBody.getBoundingClientRect();
+        const bodyTop = rect.top + window.scrollY;
+        const bodyHeight = rect.height;
+        if (bodyHeight > 0) {
+          const readTo = Math.max(0, (scrollTop + window.innerHeight) - bodyTop);
+          const readPct = Math.min(100, Math.round((readTo / bodyHeight) * 100));
+          if (readPct > contentReadDepthRef.current) {
+            contentReadDepthRef.current = readPct;
+          }
+        }
+      }
     }
     window.addEventListener("scroll", onScroll, { passive: true });
+
+    // ── Section visibility tracking ──
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        const now = Date.now();
+        for (const entry of entries) {
+          const name = (entry.target as HTMLElement).dataset.section;
+          if (!name) continue;
+
+          if (entry.isIntersecting) {
+            sectionsSeenRef.current.add(name);
+            sectionEntryRef.current.set(name, now);
+          } else {
+            const enteredAt = sectionEntryRef.current.get(name);
+            if (enteredAt) {
+              const elapsed = (now - enteredAt) / 1000;
+              sectionDwellRef.current.set(
+                name,
+                (sectionDwellRef.current.get(name) ?? 0) + elapsed
+              );
+              sectionEntryRef.current.delete(name);
+            }
+          }
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    const sectionTimer = setTimeout(() => {
+      document.querySelectorAll("[data-section]").forEach((el) => {
+        sectionObserver.observe(el);
+      });
+    }, 500);
 
     // ── CTA click tracking ──
     function onCtaClick(e: MouseEvent) {
@@ -132,26 +209,65 @@ export default function WebsiteBeacon() {
       if (!el) return;
       const cta = el.getAttribute("data-cta") ?? "unknown";
       const href = (el as HTMLAnchorElement).href ?? el.closest("a")?.href ?? "";
+      const elapsed = Date.now() - startTimeRef.current;
       ctaClicksRef.current.push({
         cta,
         href: href.slice(0, 200),
-        ts: Math.round((Date.now() - startTimeRef.current) / 1000),
+        ts: Math.round(elapsed / 1000),
       });
+      if (firstCtaTimeRef.current === null) {
+        firstCtaTimeRef.current = elapsed;
+      }
     }
     document.addEventListener("click", onCtaClick, true);
+
+    // ── Form field tracking ──
+    function onFormFocus(e: FocusEvent) {
+      const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+      if (!target?.name) return;
+      if (!target.closest("[data-track-form]")) return;
+      formFieldsTouchedRef.current.add(target.name);
+    }
+    function onFormSubmit(e: Event) {
+      if ((e.target as HTMLElement)?.closest?.("[data-track-form]")) {
+        formSubmittedRef.current = true;
+      }
+    }
+    document.addEventListener("focusin", onFormFocus, true);
+    document.addEventListener("submit", onFormSubmit, true);
+
+    // ── Build enrichment payload ──
+    function buildEnrichPayload(): Record<string, unknown> {
+      const now = Date.now();
+      const dwellSnapshot: Record<string, number> = {};
+      for (const [sec, total] of sectionDwellRef.current) {
+        dwellSnapshot[sec] = Math.round(total);
+      }
+      for (const [sec, enteredAt] of sectionEntryRef.current) {
+        const elapsed = (now - enteredAt) / 1000;
+        dwellSnapshot[sec] = Math.round((dwellSnapshot[sec] ?? 0) + elapsed);
+      }
+
+      return {
+        action: "enrich",
+        viewId: viewIdRef.current,
+        durationSeconds: Math.round((now - startTimeRef.current) / 1000),
+        scrollDepth: maxScrollRef.current,
+        ctaClicks: ctaClicksRef.current,
+        sessionPageCount,
+        sectionsViewed: [...sectionsSeenRef.current],
+        sectionDwellTimes: Object.keys(dwellSnapshot).length > 0 ? dwellSnapshot : null,
+        formFieldsTouched: formFieldsTouchedRef.current.size > 0 ? [...formFieldsTouchedRef.current] : null,
+        formSubmitted: formSubmittedRef.current || null,
+        contentReadDepth: contentReadDepthRef.current > 0 ? contentReadDepthRef.current : null,
+        timeToFirstCtaMs: firstCtaTimeRef.current,
+      };
+    }
 
     // ── Periodic enrichment (every 8s) ──
     function enrich() {
       if (!viewIdRef.current) return;
-      const dur = Math.round((Date.now() - startTimeRef.current) / 1000);
-      send({
-        action: "enrich",
-        viewId: viewIdRef.current,
-        durationSeconds: dur,
-        scrollDepth: maxScrollRef.current,
-        ctaClicks: ctaClicksRef.current,
-        sessionPageCount,
-      });
+      send(buildEnrichPayload());
     }
     const enrichInterval = setInterval(enrich, 8000);
 
@@ -159,29 +275,10 @@ export default function WebsiteBeacon() {
     function onLeave() {
       if (sentRef.current || !viewIdRef.current) return;
       sentRef.current = true;
-      const dur = Math.round((Date.now() - startTimeRef.current) / 1000);
-      // Use sendBeacon for reliability on page close
       try {
-        navigator.sendBeacon(
-          ANALYTICS_URL,
-          JSON.stringify({
-            action: "enrich",
-            viewId: viewIdRef.current,
-            durationSeconds: dur,
-            scrollDepth: maxScrollRef.current,
-            ctaClicks: ctaClicksRef.current,
-            sessionPageCount,
-          })
-        );
+        navigator.sendBeacon(ANALYTICS_URL, JSON.stringify(buildEnrichPayload()));
       } catch {
-        send({
-          action: "enrich",
-          viewId: viewIdRef.current,
-          durationSeconds: dur,
-          scrollDepth: maxScrollRef.current,
-          ctaClicks: ctaClicksRef.current,
-          sessionPageCount,
-        });
+        send(buildEnrichPayload());
       }
     }
     document.addEventListener("visibilitychange", () => {
@@ -191,10 +288,13 @@ export default function WebsiteBeacon() {
 
     return () => {
       clearInterval(enrichInterval);
+      clearTimeout(sectionTimer);
+      sectionObserver.disconnect();
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("click", onCtaClick, true);
+      document.removeEventListener("focusin", onFormFocus, true);
+      document.removeEventListener("submit", onFormSubmit, true);
       window.removeEventListener("beforeunload", onLeave);
-      // Send final data on SPA navigation
       enrich();
     };
   }, [pathname]);
