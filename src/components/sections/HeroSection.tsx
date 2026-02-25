@@ -8,61 +8,10 @@ import { FadeUp } from "../ui/Motion";
 import { heroContent } from "@/lib/config";
 
 const IFRAME_SRC = "https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882";
-const TYPEWRITER_TEXT = "WANT DPPs?";
-const TYPEWRITER_SPEED = 120; // ms per character
-const POST_TYPE_HOLD = 600;   // ms to hold complete text before revealing iframe
 
 function PhoneMockup({ src }: { src: string }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-
-  // Typewriter state — plays exactly once
-  const [typedText, setTypedText] = useState("");
-  const [typewriterDone, setTypewriterDone] = useState(false);
-
-  // Whether we've met the minimum display duration after typing
-  const [minDisplayDone, setMinDisplayDone] = useState(false);
-
-  const phoneContainerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  // ─── Intersection observer — reveal when phone enters viewport ───────────
-  useEffect(() => {
-    const el = phoneContainerRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 } // slightly lower threshold — triggers a touch earlier
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  // ─── Typewriter — runs once, then cursor just flickers ───────────────────
-  useEffect(() => {
-    if (!isVisible || typewriterDone) return;
-
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setTypedText(TYPEWRITER_TEXT.slice(0, i));
-      if (i >= TYPEWRITER_TEXT.length) {
-        clearInterval(interval);
-        setTypewriterDone(true);
-        setTimeout(() => setMinDisplayDone(true), POST_TYPE_HOLD);
-      }
-    }, TYPEWRITER_SPEED);
-
-    return () => clearInterval(interval);
-  }, [isVisible, typewriterDone]);
-
-  const showContent = iframeLoaded && minDisplayDone;
 
   // ─── Scale iframe to fit phone screen width ───────────────────────────────
   useEffect(() => {
@@ -78,7 +27,7 @@ function PhoneMockup({ src }: { src: string }) {
   }, []);
 
   return (
-    <div ref={phoneContainerRef} className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
+    <div className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
       {/* Phone outer shell */}
       <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
         {/* Status bar */}
@@ -111,32 +60,12 @@ function PhoneMockup({ src }: { src: string }) {
 
         {/* Screen */}
         <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ aspectRatio: "9 / 19" }}>
-
-          {/* Loading overlay — hides until typewriter is done AND iframe is ready */}
-          <div
-            className="absolute inset-0 z-10 flex items-center justify-center bg-white transition-opacity duration-500"
-            style={{ opacity: showContent ? 0 : 1, pointerEvents: showContent ? "none" : "auto" }}
-          >
-            <div className="flex items-center">
-              <span
-                className="font-mono text-xl font-bold uppercase text-envrt-charcoal"
-                style={{ letterSpacing: "0.25em" }}
-              >
-                {/* Show full text once typewriter finishes so cursor flicker is the only motion */}
-                {typewriterDone ? TYPEWRITER_TEXT : typedText}
-              </span>
-              {/* Cursor: blinks while loading; disappears when content shows */}
-              <span className="ml-[2px] inline-block h-6 w-[3px] animate-pulse bg-envrt-charcoal" />
-            </div>
-          </div>
-
-          {/* iframe — mounts immediately for fastest possible network start */}
+          {/* iframe — visible immediately, no loading overlay */}
           <div className="absolute inset-0 overflow-hidden">
             <iframe
               src={src}
               title="Digital Product Passport"
               loading="eager"
-              onLoad={() => setIframeLoaded(true)}
               className="absolute border-0"
               style={{
                 top: 0,
@@ -148,8 +77,6 @@ function PhoneMockup({ src }: { src: string }) {
                 overflow: "auto",
                 WebkitOverflowScrolling: "touch",
                 paddingTop: "22px",
-                // Opacity is handled by the overlay above, not the iframe itself,
-                // so the iframe is always "visible" underneath — no extra paint cost.
               }}
               sandbox="allow-scripts allow-same-origin"
             />
