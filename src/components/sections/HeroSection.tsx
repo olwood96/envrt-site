@@ -9,13 +9,19 @@ import { heroContent } from "@/lib/config";
 
 const IFRAME_SRC = "https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882";
 
-// ─── Matrix rain characters ─────────────────────────────────────────────────
-const MATRIX_CHARS =
-  "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン" +
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=<>";
+// ─── Corner bracket for viewfinder ──────────────────────────────────────────
+function ViewfinderCorner({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
+  const base = "absolute w-5 h-5 border-envrt-charcoal/40";
+  const styles: Record<string, string> = {
+    tl: `${base} top-0 left-0 border-t-2 border-l-2 rounded-tl-md`,
+    tr: `${base} top-0 right-0 border-t-2 border-r-2 rounded-tr-md`,
+    bl: `${base} bottom-0 left-0 border-b-2 border-l-2 rounded-bl-md`,
+    br: `${base} bottom-0 right-0 border-b-2 border-r-2 rounded-br-md`,
+  };
+  return <div className={styles[position]} />;
+}
 
-function MatrixRain({ visible }: { visible: boolean }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+function QRScanOverlay({ visible }: { visible: boolean }) {
   const [show, setShow] = useState(true);
 
   // After fade-out transition ends, unmount entirely
@@ -26,83 +32,65 @@ function MatrixRain({ visible }: { visible: boolean }) {
     }
   }, [visible]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let raf: number;
-    const fontSize = 11;
-    let columns = 0;
-    let drops: number[] = [];
-
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      canvas.width = parent.offsetWidth;
-      canvas.height = parent.offsetHeight;
-      columns = Math.floor(canvas.width / fontSize);
-      // Preserve existing drops, initialise new ones at random positions
-      const prev = drops;
-      drops = Array.from({ length: columns }, (_, i) =>
-        i < prev.length ? prev[i] : Math.random() * -50
-      );
-    };
-
-    resize();
-    const observer = new ResizeObserver(resize);
-    if (canvas.parentElement) observer.observe(canvas.parentElement);
-
-    const draw = () => {
-      // Semi-transparent background to create trail fade effect
-      ctx.fillStyle = "rgba(248, 247, 244, 0.08)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.font = `${fontSize}px monospace`;
-
-      for (let i = 0; i < columns; i++) {
-        const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-        const x = i * fontSize;
-        const y = drops[i] * fontSize;
-
-        // Subtle black characters at varying low opacities
-        if (Math.random() > 0.3) {
-          ctx.fillStyle = "rgba(30, 30, 30, 0.15)";
-        } else {
-          ctx.fillStyle = "rgba(30, 30, 30, 0.25)";
-        }
-        ctx.fillText(char, x, y);
-
-        // Reset drop to top after passing bottom (with randomness)
-        if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i] += 0.5 + Math.random() * 0.5;
-      }
-
-      raf = requestAnimationFrame(draw);
-    };
-
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      observer.disconnect();
-    };
-  }, []);
-
   if (!show) return null;
 
   return (
     <div
-      className="absolute inset-0 z-20 overflow-hidden rounded-[2.3rem] bg-[#f8f7f4]"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden rounded-[2.3rem] bg-[#f8f7f4]"
       style={{
         opacity: visible ? 1 : 0,
         transition: "opacity 500ms ease-out",
       }}
     >
-      <canvas ref={canvasRef} className="h-full w-full" />
+      {/* QR code with viewfinder frame */}
+      <div className="relative w-[55%] aspect-square">
+        {/* Corner brackets */}
+        <ViewfinderCorner position="tl" />
+        <ViewfinderCorner position="tr" />
+        <ViewfinderCorner position="bl" />
+        <ViewfinderCorner position="br" />
+
+        {/* QR code image */}
+        <div className="absolute inset-3 flex items-center justify-center">
+          <Image
+            src="/qr-code.png"
+            alt="Scanning QR code"
+            width={200}
+            height={200}
+            className="h-full w-full object-contain"
+          />
+        </div>
+
+        {/* Animated scan line */}
+        <div
+          className="absolute inset-x-0 h-[2px]"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(42, 161, 152, 0.6), rgba(42, 161, 152, 0.8), rgba(42, 161, 152, 0.6), transparent)",
+            boxShadow: "0 0 8px rgba(42, 161, 152, 0.4)",
+            animation: "qr-scan 2s ease-in-out infinite",
+          }}
+        />
+      </div>
+
+      {/* Scanning text */}
+      <p
+        className="mt-5 text-xs font-medium tracking-wider text-envrt-muted/70"
+        style={{ animation: "qr-pulse 2s ease-in-out infinite" }}
+      >
+        Scanning...
+      </p>
+
+      {/* Keyframe animations */}
+      <style jsx>{`
+        @keyframes qr-scan {
+          0%, 100% { top: 0; }
+          50% { top: 100%; }
+        }
+        @keyframes qr-pulse {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -181,8 +169,8 @@ function PhoneMockup({ src }: { src: string }) {
               onLoad={() => setIframeLoaded(true)}
             />
           </div>
-          {/* Matrix rain loading overlay */}
-          <MatrixRain visible={!iframeLoaded} />
+          {/* QR scan loading overlay */}
+          <QRScanOverlay visible={!iframeLoaded} />
         </div>
       </div>
 
