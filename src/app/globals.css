@@ -2,51 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* N27 Font Face – woff2 files in /public/fonts/n27/ */
+/* N27 Font Face – only used weights (400, 500, 700) + italic variants */
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-thin-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-thin-webfont.woff") format("woff");
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "N27";
-  src: url("/fonts/n27/n27-extralight-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-extralight-webfont.woff") format("woff");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "N27";
-  src: url("/fonts/n27/n27-light-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-light-webfont.woff") format("woff");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "N27";
-  src: url("/fonts/n27/n27-regular-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-regular-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-regular-webfont.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-medium-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-medium-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-medium-webfont.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-bold-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-bold-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-bold-webfont.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -54,24 +27,21 @@
 /* Italic variants */
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-regularitalic-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-regularitalic-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-regularitalic-webfont.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-mediumitalic-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-mediumitalic-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-mediumitalic-webfont.woff2") format("woff2");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: "N27";
-  src: url("/fonts/n27/n27-bolditalic-webfont.woff2") format("woff2"),
-       url("/fonts/n27/n27-bolditalic-webfont.woff") format("woff");
+  src: url("/fonts/n27/n27-bolditalic-webfont.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -238,8 +208,23 @@ body {
   }
 }
 
+/* Trusted-by logo carousel */
+@keyframes trusted-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.trusted-track {
+  animation: trusted-scroll 35s linear infinite;
+}
+.trusted-track:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glass-nav {
+    animation: none;
+  }
+  .trusted-track {
     animation: none;
   }
 }

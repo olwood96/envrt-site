@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-
 /*
   Infinite logo carousel — pure CSS animation, no JS scroll loop.
   Logos are duplicated enough times to always fill the viewport with no gaps,
   regardless of how many logos are provided.
+  Animation styles are in globals.css (trusted-scroll keyframe + .trusted-track).
 */
 
 interface Logo {
@@ -24,29 +23,7 @@ function buildTrack(logos: Logo[]): Logo[] {
   return Array.from({ length: copies }, () => logos).flat();
 }
 
-function useInjectCarouselCSS() {
-  useEffect(() => {
-    if (document.getElementById("trusted-carousel-css")) return;
-    const el = document.createElement("style");
-    el.id = "trusted-carousel-css";
-    el.textContent = `
-      @keyframes trusted-scroll {
-        0%   { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-      }
-      .trusted-track {
-        animation: trusted-scroll 35s linear infinite;
-      }
-      .trusted-track:hover {
-        animation-play-state: paused;
-      }
-    `;
-    document.head.appendChild(el);
-  }, []);
-}
-
 export function TrustedByCarousel({ logos }: { logos: Logo[] }) {
-  useInjectCarouselCSS();
 
   const track = buildTrack(logos);
 

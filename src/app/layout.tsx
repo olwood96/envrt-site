@@ -19,6 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth overflow-x-hidden">
       <head>
+        {/* ── Critical font preloads ── */}
+        <link rel="preload" href="/fonts/n27/n27-regular-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/n27/n27-bold-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+
         {/* ── Connection hints ── */}
         {/* Establish TCP+TLS to the DPP subdomain before the iframe even mounts */}
         <link rel="preconnect" href="https://dashboard.envrt.com" crossOrigin="anonymous" />
