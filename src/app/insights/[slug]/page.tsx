@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { getAllSlugs, getPostBySlug } from "@/lib/insights";
 import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { TableOfContents } from "@/components/insights/TableOfContents";
 import { MdxContent } from "@/components/insights/MdxContent";
 import Link from "next/link";
@@ -74,6 +75,13 @@ export default async function InsightsPostPage({ params }: PageProps) {
   return (
     <div className="pt-28 pb-16">
       <ArticleJsonLd post={post} url={url} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Insights", url: "https://envrt.com/insights" },
+          { name: post.title, url },
+        ]}
+      />
 
       <Container>
         <article className="mx-auto max-w-2xl">

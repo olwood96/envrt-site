@@ -4,6 +4,8 @@ import { Footer } from "@/components/layout/Footer";
 import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
 import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
+import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
+import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +35,29 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: ["/og-image.png"],
+  },
+  keywords: [
+    "Digital Product Passports",
+    "DPP",
+    "DPPs UK",
+    "Digital Product Passport textiles",
+    "EU Digital Product Passport",
+    "sustainability data platform",
+    "product transparency",
+    "lifecycle assessment fashion",
+    "supply chain traceability",
+    "fashion sustainability",
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -70,6 +95,8 @@ export default function RootLayout({
         />
       </head>
       <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased overflow-x-hidden">
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
         <Navbar />
 
         {/* SVG filter for liquid glass bottom-edge refraction */}

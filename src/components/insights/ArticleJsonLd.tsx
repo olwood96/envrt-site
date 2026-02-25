@@ -22,7 +22,7 @@ export function ArticleJsonLd({ post, url }: ArticleJsonLdProps) {
       url: "https://envrt.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://envrt.com/logo.png",
+        url: "https://envrt.com/brand/envrt-logo.png",
       },
     },
     url,

@@ -1,10 +1,21 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Terms of Service | ENVRT",
   description:
     "Terms of Service for the ENVRT sustainability data platform, including dashboards, Digital Product Passports, and reports.",
+  openGraph: {
+    title: "Terms of Service | ENVRT",
+    description:
+      "Terms of Service for the ENVRT sustainability data platform.",
+    url: "https://envrt.com/terms",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://envrt.com/terms",
+  },
 };
 
 export default function TermsPage() {

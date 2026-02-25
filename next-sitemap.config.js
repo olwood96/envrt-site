@@ -14,22 +14,19 @@ module.exports = {
       },
     ],
   },
-  // Insights posts get higher priority
   transform: async (config, path) => {
-    if (path.startsWith("/insights/") && path !== "/insights") {
-      return {
-        loc: path,
-        changefreq: "monthly",
-        priority: 0.8,
-        lastmod: new Date().toISOString(),
-      };
+    if (path === "/") {
+      return { loc: path, changefreq: "weekly", priority: 1.0, lastmod: new Date().toISOString() };
     }
-
-    return {
-      loc: path,
-      changefreq: config.changefreq,
-      priority: config.priority,
-      lastmod: new Date().toISOString(),
-    };
+    if (["/pricing", "/contact", "/demo", "/insights"].includes(path)) {
+      return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() };
+    }
+    if (path.startsWith("/insights/")) {
+      return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() };
+    }
+    if (["/privacy", "/terms"].includes(path)) {
+      return { loc: path, changefreq: "yearly", priority: 0.3, lastmod: new Date().toISOString() };
+    }
+    return { loc: path, changefreq: config.changefreq, priority: config.priority, lastmod: new Date().toISOString() };
   },
 };

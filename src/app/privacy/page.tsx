@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Privacy Policy | ENVRT",
   description:
     "How ENVRT collects, uses, and protects personal data across our sustainability data platform.",
+  openGraph: {
+    title: "Privacy Policy | ENVRT",
+    description:
+      "How ENVRT collects, uses, and protects personal data across our sustainability data platform.",
+    url: "https://envrt.com/privacy",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://envrt.com/privacy",
+  },
 };
 
 export default function PrivacyPage() {
