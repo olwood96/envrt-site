@@ -9,9 +9,108 @@ import { heroContent } from "@/lib/config";
 
 const IFRAME_SRC = "https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882";
 
+// ─── Matrix rain characters ─────────────────────────────────────────────────
+const MATRIX_CHARS =
+  "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン" +
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=<>";
+
+function MatrixRain({ visible }: { visible: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [show, setShow] = useState(true);
+
+  // After fade-out transition ends, unmount entirely
+  useEffect(() => {
+    if (!visible) {
+      const timer = setTimeout(() => setShow(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let raf: number;
+    const fontSize = 11;
+    let columns = 0;
+    let drops: number[] = [];
+
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      canvas.width = parent.offsetWidth;
+      canvas.height = parent.offsetHeight;
+      columns = Math.floor(canvas.width / fontSize);
+      // Preserve existing drops, initialise new ones at random positions
+      const prev = drops;
+      drops = Array.from({ length: columns }, (_, i) =>
+        i < prev.length ? prev[i] : Math.random() * -50
+      );
+    };
+
+    resize();
+    const observer = new ResizeObserver(resize);
+    if (canvas.parentElement) observer.observe(canvas.parentElement);
+
+    const draw = () => {
+      // Semi-transparent background to create trail fade effect
+      ctx.fillStyle = "rgba(248, 247, 244, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < columns; i++) {
+        const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        // Subtle black characters at varying low opacities
+        if (Math.random() > 0.3) {
+          ctx.fillStyle = "rgba(30, 30, 30, 0.15)";
+        } else {
+          ctx.fillStyle = "rgba(30, 30, 30, 0.25)";
+        }
+        ctx.fillText(char, x, y);
+
+        // Reset drop to top after passing bottom (with randomness)
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i] += 0.5 + Math.random() * 0.5;
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <div
+      className="absolute inset-0 z-20 overflow-hidden rounded-[2.3rem] bg-[#f8f7f4]"
+      style={{
+        opacity: visible ? 1 : 0,
+        transition: "opacity 500ms ease-out",
+      }}
+    >
+      <canvas ref={canvasRef} className="h-full w-full" />
+    </div>
+  );
+}
+
 function PhoneMockup({ src }: { src: string }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   // ─── Scale iframe to fit phone screen width ───────────────────────────────
   useEffect(() => {
@@ -60,7 +159,7 @@ function PhoneMockup({ src }: { src: string }) {
 
         {/* Screen */}
         <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ aspectRatio: "9 / 19" }}>
-          {/* iframe — visible immediately, no loading overlay */}
+          {/* iframe */}
           <div className="absolute inset-0 overflow-hidden">
             <iframe
               src={src}
@@ -79,8 +178,11 @@ function PhoneMockup({ src }: { src: string }) {
                 paddingTop: "22px",
               }}
               sandbox="allow-scripts allow-same-origin"
+              onLoad={() => setIframeLoaded(true)}
             />
           </div>
+          {/* Matrix rain loading overlay */}
+          <MatrixRain visible={!iframeLoaded} />
         </div>
       </div>
 
