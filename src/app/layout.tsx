@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
+  verification: {
+    google: "j62BTjUf_jbiWVEIwjZhno6IFF9ePefSNWiBCLciaUc",
+  },
   openGraph: {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
