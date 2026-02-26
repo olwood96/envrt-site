@@ -218,8 +218,11 @@ export function HeroSection() {
           </FadeUp>
           <FadeUp delay={0.3}>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button href={heroContent.ctaPrimary.href} size="lg" data-cta="hero-book-demo">
-                {heroContent.ctaPrimary.label}<span className="ml-2">→</span>
+              <Button href="/assessment" size="lg" data-cta="hero-assessment">
+                Test your DPP readiness<span className="ml-2">→</span>
+              </Button>
+              <Button href={heroContent.ctaPrimary.href} variant="secondary" size="lg" data-cta="hero-book-demo">
+                {heroContent.ctaPrimary.label}
               </Button>
             </div>
           </FadeUp>
