@@ -11,8 +11,8 @@ export const siteConfig = {
 
 export const navLinks = [
   { label: "How it works", href: "/#how-it-works" },
-  { label: "Get assessed", href: "/assessment" },
-  { label: "Compare costs", href: "/roi" },
+  { label: "Why ENVRT?", href: "/roi" },
+  { label: "Are you ready?", href: "/assessment" },
   { label: "Pricing", href: "/pricing" },
   // { label: "Demo", href: "/demo" },  // temporarily hidden
   { label: "Team", href: "/team" },

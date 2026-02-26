@@ -313,64 +313,57 @@ export default function ROICalculatorPage() {
     <>
       {/* ---- HERO ---- */}
       {screen === "hero" && (
-        <div className="pb-20 pt-28 sm:pt-32">
-          <Container className="max-w-[720px]">
-            <FadeUp>
-              <div className="text-center">
-                <Badge>ROI Calculator</Badge>
-                <h1 className="mt-6 text-3xl font-bold leading-tight tracking-tight text-envrt-charcoal sm:text-4xl lg:text-[2.75rem]">
-                  What does DPP compliance actually cost?
-                </h1>
-                <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-envrt-muted sm:text-lg">
-                  Compare the cost of ENVRT against hiring a consultant or
-                  building an in-house sustainability team. Get your personalised
-                  savings estimate in under 3 minutes.
-                </p>
-                <div className="mt-8">
-                  <Button
-                    size="lg"
-                    onClick={() => {
-                      setScreen("calculator");
-                      window.scrollTo(0, 0);
-                    }}
-                  >
-                    Calculate your savings
-                    <span className="ml-2">&rarr;</span>
-                  </Button>
-                </div>
-              </div>
-            </FadeUp>
+        <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-5 py-20 text-center">
+          <FadeUp>
+            <div className="mx-auto max-w-2xl">
+              <Badge className="mb-6">ROI Calculator</Badge>
+              <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
+                What does DPP compliance actually cost?
+              </h1>
+              <p className="mx-auto mt-5 max-w-xl text-base text-envrt-muted sm:text-lg">
+                Compare the cost of ENVRT against hiring a consultant or
+                building an in-house sustainability team. Get your personalised
+                savings estimate in under 3 minutes.
+              </p>
 
-            <FadeUp delay={0.2}>
-              <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="mt-8 flex flex-col gap-2.5 text-left">
                 {[
-                  {
-                    stat: "3 min",
-                    desc: "To get your personalised estimate",
-                  },
-                  {
-                    stat: "3 options",
-                    desc: "ENVRT vs consultant vs in-house",
-                  },
-                  {
-                    stat: "Free",
-                    desc: "No obligation, just clarity",
-                  },
-                ].map((item) => (
-                  <SectionCard key={item.stat}>
-                    <div className="p-6 text-center">
-                      <p className="text-2xl font-bold text-envrt-teal">
-                        {item.stat}
-                      </p>
-                      <p className="mt-1 text-sm text-envrt-muted">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </SectionCard>
+                  "Free, no account required",
+                  "Personalised cost comparison in under 3 minutes",
+                  "ENVRT vs consultant vs in-house hire",
+                ].map((text) => (
+                  <div
+                    key={text}
+                    className="flex items-center gap-2.5 text-sm text-envrt-muted"
+                  >
+                    <svg
+                      className="h-4 w-4 flex-shrink-0 text-envrt-teal"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <circle cx="8" cy="8" r="6.5" />
+                      <path d="M5.5 8.5l2 2 3.5-4" />
+                    </svg>
+                    {text}
+                  </div>
                 ))}
               </div>
-            </FadeUp>
-          </Container>
+
+              <div className="mt-10">
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    setScreen("calculator");
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  Calculate your savings <span className="ml-2">&rarr;</span>
+                </Button>
+              </div>
+            </div>
+          </FadeUp>
         </div>
       )}
 

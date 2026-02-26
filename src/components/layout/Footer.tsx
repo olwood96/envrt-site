@@ -10,8 +10,9 @@ const footerLinks = [
     heading: "Product",
     links: [
       { label: "How it works", href: "/#how-it-works" },
+      { label: "Why ENVRT?", href: "/roi" },
+      { label: "Are you ready?", href: "/assessment" },
       { label: "Pricing", href: "/pricing" },
-      { label: "ROI calculator", href: "/roi" },
       { label: "Insights", href: "/insights" },
     ],
   },
