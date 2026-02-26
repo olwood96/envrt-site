@@ -11,12 +11,12 @@ export const siteConfig = {
 
 export const navLinks = [
   { label: "How it works", href: "/#how-it-works" },
+  { label: "Are you ready?", href: "/assessment" },
   { label: "Pricing", href: "/pricing" },
   // { label: "Demo", href: "/demo" },  // temporarily hidden
   { label: "Team", href: "/team" },
   { label: "Insights", href: "/insights" },
-  { label: "Contact", href: "/contact" }
-,
+  { label: "Contact", href: "/contact" },
 ];
 
 export const heroContent = {
