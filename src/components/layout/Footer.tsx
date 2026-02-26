@@ -11,6 +11,7 @@ const footerLinks = [
     links: [
       { label: "How it works", href: "/#how-it-works" },
       { label: "Pricing", href: "/pricing" },
+      { label: "ROI calculator", href: "/roi" },
       { label: "Insights", href: "/insights" },
     ],
   },
