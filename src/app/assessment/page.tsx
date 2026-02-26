@@ -1073,13 +1073,13 @@ export default function AssessmentPage() {
                 out exactly where you stand in 10 minutes.
               </p>
 
-              <div className="mx-auto mt-8 flex max-w-xs flex-col gap-3">
+              <div className="mt-8 flex flex-col gap-2.5 text-left">
                 {[
                   "Free, no account required",
                   "Instant personalised report",
                   "Used by fashion brands preparing for 2027 compliance deadlines",
                 ].map((text) => (
-                  <span
+                  <div
                     key={text}
                     className="flex items-center gap-2.5 text-sm text-envrt-muted"
                   >
@@ -1094,7 +1094,7 @@ export default function AssessmentPage() {
                       <path d="M5.5 8.5l2 2 3.5-4" />
                     </svg>
                     {text}
-                  </span>
+                  </div>
                 ))}
               </div>
 
