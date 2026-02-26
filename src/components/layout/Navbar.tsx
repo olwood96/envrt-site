@@ -13,6 +13,28 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
+  /* ── Sliding pill state ── */
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [pillRect, setPillRect] = useState({ left: 0, width: 0 });
+  const linkRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  const updatePill = useCallback((index: number) => {
+    const el = linkRefs.current[index];
+    const container = navRef.current;
+    if (!el || !container) return;
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    setPillRect({
+      left: elRect.left - containerRect.left,
+      width: elRect.width,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (hoveredIndex !== null) updatePill(hoveredIndex);
+  }, [hoveredIndex, updatePill]);
+
   /* ── Track scroll position ── */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -27,13 +49,10 @@ export function Navbar() {
 
   useEffect(() => {
     if (!mobileOpen) return;
-
-    // Small delay so the open animation isn't interrupted by residual events
     const timer = setTimeout(() => {
       window.addEventListener("scroll", closeMobile, { passive: true });
       window.addEventListener("touchmove", closeMobile, { passive: true });
     }, 150);
-
     return () => {
       clearTimeout(timer);
       window.removeEventListener("scroll", closeMobile);
@@ -41,17 +60,14 @@ export function Navbar() {
     };
   }, [mobileOpen, closeMobile]);
 
-  /* ── Header glass logic ──
-     Desktop: glass-nav when scrolled, transparent at top of page.
-     Mobile:  same — transparent at top, glass-nav when scrolled.
-              When menu is OPEN → opaque (glass-nav-solid) so text is readable. */
+  /* ── Header glass logic ── */
   const headerClass = mobileOpen
     ? "glass-nav-solid py-2 sm:py-3"
     : scrolled
       ? "glass-nav py-2 sm:py-3"
       : "bg-transparent py-3 sm:py-5";
 
-  /* ── Suck-back exit: compute offset toward the hamburger button ── */
+  /* ── Suck-back exit offset ── */
   const getToggleOffset = () => {
     if (typeof window === "undefined" || !toggleRef.current) return 0;
     const rect = toggleRef.current.getBoundingClientRect();
@@ -68,7 +84,7 @@ export function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2 text-xl font-bold tracking-tight text-envrt-charcoal"
+              className="flex-shrink-0 flex items-center gap-2 text-xl font-bold tracking-tight text-envrt-charcoal"
             >
               <div className="relative flex h-6 sm:h-8 items-center">
                 <picture>
@@ -95,12 +111,40 @@ export function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop nav */}
-            <div className="hidden items-center gap-7 md:flex">
-              {navLinks.map((link) => (
-                <GlitchLink key={link.href} href={link.href} label={link.label} />
+            {/* Desktop nav with sliding pill — xl and up */}
+            <div
+              ref={navRef}
+              className="hidden items-center xl:flex relative"
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              {/* Animated pill */}
+              <motion.div
+                className="pointer-events-none absolute rounded-full bg-envrt-charcoal/[0.05]"
+                animate={{
+                  left: pillRect.left,
+                  width: pillRect.width,
+                  opacity: hoveredIndex !== null ? 1 : 0,
+                }}
+                transition={{
+                  left: { type: "spring", stiffness: 400, damping: 35 },
+                  width: { type: "spring", stiffness: 400, damping: 35 },
+                  opacity: { duration: 0.2 },
+                }}
+                style={{ top: "50%", y: "-50%", height: 32 }}
+              />
+
+              {navLinks.map((link, i) => (
+                <div
+                  key={link.href}
+                  ref={(el) => { linkRefs.current[i] = el; }}
+                  onMouseEnter={() => setHoveredIndex(i)}
+                  className="relative z-10 px-3.5 py-1.5"
+                >
+                  <GlitchLink href={link.href} label={link.label} />
+                </div>
               ))}
-              <div className="flex items-center gap-2.5 ml-1">
+
+              <div className="flex items-center gap-2.5 ml-2">
                 <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" data-cta="nav-login">
                   Login
                 </Button>
@@ -110,11 +154,11 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Mobile toggle */}
+            {/* Mobile toggle — below xl */}
             <button
               ref={toggleRef}
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+              className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 xl:hidden"
               aria-label="Toggle menu"
             >
               <motion.span
@@ -134,11 +178,10 @@ export function Navbar() {
         </Container>
       </header>
 
-      {/* ── Mobile dropdown menu ── */}
+      {/* ── Mobile / tablet menu ── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            /* Open: slide down smoothly */
             initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
             animate={{
               opacity: 1,
@@ -146,7 +189,6 @@ export function Navbar() {
               scaleY: 1,
               transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
             }}
-            /* Exit: suck back toward the hamburger button */
             exit={{
               opacity: 0,
               scale: 0.15,
@@ -158,21 +200,19 @@ export function Navbar() {
               },
             }}
             style={{ transformOrigin: "top right" }}
-            className="glass-nav-menu fixed inset-x-0 top-[48px] sm:top-[60px] z-40 md:hidden overflow-hidden"
+            className="glass-nav-menu fixed inset-x-0 top-[48px] sm:top-[60px] z-40 xl:hidden overflow-hidden"
           >
             <Container>
-              <div className="flex flex-col gap-1 py-4">
+              <div className="mx-auto max-w-sm flex flex-col gap-1 py-4">
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.href}
-                    /* Staggered entrance from right */
                     initial={{ opacity: 0, x: 24 }}
                     animate={{
                       opacity: 1,
                       x: 0,
                       transition: { delay: 0.04 * i, duration: 0.28, ease: [0.4, 0, 0.2, 1] },
                     }}
-                    /* Staggered exit: items collapse back in reverse order */
                     exit={{
                       opacity: 0,
                       x: 40,
@@ -187,7 +227,7 @@ export function Navbar() {
                     <GlitchLink
                       href={link.href}
                       label={link.label}
-                      className="block py-3 text-base"
+                      className="block py-3 text-base text-center"
                       onClick={() => setMobileOpen(false)}
                     />
                   </motion.div>

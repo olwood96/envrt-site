@@ -217,11 +217,11 @@ export function HeroSection() {
             <p className="mt-6 text-base leading-relaxed text-envrt-muted sm:text-lg">{heroContent.subheadline}</p>
           </FadeUp>
           <FadeUp delay={0.3}>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button href="/assessment" size="lg" data-cta="hero-assessment">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button href="/assessment" size="md" className="sm:px-8 sm:py-4 sm:text-lg" data-cta="hero-assessment">
                 Test your DPP readiness<span className="ml-2">→</span>
               </Button>
-              <Button href={heroContent.ctaPrimary.href} variant="secondary" size="lg" data-cta="hero-book-demo">
+              <Button href={heroContent.ctaPrimary.href} variant="secondary" size="md" className="sm:px-8 sm:py-4 sm:text-lg" data-cta="hero-book-demo">
                 {heroContent.ctaPrimary.label}
               </Button>
             </div>

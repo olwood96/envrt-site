@@ -1073,7 +1073,7 @@ export default function AssessmentPage() {
                 out exactly where you stand in 10 minutes.
               </p>
 
-              <div className="mt-8 flex flex-col gap-2.5 text-left">
+              <div className="mt-8 inline-flex flex-col gap-2.5 text-left">
                 {[
                   "Free, no account required",
                   "Instant personalised report",
