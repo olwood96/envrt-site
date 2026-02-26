@@ -18,6 +18,7 @@ interface AssessmentPayload {
   actions: string[];
   timelineRisk: string;
   greenClaimsFlag: boolean;
+  marketingConsent: boolean;
 }
 
 function buildEmailHtml(data: AssessmentPayload): string {
@@ -141,6 +142,31 @@ function buildEmailHtml(data: AssessmentPayload): string {
 </html>`;
 }
 
+const INTERNAL_NOTIFY_EMAIL = "info@envrt.com";
+
+function buildInternalNotifyHtml(data: AssessmentPayload): string {
+  const dimensionRows = data.dimensions
+    .map((d) => `<tr><td style="padding:6px 12px;font-size:14px;">${d.label}</td><td style="padding:6px 12px;font-size:14px;font-weight:600;">${d.score}/100</td></tr>`)
+    .join("");
+
+  return `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
+  <h2 style="color:#1b3a2d;margin:0 0 16px;">New Assessment Lead</h2>
+  <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
+    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${data.firstName}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Brand</td><td style="padding:6px 12px;font-weight:600;">${data.brandName}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Marketing consent</td><td style="padding:6px 12px;font-weight:600;">${data.marketingConsent ? "Yes" : "No"}</td></tr>
+  </table>
+  <h3 style="color:#1b3a2d;margin:0 0 8px;">Score: ${data.overall}/100 (${data.band})</h3>
+  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
+    ${dimensionRows}
+  </table>
+  ${data.greenClaimsFlag ? '<p style="color:#92400e;font-weight:600;">Green Claims Risk Flag triggered</p>' : ""}
+  <p style="font-size:13px;color:#888;margin-top:24px;">Sent from the DPP Readiness Assessment at envrt.com/assessment</p>
+</div>`;
+}
+
 const handler: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method not allowed" };
@@ -175,11 +201,20 @@ const handler: Handler = async (event) => {
   const resend = new Resend(apiKey);
 
   try {
+    // Send results to the user
     await resend.emails.send({
       from: "ENVRT Assessment <results@envrt.com>",
       to: data.email,
       subject: `Your DPP Readiness Score: ${data.overall}/100 - ${data.band}`,
       html: buildEmailHtml(data),
+    });
+
+    // Send internal lead notification
+    await resend.emails.send({
+      from: "ENVRT Assessment <results@envrt.com>",
+      to: INTERNAL_NOTIFY_EMAIL,
+      subject: `Assessment Lead: ${data.firstName} @ ${data.brandName} (${data.overall}/100)`,
+      html: buildInternalNotifyHtml(data),
     });
 
     return {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
@@ -1027,9 +1028,9 @@ export default function AssessmentPage() {
   const showResults = () => {
     const s = calculateScores(answers);
     setScores(s);
+    window.scrollTo(0, 0);
     setScreen("results");
     setAnimateResults(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => setAnimateResults(true), 300);
   };
 
@@ -1072,7 +1073,7 @@ export default function AssessmentPage() {
                 out exactly where you stand in 10 minutes.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+              <div className="mx-auto mt-8 flex max-w-xs flex-col gap-3">
                 {[
                   "Free, no account required",
                   "Instant personalised report",
@@ -1080,7 +1081,7 @@ export default function AssessmentPage() {
                 ].map((text) => (
                   <span
                     key={text}
-                    className="flex items-center gap-2 text-sm text-envrt-muted"
+                    className="flex items-center gap-2.5 text-sm text-envrt-muted"
                   >
                     <svg
                       className="h-4 w-4 flex-shrink-0 text-envrt-teal"
@@ -1240,6 +1241,7 @@ export default function AssessmentPage() {
                           actions: getRecommendedActions(s, answers),
                           timelineRisk: getTimelineRisk(answers),
                           greenClaimsFlag: s.greenClaimsFlag,
+                          marketingConsent: !!formData.get("marketingConsent"),
                         }),
                       });
                     } catch {
@@ -1285,9 +1287,27 @@ export default function AssessmentPage() {
                       className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
                     />
                   </div>
+                  <label className="flex items-start gap-2.5 pt-1">
+                    <input
+                      type="checkbox"
+                      name="marketingConsent"
+                      className="mt-0.5 h-4 w-4 rounded border-envrt-charcoal/20 text-envrt-teal accent-envrt-teal"
+                    />
+                    <span className="text-xs leading-relaxed text-envrt-muted">
+                      I am happy to receive follow-up communications from ENVRT
+                      about DPP compliance and product updates.
+                    </span>
+                  </label>
                   <Button type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
                     {emailSending ? "Sending your report..." : <>View My Report <span className="ml-2">&rarr;</span></>}
                   </Button>
+                  <p className="text-center text-[11px] leading-relaxed text-envrt-muted/70">
+                    Your results will be emailed to you. See our{" "}
+                    <Link href="/privacy" className="underline hover:text-envrt-teal">
+                      privacy policy
+                    </Link>{" "}
+                    for how we handle your data.
+                  </p>
                 </form>
 
                 <button
@@ -1430,27 +1450,33 @@ export default function AssessmentPage() {
             {/* CTA block */}
             <FadeUp delay={0.4}>
               <SectionCard dark className="mt-10">
-                <div className="p-8 text-center sm:p-12">
-                  <h2 className="text-xl font-bold tracking-tight text-envrt-offwhite sm:text-2xl">
-                    Ready to close your compliance gaps?
-                  </h2>
-                  <p className="mx-auto mt-3 max-w-md text-sm text-envrt-muted sm:text-base">
-                    ENVRT generates fully compliant Digital Product Passports
-                    from your existing data. Get in touch and we will walk you
-                    through how it works.
-                  </p>
-                  <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                    <Button href="/contact" variant="secondary" size="lg">
-                      Get in touch{" "}
-                      <span className="ml-2">&rarr;</span>
-                    </Button>
-                    <Button
-                      href="/insights"
-                      variant="ghost"
-                      className="text-envrt-offwhite hover:text-envrt-teal-light"
-                    >
-                      Read more in our insights
-                    </Button>
+                <div className="py-16 sm:py-20">
+                  <div className="mx-auto max-w-2xl text-center">
+                    <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                      Ready to close your compliance gaps?
+                    </h2>
+                    <p className="mt-4 text-base leading-relaxed text-white/60">
+                      ENVRT generates fully compliant Digital Product Passports
+                      from your existing data. Get in touch and we will walk you
+                      through how it works.
+                    </p>
+                    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                      <Link
+                        href="/contact"
+                        data-cta="assessment-cta-contact"
+                        className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-envrt-green transition-all duration-300 hover:bg-envrt-cream shadow-sm hover:shadow-md"
+                      >
+                        Get in touch
+                        <span className="ml-2">&rarr;</span>
+                      </Link>
+                      <Link
+                        href="/insights"
+                        data-cta="assessment-cta-insights"
+                        className="inline-flex items-center justify-center rounded-xl border border-white/30 px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
+                      >
+                        Read our insights
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </SectionCard>
