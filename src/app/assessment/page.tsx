@@ -99,13 +99,13 @@ const sections: Section[] = [
       {
         id: "q4",
         type: "single",
-        text: "What is your approximate annual turnover?",
+        text: "What size best describes your brand?",
         options: [
-          { label: "Under £250k", value: "under250k" },
-          { label: "£250k-£1M", value: "250k-1m" },
-          { label: "£1M-£5M", value: "1m-5m" },
-          { label: "£5M-£20M", value: "5m-20m" },
-          { label: "£20M+", value: "20m+" },
+          { label: "Startup or emerging", value: "under250k" },
+          { label: "Small (under 20 employees)", value: "250k-1m" },
+          { label: "Growing (20-50 employees)", value: "1m-5m" },
+          { label: "Established (50-200 employees)", value: "5m-20m" },
+          { label: "Enterprise (200+)", value: "20m+" },
         ],
       },
       {
@@ -380,18 +380,18 @@ const sections: Section[] = [
       {
         id: "q20",
         type: "single",
-        text: "Are you aware that making unsubstantiated sustainability claims will become legally actionable under EU and UK law from 2026 onwards?",
+        text: "Have you reviewed your marketing materials against upcoming green claims legislation?",
         options: [
           {
-            label: "Yes, and we\u2019ve reviewed our claims",
+            label: "Yes, we have fully reviewed and updated our claims",
             value: "reviewed",
           },
-          { label: "Yes, and we\u2019re concerned", value: "concerned" },
+          { label: "We have started reviewing", value: "concerned" },
           {
-            label: "We\u2019d heard something about this",
+            label: "It is on our to-do list",
             value: "heard",
           },
-          { label: "No, this is new to us", value: "new" },
+          { label: "Not yet", value: "new" },
         ],
       },
     ],
