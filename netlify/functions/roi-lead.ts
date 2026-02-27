@@ -7,10 +7,10 @@ interface ROIPayload {
   email: string;
   marketingConsent: boolean;
   skuCount: number;
+  dataMaturity: string;
   hoursPerProduct: number;
   market: string;
   approach: string;
-  teamSize: string;
   envrtCost: number;
   envrtPlan: string;
   envrtPlanPrice: string;
@@ -150,10 +150,9 @@ function buildInternalNotifyHtml(data: ROIPayload): string {
   <h3 style="color:#1b3a2d;margin:0 0 8px;">Calculator Inputs</h3>
   <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
     <tr><td style="padding:6px 12px;color:#666;">Products</td><td style="padding:6px 12px;font-weight:600;">${data.skuCount}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Hours/product</td><td style="padding:6px 12px;font-weight:600;">${data.hoursPerProduct}h</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Data maturity</td><td style="padding:6px 12px;font-weight:600;">${data.dataMaturity} (~${data.hoursPerProduct}h/product)</td></tr>
     <tr><td style="padding:6px 12px;color:#666;">Markets</td><td style="padding:6px 12px;font-weight:600;">${data.market}</td></tr>
     <tr><td style="padding:6px 12px;color:#666;">Current approach</td><td style="padding:6px 12px;font-weight:600;">${data.approach}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Team size</td><td style="padding:6px 12px;font-weight:600;">${data.teamSize}</td></tr>
   </table>
   <h3 style="color:#1b3a2d;margin:0 0 8px;">Results</h3>
   <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">

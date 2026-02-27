@@ -15,14 +15,13 @@ import { FadeUp } from "@/components/ui/Motion";
 type Screen = "hero" | "calculator" | "email" | "results";
 type Market = "eu" | "uk" | "both";
 type Approach = "none" | "spreadsheets" | "consultant" | "inhouse";
-type TeamSize = "founder" | "small" | "dedicated";
+type DataMaturity = "not-started" | "manual" | "some-systems" | "digitised";
 
 interface CalcInputs {
   skuCount: number;
-  hoursPerProduct: number;
+  dataMaturity: DataMaturity;
   market: Market;
   approach: Approach;
-  teamSize: TeamSize;
 }
 
 interface CalcResults {
@@ -41,6 +40,14 @@ interface CalcResults {
 /* ================================================================
    CALCULATION LOGIC
    ================================================================ */
+
+// Map data maturity to estimated hours per product
+const DATA_MATURITY_HOURS: Record<DataMaturity, number> = {
+  "not-started": 8,
+  manual: 6,
+  "some-systems": 4,
+  digitised: 2,
+};
 
 function calculateROI(inputs: CalcInputs): CalcResults {
   // ENVRT cost: auto-select plan by SKU count
@@ -62,24 +69,28 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   }
   const envrtCost = envrtMonthly * 12;
 
+  // Derive day rate and salary from SKU count (proxy for brand scale)
+  let consultantDayRate: number;
+  let inhouseSalary: number;
+  if (inputs.skuCount <= 25) {
+    consultantDayRate = 500;
+    inhouseSalary = 43000;
+  } else if (inputs.skuCount <= 100) {
+    consultantDayRate = 650;
+    inhouseSalary = 55000;
+  } else {
+    consultantDayRate = 800;
+    inhouseSalary = 67000;
+  }
+
   // Consultant cost
-  const dayRates: Record<TeamSize, number> = {
-    founder: 500,
-    small: 650,
-    dedicated: 800,
-  };
   const marketMultiplier = inputs.market === "both" ? 1.3 : 1.0;
   const consultantDays = 5 + inputs.skuCount * 1.5;
   const consultantCost =
-    consultantDays * dayRates[inputs.teamSize] * marketMultiplier;
+    consultantDays * consultantDayRate * marketMultiplier;
 
   // In-house cost (salary + overhead)
-  const salaries: Record<TeamSize, number> = {
-    founder: 43000,
-    small: 55000,
-    dedicated: 67000,
-  };
-  const inhouseCost = salaries[inputs.teamSize];
+  const inhouseCost = inhouseSalary;
 
   // Savings
   const savingVsConsultant = Math.max(0, consultantCost - envrtCost);
@@ -87,7 +98,8 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   const maxSaving = Math.max(savingVsConsultant, savingVsInhouse);
 
   // Time savings: (current hours - 1 hour with ENVRT) per SKU per year
-  const hoursSaved = Math.max(0, (inputs.hoursPerProduct - 1) * inputs.skuCount);
+  const hoursPerProduct = DATA_MATURITY_HOURS[inputs.dataMaturity];
+  const hoursSaved = Math.max(0, (hoursPerProduct - 1) * inputs.skuCount);
   const daysSaved = Math.round(hoursSaved / 8);
 
   return {
@@ -263,10 +275,9 @@ export default function ROICalculatorPage() {
 
   // Calculator inputs
   const [skuCount, setSkuCount] = useState(25);
-  const [hoursPerProduct, setHoursPerProduct] = useState(4);
+  const [dataMaturity, setDataMaturity] = useState<DataMaturity>("manual");
   const [market, setMarket] = useState<Market>("both");
   const [approach, setApproach] = useState<Approach>("spreadsheets");
-  const [teamSize, setTeamSize] = useState<TeamSize>("small");
 
   // Results
   const [results, setResults] = useState<CalcResults | null>(null);
@@ -282,16 +293,15 @@ export default function ROICalculatorPage() {
   const calculate = useCallback(() => {
     const inputs: CalcInputs = {
       skuCount,
-      hoursPerProduct,
+      dataMaturity,
       market,
       approach,
-      teamSize,
     };
     const r = calculateROI(inputs);
     setResults(r);
     setScreen("email");
     window.scrollTo(0, 0);
-  }, [skuCount, hoursPerProduct, market, approach, teamSize]);
+  }, [skuCount, dataMaturity, market, approach]);
 
   const showResults = useCallback(() => {
     setScreen("results");
@@ -396,16 +406,30 @@ export default function ROICalculatorPage() {
                     onChange={setSkuCount}
                   />
 
-                  {/* Hours per product slider */}
-                  <RangeSlider
-                    label="Hours per product on sustainability data"
-                    min={0.5}
-                    max={40}
-                    step={0.5}
-                    value={hoursPerProduct}
-                    onChange={setHoursPerProduct}
-                    format={(v) => `${v}h`}
-                  />
+                  {/* Data maturity */}
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-envrt-charcoal">
+                      How do you currently manage product sustainability data?
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(
+                        [
+                          { value: "not-started", label: "We haven't started yet" },
+                          { value: "manual", label: "Spreadsheets and emails" },
+                          { value: "some-systems", label: "Some systems in place" },
+                          { value: "digitised", label: "Fully digitised" },
+                        ] as const
+                      ).map((opt) => (
+                        <OptionTile
+                          key={opt.value}
+                          label={opt.label}
+                          value={opt.value}
+                          selected={dataMaturity === opt.value}
+                          onSelect={setDataMaturity}
+                        />
+                      ))}
+                    </div>
+                  </div>
 
                   {/* Markets */}
                   <div>
@@ -451,30 +475,6 @@ export default function ROICalculatorPage() {
                           value={opt.value}
                           selected={approach === opt.value}
                           onSelect={setApproach}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Team size */}
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-envrt-charcoal">
-                      Team size
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {(
-                        [
-                          { value: "founder", label: "Founder-led" },
-                          { value: "small", label: "Small team" },
-                          { value: "dedicated", label: "Dedicated person" },
-                        ] as const
-                      ).map((opt) => (
-                        <OptionTile
-                          key={opt.value}
-                          label={opt.label}
-                          value={opt.value}
-                          selected={teamSize === opt.value}
-                          onSelect={setTeamSize}
                         />
                       ))}
                     </div>
@@ -542,10 +542,10 @@ export default function ROICalculatorPage() {
                               email,
                               marketingConsent,
                               skuCount,
-                              hoursPerProduct,
+                              dataMaturity,
+                              hoursPerProduct: DATA_MATURITY_HOURS[dataMaturity],
                               market,
                               approach,
-                              teamSize,
                               ...results,
                             }),
                           });
@@ -816,15 +816,15 @@ export default function ROICalculatorPage() {
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">Consultant cost:</strong>{" "}
-                        Calculated as (5 setup days + {skuCount} products x 1.5 days each) x day rate{market === "both" ? " x 1.3 dual-market multiplier" : ""}. Day rates vary by team context: £500 (founder-led), £650 (small team), £800 (dedicated hire).
+                        Calculated as (5 setup days + {skuCount} products x 1.5 days each) x day rate{market === "both" ? " x 1.3 dual-market multiplier" : ""}. Day rates scale with brand size: £500/day (up to 25 products), £650/day (26-100), £800/day (100+).
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">In-house cost:</strong>{" "}
-                        Based on typical UK salary plus overhead for a sustainability-focused role: £43k (founder doing it themselves), £55k (junior hire in small team), £67k (dedicated sustainability manager).
+                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 25 products), £55k (26-100), £67k (100+).
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">Time savings:</strong>{" "}
-                        Based on your estimate of {hoursPerProduct}h per product currently, reduced to approximately 1h per product with ENVRT, across {skuCount} products.
+                        Based on an estimated {DATA_MATURITY_HOURS[dataMaturity]}h per product at your current data maturity, reduced to approximately 1h per product with ENVRT, across {skuCount} products.
                       </p>
                       <p className="pt-2 text-envrt-muted/60">
                         These are estimates for illustration only and may vary based on your specific circumstances.
