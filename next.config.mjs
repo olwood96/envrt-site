@@ -10,6 +10,16 @@ const nextConfig = {
     optimizePackageImports: ["framer-motion"],
   },
 
+  async redirects() {
+    return [
+      {
+        source: "/how-it-works",
+        destination: "/#how-it-works",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
