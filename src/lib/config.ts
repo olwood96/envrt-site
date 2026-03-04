@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "ENVRT",
-  tagline: "The Infrastructure Layer For Product Transparency.",
+  tagline: "Digital Product Passports in minutes, not months.",
   description:
     "Digital Product Passports, lifecycle metrics and sustainability analytics, all in one place. Fast and simple.",
   url: "https://envrt.com",
@@ -21,7 +21,7 @@ export const navLinks = [
 ];
 
 export const heroContent = {
-  badge: "The Infrastructure Layer For Product Transparency",
+  badge: "Onboard in 30 minutes. Generate DPPs today.",
   headline: "Your GARMENTS.\nTheir IMPACT.\nOne PLATFORM.",
   subheadline:
     "Create regulation-ready Digital Product Passports, calculate CO₂e and water scarcity metrics and share sustainability data with your customers, all in one place.",
@@ -48,7 +48,7 @@ export const whyNowCards = [
     icon: "⚡",
     title: "Complex doesn't mean slow",
     description:
-      "Lifecycle assessments used to take months. We've reduced that to under an hour per product.",
+      "Lifecycle assessments used to take months. With ENVRT, brands onboard in under 30 minutes and can generate their first DPP the same day.",
   },
   {
     icon: "📊",
@@ -287,7 +287,7 @@ export const faqItems = [
   {
     question: "How long does it take to create a DPP?",
     answer:
-      "Most brands can go from raw supply chain data to a published Digital Product Passport in under an hour. Our guided data entry and automated calculations do the heavy lifting.",
+      "Most brands onboard in around 30 minutes. Once set up, generating each DPP takes just minutes. Our guided data entry and automated calculations do the heavy lifting.",
   },
   {
     question: "What data do I need to get started?",

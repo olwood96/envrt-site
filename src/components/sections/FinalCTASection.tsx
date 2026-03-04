@@ -17,7 +17,7 @@ export function FinalCTASection() {
               </h2>
               <p className="mt-5 text-base leading-relaxed text-white/60 sm:text-lg">
                 Join the brands turning sustainability data into competitive advantage.
-                Get your first Digital Product Passport in under an hour.
+                Onboard in 30 minutes, then generate DPPs whenever you need them.
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link

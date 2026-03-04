@@ -14,7 +14,7 @@ export function OutcomesSection() {
               What you get
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-              Better data. Better decisions. Better products.
+              Better data. Better decisions. In a fraction of the time.
             </h2>
           </div>
         </FadeUp>

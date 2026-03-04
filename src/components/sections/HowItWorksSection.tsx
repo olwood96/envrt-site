@@ -925,7 +925,7 @@ export function HowItWorksSection() {
           <FadeUp>
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">How it works</p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">From data to DPP in under an hour</h2>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">Onboard once. Generate DPPs in minutes.</h2>
             </div>
           </FadeUp>
           <FadeUp delay={0.1}>
