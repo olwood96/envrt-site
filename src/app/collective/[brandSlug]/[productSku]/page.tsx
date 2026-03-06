@@ -8,13 +8,13 @@ import { CollectiveDppEmbed } from "@/components/collective/CollectiveDppEmbed";
 export const revalidate = 300;
 
 interface PageProps {
-  params: Promise<{ brandSlug: string; productSku: string }>;
+  params: { brandSlug: string; productSku: string };
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { brandSlug, productSku } = await params;
+  const { brandSlug, productSku } = params;
   const card = await getFeaturedDpp(brandSlug, productSku);
 
   if (!card) {
@@ -49,7 +49,7 @@ export async function generateMetadata({
 }
 
 export default async function CollectiveDetailPage({ params }: PageProps) {
-  const { brandSlug, productSku } = await params;
+  const { brandSlug, productSku } = params;
   const card = await getFeaturedDpp(brandSlug, productSku);
 
   if (!card) notFound();

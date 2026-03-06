@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ products?: string }>;
+  searchParams: { products?: string };
 }
 
 export default async function ComparePage({ searchParams }: PageProps) {
-  const { products } = await searchParams;
+  const { products } = searchParams;
 
   if (!products) notFound();
 
