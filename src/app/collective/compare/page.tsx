@@ -46,11 +46,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
   if (validCards.length < 2) notFound();
 
-  // Enforce same brand
-  const brandIds = new Set(validCards.map((c) => c.brand.id));
-  if (brandIds.size > 1) notFound();
-
-  const brandName = validCards[0].brand.name;
+  const brandNames = Array.from(new Set(validCards.map((c) => c.brand.name)));
 
   return (
     <div className="pt-28 pb-16">
@@ -65,7 +61,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
         <div className="mt-6">
           <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
-            {brandName}
+            {brandNames.join(" vs ")}
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
             Product comparison

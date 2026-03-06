@@ -41,7 +41,7 @@ export interface CollectiveCardData {
 
 /** Available filter options derived from the featured set */
 export interface CollectiveFilters {
-  brands: { id: string; name: string }[];
+  brands: { id: string; name: string; count: number }[];
   collections: string[];
   materialTypes: string[];
 }
@@ -53,7 +53,8 @@ export type CollectiveSortKey =
   | "emissions_desc"
   | "water_asc"
   | "water_desc"
-  | "name";
+  | "name"
+  | "most_compared";
 
 /** Full data returned from getFeaturedDpps */
 export interface CollectivePageData {

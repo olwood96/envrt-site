@@ -7,11 +7,13 @@ import type {
 
 interface Props {
   filters: CollectiveFilters;
+  searchQuery: string;
   selectedBrand: string;
   selectedCollection: string;
   selectedMaterial: string;
   sortKey: CollectiveSortKey;
   resultCount: number;
+  onSearchChange: (value: string) => void;
   onBrandChange: (value: string) => void;
   onCollectionChange: (value: string) => void;
   onMaterialChange: (value: string) => void;
@@ -25,6 +27,7 @@ const SORT_OPTIONS: { value: CollectiveSortKey; label: string }[] = [
   { value: "emissions_desc", label: "CO₂e (high to low)" },
   { value: "water_asc", label: "Water (low to high)" },
   { value: "water_desc", label: "Water (high to low)" },
+  { value: "most_compared", label: "Most compared" },
 ];
 
 const selectClasses =
@@ -32,11 +35,13 @@ const selectClasses =
 
 export function CollectiveFiltersBar({
   filters,
+  searchQuery,
   selectedBrand,
   selectedCollection,
   selectedMaterial,
   sortKey,
   resultCount,
+  onSearchChange,
   onBrandChange,
   onCollectionChange,
   onMaterialChange,
@@ -44,6 +49,29 @@ export function CollectiveFiltersBar({
 }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-3">
+      <div className="relative">
+        <svg
+          className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-envrt-muted"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search products..."
+          className={`${selectClasses} w-44 pl-8`}
+        />
+      </div>
+
       <select
         value={selectedBrand}
         onChange={(e) => onBrandChange(e.target.value)}
@@ -52,7 +80,7 @@ export function CollectiveFiltersBar({
         <option value="">All brands</option>
         {filters.brands.map((b) => (
           <option key={b.id} value={b.id}>
-            {b.name}
+            {b.name} ({b.count})
           </option>
         ))}
       </select>

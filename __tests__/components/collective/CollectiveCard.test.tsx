@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CollectiveCard } from "@/components/collective/CollectiveCard";
@@ -90,6 +90,19 @@ describe("CollectiveCard", () => {
     expect(screen.getByText("45.8 L H₂O")).toBeInTheDocument();
   });
 
+  it("renders traceability score", () => {
+    render(
+      <CollectiveCard
+        card={mockCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    expect(screen.getByText("85% trace")).toBeInTheDocument();
+  });
+
   it("renders material tags", () => {
     render(
       <CollectiveCard
@@ -163,5 +176,116 @@ describe("CollectiveCard", () => {
       (l) => l.getAttribute("href") === "/collective/ecobrand/tee-001"
     );
     expect(detailLinks.length).toBeGreaterThan(0);
+  });
+
+  describe("New badge", () => {
+    let dateSpy: ReturnType<typeof vi.spyOn>;
+
+    afterEach(() => {
+      dateSpy?.mockRestore();
+    });
+
+    it("shows New badge for recently featured products", () => {
+      // Mock Date.now to be 5 days after featured_at
+      const fiveDaysAfter = new Date("2025-01-06T00:00:00Z").getTime();
+      dateSpy = vi.spyOn(Date, "now").mockReturnValue(fiveDaysAfter);
+
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByText("New")).toBeInTheDocument();
+    });
+
+    it("does not show New badge for old products", () => {
+      // Mock Date.now to be 30 days after featured_at
+      const thirtyDaysAfter = new Date("2025-01-31T00:00:00Z").getTime();
+      dateSpy = vi.spyOn(Date, "now").mockReturnValue(thirtyDaysAfter);
+
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByText("New")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("lightbox", () => {
+    const cardWithImage: CollectiveCardData = {
+      ...mockCard,
+      productImageUrl: "https://example.com/image.jpg",
+    };
+
+    beforeEach(() => {
+      // Reset body overflow
+      document.body.style.overflow = "";
+    });
+
+    it("shows expand button when image is present", () => {
+      render(
+        <CollectiveCard
+          card={cardWithImage}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByLabelText("View full image")).toBeInTheDocument();
+    });
+
+    it("opens lightbox when expand button is clicked", () => {
+      render(
+        <CollectiveCard
+          card={cardWithImage}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByLabelText("View full image"));
+      expect(screen.getByLabelText("Close lightbox")).toBeInTheDocument();
+    });
+
+    it("closes lightbox when close button is clicked", () => {
+      render(
+        <CollectiveCard
+          card={cardWithImage}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByLabelText("View full image"));
+      expect(screen.getByLabelText("Close lightbox")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByLabelText("Close lightbox"));
+      expect(screen.queryByLabelText("Close lightbox")).not.toBeInTheDocument();
+    });
+
+    it("does not show expand button when no image", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByLabelText("View full image")).not.toBeInTheDocument();
+    });
   });
 });

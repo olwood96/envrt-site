@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
 import { CollectiveDppEmbed } from "@/components/collective/CollectiveDppEmbed";
+import { CollectiveShareButton } from "@/components/collective/CollectiveShareButton";
 
 export const revalidate = 300;
 
@@ -55,6 +56,7 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
   if (!card) notFound();
 
   const { dpp, brand, embedUrl } = card;
+  const shareUrl = `https://envrt.com/collective/${brandSlug}/${productSku}`;
 
   return (
     <div className="pt-28 pb-16">
@@ -70,15 +72,26 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
 
         {/* Header */}
         <div className="mt-6">
-          <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
-            {brand.name}
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-            {dpp.garment_name}
-          </h1>
-          <p className="mt-1 text-sm text-envrt-muted">
-            {dpp.collection_name}
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Link
+                href={`/collective/${brandSlug}`}
+                className="text-xs font-medium uppercase tracking-widest text-envrt-teal transition-colors hover:text-envrt-green"
+              >
+                {brand.name}
+              </Link>
+              <h1 className="mt-2 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
+                {dpp.garment_name}
+              </h1>
+              <p className="mt-1 text-sm text-envrt-muted">
+                {dpp.collection_name}
+              </p>
+            </div>
+            <CollectiveShareButton
+              url={shareUrl}
+              title={`${dpp.garment_name} by ${brand.name}`}
+            />
+          </div>
 
           {/* Metrics strip */}
           <div className="mt-4 flex flex-wrap items-center gap-3">

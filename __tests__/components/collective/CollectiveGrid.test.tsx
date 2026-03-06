@@ -89,8 +89,8 @@ const mockCards: CollectiveCardData[] = [
 
 const mockFilters: CollectiveFilters = {
   brands: [
-    { id: "b1", name: "BrandA" },
-    { id: "b2", name: "BrandB" },
+    { id: "b1", name: "BrandA", count: 2 },
+    { id: "b2", name: "BrandB", count: 1 },
   ],
   collections: ["Summer 2025"],
   materialTypes: ["Cotton", "Polyester"],
@@ -134,7 +134,6 @@ describe("CollectiveGrid", () => {
   });
 
   it("shows empty state when no filters match", () => {
-    // BrandB has no Polyester products, so combining these filters yields 0 results
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
 
     const brandSelect = screen.getAllByRole("combobox")[0];
@@ -143,6 +142,64 @@ describe("CollectiveGrid", () => {
     const materialSelect = screen.getAllByRole("combobox")[2];
     fireEvent.change(materialSelect, { target: { value: "Polyester" } });
 
-    expect(screen.getByText("No products match your filters.")).toBeInTheDocument();
+    expect(
+      screen.getByText("No products match your filters.")
+    ).toBeInTheDocument();
+  });
+
+  it("filters by search query", () => {
+    render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
+
+    const searchInput = screen.getByPlaceholderText("Search products...");
+    fireEvent.change(searchInput, { target: { value: "Product A" } });
+
+    expect(screen.getByText("Product A")).toBeInTheDocument();
+    expect(screen.queryByText("Product B")).not.toBeInTheDocument();
+    expect(screen.queryByText("Product C")).not.toBeInTheDocument();
+    expect(screen.getByText("1 product")).toBeInTheDocument();
+  });
+
+  it("searches by brand name", () => {
+    render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
+
+    const searchInput = screen.getByPlaceholderText("Search products...");
+    fireEvent.change(searchInput, { target: { value: "BrandB" } });
+
+    expect(screen.queryByText("Product A")).not.toBeInTheDocument();
+    expect(screen.queryByText("Product B")).not.toBeInTheDocument();
+    expect(screen.getByText("Product C")).toBeInTheDocument();
+  });
+
+  it("shows Show more button when cards exceed page size", () => {
+    const manyCards = Array.from({ length: 15 }, (_, i) =>
+      makeCard(`id-${i}`, "b1", "BrandA", `Product ${i}`, 3.0, 50, "Cotton")
+    );
+    const manyFilters: CollectiveFilters = {
+      brands: [{ id: "b1", name: "BrandA", count: 15 }],
+      collections: ["Summer 2025"],
+      materialTypes: ["Cotton"],
+    };
+
+    render(<CollectiveGrid cards={manyCards} filters={manyFilters} />);
+    expect(screen.getByText(/Show more/)).toBeInTheDocument();
+    expect(screen.getByText(/3 remaining/)).toBeInTheDocument();
+  });
+
+  it("does not show Show more when all cards fit on one page", () => {
+    render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
+    expect(screen.queryByText(/Show more/)).not.toBeInTheDocument();
+  });
+
+  it("allows cross-brand comparison", () => {
+    render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    // Select Product A (BrandA) and Product C (BrandB)
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[2]);
+
+    // Both should be checked — cross-brand is now allowed
+    expect(checkboxes[0]).toBeChecked();
+    expect(checkboxes[2]).toBeChecked();
   });
 });
