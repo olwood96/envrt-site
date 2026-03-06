@@ -18,8 +18,11 @@ module.exports = {
     if (path === "/") {
       return { loc: path, changefreq: "weekly", priority: 1.0, lastmod: new Date().toISOString() };
     }
-    if (["/pricing", "/contact", "/demo", "/insights"].includes(path)) {
+    if (["/pricing", "/contact", "/demo", "/insights", "/collective"].includes(path)) {
       return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() };
+    }
+    if (path.startsWith("/collective/")) {
+      return { loc: path, changefreq: "weekly", priority: 0.7, lastmod: new Date().toISOString() };
     }
     if (path.startsWith("/insights/")) {
       return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() };

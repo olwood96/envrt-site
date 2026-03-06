@@ -13,6 +13,7 @@ const footerLinks = [
       { label: "Why ENVRT?", href: "/roi" },
       { label: "Are you ready?", href: "/assessment" },
       { label: "Pricing", href: "/pricing" },
+      { label: "The Collective", href: "/collective" },
       { label: "Insights", href: "/insights" },
     ],
   },
