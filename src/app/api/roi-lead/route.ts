@@ -197,6 +197,7 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: "ENVRT Calculator <results@envrt.com>",
       to: INTERNAL_NOTIFY_EMAIL,
+      bcc: ["charlie@envrt.com", "oliver@envrt.com"],
       subject: `ROI Lead: ${data.firstName} @ ${data.brandName} (${formatCurrency(data.maxSaving)} saving)`,
       html: buildInternalNotifyHtml(data),
     });

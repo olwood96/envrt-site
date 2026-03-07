@@ -198,6 +198,7 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: "ENVRT Assessment <results@envrt.com>",
       to: INTERNAL_NOTIFY_EMAIL,
+      bcc: ["charlie@envrt.com", "oliver@envrt.com"],
       subject: `Assessment Lead: ${data.firstName} @ ${data.brandName} (${data.overall}/100)`,
       html: buildInternalNotifyHtml(data),
     });
