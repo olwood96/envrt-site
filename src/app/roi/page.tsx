@@ -533,7 +533,7 @@ export default function ROICalculatorPage() {
 
                       if (results) {
                         try {
-                          await fetch("/.netlify/functions/roi-lead", {
+                          await fetch("/api/roi-lead", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({

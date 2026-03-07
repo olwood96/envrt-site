@@ -1,25 +1,26 @@
-import { schedule } from "@netlify/functions";
-import { createClient } from "@supabase/supabase-js";
+import { NextRequest, NextResponse } from "next/server";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { Resend } from "resend";
 import {
   buildDigestEmail,
   type DigestProduct,
-} from "../../src/lib/collective/email-templates";
+} from "@/lib/collective/email-templates";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const RESEND_API_KEY = process.env.RESEND_API_KEY!;
-const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public`;
+const STORAGE_BASE = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 const FROM_ADDRESS = "ENVRT Collective <collective@envrt.com>";
 const BATCH_SIZE = 100;
 
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-export const handler = schedule("0 9 * * 1", async () => {
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-    auth: { persistSession: false },
-  });
+export async function GET(request: NextRequest) {
+  // Verify cron secret to prevent unauthorized access
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const supabase = getSupabaseAdmin();
 
   // 1. Check kill switch
   const { data: config } = await supabase
@@ -29,8 +30,7 @@ export const handler = schedule("0 9 * * 1", async () => {
     .single();
 
   if (config?.value !== "true") {
-    console.log("Collective digest is disabled");
-    return { statusCode: 200, body: "Digest disabled" };
+    return NextResponse.json({ message: "Digest disabled" });
   }
 
   // 2. Fetch DPPs featured in last 7 days
@@ -47,8 +47,7 @@ export const handler = schedule("0 9 * * 1", async () => {
     .order("featured_at", { ascending: false });
 
   if (dppError || !newDpps?.length) {
-    console.log("No new DPPs this week");
-    return { statusCode: 200, body: "No new products" };
+    return NextResponse.json({ message: "No new products" });
   }
 
   // 3. Fetch brand names
@@ -87,12 +86,16 @@ export const handler = schedule("0 9 * * 1", async () => {
     .is("unsubscribed_at", null);
 
   if (subError || !subscribers?.length) {
-    console.log("No active subscribers");
-    return { statusCode: 200, body: "No subscribers" };
+    return NextResponse.json({ message: "No subscribers" });
   }
 
   // 6. Send digest in batches
-  const resend = new Resend(RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
+  }
+
+  const resend = new Resend(apiKey);
   let sent = 0;
 
   for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
@@ -120,6 +123,7 @@ export const handler = schedule("0 9 * * 1", async () => {
     }
   }
 
-  console.log(`Digest sent to ${sent}/${subscribers.length} subscribers (${products.length} products)`);
-  return { statusCode: 200, body: `Sent to ${sent} subscribers` };
-});
+  return NextResponse.json({
+    message: `Sent to ${sent}/${subscribers.length} subscribers (${products.length} products)`,
+  });
+}

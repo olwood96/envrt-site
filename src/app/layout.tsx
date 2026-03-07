@@ -90,7 +90,7 @@ export default function RootLayout({
         */}
         <link
           rel="prefetch"
-          href="https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882"
+          href="https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882"
           as="document"
         />
       </head>
@@ -135,17 +135,6 @@ export default function RootLayout({
           </SupplyChainBackground>
         </main>
         <Footer />
-
-        {/* Hidden form for Netlify Forms bot detection */}
-        <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
-          <input name="form-name" type="hidden" value="contact" />
-          <input name="bot-field" />
-          <input name="first-name" />
-          <input name="last-name" />
-          <input name="email" />
-          <input name="company" />
-          <textarea name="message" />
-        </form>
 
         <WebsiteBeacon />
       </body>

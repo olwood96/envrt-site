@@ -192,7 +192,7 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
       brand,
       productImageUrl: storageUrl("dpp-images", dpp.image_path),
       brandLogoUrl: storageUrl("brand-assets", brand.logo_path),
-      embedUrl: `https://dashboard.envrt.com/dpp/${brandSlug}/${encodeURIComponent(dpp.collection_name)}/${dpp.product_sku}/embed`,
+      embedUrl: `https://dpp.envrt.com/${brandSlug}/${slugify(dpp.collection_name)}/${slugify(dpp.product_sku)}/embed`,
       detailUrl: `/collective/${brandSlug}/${dpp.product_sku}`,
     };
   });
@@ -245,7 +245,7 @@ export async function getFeaturedDpp(
     brand,
     productImageUrl: storageUrl("dpp-images", dpp.image_path),
     brandLogoUrl: storageUrl("brand-assets", brand.logo_path),
-    embedUrl: `https://dashboard.envrt.com/dpp/${resolvedSlug}/${encodeURIComponent(dpp.collection_name)}/${dpp.product_sku}/embed`,
+    embedUrl: `https://dpp.envrt.com/${resolvedSlug}/${slugify(dpp.collection_name)}/${slugify(dpp.product_sku)}/embed`,
     detailUrl: `/collective/${resolvedSlug}/${dpp.product_sku}`,
   };
 }
@@ -299,7 +299,7 @@ export async function getFeaturedDppsByBrand(
     brand,
     productImageUrl: storageUrl("dpp-images", dpp.image_path),
     brandLogoUrl: storageUrl("brand-assets", brand.logo_path),
-    embedUrl: `https://dashboard.envrt.com/dpp/${resolvedSlug}/${encodeURIComponent(dpp.collection_name)}/${dpp.product_sku}/embed`,
+    embedUrl: `https://dpp.envrt.com/${resolvedSlug}/${slugify(dpp.collection_name)}/${slugify(dpp.product_sku)}/embed`,
     detailUrl: `/collective/${resolvedSlug}/${dpp.product_sku}`,
   }));
 

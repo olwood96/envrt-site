@@ -64,7 +64,7 @@ const mockCard: CollectiveCardData = {
   },
   productImageUrl: null,
   brandLogoUrl: null,
-  embedUrl: "https://dashboard.envrt.com/dpp/ecobrand/Summer%202025/tee-001/embed",
+  embedUrl: "https://dpp.envrt.com/ecobrand/summer-2025/tee-001/embed",
   detailUrl: "/collective/ecobrand/tee-001",
 };
 

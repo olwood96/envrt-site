@@ -1221,7 +1221,7 @@ export default function AssessmentPage() {
                     const s = calculateScores(answers);
                     const b = getBand(s.overall);
                     try {
-                      await fetch("/.netlify/functions/assessment-lead", {
+                      await fetch("/api/assessment-lead", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({

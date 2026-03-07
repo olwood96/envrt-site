@@ -85,7 +85,7 @@ const makeCard = (
   },
   productImageUrl: null,
   brandLogoUrl: null,
-  embedUrl: `https://dashboard.envrt.com/dpp/${brandName.toLowerCase()}/Summer%202025/sku-${id}/embed`,
+  embedUrl: `https://dpp.envrt.com/${brandName.toLowerCase()}/summer-2025/sku-${id}/embed`,
   detailUrl: `/collective/${brandName.toLowerCase()}/sku-${id}`,
 });
 

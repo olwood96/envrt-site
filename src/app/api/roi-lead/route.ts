@@ -1,4 +1,4 @@
-import type { Handler } from "@netlify/functions";
+import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 interface ROIPayload {
@@ -166,41 +166,27 @@ function buildInternalNotifyHtml(data: ROIPayload): string {
 </div>`;
 }
 
-const handler: Handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method not allowed" };
-  }
-
+export async function POST(request: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error("RESEND_API_KEY is not set");
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Email service not configured" }),
-    };
+    return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
   }
 
   let data: ROIPayload;
   try {
-    data = JSON.parse(event.body || "{}");
+    data = await request.json();
   } catch {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid request body" }),
-    };
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   if (!data.email || !data.firstName) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Missing required fields" }),
-    };
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const resend = new Resend(apiKey);
 
   try {
-    // Send results to the user
     await resend.emails.send({
       from: "ENVRT Calculator <results@envrt.com>",
       to: data.email,
@@ -208,7 +194,6 @@ const handler: Handler = async (event) => {
       html: buildEmailHtml(data),
     });
 
-    // Send internal lead notification
     await resend.emails.send({
       from: "ENVRT Calculator <results@envrt.com>",
       to: INTERNAL_NOTIFY_EMAIL,
@@ -216,17 +201,9 @@ const handler: Handler = async (event) => {
       html: buildInternalNotifyHtml(data),
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true }),
-    };
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Resend error:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Failed to send email" }),
-    };
+    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
-};
-
-export { handler };
+}

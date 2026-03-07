@@ -18,13 +18,18 @@ export default function ContactPage() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    formData.append("form-name", "contact");
 
     try {
-      const res = await fetch("/netlify-form.html", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData as unknown as Record<string, string>).toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.get("first-name") || "",
+          lastName: formData.get("last-name") || "",
+          email: formData.get("email") || "",
+          company: formData.get("company") || "",
+          message: formData.get("message") || "",
+        }),
       });
       if (res.ok) {
         setSubmitted(true);

@@ -7,7 +7,7 @@ import { Badge } from "../ui/Badge";
 import { FadeUp } from "../ui/Motion";
 import { heroContent } from "@/lib/config";
 
-const IFRAME_SRC = "https://dashboard.envrt.com/dpp/envrt/Demo%20Garments/hoodie-0509-1882/embed";
+const IFRAME_SRC = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882/embed";
 
 // ─── Corner bracket for viewfinder ──────────────────────────────────────────
 function ViewfinderCorner({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
