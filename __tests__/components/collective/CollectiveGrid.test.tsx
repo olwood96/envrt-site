@@ -65,15 +65,23 @@ const makeCard = (
     traceability_score: 80,
     total_emissions: emissions,
     total_water: water,
+    total_emissions_reduction_pct: null,
+    total_water_reduction_pct: null,
     constituents: [{ material, pct: 100 }],
     image_path: null,
     featured_at: "2025-01-01T00:00:00Z",
+    purchase_url: null,
+    production_stages: null,
   },
   brand: {
     id: brandId,
     name: brandName,
     slug: brandName.toLowerCase(),
     logo_path: null,
+    website_url: null,
+    description: null,
+    verified_at: null,
+    tier: "free" as const,
   },
   productImageUrl: null,
   brandLogoUrl: null,
@@ -190,16 +198,20 @@ describe("CollectiveGrid", () => {
     expect(screen.queryByText(/Show more/)).not.toBeInTheDocument();
   });
 
-  it("allows cross-brand comparison", () => {
+  it("enforces same-brand comparison", () => {
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
 
     const checkboxes = screen.getAllByRole("checkbox");
-    // Select Product A (BrandA) and Product C (BrandB)
+    // Select Product A (BrandA)
     fireEvent.click(checkboxes[0]);
-    fireEvent.click(checkboxes[2]);
-
-    // Both should be checked — cross-brand is now allowed
     expect(checkboxes[0]).toBeChecked();
-    expect(checkboxes[2]).toBeChecked();
+
+    // Try selecting Product C (BrandB) — should be blocked
+    fireEvent.click(checkboxes[2]);
+    expect(checkboxes[2]).not.toBeChecked();
+
+    // Product B (same brand as A) should work
+    fireEvent.click(checkboxes[1]);
+    expect(checkboxes[1]).toBeChecked();
   });
 });

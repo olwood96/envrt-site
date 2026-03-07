@@ -5,9 +5,19 @@ import type {
   CollectiveCardData,
   CollectivePageData,
   CollectiveFilters,
+  CollectiveProductionStage,
+  BrandEngagement,
 } from "./types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+
+const STAGE_CONFIG = [
+  { key: "fibre", label: "Fibre Production" },
+  { key: "yarn", label: "Yarn Production" },
+  { key: "fabric", label: "Fabric Production" },
+  { key: "dyeing", label: "Bleaching & Dyeing" },
+  { key: "assembly", label: "Assembly" },
+];
 
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -17,16 +27,89 @@ function storageUrl(bucket: string, path: string | null): string | null {
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
+const DPP_LIST_FIELDS =
+  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url, version";
+
+const DPP_DETAIL_FIELDS =
+  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url";
+
+const BRAND_FIELDS = "id, name, slug, logo_path, website_url, description, verified_at, tier";
+
+function parseConstituents(raw: unknown): { material: string; pct: number }[] {
+  const arr = raw as { material: string; pct: number }[];
+  return arr?.map((c) => ({ material: c.material, pct: c.pct })) ?? [];
+}
+
+/** Extract production stages from ALL constituents' raw JSONB */
+function extractProductionStages(
+  rawConstituents: unknown
+): CollectiveProductionStage[] | null {
+  const arr = rawConstituents as {
+    material: string;
+    pct: number;
+    locations?: Record<string, string | null>;
+    regional_locations?: Record<string, string | null>;
+  }[];
+  if (!arr?.length) return null;
+
+  // For each stage, collect unique locations across ALL constituents
+  const stageLocations = new Map<
+    string,
+    { country: string; regional: string | null }[]
+  >();
+
+  for (const constituent of arr) {
+    if (!constituent.locations) continue;
+    for (const { key } of STAGE_CONFIG) {
+      const country = constituent.locations[key];
+      if (!country) continue;
+      const regional = constituent.regional_locations?.[key] ?? null;
+      const existing = stageLocations.get(key) ?? [];
+      const isDupe = existing.some(
+        (e) => e.country === country && e.regional === regional
+      );
+      if (!isDupe) existing.push({ country, regional });
+      stageLocations.set(key, existing);
+    }
+  }
+
+  // Flatten: one stage entry per unique location
+  const stages: CollectiveProductionStage[] = [];
+  for (const { key, label } of STAGE_CONFIG) {
+    const locs = stageLocations.get(key);
+    if (!locs?.length) {
+      stages.push({ key, label, country: null, regional: null });
+    } else {
+      for (const loc of locs) {
+        stages.push({ key, label, country: loc.country, regional: loc.regional });
+      }
+    }
+  }
+
+  if (stages.every((s) => !s.country)) return null;
+  return stages;
+}
+
+function parseBrand(b: Record<string, unknown>): CollectiveBrand {
+  return {
+    id: b.id as string,
+    name: b.name as string,
+    slug: (b.slug as string) ?? null,
+    logo_path: (b.logo_path as string) ?? null,
+    website_url: (b.website_url as string) ?? null,
+    description: (b.description as string) ?? null,
+    verified_at: (b.verified_at as string) ?? null,
+    tier: ((b.tier as string) ?? "free") as "free" | "verified" | "premium",
+  };
+}
+
 /**
  * Fetch all featured DPPs with brand data, deduplicated by latest version.
  */
 export async function getFeaturedDpps(): Promise<CollectivePageData> {
-  // Fetch featured DPPs (non-deleted)
   const { data: dpps, error: dppError } = await supabase
     .from("dpp_generated")
-    .select(
-      "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, constituents, image_path, featured_at, version"
-    )
+    .select(DPP_LIST_FIELDS)
     .eq("featured_on_site", true)
     .is("deleted_at", null)
     .order("version", { ascending: false });
@@ -44,10 +127,8 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
     seen.add(key);
     uniqueDpps.push({
       ...dpp,
-      constituents: (dpp.constituents as { material: string; pct: number }[])?.map((c) => ({
-        material: c.material,
-        pct: c.pct,
-      })) ?? [],
+      constituents: parseConstituents(dpp.constituents),
+      production_stages: extractProductionStages(dpp.constituents),
     });
   }
 
@@ -55,12 +136,12 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
   const brandIds = Array.from(new Set(uniqueDpps.map((d) => d.brand_id)));
   const { data: brands } = await supabase
     .from("brands")
-    .select("id, name, slug, logo_path")
+    .select(BRAND_FIELDS)
     .in("id", brandIds);
 
   const brandMap = new Map<string, CollectiveBrand>();
   for (const b of brands ?? []) {
-    brandMap.set(b.id, b);
+    brandMap.set(b.id, parseBrand(b));
   }
 
   // Build card data
@@ -70,6 +151,10 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
       name: "Unknown",
       slug: null,
       logo_path: null,
+      website_url: null,
+      description: null,
+      verified_at: null,
+      tier: "free" as const,
     };
     const brandSlug = brand.slug || slugify(brand.name);
 
@@ -83,9 +168,7 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
     };
   });
 
-  // Build filters
   const filters = deriveFilters(cards);
-
   return { cards, filters };
 }
 
@@ -96,24 +179,22 @@ export async function getFeaturedDpp(
   brandSlug: string,
   productSku: string
 ): Promise<CollectiveCardData | null> {
-  // Look up brand by slug, then fallback to slugified name
   const { data: brands } = await supabase
     .from("brands")
-    .select("id, name, slug, logo_path");
+    .select(BRAND_FIELDS);
 
   if (!brands?.length) return null;
 
-  const brand =
+  const brandRaw =
     brands.find((b) => b.slug === brandSlug) ??
     brands.find((b) => slugify(b.name) === brandSlug);
 
-  if (!brand) return null;
+  if (!brandRaw) return null;
+  const brand = parseBrand(brandRaw);
 
   const { data: dpp } = await supabase
     .from("dpp_generated")
-    .select(
-      "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, constituents, image_path, featured_at"
-    )
+    .select(DPP_DETAIL_FIELDS)
     .eq("brand_id", brand.id)
     .eq("product_sku", productSku)
     .eq("featured_on_site", true)
@@ -129,10 +210,8 @@ export async function getFeaturedDpp(
   return {
     dpp: {
       ...dpp,
-      constituents: (dpp.constituents as { material: string; pct: number }[])?.map((c) => ({
-        material: c.material,
-        pct: c.pct,
-      })) ?? [],
+      constituents: parseConstituents(dpp.constituents),
+      production_stages: extractProductionStages(dpp.constituents),
     },
     brand,
     productImageUrl: storageUrl("dpp-images", dpp.image_path),
@@ -150,21 +229,20 @@ export async function getFeaturedDppsByBrand(
 ): Promise<{ cards: CollectiveCardData[]; brand: CollectiveBrand } | null> {
   const { data: brands } = await supabase
     .from("brands")
-    .select("id, name, slug, logo_path");
+    .select(BRAND_FIELDS);
 
   if (!brands?.length) return null;
 
-  const brand =
+  const brandRaw =
     brands.find((b) => b.slug === brandSlug) ??
     brands.find((b) => slugify(b.name) === brandSlug);
 
-  if (!brand) return null;
+  if (!brandRaw) return null;
+  const brand = parseBrand(brandRaw);
 
   const { data: dpps } = await supabase
     .from("dpp_generated")
-    .select(
-      "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, constituents, image_path, featured_at, version"
-    )
+    .select(DPP_LIST_FIELDS)
     .eq("brand_id", brand.id)
     .eq("featured_on_site", true)
     .is("deleted_at", null)
@@ -180,10 +258,8 @@ export async function getFeaturedDppsByBrand(
     seen.add(key);
     uniqueDpps.push({
       ...dpp,
-      constituents: (dpp.constituents as { material: string; pct: number }[])?.map((c) => ({
-        material: c.material,
-        pct: c.pct,
-      })) ?? [],
+      constituents: parseConstituents(dpp.constituents),
+      production_stages: extractProductionStages(dpp.constituents),
     });
   }
 
@@ -199,6 +275,46 @@ export async function getFeaturedDppsByBrand(
   }));
 
   return { cards, brand };
+}
+
+/**
+ * Fetch aggregate engagement data for a brand's featured DPPs.
+ */
+export async function getBrandEngagement(
+  brandId: string
+): Promise<BrandEngagement> {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  // Get all DPP IDs for this brand
+  const { data: dpps } = await supabase
+    .from("dpp_generated")
+    .select("id")
+    .eq("brand_id", brandId)
+    .eq("featured_on_site", true)
+    .is("deleted_at", null);
+
+  if (!dpps?.length) return { totalViews: 0, monthlyViews: 0 };
+
+  const dppIds = dpps.map((d) => d.id);
+
+  // Total views
+  const { count: totalViews } = await supabase
+    .from("dpp_views")
+    .select("id", { count: "exact", head: true })
+    .in("dpp_id", dppIds);
+
+  // Monthly views
+  const { count: monthlyViews } = await supabase
+    .from("dpp_views")
+    .select("id", { count: "exact", head: true })
+    .in("dpp_id", dppIds)
+    .gte("viewed_at", monthStart);
+
+  return {
+    totalViews: totalViews ?? 0,
+    monthlyViews: monthlyViews ?? 0,
+  };
 }
 
 function deriveFilters(cards: CollectiveCardData[]): CollectiveFilters {

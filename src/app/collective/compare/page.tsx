@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
 import { CollectiveComparisonView } from "@/components/collective/CollectiveComparisonView";
 import type { CollectiveCardData } from "@/lib/collective/types";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   title: "Compare Products | ENVRT Collective",
@@ -46,9 +47,21 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
   if (validCards.length < 2) notFound();
 
-  const brandNames = Array.from(new Set(validCards.map((c) => c.brand.name)));
+  // Enforce same brand
+  const brandIds = new Set(validCards.map((c) => c.brand.id));
+  if (brandIds.size > 1) notFound();
+
+  const brandName = validCards[0].brand.name;
 
   return (
+    <>
+    <BreadcrumbJsonLd
+      items={[
+        { name: "Home", url: "https://envrt.com" },
+        { name: "The Collective", url: "https://envrt.com/collective" },
+        { name: "Compare", url: "https://envrt.com/collective/compare" },
+      ]}
+    />
     <div className="pt-28 pb-16">
       <Container>
         <Link
@@ -61,7 +74,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
         <div className="mt-6">
           <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
-            {brandNames.join(" vs ")}
+            {brandName}
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
             Product comparison
@@ -76,5 +89,6 @@ export default async function ComparePage({ searchParams }: PageProps) {
         </div>
       </Container>
     </div>
+    </>
   );
 }

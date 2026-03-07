@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 import { CollectiveGrid } from "@/components/collective/CollectiveGrid";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const revalidate = 300; // ISR 5 minutes
 
@@ -8,6 +9,13 @@ export default async function CollectivePage() {
   const { cards, filters } = await getFeaturedDpps();
 
   return (
+    <>
+    <BreadcrumbJsonLd
+      items={[
+        { name: "Home", url: "https://envrt.com" },
+        { name: "The Collective", url: "https://envrt.com/collective" },
+      ]}
+    />
     <div className="pt-28 pb-16">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
@@ -35,5 +43,6 @@ export default async function CollectivePage() {
         )}
       </Container>
     </div>
+    </>
   );
 }

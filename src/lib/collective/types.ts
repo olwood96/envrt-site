@@ -10,9 +10,14 @@ export interface CollectiveDpp {
   traceability_score: number | null;
   total_emissions: number | null;
   total_water: number | null;
+  total_emissions_reduction_pct: number | null;
+  total_water_reduction_pct: number | null;
   constituents: CollectiveConstituent[];
   image_path: string | null;
   featured_at: string | null;
+  purchase_url: string | null;
+  /** Production stages with countries (only populated on detail pages) */
+  production_stages: CollectiveProductionStage[] | null;
 }
 
 /** Material constituent — just material name and percentage */
@@ -21,12 +26,24 @@ export interface CollectiveConstituent {
   pct: number;
 }
 
+/** Production stage with location */
+export interface CollectiveProductionStage {
+  key: string;
+  label: string;
+  country: string | null;
+  regional: string | null;
+}
+
 /** Brand data joined to a DPP */
 export interface CollectiveBrand {
   id: string;
   name: string;
   slug: string | null;
   logo_path: string | null;
+  website_url: string | null;
+  description: string | null;
+  verified_at: string | null;
+  tier: "free" | "verified" | "premium";
 }
 
 /** Combined card data for the grid */
@@ -60,4 +77,10 @@ export type CollectiveSortKey =
 export interface CollectivePageData {
   cards: CollectiveCardData[];
   filters: CollectiveFilters;
+}
+
+/** Brand engagement stats */
+export interface BrandEngagement {
+  totalViews: number;
+  monthlyViews: number;
 }

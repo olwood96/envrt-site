@@ -41,18 +41,26 @@ const mockCard: CollectiveCardData = {
     traceability_score: 85,
     total_emissions: 3.2,
     total_water: 45.8,
+    total_emissions_reduction_pct: 32,
+    total_water_reduction_pct: 18,
     constituents: [
       { material: "Organic Cotton", pct: 95 },
       { material: "Elastane", pct: 5 },
     ],
     image_path: null,
     featured_at: "2025-01-01T00:00:00Z",
+    purchase_url: null,
+    production_stages: null,
   },
   brand: {
     id: "brand-1",
     name: "EcoBrand",
     slug: "ecobrand",
     logo_path: null,
+    website_url: null,
+    description: null,
+    verified_at: null,
+    tier: "free",
   },
   productImageUrl: null,
   brandLogoUrl: null,
@@ -100,7 +108,7 @@ describe("CollectiveCard", () => {
       />
     );
 
-    expect(screen.getByText("85% trace")).toBeInTheDocument();
+    expect(screen.getByText("85% traceability")).toBeInTheDocument();
   });
 
   it("renders material tags", () => {
@@ -218,6 +226,111 @@ describe("CollectiveCard", () => {
 
       expect(screen.queryByText("New")).not.toBeInTheDocument();
     });
+  });
+
+  it("shows emissions reduction percentage", () => {
+    render(
+      <CollectiveCard
+        card={mockCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    expect(screen.getByText("↓ 32% vs avg")).toBeInTheDocument();
+  });
+
+  it("shows water reduction percentage", () => {
+    render(
+      <CollectiveCard
+        card={mockCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    expect(screen.getByText("↓ 18% vs avg")).toBeInTheDocument();
+  });
+
+  it("shows material tooltip on hover", () => {
+    render(
+      <CollectiveCard
+        card={mockCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    // Tooltip text should be in the DOM (hidden until hover)
+    expect(
+      screen.getByText(/Grown without synthetic pesticides/)
+    ).toBeInTheDocument();
+  });
+
+  it("shows verified badge when brand is verified", () => {
+    const verifiedCard: CollectiveCardData = {
+      ...mockCard,
+      brand: { ...mockCard.brand, verified_at: "2025-01-01T00:00:00Z" },
+    };
+    render(
+      <CollectiveCard
+        card={verifiedCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    expect(screen.getByLabelText("Verified brand")).toBeInTheDocument();
+  });
+
+  it("shows production journey toggle when stages have countries", () => {
+    const journeyCard: CollectiveCardData = {
+      ...mockCard,
+      dpp: {
+        ...mockCard.dpp,
+        production_stages: [
+          { key: "fibre", label: "Fibre Production", country: "Turkey", regional: "Aydin" },
+          { key: "yarn", label: "Yarn Production", country: null, regional: null },
+          { key: "assembly", label: "Assembly", country: "Portugal", regional: null },
+        ],
+      },
+    };
+    render(
+      <CollectiveCard
+        card={journeyCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    expect(screen.getByText("Production journey")).toBeInTheDocument();
+  });
+
+  it("shows shop link when purchase_url is set", () => {
+    const shopCard: CollectiveCardData = {
+      ...mockCard,
+      dpp: { ...mockCard.dpp, purchase_url: "https://shop.example.com" },
+    };
+    render(
+      <CollectiveCard
+        card={shopCard}
+        isSelected={false}
+        onToggleCompare={vi.fn()}
+        compareDisabled={false}
+      />
+    );
+
+    const shopLink = screen.getByText("Shop");
+    expect(shopLink).toBeInTheDocument();
+    expect(shopLink.closest("a")).toHaveAttribute(
+      "href",
+      "https://shop.example.com"
+    );
   });
 
   describe("lightbox", () => {

@@ -144,11 +144,14 @@ export function CollectiveGrid({ cards, filters }: Props) {
   const visibleCards = filteredCards.slice(0, visibleCount);
   const hasMore = visibleCount < filteredCards.length;
 
-  // Compare logic (cross-brand allowed, max 4)
+  // Compare logic — same-brand only, max 4
   const selectedCards = useMemo(
     () => cards.filter((c) => compareIds.has(c.dpp.id)),
     [cards, compareIds]
   );
+
+  const compareBrandId =
+    selectedCards.length > 0 ? selectedCards[0].brand.id : null;
 
   const toggleCompare = useCallback(
     (id: string) => {
@@ -158,6 +161,9 @@ export function CollectiveGrid({ cards, filters }: Props) {
         if (next.has(id)) {
           next.delete(id);
         } else {
+          const card = cards.find((c) => c.dpp.id === id);
+          if (!card) return prev;
+          if (compareBrandId && card.brand.id !== compareBrandId) return prev;
           if (next.size >= MAX_COMPARE) return prev;
           next.add(id);
           wasAdded = true;
@@ -169,7 +175,16 @@ export function CollectiveGrid({ cards, filters }: Props) {
         setCompareCounts(getCompareCounts());
       }
     },
-    []
+    [cards, compareBrandId]
+  );
+
+  const isCompareDisabled = useCallback(
+    (card: CollectiveCardData) => {
+      if (compareIds.size >= MAX_COMPARE) return true;
+      if (compareBrandId && card.brand.id !== compareBrandId) return true;
+      return false;
+    },
+    [compareIds.size, compareBrandId]
   );
 
   return (
@@ -204,7 +219,7 @@ export function CollectiveGrid({ cards, filters }: Props) {
                   card={card}
                   isSelected={compareIds.has(card.dpp.id)}
                   onToggleCompare={toggleCompare}
-                  compareDisabled={compareIds.size >= MAX_COMPARE}
+                  compareDisabled={isCompareDisabled(card)}
                 />
               </StaggerItem>
             ))}
