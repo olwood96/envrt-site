@@ -26,12 +26,16 @@ export interface CollectiveConstituent {
   pct: number;
 }
 
-/** Production stage with location */
+/** Verification level for a production stage */
+export type CollectiveVerification = "declared" | "modelled" | "validated" | "verified";
+
+/** Production stage with location and verification */
 export interface CollectiveProductionStage {
   key: string;
   label: string;
   country: string | null;
   regional: string | null;
+  verification: CollectiveVerification | null;
 }
 
 /** Brand data joined to a DPP */

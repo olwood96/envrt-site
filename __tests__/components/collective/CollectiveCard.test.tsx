@@ -293,9 +293,9 @@ describe("CollectiveCard", () => {
       dpp: {
         ...mockCard.dpp,
         production_stages: [
-          { key: "fibre", label: "Fibre Production", country: "Turkey", regional: "Aydin" },
-          { key: "yarn", label: "Yarn Production", country: null, regional: null },
-          { key: "assembly", label: "Assembly", country: "Portugal", regional: null },
+          { key: "fibre", label: "Fibre Production", country: "Turkey", regional: "Aydin", verification: "validated" },
+          { key: "yarn", label: "Yarn Production", country: null, regional: null, verification: null },
+          { key: "assembly", label: "Assembly", country: "Portugal", regional: null, verification: "declared" },
         ],
       },
     };

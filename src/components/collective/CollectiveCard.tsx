@@ -17,6 +17,8 @@ interface Props {
   isSelected: boolean;
   onToggleCompare: (id: string) => void;
   compareDisabled: boolean;
+  mapOpen?: boolean;
+  onToggleMap?: () => void;
 }
 
 function isNew(featuredAt: string | null): boolean {
@@ -30,10 +32,12 @@ export function CollectiveCard({
   isSelected,
   onToggleCompare,
   compareDisabled,
+  mapOpen: externalMapOpen,
+  onToggleMap,
 }: Props) {
   const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl } = card;
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [mapOpen, setMapOpen] = useState(false);
+  const mapOpen = externalMapOpen ?? false;
   const hasJourney =
     dpp.production_stages &&
     dpp.production_stages.length > 0 &&
@@ -54,7 +58,7 @@ export function CollectiveCard({
 
   return (
     <>
-      <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-envrt-teal/20 hover:shadow-xl hover:shadow-envrt-teal/8">
+      <div className="group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-envrt-teal/20 hover:shadow-xl hover:shadow-envrt-teal/8">
         {/* New badge */}
         {isNew(dpp.featured_at) && (
           <div className="absolute right-3 top-3 z-20 rounded-full bg-envrt-teal px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-sm">
@@ -247,7 +251,7 @@ export function CollectiveCard({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setMapOpen(!mapOpen);
+                  onToggleMap?.();
                 }}
                 className="flex w-full items-center gap-1.5 text-[10px] font-medium text-envrt-muted transition-colors hover:text-envrt-teal"
               >

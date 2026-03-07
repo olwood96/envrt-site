@@ -6,6 +6,7 @@ import type {
   CollectivePageData,
   CollectiveFilters,
   CollectiveProductionStage,
+  CollectiveVerification,
   BrandEngagement,
 } from "./types";
 
@@ -40,6 +41,14 @@ function parseConstituents(raw: unknown): { material: string; pct: number }[] {
   return arr?.map((c) => ({ material: c.material, pct: c.pct })) ?? [];
 }
 
+/** Verification priority: higher index wins */
+const VERIFICATION_RANK: Record<string, number> = {
+  declared: 0,
+  modelled: 1,
+  validated: 2,
+  verified: 3,
+};
+
 /** Extract production stages from ALL constituents' raw JSONB */
 function extractProductionStages(
   rawConstituents: unknown
@@ -49,13 +58,14 @@ function extractProductionStages(
     pct: number;
     locations?: Record<string, string | null>;
     regional_locations?: Record<string, string | null>;
+    verification?: Record<string, string | null>;
   }[];
   if (!arr?.length) return null;
 
   // For each stage, collect unique locations across ALL constituents
   const stageLocations = new Map<
     string,
-    { country: string; regional: string | null }[]
+    { country: string; regional: string | null; verification: CollectiveVerification | null }[]
   >();
 
   for (const constituent of arr) {
@@ -64,11 +74,24 @@ function extractProductionStages(
       const country = constituent.locations[key];
       if (!country) continue;
       const regional = constituent.regional_locations?.[key] ?? null;
+      const rawVerif = constituent.verification?.[key] ?? null;
+      const verification = (rawVerif && rawVerif in VERIFICATION_RANK
+        ? rawVerif
+        : null) as CollectiveVerification | null;
+
       const existing = stageLocations.get(key) ?? [];
-      const isDupe = existing.some(
+      const dupeIdx = existing.findIndex(
         (e) => e.country === country && e.regional === regional
       );
-      if (!isDupe) existing.push({ country, regional });
+      if (dupeIdx >= 0) {
+        // Keep highest verification level
+        const prev = existing[dupeIdx].verification;
+        const prevRank = prev ? VERIFICATION_RANK[prev] ?? -1 : -1;
+        const newRank = verification ? VERIFICATION_RANK[verification] ?? -1 : -1;
+        if (newRank > prevRank) existing[dupeIdx].verification = verification;
+      } else {
+        existing.push({ country, regional, verification });
+      }
       stageLocations.set(key, existing);
     }
   }
@@ -78,10 +101,16 @@ function extractProductionStages(
   for (const { key, label } of STAGE_CONFIG) {
     const locs = stageLocations.get(key);
     if (!locs?.length) {
-      stages.push({ key, label, country: null, regional: null });
+      stages.push({ key, label, country: null, regional: null, verification: null });
     } else {
       for (const loc of locs) {
-        stages.push({ key, label, country: loc.country, regional: loc.regional });
+        stages.push({
+          key,
+          label,
+          country: loc.country,
+          regional: loc.regional,
+          verification: loc.verification,
+        });
       }
     }
   }

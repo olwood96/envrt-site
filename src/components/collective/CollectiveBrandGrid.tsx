@@ -12,6 +12,7 @@ interface Props {
 
 export function CollectiveBrandGrid({ cards }: Props) {
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
+  const [mapsOpen, setMapsOpen] = useState(false);
 
   const toggleCompare = useCallback((id: string) => {
     setCompareIds((prev) => {
@@ -34,6 +35,8 @@ export function CollectiveBrandGrid({ cards }: Props) {
           isSelected={compareIds.has(card.dpp.id)}
           onToggleCompare={toggleCompare}
           compareDisabled={compareIds.size >= MAX_COMPARE}
+          mapOpen={mapsOpen}
+          onToggleMap={() => setMapsOpen((prev) => !prev)}
         />
       ))}
     </div>
