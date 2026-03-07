@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 import { CollectiveGrid } from "@/components/collective/CollectiveGrid";
+import { CollectiveSubscribe } from "@/components/collective/CollectiveSubscribe";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const revalidate = 300; // ISR 5 minutes
@@ -32,6 +34,12 @@ export default async function CollectivePage() {
           </p>
         </div>
 
+        <div className="mt-8">
+          <Suspense>
+            <CollectiveSubscribe variant="compact" />
+          </Suspense>
+        </div>
+
         {cards.length === 0 ? (
           <p className="mt-16 text-center text-envrt-muted">
             No featured products yet. Check back soon.
@@ -41,6 +49,10 @@ export default async function CollectivePage() {
             <CollectiveGrid cards={cards} filters={filters} />
           </div>
         )}
+
+        <Suspense>
+          <CollectiveSubscribe variant="cta" />
+        </Suspense>
       </Container>
     </div>
     </>
