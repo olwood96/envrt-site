@@ -208,9 +208,9 @@ export function HeroSection() {
           <FadeUp><Badge>{heroContent.badge}</Badge></FadeUp>
           <FadeUp delay={0.1}>
             <h1 className="mt-6 text-4xl font-bold leading-[1.4] tracking-tight text-envrt-charcoal sm:text-4xl lg:text-[3rem]">
-              {heroContent.headline.split("\n").map((line, i) => (
-                <span key={i}>{line}{i < heroContent.headline.split("\n").length - 1 && <br />}</span>
-              ))}
+              <em className="italic">Your</em> GARMENTS.<br />
+              <em className="italic">Their</em> IMPACT.<br />
+              <em className="italic">One</em> PLATFORM.
             </h1>
           </FadeUp>
           <FadeUp delay={0.2}>
