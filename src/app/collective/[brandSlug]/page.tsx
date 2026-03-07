@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDppsByBrand, getBrandEngagement } from "@/lib/collective/fetch";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { CollectiveBrandGrid } from "@/components/collective/CollectiveBrandGrid";
 
 export const revalidate = 300;
 
@@ -207,77 +208,9 @@ export default async function BrandProfilePage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Product grid */}
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((card) => (
-            <Link
-              key={card.dpp.id}
-              href={card.detailUrl}
-              className="group overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden bg-envrt-cream/40">
-                {card.productImageUrl ? (
-                  <>
-                    <Image
-                      src={card.productImageUrl}
-                      alt=""
-                      fill
-                      className="scale-150 object-cover blur-2xl opacity-30"
-                      sizes="128px"
-                      aria-hidden="true"
-                    />
-                    <div className="absolute inset-3 z-10">
-                      <div className="relative h-full w-full">
-                        <Image
-                          src={card.productImageUrl}
-                          alt={card.dpp.garment_name}
-                          fill
-                          className="object-contain transition-transform duration-500 group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-envrt-muted/40">
-                    <svg
-                      className="h-12 w-12"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1}
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-              <div className="p-5">
-                <h3 className="truncate text-sm font-semibold text-envrt-charcoal group-hover:text-envrt-green">
-                  {card.dpp.garment_name}
-                </h3>
-                <p className="mt-0.5 text-xs text-envrt-muted">
-                  {card.dpp.collection_name}
-                </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  {card.dpp.total_emissions != null && (
-                    <span className="rounded-full bg-envrt-green/5 px-2 py-0.5 text-[10px] font-medium text-envrt-green">
-                      {card.dpp.total_emissions.toFixed(1)} kg CO₂e
-                    </span>
-                  )}
-                  {card.dpp.total_water != null && (
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
-                      {card.dpp.total_water.toFixed(1)} L H₂O
-                    </span>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
+        {/* Product grid — reuses the same CollectiveCard from the main page */}
+        <div className="mt-10">
+          <CollectiveBrandGrid cards={cards} />
         </div>
       </Container>
     </div>

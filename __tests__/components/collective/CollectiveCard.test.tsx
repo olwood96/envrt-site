@@ -325,7 +325,7 @@ describe("CollectiveCard", () => {
       />
     );
 
-    const shopLink = screen.getByText("Shop");
+    const shopLink = screen.getByText("Shop this product");
     expect(shopLink).toBeInTheDocument();
     expect(shopLink.closest("a")).toHaveAttribute(
       "href",

@@ -110,9 +110,13 @@ export function CollectiveCard({
             {/* Gradient blend into content */}
             <div className="absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-white to-transparent" />
 
-            {/* Brand logo overlay */}
+            {/* Brand logo overlay — clickable to brand page */}
             {brandLogoUrl && (
-              <div className="absolute left-3 top-3 z-20 rounded-lg bg-white/90 p-1.5 shadow-sm backdrop-blur">
+              <Link
+                href={`/collective/${brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute left-3 top-3 z-20 rounded-lg bg-white/90 p-1.5 shadow-sm backdrop-blur transition-transform duration-300 hover:scale-110"
+              >
                 <Image
                   src={brandLogoUrl}
                   alt={brand.name}
@@ -120,7 +124,7 @@ export function CollectiveCard({
                   height={28}
                   className="h-7 w-7 object-contain"
                 />
-              </div>
+              </Link>
             )}
 
             {/* Expand button for lightbox */}
@@ -309,10 +313,13 @@ export function CollectiveCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="text-xs font-medium text-envrt-muted transition-colors hover:text-envrt-green"
+                  className="inline-flex items-center gap-1 rounded-full bg-envrt-green/5 px-2.5 py-1 text-[11px] font-medium text-envrt-green transition-colors hover:bg-envrt-green/10"
                   data-cta="shop-product"
                 >
-                  Shop
+                  Shop this product
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
                 </a>
               )}
               <Link
