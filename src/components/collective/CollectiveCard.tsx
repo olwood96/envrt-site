@@ -68,7 +68,7 @@ export function CollectiveCard({
 
         {/* Image */}
         <Link href={detailUrl} className="block">
-          <div className="relative aspect-[4/3] overflow-hidden bg-envrt-cream/40">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-envrt-cream/40">
             {productImageUrl ? (
               <>
                 {/* Blurred background fill */}
