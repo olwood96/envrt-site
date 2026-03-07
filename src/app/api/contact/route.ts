@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: "ENVRT Contact <hello@envrt.com>",
       to: INTERNAL_EMAIL,
+      bcc: ["charlie@envrt.com", "oliver@envrt.com"],
       subject: `Contact: ${data.firstName} ${data.lastName}${data.company ? ` @ ${data.company}` : ""}`,
       html: buildInternalNotifyHtml(data),
     });
