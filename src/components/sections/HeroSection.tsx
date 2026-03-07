@@ -207,7 +207,7 @@ export function HeroSection() {
         <div className="max-w-xl">
           <FadeUp><Badge>{heroContent.badge}</Badge></FadeUp>
           <FadeUp delay={0.1}>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.4] tracking-tight text-envrt-charcoal sm:text-4xl lg:text-[3rem]">
+            <h1 className="mt-6 text-4xl font-bold leading-[1.6] tracking-tight text-envrt-charcoal sm:text-4xl lg:text-[3rem]">
               <em className="italic">Your</em> GARMENTS.<br />
               <em className="italic">Their</em> IMPACT.<br />
               <em className="italic">One</em> PLATFORM.
