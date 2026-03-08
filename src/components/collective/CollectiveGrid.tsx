@@ -213,7 +213,10 @@ export function CollectiveGrid({ cards, filters }: Props) {
         </p>
       ) : (
         <>
-          <StaggerChildren className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerChildren
+            key={`${searchQuery}::${selectedBrand}::${selectedCollection}::${selectedMaterial}::${sortKey}`}
+            className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {visibleCards.map((card) => (
               <StaggerItem key={card.dpp.id}>
                 <CollectiveCard
