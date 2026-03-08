@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { CollectiveCard } from "./CollectiveCard";
+import { CollectiveCompareBar } from "./CollectiveCompareBar";
 
 const MAX_COMPARE = 4;
 
@@ -26,19 +27,32 @@ export function CollectiveBrandGrid({ cards }: Props) {
     });
   }, []);
 
+  const selectedCards = useMemo(
+    () => cards.filter((c) => compareIds.has(c.dpp.id)),
+    [cards, compareIds]
+  );
+
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {cards.map((card) => (
-        <CollectiveCard
-          key={card.dpp.id}
-          card={card}
-          isSelected={compareIds.has(card.dpp.id)}
-          onToggleCompare={toggleCompare}
-          compareDisabled={compareIds.size >= MAX_COMPARE}
-          mapOpen={mapsOpen}
-          onToggleMap={() => setMapsOpen((prev) => !prev)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <CollectiveCard
+            key={card.dpp.id}
+            card={card}
+            isSelected={compareIds.has(card.dpp.id)}
+            onToggleCompare={toggleCompare}
+            compareDisabled={compareIds.size >= MAX_COMPARE}
+            mapOpen={mapsOpen}
+            onToggleMap={() => setMapsOpen((prev) => !prev)}
+          />
+        ))}
+      </div>
+
+      <CollectiveCompareBar
+        selectedCards={selectedCards}
+        onRemove={toggleCompare}
+        onClear={() => setCompareIds(new Set())}
+      />
+    </>
   );
 }

@@ -221,6 +221,7 @@ export function CollectiveGrid({ cards, filters }: Props) {
                   isSelected={compareIds.has(card.dpp.id)}
                   onToggleCompare={toggleCompare}
                   compareDisabled={isCompareDisabled(card)}
+                  crossBrandDisabled={!!compareBrandId && card.brand.id !== compareBrandId}
                   mapOpen={mapsOpen}
                   onToggleMap={() => setMapsOpen((prev) => !prev)}
                 />

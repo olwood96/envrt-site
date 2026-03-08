@@ -333,6 +333,72 @@ describe("CollectiveCard", () => {
     );
   });
 
+  describe("crossBrandDisabled", () => {
+    it("greys out card when crossBrandDisabled is true", () => {
+      const { container } = render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={true}
+          crossBrandDisabled={true}
+        />
+      );
+
+      // The card wrapper should have opacity and grayscale classes
+      const cardEl = container.querySelector(".opacity-40");
+      expect(cardEl).toBeInTheDocument();
+      expect(cardEl).toHaveClass("grayscale");
+    });
+
+    it("disables checkbox when crossBrandDisabled is true", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={true}
+        />
+      );
+
+      const checkbox = screen.getByRole("checkbox");
+      expect(checkbox).toBeDisabled();
+    });
+
+    it("shows cross-brand tooltip when crossBrandDisabled is true", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={true}
+        />
+      );
+
+      expect(
+        screen.getByText(/Cross-brand comparisons aren't available yet/)
+      ).toBeInTheDocument();
+    });
+
+    it("does not show tooltip when crossBrandDisabled is false", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={false}
+        />
+      );
+
+      expect(
+        screen.queryByText(/Cross-brand comparisons aren't available yet/)
+      ).not.toBeInTheDocument();
+    });
+  });
+
   describe("lightbox", () => {
     const cardWithImage: CollectiveCardData = {
       ...mockCard,

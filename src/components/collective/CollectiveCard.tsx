@@ -17,6 +17,8 @@ interface Props {
   isSelected: boolean;
   onToggleCompare: (id: string) => void;
   compareDisabled: boolean;
+  /** True when this card is from a different brand than the first selected compare item */
+  crossBrandDisabled?: boolean;
   mapOpen?: boolean;
   onToggleMap?: () => void;
 }
@@ -32,6 +34,7 @@ export function CollectiveCard({
   isSelected,
   onToggleCompare,
   compareDisabled,
+  crossBrandDisabled = false,
   mapOpen: externalMapOpen,
   onToggleMap,
 }: Props) {
@@ -58,7 +61,7 @@ export function CollectiveCard({
 
   return (
     <>
-      <div className="group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-envrt-teal/20 hover:shadow-xl hover:shadow-envrt-teal/8">
+      <div className={`group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 ${crossBrandDisabled ? "opacity-40 grayscale pointer-events-auto" : "hover:-translate-y-1 hover:border-envrt-teal/20 hover:shadow-xl hover:shadow-envrt-teal/8"}`}>
         {/* New badge */}
         {isNew(dpp.featured_at) && (
           <div className="absolute right-3 top-3 z-20 rounded-full bg-envrt-teal px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-sm">
@@ -300,16 +303,24 @@ export function CollectiveCard({
 
           {/* Footer: compare + view CTA */}
           <div className="mt-4 flex items-center justify-between border-t border-envrt-charcoal/5 pt-3">
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-envrt-muted">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                disabled={compareDisabled && !isSelected}
-                onChange={() => onToggleCompare(dpp.id)}
-                className="rounded border-envrt-charcoal/20 text-envrt-teal focus:ring-envrt-teal/30"
-              />
-              Compare
-            </label>
+            <div className="group/compare relative">
+              <label className={`flex items-center gap-2 text-xs ${crossBrandDisabled ? "cursor-not-allowed text-envrt-muted/50" : "cursor-pointer text-envrt-muted"}`}>
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  disabled={(compareDisabled && !isSelected) || crossBrandDisabled}
+                  onChange={() => onToggleCompare(dpp.id)}
+                  className="rounded border-envrt-charcoal/20 text-envrt-teal focus:ring-envrt-teal/30 disabled:opacity-40"
+                />
+                Compare
+              </label>
+              {crossBrandDisabled && (
+                <span className="pointer-events-none absolute bottom-full left-0 z-30 mb-2 hidden w-52 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] leading-relaxed text-envrt-charcoal shadow-lg group-hover/compare:block">
+                  Cross-brand comparisons aren&apos;t available yet — you can compare products from the same brand only.
+                  <span className="absolute left-4 top-full border-4 border-transparent border-t-white" />
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               {dpp.purchase_url && (
                 <a

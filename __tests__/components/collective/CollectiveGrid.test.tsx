@@ -214,4 +214,37 @@ describe("CollectiveGrid", () => {
     fireEvent.click(checkboxes[1]);
     expect(checkboxes[1]).toBeChecked();
   });
+
+  it("greys out other-brand cards when one brand is selected for compare", () => {
+    const { container } = render(
+      <CollectiveGrid cards={mockCards} filters={mockFilters} />
+    );
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    // Select Product A (BrandA)
+    fireEvent.click(checkboxes[0]);
+
+    // Product C (BrandB) card should be greyed out
+    const greyedCards = container.querySelectorAll(".opacity-40.grayscale");
+    expect(greyedCards.length).toBe(1);
+
+    // Should show the cross-brand tooltip
+    expect(
+      screen.getByText(/Cross-brand comparisons aren't available yet/)
+    ).toBeInTheDocument();
+  });
+
+  it("removes greyed-out state when compare selection is cleared", () => {
+    const { container } = render(
+      <CollectiveGrid cards={mockCards} filters={mockFilters} />
+    );
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    // Select then deselect Product A
+    fireEvent.click(checkboxes[0]);
+    expect(container.querySelectorAll(".opacity-40.grayscale").length).toBe(1);
+
+    fireEvent.click(checkboxes[0]);
+    expect(container.querySelectorAll(".opacity-40.grayscale").length).toBe(0);
+  });
 });
