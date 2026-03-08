@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback, lazy, Suspense } from "react";
+import { useState, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toPng } from "html-to-image";
 import type { CollectiveCardData } from "@/lib/collective/types";
-import { getMaterialDescription } from "@/lib/collective/material-info";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -13,7 +12,7 @@ const CollectiveProductionMap = lazy(() =>
   }))
 );
 
-/* ── Metric explainers ── */
+/* ── Constants ── */
 
 const METRIC_EXPLAINERS: Record<string, string> = {
   "CO₂e emissions":
@@ -29,47 +28,6 @@ const METRIC_EXPLAINERS: Record<string, string> = {
   Mass: "The total weight of the finished garment in grams.",
 };
 
-/* ── Types ── */
-
-interface MetricRow {
-  label: string;
-  values: (number | null)[];
-  unit: string;
-  lowerIsBetter: boolean;
-  format?: (v: number) => string;
-}
-
-/* ── Helpers ── */
-
-function bestValue(values: (number | null)[], lowerIsBetter: boolean): number | null {
-  const valid = values.filter((v): v is number => v != null);
-  if (valid.length === 0) return null;
-  return lowerIsBetter ? Math.min(...valid) : Math.max(...valid);
-}
-
-/** Title-case a place name: "turkey" → "Turkey", "AYDIN" → "Aydin" */
-function titleCase(s: string): string {
-  return s
-    .split(/(\s+|-)/g)
-    .map((part) =>
-      /\s|-/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-    )
-    .join("");
-}
-
-/* ── Radar chart (SVG) ── */
-
-interface RadarProps {
-  cards: CollectiveCardData[];
-}
-
-/**
- * Radar uses percentage-based scoring (0–100) per axis:
- * - Traceability: raw score (already 0-100)
- * - Emissions/water: scored as reduction percentage vs avg (if available),
- *   otherwise uses a proportional score where lower = better
- * This avoids the relative-normalization problem with only 2 products.
- */
 const RADAR_METRICS = [
   {
     key: "emissions",
@@ -120,75 +78,52 @@ const RADAR_COLORS = [
   { stroke: "#3b82f6", fill: "rgba(59, 130, 246, 0.10)" },
 ];
 
-function RadarChart({ cards }: RadarProps) {
-  const size = 320;
-  const cx = size / 2;
-  const cy = size / 2;
-  const radius = 115;
+/* ── Types ── */
+
+interface MetricRow {
+  label: string;
+  values: (number | null)[];
+  unit: string;
+  lowerIsBetter: boolean;
+  format?: (v: number) => string;
+}
+
+/* ── Helpers ── */
+
+function bestValue(values: (number | null)[], lowerIsBetter: boolean): number | null {
+  const valid = values.filter((v): v is number => v != null);
+  if (valid.length === 0) return null;
+  return lowerIsBetter ? Math.min(...valid) : Math.max(...valid);
+}
+
+function titleCase(s: string): string {
+  return s
+    .split(/(\s+|-)/g)
+    .map((part) =>
+      /\s|-/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    )
+    .join("");
+}
+
+/* ── Sub-components ── */
+
+function RadarChart({ cards }: { cards: CollectiveCardData[] }) {
+  const radius = 110;
+  const cx = 200;
+  const cy = 170;
+  const vbW = 400;
+  const vbH = 320;
   const levels = 4;
   const n = RADAR_METRICS.length;
-
   const angleStep = (2 * Math.PI) / n;
-  const getPoint = (i: number, r: number) => ({
+  const pt = (i: number, r: number) => ({
     x: cx + r * Math.sin(i * angleStep),
     y: cy - r * Math.cos(i * angleStep),
   });
 
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
-        {/* Background grid */}
-        {Array.from({ length: levels }, (_, l) => {
-          const r = (radius / levels) * (l + 1);
-          const points = Array.from({ length: n }, (_, i) => getPoint(i, r))
-            .map((p) => `${p.x},${p.y}`)
-            .join(" ");
-          return <polygon key={`grid-${l}`} points={points} fill="none" stroke="#e5e7eb" strokeWidth={0.5} />;
-        })}
-
-        {/* Axis lines */}
-        {Array.from({ length: n }, (_, i) => {
-          const p = getPoint(i, radius);
-          return <line key={`axis-${i}`} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#e5e7eb" strokeWidth={0.5} />;
-        })}
-
-        {/* Data polygons */}
-        {cards.map((card, ci) => {
-          const color = RADAR_COLORS[ci % RADAR_COLORS.length];
-          const points = RADAR_METRICS.map((m, mi) => {
-            const score = m.score(card);
-            const norm = score != null ? Math.max(0.08, Math.min(1, score / 100)) : 0.08;
-            return getPoint(mi, radius * norm);
-          })
-            .map((p) => `${p.x},${p.y}`)
-            .join(" ");
-          return <polygon key={card.dpp.id} points={points} fill={color.fill} stroke={color.stroke} strokeWidth={1.5} />;
-        })}
-
-        {/* Data points */}
-        {cards.map((card, ci) => {
-          const color = RADAR_COLORS[ci % RADAR_COLORS.length];
-          return RADAR_METRICS.map((m, mi) => {
-            const score = m.score(card);
-            const norm = score != null ? Math.max(0.08, Math.min(1, score / 100)) : 0.08;
-            const p = getPoint(mi, radius * norm);
-            return <circle key={`${card.dpp.id}-${m.key}`} cx={p.x} cy={p.y} r={3} fill={color.stroke} />;
-          });
-        })}
-
-        {/* Axis labels */}
-        {RADAR_METRICS.map((m, i) => {
-          const p = getPoint(i, radius + 24);
-          return (
-            <text key={m.key} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" className="fill-envrt-muted text-[11px]">
-              {m.label}
-            </text>
-          );
-        })}
-      </svg>
-
-      {/* Legend */}
-      <div className="mt-3 flex flex-wrap justify-center gap-5">
+      <div className="mb-1 flex flex-wrap justify-center gap-4">
         {cards.map((card, ci) => {
           const color = RADAR_COLORS[ci % RADAR_COLORS.length];
           return (
@@ -199,11 +134,46 @@ function RadarChart({ cards }: RadarProps) {
           );
         })}
       </div>
+      <svg viewBox={`0 0 ${vbW} ${vbH}`} className="w-full">
+        {Array.from({ length: levels }, (_, l) => {
+          const r = (radius / levels) * (l + 1);
+          const pts = Array.from({ length: n }, (_, i) => pt(i, r)).map((p) => `${p.x},${p.y}`).join(" ");
+          return <polygon key={l} points={pts} fill="none" stroke="#e5e7eb" strokeWidth={0.5} />;
+        })}
+        {Array.from({ length: n }, (_, i) => {
+          const p = pt(i, radius);
+          return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#e5e7eb" strokeWidth={0.5} />;
+        })}
+        {cards.map((card, ci) => {
+          const color = RADAR_COLORS[ci % RADAR_COLORS.length];
+          const pts = RADAR_METRICS.map((m, mi) => {
+            const score = m.score(card);
+            const norm = score != null ? Math.max(0.08, Math.min(1, score / 100)) : 0.08;
+            return pt(mi, radius * norm);
+          }).map((p) => `${p.x},${p.y}`).join(" ");
+          return <polygon key={card.dpp.id} points={pts} fill={color.fill} stroke={color.stroke} strokeWidth={1.5} />;
+        })}
+        {cards.map((card, ci) => {
+          const color = RADAR_COLORS[ci % RADAR_COLORS.length];
+          return RADAR_METRICS.map((m, mi) => {
+            const score = m.score(card);
+            const norm = score != null ? Math.max(0.08, Math.min(1, score / 100)) : 0.08;
+            const p = pt(mi, radius * norm);
+            return <circle key={`${card.dpp.id}-${m.key}`} cx={p.x} cy={p.y} r={3} fill={color.stroke} />;
+          });
+        })}
+        {RADAR_METRICS.map((m, i) => {
+          const p = pt(i, radius + 28);
+          return (
+            <text key={m.key} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" className="fill-envrt-muted" style={{ fontSize: 13 }}>
+              {m.label}
+            </text>
+          );
+        })}
+      </svg>
     </div>
   );
 }
-
-/* ── Winner badge ── */
 
 function WinnerBadge() {
   return (
@@ -215,17 +185,15 @@ function WinnerBadge() {
   );
 }
 
-/* ── Info tooltip ── */
-
 function InfoTooltip({ text }: { text: string }) {
   return (
     <span className="group/info relative ml-1 inline-flex cursor-help">
-      <svg className="h-3 w-3 text-envrt-muted/40 transition-colors group-hover/info:text-envrt-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <svg className="h-3.5 w-3.5 text-envrt-muted/40 transition-colors group-hover/info:text-envrt-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
       </svg>
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-52 -translate-x-1/2 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg group-hover/info:block">
+      <span className="pointer-events-none absolute bottom-full left-0 z-30 mb-2 hidden w-52 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg group-hover/info:block">
         {text}
-        <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-white" />
+        <span className="absolute left-3 top-full border-4 border-transparent border-t-white" />
       </span>
     </span>
   );
@@ -237,16 +205,19 @@ interface Props {
   cards: CollectiveCardData[];
 }
 
-export function CollectiveComparisonView({ cards }: Props) {
+const EXPORT_ID = "comparison-export";
+
+export function ComparisonShareButton() {
   const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const exportRef = useRef<HTMLDivElement>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleShare = useCallback(async () => {
+  const handleCopyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => { setCopied(false); setShareOpen(false); }, 1500);
     } catch {
       const input = document.createElement("input");
       input.value = window.location.href;
@@ -255,80 +226,99 @@ export function CollectiveComparisonView({ cards }: Props) {
       document.execCommand("copy");
       document.body.removeChild(input);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => { setCopied(false); setShareOpen(false); }, 1500);
     }
   }, []);
 
   const handleExport = useCallback(async () => {
-    if (!exportRef.current || exporting) return;
+    const el = document.getElementById(EXPORT_ID);
+    if (!el || exporting) return;
+    setShareOpen(false);
     setExporting(true);
     try {
-      const dataUrl = await toPng(exportRef.current, {
+      const dataUrl = await toPng(el, {
         backgroundColor: "#ffffff",
         pixelRatio: 2,
-        width: exportRef.current.scrollWidth,
-        height: exportRef.current.scrollHeight,
-        style: {
-          padding: "32px",
-          borderRadius: "16px",
-        },
+        width: el.scrollWidth,
+        height: el.scrollHeight,
+        style: { padding: "32px", borderRadius: "16px" },
       });
       const link = document.createElement("a");
       link.download = `envrt-comparison-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
     } catch {
-      // Silently fail
+      /* silently fail */
     } finally {
       setExporting(false);
     }
   }, [exporting]);
 
-  /* ── Metrics ── */
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!shareOpen) return;
+    function onClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [shareOpen]);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setShareOpen((o) => !o)}
+        className="inline-flex items-center gap-1.5 rounded-lg border border-envrt-charcoal/8 px-3.5 py-2 text-xs font-medium text-envrt-muted transition-colors hover:border-envrt-teal/20 hover:text-envrt-teal"
+      >
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" /></svg>
+        Share
+        <svg className={`h-3 w-3 transition-transform ${shareOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+      </button>
+      {shareOpen && (
+        <div className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-lg border border-envrt-charcoal/8 bg-white shadow-lg">
+          <button
+            onClick={handleCopyLink}
+            className="flex w-full items-center gap-2 px-3 py-2.5 text-xs font-medium text-envrt-charcoal transition-colors hover:bg-envrt-cream/40"
+          >
+            {copied ? (
+              <>
+                <svg className="h-3.5 w-3.5 text-envrt-teal" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" /></svg>
+                Link copied!
+              </>
+            ) : (
+              <>
+                <svg className="h-3.5 w-3.5 text-envrt-muted" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
+                Copy link
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex w-full items-center gap-2 border-t border-envrt-charcoal/5 px-3 py-2.5 text-xs font-medium text-envrt-charcoal transition-colors hover:bg-envrt-cream/40 disabled:opacity-50"
+          >
+            <svg className="h-3.5 w-3.5 text-envrt-muted" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+            {exporting ? "Exporting..." : "Save as image"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function CollectiveComparisonView({ cards }: Props) {
+
+  /* ── Derived data ── */
 
   const metrics: MetricRow[] = [
-    {
-      label: "CO₂e emissions",
-      values: cards.map((c) => c.dpp.total_emissions),
-      unit: "kg",
-      lowerIsBetter: true,
-    },
-    {
-      label: "Emissions / kg",
-      values: cards.map((c) =>
-        c.dpp.total_emissions != null ? c.dpp.total_emissions / (c.dpp.garment_mass_g / 1000) : null
-      ),
-      unit: "kg CO₂e/kg",
-      lowerIsBetter: true,
-      format: (v) => v.toFixed(2),
-    },
-    {
-      label: "Water usage",
-      values: cards.map((c) => c.dpp.total_water),
-      unit: "L",
-      lowerIsBetter: true,
-    },
-    {
-      label: "Water / kg",
-      values: cards.map((c) =>
-        c.dpp.total_water != null ? c.dpp.total_water / (c.dpp.garment_mass_g / 1000) : null
-      ),
-      unit: "L/kg",
-      lowerIsBetter: true,
-      format: (v) => v.toFixed(1),
-    },
-    {
-      label: "Traceability",
-      values: cards.map((c) => c.dpp.traceability_score),
-      unit: "%",
-      lowerIsBetter: false,
-    },
-    {
-      label: "Mass",
-      values: cards.map((c) => c.dpp.garment_mass_g),
-      unit: "g",
-      lowerIsBetter: false,
-    },
+    { label: "CO₂e emissions", values: cards.map((c) => c.dpp.total_emissions), unit: "kg", lowerIsBetter: true },
+    { label: "Emissions / kg", values: cards.map((c) => c.dpp.total_emissions != null ? c.dpp.total_emissions / (c.dpp.garment_mass_g / 1000) : null), unit: "kg CO₂e/kg", lowerIsBetter: true, format: (v) => v.toFixed(2) },
+    { label: "Water usage", values: cards.map((c) => c.dpp.total_water), unit: "L", lowerIsBetter: true },
+    { label: "Water / kg", values: cards.map((c) => c.dpp.total_water != null ? c.dpp.total_water / (c.dpp.garment_mass_g / 1000) : null), unit: "L/kg", lowerIsBetter: true, format: (v) => v.toFixed(1) },
+    { label: "Traceability", values: cards.map((c) => c.dpp.traceability_score), unit: "%", lowerIsBetter: false },
+    { label: "Mass", values: cards.map((c) => c.dpp.garment_mass_g), unit: "g", lowerIsBetter: false },
   ];
 
   const hasAnyReduction = cards.some(
@@ -337,264 +327,230 @@ export function CollectiveComparisonView({ cards }: Props) {
       (c.dpp.total_water_reduction_pct != null && c.dpp.total_water_reduction_pct > 0)
   );
 
-  const hasAnyJourney = cards.some(
-    (c) => c.dpp.production_stages?.some((s) => s.country)
-  );
+  const hasAnyJourney = cards.some((c) => c.dpp.production_stages?.some((s) => s.country));
 
-  /* Grid: label column + one column per product */
-  const gridCols =
+  // Collect unique journey stage labels across all products
+  const journeyLabels: string[] = [];
+  if (hasAnyJourney) {
+    cards.forEach((card) => {
+      card.dpp.production_stages?.filter((s) => s.country).forEach((s) => {
+        if (!journeyLabels.includes(s.label)) journeyLabels.push(s.label);
+      });
+    });
+  }
+
+  /*
+   * ONE grid for the entire layout.
+   * Col 1: label column (radar chart in header, metric labels below)
+   * Col 2+: one per product (images in header, values below, maps below that)
+   *
+   * The label column is wide enough to hold the radar (~30% of width).
+   * Product columns share remaining space equally.
+   */
+  const gridClass =
     cards.length === 2
-      ? "grid-cols-[200px_1fr_1fr]"
-      : "grid-cols-[200px_1fr_1fr_1fr]";
+      ? "grid-cols-[35%_1fr_1fr]"
+      : "grid-cols-[28%_1fr_1fr_1fr]";
+
+  const colSpanFull =
+    cards.length === 2 ? "col-span-3" : "col-span-4";
+
+  function formatValue(value: number | null, metric: MetricRow): string | null {
+    if (value == null) return null;
+    if (metric.format) return metric.format(value);
+    if (metric.unit === "%") return `${Math.round(value)}${metric.unit}`;
+    return `${value.toFixed(1)} ${metric.unit}`;
+  }
 
   return (
-    <div>
-      {/* Action bar */}
-      <div className="mb-6 flex items-center justify-end gap-2">
-        <button
-          onClick={handleShare}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-envrt-charcoal/8 px-3.5 py-2 text-xs font-medium text-envrt-muted transition-colors hover:border-envrt-teal/20 hover:text-envrt-teal"
-        >
-          {copied ? (
-            <>
-              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-              </svg>
-              Copied!
-            </>
-          ) : (
-            <>
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-              </svg>
-              Share
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-envrt-charcoal/8 px-3.5 py-2 text-xs font-medium text-envrt-muted transition-colors hover:border-envrt-teal/20 hover:text-envrt-teal disabled:opacity-50"
-        >
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-          </svg>
-          {exporting ? "Exporting..." : "Save as image"}
-        </button>
-      </div>
+    <div className="overflow-x-auto rounded-2xl border border-envrt-charcoal/5 bg-white">
+      <div id={EXPORT_ID} className={`grid ${gridClass} min-w-[600px] p-6 sm:p-8`}>
 
-      {/* Exportable area */}
-      <div ref={exportRef}>
-        {/* ── Header row: Radar (left) + Product cards (right) ── */}
-        <div className={`grid ${gridCols} items-start gap-4`}>
-          {/* Radar chart occupies the label column */}
-          <div className="flex justify-center">
-            <RadarChart cards={cards} />
-          </div>
-
-          {/* Product header cards — one per data column */}
-          {cards.map((card) => (
-            <Link key={card.dpp.id} href={card.detailUrl} className="group flex flex-col items-center text-center py-4">
-              <div className="mb-3 h-28 w-28 overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
-                {card.productImageUrl ? (
-                  <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={112} height={112} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-envrt-muted/30">DPP</div>
-                )}
-              </div>
-              <p className="text-sm font-semibold text-envrt-charcoal group-hover:text-envrt-green">{card.dpp.garment_name}</p>
-              <p className="text-xs text-envrt-muted">{card.dpp.collection_name}</p>
-            </Link>
-          ))}
+        {/* ====== ROW: Header (radar + product cards) ====== */}
+        <div className="p-2 self-center">
+          <RadarChart cards={cards} />
         </div>
-
-        {/* Divider */}
-        <div className="my-4 border-t border-envrt-charcoal/5" />
-
-        {/* ── Metrics table (structured grid) ── */}
-        <div className={`grid ${gridCols} gap-x-4`}>
-          {/* Materials row */}
-          <div className="flex items-center py-3 text-sm font-medium text-envrt-muted">Materials</div>
-          {cards.map((card) => (
-            <div key={card.dpp.id} className="flex flex-wrap items-center justify-center gap-1.5 py-3">
-              {card.dpp.constituents.length > 0 ? (
-                card.dpp.constituents.map((c) => {
-                  const desc = getMaterialDescription(c.material);
-                  return (
-                    <span key={c.material} className="group/mattip relative inline-flex rounded-full bg-envrt-teal/5 px-2.5 py-1 text-xs font-medium text-envrt-teal">
-                      {c.material} {c.pct}%
-                      {desc && (
-                        <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-48 -translate-x-1/2 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg group-hover/mattip:block">
-                          {desc}
-                          <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-white" />
-                        </span>
-                      )}
-                    </span>
-                  );
-                })
+        {cards.map((card) => (
+          <Link
+            key={card.dpp.id}
+            href={card.detailUrl}
+            className="group flex flex-col items-center px-2 py-4 text-center self-center"
+          >
+            <div className="mb-3 aspect-square w-full max-w-[180px] overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
+              {card.productImageUrl ? (
+                <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={180} height={180} className="h-full w-full object-cover" />
               ) : (
-                <span className="text-sm text-envrt-muted">—</span>
+                <div className="flex h-full items-center justify-center text-sm text-envrt-muted/30">DPP</div>
               )}
             </div>
-          ))}
+            <p className="text-sm font-semibold text-envrt-charcoal group-hover:text-envrt-green">{card.dpp.garment_name}</p>
+            <p className="text-xs text-envrt-muted">{card.dpp.collection_name}</p>
+          </Link>
+        ))}
 
-          {/* Metric rows */}
-          {metrics.map((metric) => {
-            const validValues = metric.values.filter((v): v is number => v != null);
-            const max = validValues.length > 0 ? Math.max(...validValues) : 1;
-            const best = bestValue(metric.values, metric.lowerIsBetter);
+        {/* ====== Divider ====== */}
+        <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
 
-            return (
-              <div key={metric.label} className="col-span-full contents">
-                {/* Divider */}
-                <div className={`col-span-full border-t border-envrt-charcoal/5`} />
+        {/* ====== ROW: Materials ====== */}
+        <div className="flex items-center py-3 px-2 text-sm font-medium text-envrt-muted">Materials</div>
+        {cards.map((card) => {
+          const sorted = [...card.dpp.constituents].sort((a, b) => b.pct - a.pct);
+          return (
+            <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2 text-center text-xs font-medium text-envrt-teal">
+              {sorted.length > 0 ? sorted.map((c) => `${c.material} ${c.pct}%`).join(", ") : <span className="text-envrt-muted">—</span>}
+            </div>
+          );
+        })}
 
-                {/* Label */}
-                <div className="flex items-center py-3">
-                  <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
-                    {metric.label}
-                    {METRIC_EXPLAINERS[metric.label] && <InfoTooltip text={METRIC_EXPLAINERS[metric.label]} />}
-                  </span>
+        {/* ====== ROWS: Metrics ====== */}
+        {metrics.map((metric) => {
+          const validValues = metric.values.filter((v): v is number => v != null);
+          const best = bestValue(metric.values, metric.lowerIsBetter);
+
+          return (
+            <div key={metric.label} className={`${colSpanFull} contents`}>
+              <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
+
+              <div className="flex items-center py-3 px-2 pr-4">
+                <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
+                  {metric.label}
+                  {METRIC_EXPLAINERS[metric.label] && <InfoTooltip text={METRIC_EXPLAINERS[metric.label]} />}
+                </span>
+              </div>
+
+              {metric.values.map((value, i) => {
+                const isBest = value != null && best != null && value === best && validValues.length > 1;
+                const formatted = formatValue(value, metric);
+                return (
+                  <div key={cards[i].dpp.id} className="flex items-center justify-center py-3 px-2">
+                    {formatted != null ? (
+                      <span className={`inline-flex items-center text-base font-semibold ${isBest ? "text-envrt-teal" : "text-envrt-charcoal"}`}>
+                        {formatted}
+                        {isBest && <WinnerBadge />}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-envrt-muted">—</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+
+        {/* ====== ROWS: Reduction vs avg ====== */}
+        {hasAnyReduction && (
+          <>
+            <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
+            <div className="flex items-center py-3 px-2 pr-4">
+              <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
+                Emissions vs avg
+                <InfoTooltip text="Percentage reduction in emissions compared to the industry average for this garment type." />
+              </span>
+            </div>
+            {cards.map((card) => {
+              const pct = card.dpp.total_emissions_reduction_pct;
+              return (
+                <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2">
+                  {pct != null && pct > 0 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-envrt-green/8 px-3 py-1 text-xs font-semibold text-envrt-green">
+                      ↓ {Math.round(pct)}%
+                    </span>
+                  ) : (
+                    <span className="text-sm text-envrt-muted">—</span>
+                  )}
                 </div>
+              );
+            })}
 
-                {/* Values */}
-                {metric.values.map((value, i) => {
-                  const isBest = value != null && best != null && value === best && validValues.length > 1;
-                  const barWidth = value != null && max > 0 ? Math.max((value / max) * 100, 4) : 0;
-                  const formatted = value != null
-                    ? metric.format
-                      ? metric.format(value)
-                      : metric.unit === "%" ? `${Math.round(value)}${metric.unit}` : `${value.toFixed(1)} ${metric.unit}`
-                    : null;
+            <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
+            <div className="flex items-center py-3 px-2 pr-4">
+              <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
+                Water vs avg
+                <InfoTooltip text="Percentage reduction in water usage compared to the industry average for this garment type." />
+              </span>
+            </div>
+            {cards.map((card) => {
+              const pct = card.dpp.total_water_reduction_pct;
+              return (
+                <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2">
+                  {pct != null && pct > 0 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                      ↓ {Math.round(pct)}%
+                    </span>
+                  ) : (
+                    <span className="text-sm text-envrt-muted">—</span>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
 
+        {/* ====== Production journeys ====== */}
+        {hasAnyJourney && (
+          <>
+            <div className={`${colSpanFull} mt-4 border-t border-envrt-charcoal/5 pt-4`}>
+              <h3 className="flex items-center gap-1.5 text-sm font-semibold text-envrt-charcoal">
+                <svg className="h-4 w-4 text-envrt-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+                </svg>
+                Production journeys
+              </h3>
+            </div>
+
+            {/* Maps row */}
+            <div /> {/* empty label cell */}
+            {cards.map((card) => {
+              const hasStages = card.dpp.production_stages?.some((s) => s.country);
+              return (
+                <div key={card.dpp.id} className="px-2 pt-3">
+                  {hasStages ? (
+                    <Suspense
+                      fallback={
+                        <div className="flex h-[140px] items-center justify-center rounded-lg bg-envrt-cream/40">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-envrt-teal border-t-transparent" />
+                        </div>
+                      }
+                    >
+                      <CollectiveProductionMap stages={card.dpp.production_stages!} />
+                    </Suspense>
+                  ) : (
+                    <div className="flex h-[140px] items-center justify-center rounded-lg bg-envrt-cream/20 text-xs text-envrt-muted">
+                      No journey data
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Stage rows */}
+            {journeyLabels.map((label) => (
+              <div key={label} className={`${colSpanFull} contents`}>
+                <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
+                <div className="flex items-center py-2 px-2 text-xs text-envrt-muted">{label}</div>
+                {cards.map((card) => {
+                  const stages = card.dpp.production_stages?.filter((s) => s.country && s.label === label) ?? [];
+                  const locations = Array.from(
+                    new Set(
+                      stages.map((s) =>
+                        s.regional ? `${titleCase(s.regional)}, ${titleCase(s.country!)}` : titleCase(s.country!)
+                      )
+                    )
+                  );
                   return (
-                    <div key={cards[i].dpp.id} className="flex flex-col items-center justify-center gap-1.5 py-3">
-                      {formatted != null ? (
-                        <>
-                          <span className={`inline-flex items-center text-base font-semibold ${isBest ? "text-envrt-teal" : "text-envrt-charcoal"}`}>
-                            {formatted}
-                            {isBest && <WinnerBadge />}
-                          </span>
-                          <div className="h-1.5 w-full max-w-[120px] overflow-hidden rounded-full bg-envrt-charcoal/5">
-                            <div
-                              className={`h-full rounded-full ${isBest ? "bg-envrt-teal" : "bg-envrt-charcoal/15"}`}
-                              style={{ width: `${barWidth}%` }}
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-sm text-envrt-muted">—</span>
-                      )}
+                    <div key={card.dpp.id} className="flex flex-col items-center justify-center py-2 px-2 text-center text-xs font-medium text-envrt-charcoal">
+                      {locations.length > 0 ? locations.map((loc) => <div key={loc}>{loc}</div>) : "—"}
                     </div>
                   );
                 })}
               </div>
-            );
-          })}
-
-          {/* Reduction vs avg */}
-          {hasAnyReduction && (
-            <>
-              <div className="col-span-full border-t border-envrt-charcoal/5" />
-              <div className="flex items-center py-3">
-                <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
-                  Emissions vs avg
-                  <InfoTooltip text="Percentage reduction in emissions compared to the industry average for this garment type." />
-                </span>
-              </div>
-              {cards.map((card) => {
-                const pct = card.dpp.total_emissions_reduction_pct;
-                return (
-                  <div key={card.dpp.id} className="flex items-center justify-center py-3">
-                    {pct != null && pct > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-envrt-green/8 px-3 py-1 text-xs font-semibold text-envrt-green">
-                        ↓ {Math.round(pct)}% below avg
-                      </span>
-                    ) : (
-                      <span className="text-sm text-envrt-muted">—</span>
-                    )}
-                  </div>
-                );
-              })}
-
-              <div className="col-span-full border-t border-envrt-charcoal/5" />
-              <div className="flex items-center py-3">
-                <span className="inline-flex items-center text-sm font-medium text-envrt-muted">
-                  Water vs avg
-                  <InfoTooltip text="Percentage reduction in water usage compared to the industry average for this garment type." />
-                </span>
-              </div>
-              {cards.map((card) => {
-                const pct = card.dpp.total_water_reduction_pct;
-                return (
-                  <div key={card.dpp.id} className="flex items-center justify-center py-3">
-                    {pct != null && pct > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                        ↓ {Math.round(pct)}% below avg
-                      </span>
-                    ) : (
-                      <span className="text-sm text-envrt-muted">—</span>
-                    )}
-                  </div>
-                );
-              })}
-            </>
-          )}
-        </div>
-
-        {/* Production journeys */}
-        {hasAnyJourney && (
-          <div className="mt-6 border-t border-envrt-charcoal/5 pt-5">
-            <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-envrt-charcoal">
-              <svg className="h-4 w-4 text-envrt-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
-              </svg>
-              Production journeys
-            </h3>
-            <div className={`grid gap-4 ${cards.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-              {cards.map((card) => {
-                const hasStages = card.dpp.production_stages?.some((s) => s.country);
-                return (
-                  <div key={card.dpp.id}>
-                    <p className="mb-2 text-center text-xs font-semibold text-envrt-charcoal">{card.dpp.garment_name}</p>
-                    {hasStages ? (
-                      <Suspense
-                        fallback={
-                          <div className="flex h-[140px] items-center justify-center rounded-lg bg-envrt-cream/40">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-envrt-teal border-t-transparent" />
-                          </div>
-                        }
-                      >
-                        <CollectiveProductionMap stages={card.dpp.production_stages!} />
-                      </Suspense>
-                    ) : (
-                      <div className="flex h-[140px] items-center justify-center rounded-lg bg-envrt-cream/20 text-xs text-envrt-muted">
-                        No journey data
-                      </div>
-                    )}
-                    {hasStages && (
-                      <div className="mt-2 space-y-0.5">
-                        {card.dpp.production_stages!
-                          .filter((s) => s.country)
-                          .map((stage, idx) => (
-                            <div key={`${stage.key}-${idx}`} className="flex items-center justify-between text-xs">
-                              <span className="text-envrt-muted">{stage.label}</span>
-                              <span className="font-medium text-envrt-charcoal">
-                                {stage.regional ? `${titleCase(stage.regional)}, ${titleCase(stage.country!)}` : titleCase(stage.country!)}
-                              </span>
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+            ))}
+          </>
         )}
 
-        {/* ENVRT branding for export */}
-        <div className="mt-6 text-center text-[10px] text-envrt-muted/40">
+        {/* ====== Watermark ====== */}
+        <div className={`${colSpanFull} mt-6 text-center text-[10px] text-envrt-muted/40`}>
           Compared on envrt.com/collective
         </div>
       </div>

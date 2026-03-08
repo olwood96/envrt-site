@@ -32,26 +32,28 @@ export function CollectiveCompareBar({
           {selectedCards.map((card) => (
             <div
               key={card.dpp.id}
-              className="relative h-10 w-10 overflow-hidden rounded-lg border border-envrt-charcoal/10 bg-envrt-cream/40"
+              className="relative h-10 w-10 rounded-lg border border-envrt-charcoal/10 bg-envrt-cream/40"
             >
-              {card.productImageUrl ? (
-                <Image
-                  src={card.productImageUrl}
-                  alt={card.dpp.garment_name}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-[8px] text-envrt-muted">
-                  DPP
-                </div>
-              )}
+              <div className="h-full w-full overflow-hidden rounded-lg">
+                {card.productImageUrl ? (
+                  <Image
+                    src={card.productImageUrl}
+                    alt={card.dpp.garment_name}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-[8px] text-envrt-muted">
+                    DPP
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => onRemove(card.dpp.id)}
-                className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-envrt-charcoal text-[8px] text-white"
+                className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-envrt-charcoal text-[9px] font-bold text-white shadow-sm"
               >
-                x
+                X
               </button>
             </div>
           ))}

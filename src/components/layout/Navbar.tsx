@@ -15,7 +15,7 @@ export function Navbar() {
 
   /* ── Sliding pill state ── */
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [pillRect, setPillRect] = useState({ left: 0, width: 0 });
+  const [pillRect, setPillRect] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const linkRefs = useRef<(HTMLDivElement | null)[]>([]);
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +27,9 @@ export function Navbar() {
     const elRect = el.getBoundingClientRect();
     setPillRect({
       left: elRect.left - containerRect.left,
+      top: elRect.top - containerRect.top,
       width: elRect.width,
+      height: elRect.height,
     });
   }, []);
 
@@ -119,18 +121,22 @@ export function Navbar() {
             >
               {/* Animated pill */}
               <motion.div
-                className="pointer-events-none absolute rounded-full bg-envrt-charcoal/[0.05]"
+                className="pointer-events-none absolute rounded-full bg-envrt-charcoal/25"
+                initial={false}
                 animate={{
                   left: pillRect.left,
+                  top: pillRect.top,
                   width: pillRect.width,
+                  height: pillRect.height,
                   opacity: hoveredIndex !== null ? 1 : 0,
                 }}
                 transition={{
                   left: { type: "spring", stiffness: 400, damping: 35 },
+                  top: { type: "spring", stiffness: 400, damping: 35 },
                   width: { type: "spring", stiffness: 400, damping: 35 },
+                  height: { type: "spring", stiffness: 400, damping: 35 },
                   opacity: { duration: 0.2 },
                 }}
-                style={{ top: "50%", y: "-50%", height: 32 }}
               />
 
               {navLinks.map((link, i) => (

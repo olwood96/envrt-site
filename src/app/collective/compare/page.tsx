@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
-import { CollectiveComparisonView } from "@/components/collective/CollectiveComparisonView";
+import { CollectiveComparisonView, ComparisonShareButton } from "@/components/collective/CollectiveComparisonView";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
@@ -64,27 +64,30 @@ export default async function ComparePage({ searchParams }: PageProps) {
     />
     <div className="pt-28 pb-16">
       <Container>
-        <Link
-          href="/collective"
-          className="inline-flex items-center gap-1 text-sm text-envrt-muted transition-colors hover:text-envrt-charcoal"
-        >
-          <span>←</span>
-          Back to The Collective
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link
+            href="/collective"
+            className="inline-flex items-center gap-1 text-sm text-envrt-muted transition-colors hover:text-envrt-charcoal"
+          >
+            <span>←</span>
+            Back to The Collective
+          </Link>
+          <ComparisonShareButton />
+        </div>
 
         <div className="mt-6">
           <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
             {brandName}
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
             Product comparison
           </h1>
-          <p className="mt-2 text-sm text-envrt-muted">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-envrt-muted">
             Comparing {validCards.length} products side by side.
           </p>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-envrt-charcoal/5 bg-white p-6 sm:p-8">
+        <div className="mt-6">
           <CollectiveComparisonView cards={validCards} />
         </div>
       </Container>

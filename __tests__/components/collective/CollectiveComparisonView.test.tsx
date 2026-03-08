@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CollectiveComparisonView } from "@/components/collective/CollectiveComparisonView";
+import { CollectiveComparisonView, ComparisonShareButton } from "@/components/collective/CollectiveComparisonView";
 import type { CollectiveCardData } from "@/lib/collective/types";
 
 // Mock next/image
@@ -157,23 +157,22 @@ describe("CollectiveComparisonView", () => {
   it("renders full material breakdown", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
     expect(screen.getByText("Materials")).toBeInTheDocument();
-    expect(screen.getByText("Organic Cotton 95%")).toBeInTheDocument();
-    expect(screen.getByText("Elastane 5%")).toBeInTheDocument();
+    // Materials are comma-separated, sorted by highest % first
+    expect(screen.getByText("Organic Cotton 95%, Elastane 5%")).toBeInTheDocument();
     expect(screen.getByText("Polyester 100%")).toBeInTheDocument();
   });
 
   it("shows emissions reduction vs average", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
     expect(screen.getByText("Emissions vs avg")).toBeInTheDocument();
-    // Uses ↓ prefix now
-    expect(screen.getByText(/32% below avg/)).toBeInTheDocument();
+    expect(screen.getByText(/↓ 32%/)).toBeInTheDocument();
   });
 
   it("shows water reduction vs average", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
     expect(screen.getByText("Water vs avg")).toBeInTheDocument();
-    expect(screen.getByText(/18% below avg/)).toBeInTheDocument();
-    expect(screen.getByText(/25% below avg/)).toBeInTheDocument();
+    expect(screen.getByText(/↓ 18%/)).toBeInTheDocument();
+    expect(screen.getByText(/↓ 25%/)).toBeInTheDocument();
   });
 
   it("shows metric explainer tooltips", () => {
@@ -197,18 +196,24 @@ describe("CollectiveComparisonView", () => {
     expect(screen.getAllByText("Water / kg").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("renders share button and copies URL on click", async () => {
-    render(<CollectiveComparisonView cards={mockCards} />);
+  it("renders share dropdown with copy link and save as image", async () => {
+    render(<ComparisonShareButton />);
     const shareBtn = screen.getByText("Share");
+    // Open dropdown
     fireEvent.click(shareBtn);
+    expect(screen.getByText("Copy link")).toBeInTheDocument();
+    expect(screen.getByText("Save as image")).toBeInTheDocument();
+    // Click copy link
+    fireEvent.click(screen.getByText("Copy link"));
     await waitFor(() => {
-      expect(screen.getByText("Copied!")).toBeInTheDocument();
+      expect(screen.getByText("Link copied!")).toBeInTheDocument();
     });
   });
 
-  it("renders save as image button", () => {
-    render(<CollectiveComparisonView cards={mockCards} />);
-    expect(screen.getByText("Save as image")).toBeInTheDocument();
+  it("hides share dropdown items until opened", () => {
+    render(<ComparisonShareButton />);
+    expect(screen.queryByText("Copy link")).not.toBeInTheDocument();
+    expect(screen.queryByText("Save as image")).not.toBeInTheDocument();
   });
 
   it("does not show reduction rows when no reductions exist", () => {
