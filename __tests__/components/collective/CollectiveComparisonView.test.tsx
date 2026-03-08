@@ -187,8 +187,9 @@ describe("CollectiveComparisonView", () => {
 
   it("renders radar chart with legend", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-    expect(screen.getByText("Low emissions")).toBeInTheDocument();
-    expect(screen.getByText("Low water")).toBeInTheDocument();
+    // Radar renders twice (mobile + desktop), so labels appear multiple times
+    expect(screen.getAllByText("Low emissions").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Low water").length).toBeGreaterThanOrEqual(1);
     // "Traceability" in both radar label and metric table
     expect(screen.getAllByText("Traceability").length).toBeGreaterThanOrEqual(2);
     // These labels appear in both radar and metric table

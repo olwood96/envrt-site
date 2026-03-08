@@ -363,12 +363,21 @@ export function CollectiveComparisonView({ cards }: Props) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-envrt-charcoal/5 bg-white">
+    <div className="rounded-2xl border border-envrt-charcoal/5 bg-white">
+      {/* Mobile-only radar: full-width above the scrollable grid */}
+      <div className="block sm:hidden p-6 pb-0">
+        <RadarChart cards={cards} />
+      </div>
+
+      <div className="overflow-x-auto">
       <div id={EXPORT_ID} className={`grid ${gridClass} min-w-[600px] p-6 sm:p-8`}>
 
         {/* ====== ROW: Header (radar + product cards) ====== */}
         <div className="p-2 self-center">
-          <RadarChart cards={cards} />
+          {/* Radar hidden on mobile (shown full-width above grid instead) */}
+          <div className="hidden sm:block">
+            <RadarChart cards={cards} />
+          </div>
         </div>
         {cards.map((card) => (
           <Link
@@ -553,6 +562,7 @@ export function CollectiveComparisonView({ cards }: Props) {
         <div className={`${colSpanFull} mt-6 text-center text-[10px] text-envrt-muted/40`}>
           Compared on envrt.com/collective
         </div>
+      </div>
       </div>
     </div>
   );
