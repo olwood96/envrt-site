@@ -383,11 +383,11 @@ export function CollectiveComparisonView({ cards }: Props) {
           <Link
             key={card.dpp.id}
             href={card.detailUrl}
-            className="group flex flex-col items-center px-2 py-4 text-center self-center"
+            className="group flex flex-col items-center px-2 py-4 text-center self-end"
           >
-            <div className="mb-3 aspect-square w-full max-w-[180px] overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
+            <div className="mb-3 flex h-[180px] w-full items-center justify-center overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
               {card.productImageUrl ? (
-                <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={180} height={180} className="h-full w-full object-cover" />
+                <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={180} height={180} className="h-full w-full object-contain" />
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-envrt-muted/30">DPP</div>
               )}
