@@ -24,7 +24,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
   // Parse: brand/collection/sku,brand/collection/sku,...
   const entries = products.split(",").filter(Boolean);
-  if (entries.length < 2 || entries.length > 4) notFound();
+  if (entries.length < 2 || entries.length > 3) notFound();
 
   // Fetch all DPPs in parallel
   const cards: (CollectiveCardData | null)[] = await Promise.all(

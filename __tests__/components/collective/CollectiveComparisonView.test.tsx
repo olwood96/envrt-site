@@ -108,142 +108,107 @@ const mockCards: CollectiveCardData[] = [
 
 describe("CollectiveComparisonView", () => {
   beforeEach(() => {
-    // Mock clipboard API
     Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(undefined),
-      },
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
   });
 
   it("renders product headers", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // Product names appear in both table header and radar legend
+    // Product names appear in header cards and radar legend
     expect(screen.getAllByText("Product A").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Product B").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders CO₂e emissions", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     expect(screen.getByText("3.0 kg")).toBeInTheDocument();
     expect(screen.getByText("5.0 kg")).toBeInTheDocument();
   });
 
   it("renders emissions per kg (normalized)", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // Product A: 3.0 / 0.2 = 15.00
-    // Product B: 5.0 / 0.3 = 16.67
-    expect(screen.getByText("Emissions per kg")).toBeInTheDocument();
+    // Product A: 3.0 / 0.2 = 15.00, Product B: 5.0 / 0.3 = 16.67
+    expect(screen.getAllByText("Emissions / kg").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("15.00")).toBeInTheDocument();
     expect(screen.getByText("16.67")).toBeInTheDocument();
   });
 
   it("renders water per kg (normalized)", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // Product A: 50 / 0.2 = 250.0
-    // Product B: 30 / 0.3 = 100.0
-    expect(screen.getByText("Water per kg")).toBeInTheDocument();
+    // Product A: 50 / 0.2 = 250.0, Product B: 30 / 0.3 = 100.0
+    expect(screen.getAllByText("Water / kg").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("250.0")).toBeInTheDocument();
     expect(screen.getByText("100.0")).toBeInTheDocument();
   });
 
   it("renders traceability scores", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     expect(screen.getByText("85%")).toBeInTheDocument();
     expect(screen.getByText("70%")).toBeInTheDocument();
   });
 
   it("shows winner badges on best values", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // The winner badge SVGs should be present — check via title
     const badges = screen.getAllByTitle("Best in this comparison");
     expect(badges.length).toBeGreaterThan(0);
   });
 
   it("renders full material breakdown", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     expect(screen.getByText("Materials")).toBeInTheDocument();
     expect(screen.getByText("Organic Cotton 95%")).toBeInTheDocument();
     expect(screen.getByText("Elastane 5%")).toBeInTheDocument();
     expect(screen.getByText("Polyester 100%")).toBeInTheDocument();
   });
 
-  it("shows material match count", () => {
-    render(<CollectiveComparisonView cards={mockCards} />);
-
-    expect(screen.getByText("Material match")).toBeInTheDocument();
-    // 3 unique materials total (Organic Cotton, Elastane, Polyester)
-    // Product A has 2/3, Product B has 1/3
-    expect(screen.getAllByText("/3 shared").length).toBe(2);
-  });
-
   it("shows emissions reduction vs average", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     expect(screen.getByText("Emissions vs avg")).toBeInTheDocument();
-    expect(screen.getByText("32% below avg")).toBeInTheDocument();
+    // Uses ↓ prefix now
+    expect(screen.getByText(/32% below avg/)).toBeInTheDocument();
   });
 
   it("shows water reduction vs average", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     expect(screen.getByText("Water vs avg")).toBeInTheDocument();
-    expect(screen.getByText("18% below avg")).toBeInTheDocument();
-    expect(screen.getByText("25% below avg")).toBeInTheDocument();
+    expect(screen.getByText(/18% below avg/)).toBeInTheDocument();
+    expect(screen.getByText(/25% below avg/)).toBeInTheDocument();
   });
 
   it("shows metric explainer tooltips", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // Explainer text should exist in the DOM (hidden until hover)
     expect(
-      screen.getByText(
-        /Total greenhouse gas emissions across the product lifecycle/
-      )
+      screen.getByText(/Total greenhouse gas emissions across the product lifecycle/)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Emissions normalised by product weight/
-      )
+      screen.getByText(/Emissions normalised by product weight/)
     ).toBeInTheDocument();
   });
 
   it("renders radar chart with legend", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    // Radar chart axis labels
     expect(screen.getByText("Low emissions")).toBeInTheDocument();
     expect(screen.getByText("Low water")).toBeInTheDocument();
-    // "Traceability" appears in both radar and metric table — check at least 2
+    // "Traceability" in both radar label and metric table
     expect(screen.getAllByText("Traceability").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText("Emissions/kg")).toBeInTheDocument();
-    expect(screen.getByText("Water/kg")).toBeInTheDocument();
+    // These labels appear in both radar and metric table
+    expect(screen.getAllByText("Emissions / kg").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Water / kg").length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders share button and copies URL on click", async () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     const shareBtn = screen.getByText("Share");
-    expect(shareBtn).toBeInTheDocument();
-
     fireEvent.click(shareBtn);
-
     await waitFor(() => {
       expect(screen.getByText("Copied!")).toBeInTheDocument();
     });
   });
 
-  it("renders export image button", () => {
+  it("renders save as image button", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    expect(screen.getByText("Export image")).toBeInTheDocument();
+    expect(screen.getByText("Save as image")).toBeInTheDocument();
   });
 
   it("does not show reduction rows when no reductions exist", () => {
@@ -251,22 +216,17 @@ describe("CollectiveComparisonView", () => {
       makeCard("1", "A", { total_emissions_reduction_pct: null, total_water_reduction_pct: null }),
       makeCard("2", "B", { total_emissions_reduction_pct: null, total_water_reduction_pct: null }),
     ];
-
     render(<CollectiveComparisonView cards={noReductionCards} />);
-
     expect(screen.queryByText("Emissions vs avg")).not.toBeInTheDocument();
     expect(screen.queryByText("Water vs avg")).not.toBeInTheDocument();
   });
 
   it("does not show production journeys when no stages exist", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
-    expect(
-      screen.queryByText("Production journeys")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Production journeys")).not.toBeInTheDocument();
   });
 
-  it("shows production journeys when stages have countries", async () => {
+  it("shows production journeys when stages have countries", () => {
     const journeyCards = [
       makeCard("1", "Product A", {
         production_stages: [
@@ -280,12 +240,28 @@ describe("CollectiveComparisonView", () => {
         ],
       }),
     ];
-
     render(<CollectiveComparisonView cards={journeyCards} />);
-
     expect(screen.getByText("Production journeys")).toBeInTheDocument();
     expect(screen.getByText("Aydin, Turkey")).toBeInTheDocument();
     expect(screen.getByText("Portugal")).toBeInTheDocument();
+    expect(screen.getByText("India")).toBeInTheDocument();
+  });
+
+  it("title-cases lowercase country names", () => {
+    const journeyCards = [
+      makeCard("1", "Product A", {
+        production_stages: [
+          { key: "fibre", label: "Fibre Production", country: "turkey", regional: "aydin", verification: null },
+        ],
+      }),
+      makeCard("2", "Product B", {
+        production_stages: [
+          { key: "fibre", label: "Fibre Production", country: "INDIA", regional: null, verification: null },
+        ],
+      }),
+    ];
+    render(<CollectiveComparisonView cards={journeyCards} />);
+    expect(screen.getByText("Aydin, Turkey")).toBeInTheDocument();
     expect(screen.getByText("India")).toBeInTheDocument();
   });
 
@@ -294,21 +270,20 @@ describe("CollectiveComparisonView", () => {
       makeCard("1", "Product A", { total_emissions: null, total_water: null }),
       makeCard("2", "Product B", { total_emissions: 5.0, total_water: 30 }),
     ];
-
     render(<CollectiveComparisonView cards={nullCards} />);
-
-    // Should show em dashes for null values
     const dashes = screen.getAllByText("—");
     expect(dashes.length).toBeGreaterThan(0);
   });
 
   it("links product names to detail pages", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
-
     const links = screen.getAllByRole("link");
-    const productALinks = links.filter(
-      (l) => l.getAttribute("href") === "/collective/testbrand/sku-1"
-    );
+    const productALinks = links.filter((l) => l.getAttribute("href") === "/collective/testbrand/sku-1");
     expect(productALinks.length).toBeGreaterThan(0);
+  });
+
+  it("shows ENVRT branding watermark for export", () => {
+    render(<CollectiveComparisonView cards={mockCards} />);
+    expect(screen.getByText("Compared on envrt.com/collective")).toBeInTheDocument();
   });
 });

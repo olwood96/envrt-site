@@ -5,7 +5,7 @@ import type { CollectiveCardData } from "@/lib/collective/types";
 import { CollectiveCard } from "./CollectiveCard";
 import { CollectiveCompareBar } from "./CollectiveCompareBar";
 
-const MAX_COMPARE = 4;
+const MAX_COMPARE = 3;
 
 interface Props {
   cards: CollectiveCardData[];

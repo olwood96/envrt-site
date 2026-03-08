@@ -11,7 +11,7 @@ import { CollectiveCard } from "./CollectiveCard";
 import { CollectiveCompareBar } from "./CollectiveCompareBar";
 import { FadeUp, StaggerChildren, StaggerItem } from "@/components/ui/Motion";
 
-const MAX_COMPARE = 4;
+const MAX_COMPARE = 3;
 const PAGE_SIZE = 12;
 const COMPARE_COUNTS_KEY = "envrt_compare_counts";
 

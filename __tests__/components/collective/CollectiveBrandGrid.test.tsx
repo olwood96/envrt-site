@@ -118,28 +118,26 @@ describe("CollectiveBrandGrid", () => {
     expect(checkboxes[1]).not.toBeChecked();
   });
 
-  it("enforces max 4 selections", () => {
-    const fiveCards = [
+  it("enforces max 3 selections", () => {
+    const fourCards = [
       makeCard("1", "A"),
       makeCard("2", "B"),
       makeCard("3", "C"),
       makeCard("4", "D"),
-      makeCard("5", "E"),
     ];
 
-    render(<CollectiveBrandGrid cards={fiveCards} />);
+    render(<CollectiveBrandGrid cards={fourCards} />);
 
     const checkboxes = screen.getAllByRole("checkbox");
     fireEvent.click(checkboxes[0]);
     fireEvent.click(checkboxes[1]);
     fireEvent.click(checkboxes[2]);
-    fireEvent.click(checkboxes[3]);
 
-    // 5th should be disabled
-    expect(checkboxes[4]).toBeDisabled();
+    // 4th should be disabled
+    expect(checkboxes[3]).toBeDisabled();
 
     // Try clicking it anyway — should not check
-    fireEvent.click(checkboxes[4]);
-    expect(checkboxes[4]).not.toBeChecked();
+    fireEvent.click(checkboxes[3]);
+    expect(checkboxes[3]).not.toBeChecked();
   });
 });
