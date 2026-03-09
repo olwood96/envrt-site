@@ -7,6 +7,7 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FadeUp } from "@/components/ui/Motion";
+import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
 
 /* ================================================================
    TYPES
@@ -274,6 +275,7 @@ export default function ROICalculatorPage() {
   const [assumptionsOpen, setAssumptionsOpen] = useState(false);
 
   // Calculator inputs
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [skuCount, setSkuCount] = useState(25);
   const [dataMaturity, setDataMaturity] = useState<DataMaturity>("manual");
   const [market, setMarket] = useState<Market>("both");
@@ -541,6 +543,7 @@ export default function ROICalculatorPage() {
                               brandName,
                               email,
                               marketingConsent,
+                              turnstileToken,
                               skuCount,
                               dataMaturity,
                               hoursPerProduct: DATA_MATURITY_HOURS[dataMaturity],
@@ -604,6 +607,7 @@ export default function ROICalculatorPage() {
                         ENVRT about DPP compliance and product updates.
                       </span>
                     </label>
+                    <TurnstileWidget onToken={setTurnstileToken} className="flex justify-center" />
                     <Button
                       type="submit"
                       className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`}

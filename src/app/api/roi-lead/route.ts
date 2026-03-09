@@ -6,6 +6,7 @@ import {
   isValidEmail,
   rateLimit,
   getClientIp,
+  verifyTurnstile,
 } from "@/lib/form-security";
 
 const RATE_LIMIT_MAX = 5;
@@ -31,6 +32,7 @@ interface ROIPayload {
   savingVsInhouse: number;
   hoursSaved: number;
   daysSaved: number;
+  turnstileToken?: string;
 }
 
 function formatCurrency(n: number): string {
@@ -193,6 +195,11 @@ export async function POST(request: NextRequest) {
     data = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const turnstileOk = await verifyTurnstile(data.turnstileToken);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "Bot verification failed" }, { status: 403 });
   }
 
   if (!data.email || !data.firstName) {

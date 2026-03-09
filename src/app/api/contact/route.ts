@@ -6,6 +6,7 @@ import {
   isValidEmail,
   rateLimit,
   getClientIp,
+  verifyTurnstile,
 } from "@/lib/form-security";
 
 interface ContactPayload {
@@ -15,6 +16,7 @@ interface ContactPayload {
   company: string;
   message: string;
   "bot-field"?: string;
+  turnstileToken?: string;
 }
 
 const INTERNAL_EMAIL = "info@envrt.com";
@@ -91,6 +93,12 @@ export async function POST(request: NextRequest) {
   if (data["bot-field"]) {
     // Return success to avoid tipping off the bot
     return NextResponse.json({ success: true });
+  }
+
+  // Turnstile verification
+  const turnstileOk = await verifyTurnstile(data.turnstileToken);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "Bot verification failed" }, { status: 403 });
   }
 
   if (!data.email || !data.firstName) {

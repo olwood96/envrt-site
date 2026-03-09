@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   escapeHtml,
   sanitizeForSubject,
   isValidEmail,
   rateLimit,
+  verifyTurnstile,
 } from "@/lib/form-security";
 
 // ── escapeHtml ──────────────────────────────────────────────────────────
@@ -140,5 +141,53 @@ describe("rateLimit", () => {
     expect(rateLimit(key1, 1, 60_000)).toBe(false);
     // key2 should still be allowed
     expect(rateLimit(key2, 1, 60_000)).toBe(true);
+  });
+});
+
+// ── verifyTurnstile ──────────────────────────────────────────────────
+
+describe("verifyTurnstile", () => {
+  const originalEnv = process.env.TURNSTILE_SECRET_KEY;
+
+  afterEach(() => {
+    if (originalEnv === undefined) {
+      delete process.env.TURNSTILE_SECRET_KEY;
+    } else {
+      process.env.TURNSTILE_SECRET_KEY = originalEnv;
+    }
+    vi.restoreAllMocks();
+  });
+
+  it("returns true when TURNSTILE_SECRET_KEY is not set (dev mode)", async () => {
+    delete process.env.TURNSTILE_SECRET_KEY;
+    expect(await verifyTurnstile("any-token")).toBe(true);
+  });
+
+  it("returns false when token is empty and secret is set", async () => {
+    process.env.TURNSTILE_SECRET_KEY = "test-secret";
+    expect(await verifyTurnstile("")).toBe(false);
+    expect(await verifyTurnstile(undefined)).toBe(false);
+  });
+
+  it("returns true when Cloudflare responds with success", async () => {
+    process.env.TURNSTILE_SECRET_KEY = "test-secret";
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ success: true }))
+    );
+    expect(await verifyTurnstile("valid-token")).toBe(true);
+  });
+
+  it("returns false when Cloudflare responds with failure", async () => {
+    process.env.TURNSTILE_SECRET_KEY = "test-secret";
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ success: false }))
+    );
+    expect(await verifyTurnstile("bad-token")).toBe(false);
+  });
+
+  it("fails open when fetch throws (Cloudflare down)", async () => {
+    process.env.TURNSTILE_SECRET_KEY = "test-secret";
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network"));
+    expect(await verifyTurnstile("some-token")).toBe(true);
   });
 });

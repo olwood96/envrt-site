@@ -5,11 +5,13 @@ import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
+import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +32,7 @@ export default function ContactPage() {
           company: formData.get("company") || "",
           message: formData.get("message") || "",
           "bot-field": formData.get("bot-field") || "",
+          turnstileToken,
         }),
       });
       if (res.ok) {
@@ -146,6 +149,8 @@ export default function ContactPage() {
                       placeholder="Tell us about your sustainability goals..."
                     />
                   </div>
+
+                  <TurnstileWidget onToken={setTurnstileToken} className="flex justify-center" />
 
                   {error && (
                     <p className="text-center text-sm text-red-600">

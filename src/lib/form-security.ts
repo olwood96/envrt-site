@@ -92,3 +92,35 @@ export function getClientIp(headers: Headers): string {
     "unknown"
   );
 }
+
+// ── Turnstile verification ─────────────────────────────────────────────
+
+const TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+/**
+ * Verify a Cloudflare Turnstile token server-side.
+ * Returns true if valid, false otherwise.
+ * Gracefully returns true if TURNSTILE_SECRET_KEY is not set (dev/testing).
+ */
+export async function verifyTurnstile(token: string | undefined): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // Skip in dev when key not configured
+
+  if (!token) return false;
+
+  try {
+    const res = await fetch(TURNSTILE_VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret, response: token }),
+    });
+    const data = await res.json();
+    return data.success === true;
+  } catch {
+    // Fail open: if Cloudflare is unreachable, allow the request through.
+    // Other security layers (rate limiting, honeypot, email validation) still apply.
+    console.error("Turnstile verification failed — allowing request (fail-open)");
+    return true;
+  }
+}

@@ -7,6 +7,7 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FadeUp } from "@/components/ui/Motion";
+import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
 
 /* ================================================================
    TYPE DEFINITIONS
@@ -962,6 +963,7 @@ export default function AssessmentPage() {
   const [scores, setScores] = useState<Scores | null>(null);
   const [animateResults, setAnimateResults] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   // -- Selection handler --
   const handleSelect = useCallback(
@@ -1242,6 +1244,7 @@ export default function AssessmentPage() {
                           timelineRisk: getTimelineRisk(answers),
                           greenClaimsFlag: s.greenClaimsFlag,
                           marketingConsent: !!formData.get("marketingConsent"),
+                          turnstileToken,
                         }),
                       });
                     } catch {
@@ -1298,6 +1301,7 @@ export default function AssessmentPage() {
                       about DPP compliance and product updates.
                     </span>
                   </label>
+                  <TurnstileWidget onToken={setTurnstileToken} className="flex justify-center" />
                   <Button type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
                     {emailSending ? "Sending your report..." : <>View My Report <span className="ml-2">&rarr;</span></>}
                   </Button>
