@@ -151,8 +151,8 @@ export function Navbar() {
               ))}
 
               <div className="flex items-center gap-2.5 ml-2">
-                <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" data-cta="nav-login">
-                  Login
+                <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" data-cta="nav-dashboard">
+                  Dashboard
                 </Button>
                 <Button href="/contact" size="sm" data-cta="nav-book-demo">
                   Book a demo
