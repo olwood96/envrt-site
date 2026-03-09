@@ -1,16 +1,17 @@
 import { Container } from "@/components/ui/Container";
 import { InsightsCard } from "@/components/insights/InsightCard";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { getAllPostsMeta } from "@/lib/insights";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Insights | ENVRT",
+  title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
   description:
-    "Insights on sustainability data, Digital Product Passports, supply chain traceability, and the future of fashion transparency.",
+    "Guides and articles on Digital Product Passports, sustainability data, supply chain traceability, and fashion transparency. Expert insights from the ENVRT team.",
   openGraph: {
-    title: "Insights | ENVRT",
+    title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
     description:
-      "Insights on sustainability data, Digital Product Passports, supply chain traceability, and the future of fashion transparency.",
+      "Guides and articles on Digital Product Passports, sustainability data, supply chain traceability, and fashion transparency.",
     url: "https://envrt.com/insights",
     type: "website",
   },
@@ -24,6 +25,12 @@ export default function InsightsIndexPage() {
 
   return (
     <div className="pt-28 pb-16">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Insights", url: "https://envrt.com/insights" },
+        ]}
+      />
       <Container>
         <div className="mx-auto max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">

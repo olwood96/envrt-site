@@ -14,6 +14,8 @@ export function OrganizationJsonLd() {
       contactType: "sales",
       availableLanguage: "English",
     },
+    sameAs: ["https://www.linkedin.com/company/envrt/"],
+    foundingDate: "2024",
     founders: [
       {
         "@type": "Person",

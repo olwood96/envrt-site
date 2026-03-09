@@ -309,6 +309,90 @@ export const faqItems = [
   },
 ];
 
+export const pricingFaqItems = [
+  {
+    question: "How much does a Digital Product Passport cost?",
+    answer:
+      "ENVRT offers three plans: Starter at £149/month for up to 25 DPPs, Growth at £495/month for up to 100 DPPs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support. Every plan includes a 14-day free trial.",
+  },
+  {
+    question: "What's included in each ENVRT plan?",
+    answer:
+      "Starter includes DPP creation, QR-ready passport pages, traceability scores, and CO₂e indicators. Growth adds expanded product data, core LCA metrics, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
+  },
+  {
+    question: "Can I switch plans?",
+    answer:
+      "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.",
+  },
+  {
+    question: "Is there a free trial?",
+    answer:
+      "Yes, every ENVRT plan includes a 14-day free trial so you can explore the platform and generate your first Digital Product Passports before committing.",
+  },
+  {
+    question: "Do you offer annual billing?",
+    answer:
+      "Yes, annual billing saves you 15% compared to monthly pricing across all plans.",
+  },
+];
+
+export const roiFaqItems = [
+  {
+    question: "How much does DPP compliance cost?",
+    answer:
+      "The cost depends on your approach. Hiring a sustainability consultant typically costs £30,000 or more per year. Building an in-house team starts at around £80,000 annually. ENVRT provides DPP creation, lifecycle metrics, and sustainability analytics from just £149 per month.",
+  },
+  {
+    question: "How long does it take to see ROI with ENVRT?",
+    answer:
+      "Most brands see value within the first month. ENVRT's guided data entry and automated calculations mean you can generate your first DPP in minutes rather than weeks, dramatically reducing the cost and time of compliance.",
+  },
+  {
+    question: "What's the cost of non-compliance with DPP regulations?",
+    answer:
+      "Non-compliance with the EU Ecodesign for Sustainable Products Regulation (ESPR) could mean loss of EU market access, financial penalties, and reputational damage. Preparing now avoids last-minute costs and positions your brand as a transparency leader.",
+  },
+  {
+    question: "Can ENVRT replace a sustainability consultant?",
+    answer:
+      "For DPP creation, lifecycle assessment metrics, and supply chain traceability, yes. The Pro plan includes a dedicated account specialist, supplier follow-up assistance, and eco-design strategy support, covering much of what an external consultant would provide.",
+  },
+  {
+    question: "How does the ROI calculator work?",
+    answer:
+      "Input your current team size, product volume, and approach to sustainability reporting. The calculator instantly compares your costs against ENVRT's plans and shows your potential savings over 12 months.",
+  },
+];
+
+export const assessmentFaqItems = [
+  {
+    question: "How long does the DPP readiness assessment take?",
+    answer:
+      "The assessment takes approximately 10 minutes to complete. You'll receive an instant personalised report with your DPP readiness score and recommended next steps.",
+  },
+  {
+    question: "What do I need to complete the assessment?",
+    answer:
+      "Just a basic understanding of your supply chain and current sustainability practices. No detailed data or technical knowledge is required.",
+  },
+  {
+    question: "Is the DPP readiness assessment free?",
+    answer:
+      "Yes, the assessment is completely free with no obligation. You'll receive an instant personalised report highlighting your readiness level, key gaps, and actionable next steps.",
+  },
+  {
+    question: "What will I learn from the assessment?",
+    answer:
+      "You'll receive a DPP readiness score, a breakdown of where your brand stands across key compliance areas, identification of gaps in your current processes, and prioritised recommendations for getting regulation-ready.",
+  },
+  {
+    question: "Do I need to share sensitive business data?",
+    answer:
+      "No. The assessment only asks for high-level information about your processes and supply chain approach. No proprietary supplier details or financial data is required.",
+  },
+];
+
 export const teamMembers = [
   {
     name: "Charles Woolwich",

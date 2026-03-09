@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { roiFaqItems } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
   description:
-    "Compare the cost of ENVRT against hiring a consultant or building an in-house sustainability team. Get your personalised savings estimate in under 3 minutes.",
+    "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams. Get your personalised savings estimate in under 3 minutes.",
   keywords: [
     "DPP compliance cost",
     "Digital Product Passport ROI",
@@ -15,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
     description:
-      "Compare the cost of ENVRT against hiring a consultant or building an in-house sustainability team. Get your personalised savings estimate in under 3 minutes.",
+      "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams. Personalised savings estimate in under 3 minutes.",
     url: "https://envrt.com/roi",
     type: "website",
   },
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
     description:
-      "Compare the cost of ENVRT against hiring a consultant or building an in-house sustainability team. Get your personalised savings estimate in under 3 minutes.",
+      "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams.",
   },
   alternates: {
     canonical: "https://envrt.com/roi",
@@ -35,5 +38,16 @@ export default function ROILayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <FAQJsonLd items={roiFaqItems} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Why ENVRT?", url: "https://envrt.com/roi" },
+        ]}
+      />
+      {children}
+    </>
+  );
 }

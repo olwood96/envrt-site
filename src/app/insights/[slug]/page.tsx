@@ -5,6 +5,7 @@ import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { TableOfContents } from "@/components/insights/TableOfContents";
 import { MdxContent } from "@/components/insights/MdxContent";
+import { RelatedPosts } from "@/components/insights/RelatedPosts";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -107,12 +108,13 @@ export default async function InsightsPostPage({ params }: PageProps) {
             {post.tags.length > 0 && (
               <div className="mb-3 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span
+                  <Link
                     key={tag}
-                    className="rounded-full bg-envrt-teal/5 px-2.5 py-0.5 text-xs font-medium text-envrt-teal"
+                    href={`/insights/tag/${tag.toLowerCase()}`}
+                    className="rounded-full bg-envrt-teal/5 px-2.5 py-0.5 text-xs font-medium text-envrt-teal transition-colors hover:bg-envrt-teal/10"
                   >
                     {tag}
-                  </span>
+                  </Link>
                 ))}
               </div>
             )}
@@ -143,6 +145,9 @@ export default async function InsightsPostPage({ params }: PageProps) {
           <div className="mt-8">
             <MdxContent content={post.content} />
           </div>
+
+          {/* Related posts */}
+          <RelatedPosts currentSlug={post.slug} tags={post.tags} />
 
           {/* Footer CTA */}
           <footer className="mt-16 rounded-2xl border border-envrt-teal/10 bg-envrt-teal/5 p-6 text-center sm:p-8">
