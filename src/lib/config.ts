@@ -113,28 +113,32 @@ export const howItWorksSteps = [
 
 export const outcomeCards = [
   {
-    title: "Regulation-ready product passports",
+    stat: "100%",
+    title: "Regulation-ready from day one",
     description:
-      "Prepare for upcoming EU requirements with Digital Product Passports built for the latest data standards.",
-    icon: "✓",
+      "Your DPPs meet EU ESPR requirements out of the box. No second-guessing whether you're compliant.",
+    cta: { label: "See how it works", href: "/#how-it-works" },
   },
   {
-    title: "Clear environmental metrics",
+    stat: "< 1 day",
+    title: "Your first DPP can be live today",
     description:
-      "Understand the true CO₂e and water footprint of every garment, from raw fibre to finished product.",
-    icon: "◎",
+      "No consultants and no months of setup. Our streamlined process means your first passport can be live the same day you start.",
+    cta: { label: "Take the assessment", href: "/assessment" },
   },
   {
-    title: "Stories that sell",
+    stat: "Product-level",
+    title: "Metrics your customers can see",
     description:
-      "Turn sustainability data into compelling narratives your customers can see right on the product page.",
-    icon: "◈",
+      "CO₂e, water scarcity and traceability data attached to the product itself. Not buried in a brand report nobody reads.",
+    cta: { label: "See live examples", href: "/collective" },
   },
   {
-    title: "Faster decision-making",
+    stat: "Beyond the tick-box",
+    title: "Turn data into decisions",
     description:
-      "Compare materials, suppliers and processes at a glance to make smarter sourcing decisions.",
-    icon: "↗",
+      "Compare materials, spot hotspots and benchmark products. Use the same data that powers your DPPs to make smarter sourcing choices.",
+    cta: { label: "See pricing", href: "/pricing" },
   },
 ];
 

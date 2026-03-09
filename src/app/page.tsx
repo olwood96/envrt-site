@@ -5,6 +5,7 @@ import { SupplyChainFlowSection } from "@/components/sections/SupplyChainFlowSec
 import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { TrustedBySection } from "@/components/sections/TrustedBySection";
+import { ROICTASection } from "@/components/sections/ROICTASection";
 import { PricingPreviewSection } from "@/components/sections/PricingPreviewSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
@@ -27,6 +28,7 @@ export default function HomePage() {
       <HowItWorksSection />
       <OutcomesSection />
       <TrustedBySection />
+      <ROICTASection />
       <PricingPreviewSection />
       <FAQSection />
       <FinalCTASection />
