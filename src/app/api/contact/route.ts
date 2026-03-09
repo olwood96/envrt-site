@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import {
+  escapeHtml,
+  sanitizeForSubject,
+  isValidEmail,
+  rateLimit,
+  getClientIp,
+} from "@/lib/form-security";
 
 interface ContactPayload {
   firstName: string;
@@ -7,9 +14,12 @@ interface ContactPayload {
   email: string;
   company: string;
   message: string;
+  "bot-field"?: string;
 }
 
 const INTERNAL_EMAIL = "info@envrt.com";
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 function buildConfirmationHtml(firstName: string): string {
   return `
@@ -24,7 +34,7 @@ function buildConfirmationHtml(firstName: string): string {
           <img src="https://envrt.com/brand/envrt-logo.png" alt="ENVRT" height="32" style="height:32px;width:auto;">
         </td></tr>
         <tr><td style="background:#ffffff;border-radius:16px;padding:32px;">
-          <h2 style="margin:0 0 16px;color:#1b3a2d;font-size:20px;">Thanks for getting in touch, ${firstName}!</h2>
+          <h2 style="margin:0 0 16px;color:#1b3a2d;font-size:20px;">Thanks for getting in touch, ${escapeHtml(firstName)}!</h2>
           <p style="margin:0 0 16px;font-size:14px;color:#555;line-height:1.7;">We've received your message and will get back to you shortly. In the meantime, feel free to explore our platform.</p>
           <a href="https://envrt.com" style="display:inline-block;background:#1a7a6d;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 24px;border-radius:12px;">Visit envrt.com</a>
         </td></tr>
@@ -47,17 +57,23 @@ function buildInternalNotifyHtml(data: ContactPayload): string {
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
   <h2 style="color:#1b3a2d;margin:0 0 16px;">New Contact Form Submission</h2>
   <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
-    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${data.firstName} ${data.lastName}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Company</td><td style="padding:6px 12px;font-weight:600;">${data.company || "—"}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.firstName)} ${escapeHtml(data.lastName)}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Company</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.company || "—")}</td></tr>
   </table>
   <h3 style="color:#1b3a2d;margin:0 0 8px;">Message</h3>
-  <p style="font-size:14px;color:#333;line-height:1.7;white-space:pre-wrap;">${data.message || "—"}</p>
+  <p style="font-size:14px;color:#333;line-height:1.7;white-space:pre-wrap;">${escapeHtml(data.message || "—")}</p>
   <p style="font-size:13px;color:#888;margin-top:24px;">Sent from the contact form at envrt.com/contact</p>
 </div>`;
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit by IP
+  const ip = getClientIp(request.headers);
+  if (!rateLimit(`contact:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error("RESEND_API_KEY is not set");
@@ -71,8 +87,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  // Honeypot: if the hidden field has a value, it's a bot
+  if (data["bot-field"]) {
+    // Return success to avoid tipping off the bot
+    return NextResponse.json({ success: true });
+  }
+
   if (!data.email || !data.firstName) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  if (!isValidEmail(data.email)) {
+    return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
   }
 
   const resend = new Resend(apiKey);
@@ -85,11 +111,14 @@ export async function POST(request: NextRequest) {
       html: buildConfirmationHtml(data.firstName),
     });
 
+    const safeName = sanitizeForSubject(`${data.firstName} ${data.lastName}`);
+    const safeCompany = data.company ? sanitizeForSubject(data.company) : "";
+
     await resend.emails.send({
       from: "ENVRT Contact <hello@envrt.com>",
       to: INTERNAL_EMAIL,
       bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-      subject: `Contact: ${data.firstName} ${data.lastName}${data.company ? ` @ ${data.company}` : ""}`,
+      subject: `Contact: ${safeName}${safeCompany ? ` @ ${safeCompany}` : ""}`,
       html: buildInternalNotifyHtml(data),
     });
 

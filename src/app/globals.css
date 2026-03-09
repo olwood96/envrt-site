@@ -251,3 +251,24 @@ body {
   background: var(--envrt-muted);
   border-radius: 3px;
 }
+
+/* Subtle horizontal scrollbar for comparison table */
+.scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 160, 0.3) transparent;
+}
+.scrollbar-subtle::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0 12px;
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 160, 0.25);
+  border-radius: 4px;
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 160, 0.45);
+}

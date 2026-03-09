@@ -365,11 +365,12 @@ export function CollectiveComparisonView({ cards }: Props) {
   return (
     <div className="rounded-2xl border border-envrt-charcoal/5 bg-white">
       {/* Mobile-only radar: full-width above the scrollable grid */}
-      <div className="block sm:hidden p-6 pb-0">
+      <div className="block sm:hidden p-6 pb-4">
         <RadarChart cards={cards} />
+        <div className="mt-4 border-b border-envrt-charcoal/8" />
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="scrollbar-subtle overflow-x-auto">
       <div id={EXPORT_ID} className={`grid ${gridClass} min-w-[600px] p-6 sm:p-8`}>
 
         {/* ====== ROW: Header (radar + product cards) ====== */}
@@ -383,11 +384,11 @@ export function CollectiveComparisonView({ cards }: Props) {
           <Link
             key={card.dpp.id}
             href={card.detailUrl}
-            className="group flex flex-col items-center px-2 py-4 text-center"
+            className="group flex flex-col items-center px-2 py-4 text-center self-start"
           >
-            <div className="mb-3 flex h-[180px] w-full items-end justify-center overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
+            <div className="mb-3 aspect-square w-full max-w-[180px] overflow-hidden rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40">
               {card.productImageUrl ? (
-                <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={180} height={180} className="max-h-full w-full object-contain" />
+                <Image src={card.productImageUrl} alt={card.dpp.garment_name} width={180} height={180} className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-envrt-muted/30">DPP</div>
               )}
@@ -508,12 +509,12 @@ export function CollectiveComparisonView({ cards }: Props) {
               </h3>
             </div>
 
-            {/* Maps row */}
-            <div /> {/* empty label cell */}
+            {/* Maps row — hidden on mobile */}
+            <div className="hidden sm:block" /> {/* empty label cell */}
             {cards.map((card) => {
               const hasStages = card.dpp.production_stages?.some((s) => s.country);
               return (
-                <div key={card.dpp.id} className="px-2 pt-3">
+                <div key={card.dpp.id} className="hidden sm:block px-2 pt-3">
                   {hasStages ? (
                     <Suspense
                       fallback={
@@ -537,7 +538,9 @@ export function CollectiveComparisonView({ cards }: Props) {
             {journeyLabels.map((label) => (
               <div key={label} className={`${colSpanFull} contents`}>
                 <div className={`${colSpanFull} border-t border-envrt-charcoal/5`} />
-                <div className="flex items-center py-2 px-2 text-xs text-envrt-muted">{label}</div>
+                <div className="flex items-center py-3 px-2 pr-4">
+                  <span className="text-sm font-medium text-envrt-muted">{label}</span>
+                </div>
                 {cards.map((card) => {
                   const stages = card.dpp.production_stages?.filter((s) => s.country && s.label === label) ?? [];
                   const locations = Array.from(
@@ -548,8 +551,8 @@ export function CollectiveComparisonView({ cards }: Props) {
                     )
                   );
                   return (
-                    <div key={card.dpp.id} className="flex flex-col items-center justify-center py-2 px-2 text-center text-xs font-medium text-envrt-charcoal">
-                      {locations.length > 0 ? locations.map((loc) => <div key={loc}>{loc}</div>) : "—"}
+                    <div key={card.dpp.id} className="flex flex-col items-center justify-center py-3 px-2 text-center text-sm font-medium text-envrt-charcoal">
+                      {locations.length > 0 ? locations.map((loc) => <div key={loc}>{loc}</div>) : <span className="text-sm text-envrt-muted">—</span>}
                     </div>
                   );
                 })}

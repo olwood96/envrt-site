@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import {
+  escapeHtml,
+  sanitizeForSubject,
+  isValidEmail,
+  rateLimit,
+  getClientIp,
+} from "@/lib/form-security";
+
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 
 interface DimensionScore {
   label: string;
@@ -153,9 +163,9 @@ function buildInternalNotifyHtml(data: AssessmentPayload): string {
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
   <h2 style="color:#1b3a2d;margin:0 0 16px;">New Assessment Lead</h2>
   <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
-    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${data.firstName}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Brand</td><td style="padding:6px 12px;font-weight:600;">${data.brandName}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.firstName)}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Brand</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.brandName)}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
     <tr><td style="padding:6px 12px;color:#666;">Marketing consent</td><td style="padding:6px 12px;font-weight:600;">${data.marketingConsent ? "Yes" : "No"}</td></tr>
   </table>
   <h3 style="color:#1b3a2d;margin:0 0 8px;">Score: ${data.overall}/100 (${data.band})</h3>
@@ -168,6 +178,11 @@ function buildInternalNotifyHtml(data: AssessmentPayload): string {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request.headers);
+  if (!rateLimit(`assessment:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error("RESEND_API_KEY is not set");
@@ -185,21 +200,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  if (!isValidEmail(data.email)) {
+    return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+  }
+
   const resend = new Resend(apiKey);
 
   try {
+    const safeBand = sanitizeForSubject(String(data.band));
+    const safeOverall = Math.max(0, Math.min(100, Math.round(Number(data.overall) || 0)));
+
     await resend.emails.send({
       from: "ENVRT Assessment <results@envrt.com>",
       to: data.email,
-      subject: `Your DPP Readiness Score: ${data.overall}/100 - ${data.band}`,
+      subject: `Your DPP Readiness Score: ${safeOverall}/100 - ${safeBand}`,
       html: buildEmailHtml(data),
     });
+
+    const safeName = sanitizeForSubject(data.firstName);
+    const safeBrand = sanitizeForSubject(data.brandName);
 
     await resend.emails.send({
       from: "ENVRT Assessment <results@envrt.com>",
       to: INTERNAL_NOTIFY_EMAIL,
       bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-      subject: `Assessment Lead: ${data.firstName} @ ${data.brandName} (${data.overall}/100)`,
+      subject: `Assessment Lead: ${safeName} @ ${safeBrand} (${safeOverall}/100)`,
       html: buildInternalNotifyHtml(data),
     });
 

@@ -29,6 +29,7 @@ export default function ContactPage() {
           email: formData.get("email") || "",
           company: formData.get("company") || "",
           message: formData.get("message") || "",
+          "bot-field": formData.get("bot-field") || "",
         }),
       });
       if (res.ok) {
