@@ -76,16 +76,13 @@ export function OutcomesSection() {
           </div>
         </FadeUp>
 
-        {/* Staggered 2-col grid: right column offset downward on sm+ */}
         <StaggerChildren className="mt-14 grid gap-5 sm:grid-cols-2">
           {outcomeCards.map((card, i) => {
             const Icon = cardIcons[i];
             return (
               <StaggerItem key={card.title}>
                 <div
-                  className={`group relative flex flex-col overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white p-8 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5 sm:p-10 ${
-                    i % 2 === 1 ? "sm:mt-8" : ""
-                  }`}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white p-8 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5 sm:p-10"
                 >
                   {/* Icon */}
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-envrt-teal/[0.07] transition-colors group-hover:bg-envrt-teal/[0.12]">
