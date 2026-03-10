@@ -30,6 +30,7 @@ export default function ContactPage() {
           lastName: formData.get("last-name") || "",
           email: formData.get("email") || "",
           company: formData.get("company") || "",
+          interest: formData.get("interest") || "",
           message: formData.get("message") || "",
           "bot-field": formData.get("bot-field") || "",
           turnstileToken,
@@ -139,6 +140,23 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
+                      What are you looking for?
+                    </label>
+                    <select
+                      name="interest"
+                      required
+                      className="w-full appearance-none rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Select an option</option>
+                      <option value="dpp-hub">Your DPP Hub - regulation-ready passports</option>
+                      <option value="impact-analyst">Your Impact Analyst - lifecycle metrics and insights</option>
+                      <option value="sustainability-team">Your Sustainability Team - full sustainability operations</option>
+                      <option value="not-sure">Not sure yet - I&apos;d like to explore</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
                       Message{" "}
                       <span className="text-envrt-muted font-normal">(optional)</span>
                     </label>
@@ -164,7 +182,7 @@ export default function ContactPage() {
                     className={`w-full ${submitting ? "pointer-events-none opacity-60" : ""}`}
                     size="lg"
                   >
-                    {submitting ? "Sending..." : "Request a demo"}
+                    {submitting ? "Sending..." : "Book a demo"}
                     {!submitting && <span className="ml-2">→</span>}
                   </Button>
                   <p className="text-center text-xs text-envrt-muted">

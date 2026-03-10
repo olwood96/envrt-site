@@ -263,8 +263,30 @@ export default function PricingPage() {
           </div>
         </FadeUp>
 
+        {/* Every plan includes */}
+        <FadeUp delay={0.08}>
+          <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-envrt-teal/10 bg-envrt-teal/[0.03] px-6 py-5 sm:px-8">
+            <p className="text-center text-xs font-medium uppercase tracking-widest text-envrt-teal">
+              Every plan includes
+            </p>
+            <div className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                "14-day free trial",
+                "QR-ready DPP pages",
+                "Onboarding call",
+                "No setup fees",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2 text-sm text-envrt-charcoal/80">
+                  <CheckIcon />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </FadeUp>
+
         {/* Plan cards */}
-        <StaggerChildren className="mt-14 grid gap-5 lg:grid-cols-3">
+        <StaggerChildren className="mt-10 grid gap-5 lg:grid-cols-3">
           {pricingPlans.map((plan) => {
               let price = plan.priceGBP;
               if (currency === "EUR") price = price * GBP_TO_EUR;

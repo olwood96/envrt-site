@@ -31,7 +31,7 @@ export function TrustedByCarousel({ logos }: { logos: Logo[] }) {
     <div className="py-12 sm:py-16">
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6">
         <p className="text-center text-xs font-medium uppercase tracking-widest text-envrt-muted/60">
-          Trusted by forward-thinking brands
+          Trusted by fashion brands worldwide
         </p>
 
         <div className="relative mt-8 overflow-hidden">

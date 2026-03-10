@@ -226,6 +226,11 @@ export function HeroSection() {
               </Button>
             </div>
           </FadeUp>
+          <FadeUp delay={0.4}>
+            <p className="mt-6 text-xs font-medium tracking-wide text-envrt-muted/70">
+              Built for fashion and apparel brands selling into the EU.
+            </p>
+          </FadeUp>
         </div>
 
         <FadeUp delay={0.2}>

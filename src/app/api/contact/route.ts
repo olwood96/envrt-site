@@ -14,6 +14,7 @@ interface ContactPayload {
   lastName: string;
   email: string;
   company: string;
+  interest: string;
   message: string;
   "bot-field"?: string;
   turnstileToken?: string;
@@ -62,6 +63,7 @@ function buildInternalNotifyHtml(data: ContactPayload): string {
     <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.firstName)} ${escapeHtml(data.lastName)}</td></tr>
     <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
     <tr><td style="padding:6px 12px;color:#666;">Company</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.company || "—")}</td></tr>
+    <tr><td style="padding:6px 12px;color:#666;">Interest</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.interest || "—")}</td></tr>
   </table>
   <h3 style="color:#1b3a2d;margin:0 0 8px;">Message</h3>
   <p style="font-size:14px;color:#333;line-height:1.7;white-space:pre-wrap;">${escapeHtml(data.message || "—")}</p>

@@ -10,6 +10,7 @@ import { PricingPreviewSection } from "@/components/sections/PricingPreviewSecti
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { StickyNudge } from "@/components/ui/StickyNudge";
 import { faqItems } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function HomePage() {
       <PricingPreviewSection />
       <FAQSection />
       <FinalCTASection />
+      <StickyNudge />
       <div className="h-12" />
     </>
   );
