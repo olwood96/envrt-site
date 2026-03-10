@@ -83,7 +83,7 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
           No spam, unsubscribe anytime.
         </p>
         <form onSubmit={handleSubmit} className="mx-auto mt-6 max-w-md">
-          <div className="flex gap-3 sm:flex-row">
+          <div className="flex items-center gap-3 sm:flex-row">
             <input
               type="email"
               required
@@ -109,8 +109,12 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
                 "Subscribe"
               )}
             </button>
+            <div className="h-[36px] w-[165px] shrink-0 overflow-hidden">
+              <div className="origin-top-left scale-[0.55]">
+                <TurnstileWidget onToken={setTurnstileToken} />
+              </div>
+            </div>
           </div>
-          <TurnstileWidget onToken={setTurnstileToken} className="mt-3 flex justify-center" />
         </form>
         {message && (
           <p
@@ -166,8 +170,12 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
               "Subscribe"
             )}
           </button>
+          <div className="h-[36px] w-[165px] shrink-0 overflow-hidden">
+            <div className="origin-top-left scale-[0.55]">
+              <TurnstileWidget onToken={setTurnstileToken} />
+            </div>
+          </div>
         </div>
-        <TurnstileWidget onToken={setTurnstileToken} className="mt-2 flex justify-center" />
       </form>
       {status === "error" && message && (
         <p className="mt-2 text-center text-sm text-red-500">{message}</p>
