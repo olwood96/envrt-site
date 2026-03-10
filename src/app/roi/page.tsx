@@ -204,7 +204,8 @@ function CostBar({
   delay: number;
 }) {
   const [displayAmount, setDisplayAmount] = useState(0);
-  const [barWidth, setBarWidth] = useState(0);
+  const [barWidth, setBarWidth] = useState(100);
+  const [started, setStarted] = useState(false);
   const pct = maxAmount > 0 ? Math.max(5, (amount / maxAmount) * 100) : 5;
 
   const colors = {
@@ -216,6 +217,8 @@ function CostBar({
   useEffect(() => {
     if (!animated) return;
     const timer = setTimeout(() => {
+      setStarted(true);
+      // Animate bar from 100% down to actual percentage
       setBarWidth(pct);
       // Count up animation
       const duration = 1200;
@@ -245,9 +248,9 @@ function CostBar({
           <span className="text-xs font-normal text-envrt-muted">/yr</span>
         </span>
       </div>
-      <div className="h-4 w-full overflow-hidden rounded-full bg-envrt-charcoal/5">
+      <div className="h-4 w-full overflow-hidden rounded-full bg-envrt-charcoal/[0.08]">
         <div
-          className={`h-full rounded-full ${colors[color]} transition-all duration-1000 ease-out`}
+          className={`h-full rounded-full ${colors[color]} ${started ? "transition-all duration-1000 ease-out" : ""}`}
           style={{ width: `${barWidth}%` }}
         />
       </div>
