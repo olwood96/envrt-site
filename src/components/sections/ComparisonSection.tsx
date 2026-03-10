@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Container } from "../ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "../ui/Motion";
@@ -217,86 +217,25 @@ function MobileAccordionItem({ row, isOpen }: {
   );
 }
 
-/**
- * Scroll-driven mobile accordion.
- *
- * The outer div is tall (items × 100vh), creating scroll space.
- * A `position: sticky` inner container stays pinned in the viewport.
- * As the user scrolls naturally through the tall section, we derive
- * which accordion item should be open from scroll progress.
- *
- * No body scroll lock, no translateY, no scroll restore — pure native scroll.
- */
 function MobileComparisonCards() {
-  const total = comparisonRows.length;
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  useEffect(() => {
-    if (window.matchMedia("(min-width: 768px)").matches) return;
-
-    const handleScroll = () => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const rect = section.getBoundingClientRect();
-      const sectionHeight = section.offsetHeight;
-      const vh = window.innerHeight;
-
-      // scrolled = how far the section top has moved above the viewport top
-      const scrolled = -rect.top;
-      const scrollableRange = sectionHeight - vh;
-
-      if (scrolled < 0 || scrolled > scrollableRange) {
-        setActiveIndex(-1);
-        return;
-      }
-
-      const progress = scrolled / scrollableRange;
-      setActiveIndex(Math.min(total - 1, Math.floor(progress * total)));
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [total]);
+  const toggle = (i: number) => {
+    setActiveIndex(activeIndex === i ? -1 : i);
+  };
 
   return (
-    <div
-      ref={sectionRef}
-      className="md:hidden relative"
-      style={{ height: `${(total + 1) * 85}vh` }}
-    >
-      <div className="sticky top-0 flex h-screen items-center">
-        <div className="w-full px-1">
-          <SectionHeader />
-          <div className="mt-8 space-y-2">
-            {comparisonRows.map((row, i) => (
-              <MobileAccordionItem
-                key={row.label}
-                row={row}
-                isOpen={activeIndex === i}
-              />
-            ))}
-          </div>
-          {activeIndex >= 0 && (
-            <div className="flex justify-center gap-1.5 pt-4">
-              {comparisonRows.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === activeIndex
-                      ? "w-4 bg-envrt-teal"
-                      : i < activeIndex
-                        ? "w-1.5 bg-envrt-teal/30"
-                        : "w-1.5 bg-envrt-charcoal/10"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="md:hidden space-y-2">
+      {comparisonRows.map((row, i) => (
+        <button
+          key={row.label}
+          type="button"
+          className="w-full text-left"
+          onClick={() => toggle(i)}
+        >
+          <MobileAccordionItem row={row} isOpen={activeIndex === i} />
+        </button>
+      ))}
     </div>
   );
 }
@@ -398,20 +337,16 @@ export function ComparisonSection() {
   return (
     <section className="px-4 py-16 sm:px-6 sm:py-24" id="compare" aria-label="How ENVRT compares to consultants and in-house teams">
       <Container>
-        {/* Desktop: normal layout with header above table */}
-        <div className="hidden md:block">
-          <FadeUp>
-            <SectionHeader />
-          </FadeUp>
-          <FadeUp delay={0.1}>
-            <div className="mt-14">
-              <DesktopComparisonTable />
-            </div>
-          </FadeUp>
-        </div>
+        <FadeUp>
+          <SectionHeader />
+        </FadeUp>
 
-        {/* Mobile: header is inside the translated container */}
-        <MobileComparisonCards />
+        <FadeUp delay={0.1}>
+          <div className="mt-14">
+            <DesktopComparisonTable />
+            <MobileComparisonCards />
+          </div>
+        </FadeUp>
 
         <FadeUp delay={0.2}>
           <div className="mt-10 flex flex-col items-center gap-3 text-center">
