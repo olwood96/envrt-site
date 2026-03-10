@@ -249,7 +249,10 @@ function MobileComparisonCards() {
   const total = comparisonRows.length;
   const [activeIndex, setActiveIndex] = useState(-1);
   const [locked, setLocked] = useState(false);
+  const [offsetY, setOffsetY] = useState(0);
+  const offsetRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeRef = useRef(-1);
   const cooldownRef = useRef(false);
@@ -257,22 +260,47 @@ function MobileComparisonCards() {
   // Lock body scroll while stepping through items
   const scrollYRef = useBodyScrollLock(locked);
 
+  /**
+   * Center a given item in the viewport by translating the list container.
+   * Because body is position:fixed, we can't use scrollIntoView — instead
+   * we shift the entire list with translateY so the target item sits at
+   * the vertical center of the screen.
+   */
+  const centerItem = useCallback((idx: number) => {
+    const el = itemRefs.current[idx];
+    const list = listRef.current;
+    if (!el || !list) return;
+
+    const itemMid = el.offsetTop + el.offsetHeight / 2;
+    const viewportCenter = window.innerHeight / 2;
+
+    // Get the list's natural position by removing current transform offset
+    const listRect = list.getBoundingClientRect();
+    const naturalTop = listRect.top - offsetRef.current;
+
+    const newOffset = viewportCenter - naturalTop - itemMid;
+    offsetRef.current = newOffset;
+    setOffsetY(newOffset);
+  }, []);
+
   // Sync activeRef for use in event handlers
   const step = useCallback((idx: number) => {
     activeRef.current = idx;
     setActiveIndex(idx);
-  }, []);
+    // Defer centering to next frame so the accordion has started expanding
+    if (idx >= 0) {
+      requestAnimationFrame(() => {
+        // Wait a bit more for the grid-template-rows transition to get underway
+        setTimeout(() => centerItem(idx), 80);
+      });
+    }
+  }, [centerItem]);
 
   const unlock = useCallback((direction: 1 | -1) => {
-    // Before unlocking, calculate where to restore scroll:
-    // If exiting forward (past last), scroll to just below the section.
-    // If exiting backward (past first), scroll to just above the section.
     const container = containerRef.current;
     if (container) {
       const savedY = scrollYRef.current;
       const rect = container.getBoundingClientRect();
-      // rect is relative to the fixed viewport, but body is fixed at -savedY,
-      // so the real document offset is savedY + rect.top
       const sectionTop = savedY + rect.top;
       const sectionBottom = savedY + rect.bottom;
       if (direction === 1) {
@@ -281,6 +309,8 @@ function MobileComparisonCards() {
         scrollYRef.current = Math.max(0, sectionTop - window.innerHeight + 20);
       }
     }
+    offsetRef.current = 0;
+    setOffsetY(0);
     step(-1);
     setLocked(false);
   }, [step, scrollYRef]);
@@ -298,13 +328,6 @@ function MobileComparisonCards() {
     }
 
     step(next);
-
-    // Scroll the newly active item into view within the locked viewport
-    // (the items are in a scrollable container while body is locked)
-    const el = itemRefs.current[next];
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
   }, [total, step, unlock]);
 
   // IntersectionObserver — activate when section scrolls into the middle band
@@ -366,7 +389,11 @@ function MobileComparisonCards() {
 
   return (
     <div ref={containerRef} className="md:hidden">
-      <div className="space-y-2">
+      <div
+        ref={listRef}
+        className="space-y-2 transition-transform duration-500 ease-out"
+        style={{ transform: `translateY(${offsetY}px)` }}
+      >
         {comparisonRows.map((row, i) => (
           <div key={row.label} ref={(el) => { itemRefs.current[i] = el; }}>
             <MobileAccordionItem
