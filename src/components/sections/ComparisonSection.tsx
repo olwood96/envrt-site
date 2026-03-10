@@ -217,118 +217,163 @@ function MobileAccordionItem({ row, isOpen }: {
   );
 }
 
+/**
+ * Locks body scroll while active, capturing the scroll position.
+ * Restores it on unlock. Same proven pattern as HowItWorksSection.
+ */
+function useBodyScrollLock(locked: boolean) {
+  const scrollYRef = useRef(0);
+
+  useEffect(() => {
+    if (!locked) return;
+    scrollYRef.current = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollYRef.current}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollYRef.current);
+    };
+  }, [locked]);
+
+  return scrollYRef;
+}
+
 function MobileComparisonCards() {
   const total = comparisonRows.length;
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [locked, setLocked] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  // Use refs for values read inside event handlers (synchronous access)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeRef = useRef(-1);
-  const lockedRef = useRef(false);
   const cooldownRef = useRef(false);
-  const hasTriggeredRef = useRef(false);
 
-  // Synchronously update refs alongside state
-  const setActive = useCallback((idx: number) => {
+  // Lock body scroll while stepping through items
+  const scrollYRef = useBodyScrollLock(locked);
+
+  // Sync activeRef for use in event handlers
+  const step = useCallback((idx: number) => {
     activeRef.current = idx;
     setActiveIndex(idx);
   }, []);
 
-  const setLock = useCallback((val: boolean) => {
-    lockedRef.current = val;
-  }, []);
+  const unlock = useCallback((direction: 1 | -1) => {
+    // Before unlocking, calculate where to restore scroll:
+    // If exiting forward (past last), scroll to just below the section.
+    // If exiting backward (past first), scroll to just above the section.
+    const container = containerRef.current;
+    if (container) {
+      const savedY = scrollYRef.current;
+      const rect = container.getBoundingClientRect();
+      // rect is relative to the fixed viewport, but body is fixed at -savedY,
+      // so the real document offset is savedY + rect.top
+      const sectionTop = savedY + rect.top;
+      const sectionBottom = savedY + rect.bottom;
+      if (direction === 1) {
+        scrollYRef.current = sectionBottom + 20;
+      } else {
+        scrollYRef.current = Math.max(0, sectionTop - window.innerHeight + 20);
+      }
+    }
+    step(-1);
+    setLocked(false);
+  }, [step, scrollYRef]);
 
   const advance = useCallback((direction: 1 | -1) => {
     if (cooldownRef.current) return;
     cooldownRef.current = true;
-    setTimeout(() => { cooldownRef.current = false; }, 400);
+    setTimeout(() => { cooldownRef.current = false; }, 500);
 
-    const cur = activeRef.current;
-    const next = cur + direction;
+    const next = activeRef.current + direction;
 
-    // Scrolling up past first item or down past last — release lock
     if (next < 0 || next >= total) {
-      setLock(false);
-      hasTriggeredRef.current = false;
-      setActive(-1);
+      unlock(direction);
       return;
     }
 
-    setActive(next);
-  }, [total, setActive, setLock]);
+    step(next);
 
-  // IntersectionObserver — activate when section hits viewport center
+    // Scroll the newly active item into view within the locked viewport
+    // (the items are in a scrollable container while body is locked)
+    const el = itemRefs.current[next];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [total, step, unlock]);
+
+  // IntersectionObserver — activate when section scrolls into the middle band
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
-    // Only run on mobile
     if (window.matchMedia("(min-width: 768px)").matches) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !lockedRef.current && !hasTriggeredRef.current) {
-          hasTriggeredRef.current = true;
-          setLock(true);
-          setActive(0);
+        if (entry.isIntersecting && !locked && activeRef.current === -1) {
+          step(0);
+          setLocked(true);
         }
       },
-      { threshold: 0.3, rootMargin: "-20% 0px -20% 0px" }
+      { threshold: 0.2, rootMargin: "-10% 0px -40% 0px" }
     );
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [setActive, setLock]);
+  }, [locked, step]);
 
-  // Wheel handler — each scroll gesture steps one item (DevTools + desktop trackpad)
+  // Wheel — for DevTools and desktop trackpad in narrow viewport
   useEffect(() => {
+    if (!locked) return;
     const handler = (e: WheelEvent) => {
-      if (!lockedRef.current) return;
       e.preventDefault();
       advance(e.deltaY > 0 ? 1 : -1);
     };
-
     window.addEventListener("wheel", handler, { passive: false });
     return () => window.removeEventListener("wheel", handler);
-  }, [advance]);
+  }, [locked, advance]);
 
-  // Touch handlers — intercept touchmove to prevent native scroll while locked
+  // Touch — each swipe gesture advances one step
   useEffect(() => {
+    if (!locked) return;
     let startY = 0;
-    let gestureHandled = false;
+    let handled = false;
 
-    const handleStart = (e: TouchEvent) => {
-      if (!lockedRef.current) return;
+    const onStart = (e: TouchEvent) => {
       startY = e.touches[0].clientY;
-      gestureHandled = false;
+      handled = false;
     };
-
-    const handleMove = (e: TouchEvent) => {
-      if (!lockedRef.current || gestureHandled) return;
+    const onMove = (e: TouchEvent) => {
+      if (handled) return;
       const delta = startY - e.touches[0].clientY;
-      if (Math.abs(delta) < 30) return; // wait for meaningful movement
-      // Prevent the native scroll
-      e.preventDefault();
-      gestureHandled = true;
+      if (Math.abs(delta) < 30) return;
+      handled = true;
       advance(delta > 0 ? 1 : -1);
     };
 
-    window.addEventListener("touchstart", handleStart, { passive: true });
-    window.addEventListener("touchmove", handleMove, { passive: false });
+    window.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: true });
     return () => {
-      window.removeEventListener("touchstart", handleStart);
-      window.removeEventListener("touchmove", handleMove);
+      window.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchmove", onMove);
     };
-  }, [advance]);
+  }, [locked, advance]);
 
   return (
     <div ref={containerRef} className="md:hidden">
       <div className="space-y-2">
         {comparisonRows.map((row, i) => (
-          <MobileAccordionItem
-            key={row.label}
-            row={row}
-            isOpen={activeIndex === i}
-          />
+          <div key={row.label} ref={(el) => { itemRefs.current[i] = el; }}>
+            <MobileAccordionItem
+              row={row}
+              isOpen={activeIndex === i}
+            />
+          </div>
         ))}
       </div>
       {activeIndex >= 0 && (
