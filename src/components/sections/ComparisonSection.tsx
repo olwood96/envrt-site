@@ -139,21 +139,17 @@ function MobileComparisonCards() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="md:hidden space-y-2">
+    <div className="md:hidden rounded-2xl border border-envrt-charcoal/5 bg-white overflow-hidden divide-y divide-envrt-charcoal/5">
       {comparisonRows.map((row, i) => {
         const isOpen = activeIndex === i;
         return (
-          <div
-            key={row.label}
-            className="rounded-xl border border-envrt-charcoal/5 bg-white overflow-hidden"
-            style={{ boxShadow: isOpen ? "0 4px 20px rgba(0,0,0,0.06)" : "none" }}
-          >
+          <div key={row.label}>
             <button
               type="button"
-              className="flex w-full items-center justify-between px-4 py-3.5"
+              className="flex w-full items-center justify-between px-4 py-3"
               onClick={() => setActiveIndex(isOpen ? -1 : i)}
             >
-              <span className={`text-sm font-medium ${isOpen ? "text-envrt-charcoal" : "text-envrt-charcoal/50"}`}>
+              <span className={`text-sm font-medium ${isOpen ? "text-envrt-charcoal" : "text-envrt-charcoal/60"}`}>
                 {row.shortLabel}
               </span>
               <svg
@@ -164,23 +160,19 @@ function MobileComparisonCards() {
                 <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
               </svg>
             </button>
-
             <div
               className="overflow-hidden transition-[max-height] duration-300 ease-out"
               style={{ maxHeight: isOpen ? "300px" : "0px" }}
             >
-              <div className="space-y-3 px-4 pb-4">
-                {/* Consultant */}
+              <div className="space-y-2.5 px-4 pb-3.5">
                 <div className="flex items-baseline justify-between">
                   <span className="text-xs text-envrt-muted">Consultant</span>
                   <span className="text-xs text-envrt-muted">{row.consultant}</span>
                 </div>
-                {/* In-house */}
                 <div className="flex items-baseline justify-between">
                   <span className="text-xs text-envrt-muted">In-house</span>
                   <span className="text-xs text-envrt-muted">{row.inHouse}</span>
                 </div>
-                {/* ENVRT */}
                 <div className="flex items-center justify-between rounded-lg bg-envrt-teal/[0.06] px-3 py-2">
                   <span className="flex items-center gap-1.5 text-xs font-medium text-envrt-teal">
                     <CheckIcon className="h-3.5 w-3.5 flex-shrink-0" />
