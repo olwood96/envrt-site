@@ -299,14 +299,19 @@ function MobileComparisonCards() {
   const unlock = useCallback((direction: 1 | -1) => {
     const container = containerRef.current;
     if (container) {
-      const savedY = scrollYRef.current;
+      // containerRef is the outer wrapper (not translated).
+      // With body fixed at -scrollYRef.current, getBoundingClientRect
+      // gives position relative to the frozen viewport.
+      // Real document position = scrollYRef.current + rect.top
       const rect = container.getBoundingClientRect();
-      const sectionTop = savedY + rect.top;
-      const sectionBottom = savedY + rect.bottom;
+      const docTop = scrollYRef.current + rect.top;
+      const docBottom = scrollYRef.current + rect.bottom;
       if (direction === 1) {
-        scrollYRef.current = sectionBottom + 20;
+        // Place viewport just past the section
+        scrollYRef.current = docBottom - window.innerHeight * 0.2;
       } else {
-        scrollYRef.current = Math.max(0, sectionTop - window.innerHeight + 20);
+        // Place viewport just above the section
+        scrollYRef.current = Math.max(0, docTop - window.innerHeight * 0.8);
       }
     }
     offsetRef.current = 0;
@@ -388,37 +393,41 @@ function MobileComparisonCards() {
   }, [locked, advance]);
 
   return (
-    <div ref={containerRef} className="md:hidden">
+    <div ref={containerRef} className="md:hidden overflow-hidden">
       <div
         ref={listRef}
-        className="space-y-2 transition-transform duration-500 ease-out"
+        className="transition-transform duration-500 ease-out"
         style={{ transform: `translateY(${offsetY}px)` }}
       >
-        {comparisonRows.map((row, i) => (
-          <div key={row.label} ref={(el) => { itemRefs.current[i] = el; }}>
-            <MobileAccordionItem
-              row={row}
-              isOpen={activeIndex === i}
-            />
-          </div>
-        ))}
-      </div>
-      {activeIndex >= 0 && (
-        <div className="flex justify-center gap-1.5 pt-3 pb-1">
-          {comparisonRows.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex
-                  ? "w-4 bg-envrt-teal"
-                  : i < activeIndex
-                    ? "w-1.5 bg-envrt-teal/30"
-                    : "w-1.5 bg-envrt-charcoal/10"
-              }`}
-            />
+        {/* Include header so it translates with the accordion */}
+        <SectionHeader />
+        <div className="mt-10 space-y-2">
+          {comparisonRows.map((row, i) => (
+            <div key={row.label} ref={(el) => { itemRefs.current[i] = el; }}>
+              <MobileAccordionItem
+                row={row}
+                isOpen={activeIndex === i}
+              />
+            </div>
           ))}
         </div>
-      )}
+        {activeIndex >= 0 && (
+          <div className="flex justify-center gap-1.5 pt-3 pb-1">
+            {comparisonRows.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === activeIndex
+                    ? "w-4 bg-envrt-teal"
+                    : i < activeIndex
+                      ? "w-1.5 bg-envrt-teal/30"
+                      : "w-1.5 bg-envrt-charcoal/10"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -499,31 +508,41 @@ function DesktopComparisonTable() {
 
 /* ── Section ───────────────────────────────────────────────────────────── */
 
+function SectionHeader() {
+  return (
+    <div className="mx-auto max-w-2xl text-center">
+      <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
+        Why ENVRT
+      </p>
+      <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
+        How does ENVRT compare?
+      </h2>
+      <p className="mt-4 text-base text-envrt-muted">
+        Most brands think they need a consultant or a dedicated hire.
+        Here&apos;s how the options actually stack up.
+      </p>
+    </div>
+  );
+}
+
 export function ComparisonSection() {
   return (
     <section className="px-4 py-16 sm:px-6 sm:py-24" id="compare" aria-label="How ENVRT compares to consultants and in-house teams">
       <Container>
-        <FadeUp>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
-              Why ENVRT
-            </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-              How does ENVRT compare?
-            </h2>
-            <p className="mt-4 text-base text-envrt-muted">
-              Most brands think they need a consultant or a dedicated hire.
-              Here&apos;s how the options actually stack up.
-            </p>
-          </div>
-        </FadeUp>
+        {/* Desktop: normal layout with header above table */}
+        <div className="hidden md:block">
+          <FadeUp>
+            <SectionHeader />
+          </FadeUp>
+          <FadeUp delay={0.1}>
+            <div className="mt-14">
+              <DesktopComparisonTable />
+            </div>
+          </FadeUp>
+        </div>
 
-        <FadeUp delay={0.1}>
-          <div className="mt-14">
-            <DesktopComparisonTable />
-            <MobileComparisonCards />
-          </div>
-        </FadeUp>
+        {/* Mobile: header is inside the translated container */}
+        <MobileComparisonCards />
 
         <FadeUp delay={0.2}>
           <div className="mt-10 flex flex-col items-center gap-3 text-center">
