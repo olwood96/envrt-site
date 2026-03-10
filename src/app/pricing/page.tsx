@@ -112,6 +112,7 @@ const pricingPlans = [
       "Auto-generated disclosures and templates",
       "CO\u2082e and AWARE water scarcity indicators",
       "Fibre-to-assembly supply chain reconstruction",
+      "DPP scan and engagement analytics",
       "Email support with onboarding call",
     ],
     cta: "Get Started",
@@ -130,9 +131,11 @@ const pricingPlans = [
       "Process-level supply chain reconstruction",
       "Hotspot detection across lifecycle stages",
       "Product comparisons",
+      "AI-powered data ingestion",
       "Entry-level decarbonisation guidance",
       "Stage-linked evidence library",
       "Hotspot insights with reduction opportunities",
+      "Collection summaries with CSV/PDF exports",
       "Priority support",
     ],
     cta: "Get Started",
@@ -166,8 +169,10 @@ const pricingComparison = {
       features: [
         { name: "DPP page allocation", starter: "Up to 25", growth: "Up to 100", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
+        { name: "Multi-language DPP pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
         { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
+        { name: "AI-powered data ingestion", starter: false, growth: true, pro: true },
       ],
     },
     {
@@ -198,6 +203,7 @@ const pricingComparison = {
     {
       name: "Dashboard and Insights",
       features: [
+        { name: "DPP scan and engagement analytics", starter: true, growth: true, pro: true },
         { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
         { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
@@ -241,8 +247,7 @@ export default function PricingPage() {
               Pricing
             </h1>
             <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-              From your first DPP to full sustainability operations. Every plan includes
-              a 14-day free trial.
+              From your first DPP to full sustainability operations.
             </p>
           </div>
         </FadeUp>
@@ -271,8 +276,8 @@ export default function PricingPage() {
             </p>
             <div className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                "14-day free trial",
                 "QR-ready DPP pages",
+                "Multi-language DPP pages",
                 "Onboarding call",
                 "No setup fees",
               ].map((item) => (

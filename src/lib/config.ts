@@ -317,12 +317,12 @@ export const pricingFaqItems = [
   {
     question: "How much does a Digital Product Passport cost?",
     answer:
-      "ENVRT offers three plans: Starter at £149/month for up to 25 DPPs, Growth at £495/month for up to 100 DPPs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support. Every plan includes a 14-day free trial.",
+      "ENVRT offers three plans: Starter at £149/month for up to 25 DPPs, Growth at £495/month for up to 100 DPPs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support.",
   },
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes DPP creation, QR-ready passport pages, traceability scores, and CO₂e indicators. Growth adds expanded product data, core LCA metrics, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
+      "Starter includes DPP creation, QR-ready passport pages, traceability scores, CO₂e indicators, and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",
@@ -330,9 +330,9 @@ export const pricingFaqItems = [
       "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.",
   },
   {
-    question: "Is there a free trial?",
+    question: "Can I see a demo before signing up?",
     answer:
-      "Yes, every ENVRT plan includes a 14-day free trial so you can explore the platform and generate your first Digital Product Passports before committing.",
+      "Yes, book a demo and we'll walk you through the platform with your own product data. No commitment required.",
   },
   {
     question: "Do you offer annual billing?",
