@@ -1,17 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
 
+/* ── Custom Dropdown ──────────────────────────────────────────────────── */
+
+interface DropdownOption {
+  value: string;
+  label: string;
+  description: string;
+}
+
+const interestOptions: DropdownOption[] = [
+  { value: "dpp-hub", label: "Your DPP Hub", description: "Regulation-ready passports" },
+  { value: "impact-analyst", label: "Your Impact Analyst", description: "Lifecycle metrics and insights" },
+  { value: "sustainability-team", label: "Your Sustainability Team", description: "Full sustainability operations" },
+  { value: "not-sure", label: "Not sure yet", description: "I'd like to explore my options" },
+];
+
+function InterestDropdown({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selected = interestOptions.find((o) => o.value === value);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`flex w-full items-center justify-between rounded-xl border bg-white px-4 py-3 text-left text-sm outline-none transition-all ${
+          open
+            ? "border-envrt-teal/40 ring-1 ring-envrt-teal/20"
+            : "border-envrt-charcoal/10 hover:border-envrt-charcoal/20"
+        }`}
+      >
+        {selected ? (
+          <span className="flex items-baseline gap-2">
+            <span className="font-medium text-envrt-charcoal">{selected.label}</span>
+            <span className="text-xs text-envrt-muted">{selected.description}</span>
+          </span>
+        ) : (
+          <span className="text-envrt-muted">Select an option</span>
+        )}
+        <svg
+          className={`h-4 w-4 flex-shrink-0 text-envrt-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+        </svg>
+      </button>
+
+      {/* Hidden native input for form submission */}
+      <input type="hidden" name="interest" value={value} />
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-20 mt-1.5 overflow-hidden rounded-xl border border-envrt-charcoal/10 bg-white shadow-lg shadow-envrt-charcoal/8">
+          {interestOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
+              className={`flex w-full flex-col px-4 py-3 text-left transition-colors ${
+                value === option.value
+                  ? "bg-envrt-teal/[0.05]"
+                  : "hover:bg-envrt-charcoal/[0.02]"
+              }`}
+            >
+              <span className={`text-sm font-medium ${value === option.value ? "text-envrt-teal" : "text-envrt-charcoal"}`}>
+                {option.label}
+              </span>
+              <span className="text-xs text-envrt-muted">{option.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Page ──────────────────────────────────────────────────────────────── */
+
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [interest, setInterest] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -142,18 +241,7 @@ export default function ContactPage() {
                     <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
                       What are you looking for?
                     </label>
-                    <select
-                      name="interest"
-                      required
-                      className="w-full appearance-none rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      defaultValue=""
-                    >
-                      <option value="" disabled>Select an option</option>
-                      <option value="dpp-hub">Your DPP Hub - regulation-ready passports</option>
-                      <option value="impact-analyst">Your Impact Analyst - lifecycle metrics and insights</option>
-                      <option value="sustainability-team">Your Sustainability Team - full sustainability operations</option>
-                      <option value="not-sure">Not sure yet - I&apos;d like to explore</option>
-                    </select>
+                    <InterestDropdown value={interest} onChange={setInterest} />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
