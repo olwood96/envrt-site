@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Container } from "../ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "../ui/Motion";
@@ -218,215 +218,84 @@ function MobileAccordionItem({ row, isOpen }: {
 }
 
 /**
- * Locks body scroll while active, capturing the scroll position.
- * Restores it on unlock. Same proven pattern as HowItWorksSection.
+ * Scroll-driven mobile accordion.
+ *
+ * The outer div is tall (items × 100vh), creating scroll space.
+ * A `position: sticky` inner container stays pinned in the viewport.
+ * As the user scrolls naturally through the tall section, we derive
+ * which accordion item should be open from scroll progress.
+ *
+ * No body scroll lock, no translateY, no scroll restore — pure native scroll.
  */
-function useBodyScrollLock(locked: boolean) {
-  const scrollYRef = useRef(0);
-
-  useEffect(() => {
-    if (!locked) return;
-    scrollYRef.current = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollYRef.current}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.overflow = "";
-      window.scrollTo(0, scrollYRef.current);
-    };
-  }, [locked]);
-
-  return scrollYRef;
-}
-
 function MobileComparisonCards() {
   const total = comparisonRows.length;
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [locked, setLocked] = useState(false);
-  const [offsetY, setOffsetY] = useState(0);
-  const offsetRef = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const activeRef = useRef(-1);
-  const cooldownRef = useRef(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll while stepping through items
-  const scrollYRef = useBodyScrollLock(locked);
-
-  /**
-   * Center a given item in the viewport by translating the list container.
-   * Because body is position:fixed, we can't use scrollIntoView — instead
-   * we shift the entire list with translateY so the target item sits at
-   * the vertical center of the screen.
-   */
-  const centerItem = useCallback((idx: number) => {
-    const el = itemRefs.current[idx];
-    const list = listRef.current;
-    if (!el || !list) return;
-
-    const itemMid = el.offsetTop + el.offsetHeight / 2;
-    const viewportCenter = window.innerHeight / 2;
-
-    // Get the list's natural position by removing current transform offset
-    const listRect = list.getBoundingClientRect();
-    const naturalTop = listRect.top - offsetRef.current;
-
-    const newOffset = viewportCenter - naturalTop - itemMid;
-    offsetRef.current = newOffset;
-    setOffsetY(newOffset);
-  }, []);
-
-  // Sync activeRef for use in event handlers
-  const step = useCallback((idx: number) => {
-    activeRef.current = idx;
-    setActiveIndex(idx);
-    // Defer centering to next frame so the accordion has started expanding
-    if (idx >= 0) {
-      requestAnimationFrame(() => {
-        // Wait a bit more for the grid-template-rows transition to get underway
-        setTimeout(() => centerItem(idx), 80);
-      });
-    }
-  }, [centerItem]);
-
-  const unlock = useCallback((direction: 1 | -1) => {
-    const container = containerRef.current;
-    if (container) {
-      // containerRef is the outer wrapper (not translated).
-      // With body fixed at -scrollYRef.current, getBoundingClientRect
-      // gives position relative to the frozen viewport.
-      // Real document position = scrollYRef.current + rect.top
-      const rect = container.getBoundingClientRect();
-      const docTop = scrollYRef.current + rect.top;
-      const docBottom = scrollYRef.current + rect.bottom;
-      if (direction === 1) {
-        // Place viewport just past the section
-        scrollYRef.current = docBottom - window.innerHeight * 0.2;
-      } else {
-        // Place viewport just above the section
-        scrollYRef.current = Math.max(0, docTop - window.innerHeight * 0.8);
-      }
-    }
-    offsetRef.current = 0;
-    setOffsetY(0);
-    step(-1);
-    setLocked(false);
-  }, [step, scrollYRef]);
-
-  const advance = useCallback((direction: 1 | -1) => {
-    if (cooldownRef.current) return;
-    cooldownRef.current = true;
-    setTimeout(() => { cooldownRef.current = false; }, 500);
-
-    const next = activeRef.current + direction;
-
-    if (next < 0 || next >= total) {
-      unlock(direction);
-      return;
-    }
-
-    step(next);
-  }, [total, step, unlock]);
-
-  // IntersectionObserver — activate when section scrolls into the middle band
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
     if (window.matchMedia("(min-width: 768px)").matches) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !locked && activeRef.current === -1) {
-          step(0);
-          setLocked(true);
-        }
-      },
-      { threshold: 0.2, rootMargin: "-10% 0px -40% 0px" }
-    );
+    const handleScroll = () => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [locked, step]);
+      const rect = section.getBoundingClientRect();
+      const sectionHeight = section.offsetHeight;
+      const vh = window.innerHeight;
 
-  // Wheel — for DevTools and desktop trackpad in narrow viewport
-  useEffect(() => {
-    if (!locked) return;
-    const handler = (e: WheelEvent) => {
-      e.preventDefault();
-      advance(e.deltaY > 0 ? 1 : -1);
-    };
-    window.addEventListener("wheel", handler, { passive: false });
-    return () => window.removeEventListener("wheel", handler);
-  }, [locked, advance]);
+      // scrolled = how far the section top has moved above the viewport top
+      const scrolled = -rect.top;
+      const scrollableRange = sectionHeight - vh;
 
-  // Touch — each swipe gesture advances one step
-  useEffect(() => {
-    if (!locked) return;
-    let startY = 0;
-    let handled = false;
+      if (scrolled < 0 || scrolled > scrollableRange) {
+        setActiveIndex(-1);
+        return;
+      }
 
-    const onStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      handled = false;
-    };
-    const onMove = (e: TouchEvent) => {
-      if (handled) return;
-      const delta = startY - e.touches[0].clientY;
-      if (Math.abs(delta) < 30) return;
-      handled = true;
-      advance(delta > 0 ? 1 : -1);
+      const progress = scrolled / scrollableRange;
+      setActiveIndex(Math.min(total - 1, Math.floor(progress * total)));
     };
 
-    window.addEventListener("touchstart", onStart, { passive: true });
-    window.addEventListener("touchmove", onMove, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onStart);
-      window.removeEventListener("touchmove", onMove);
-    };
-  }, [locked, advance]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [total]);
 
   return (
-    <div ref={containerRef} className="md:hidden overflow-hidden">
-      <div
-        ref={listRef}
-        className="transition-transform duration-500 ease-out"
-        style={{ transform: `translateY(${offsetY}px)` }}
-      >
-        {/* Include header so it translates with the accordion */}
-        <SectionHeader />
-        <div className="mt-10 space-y-2">
-          {comparisonRows.map((row, i) => (
-            <div key={row.label} ref={(el) => { itemRefs.current[i] = el; }}>
+    <div
+      ref={sectionRef}
+      className="md:hidden relative"
+      style={{ height: `${(total + 1) * 85}vh` }}
+    >
+      <div className="sticky top-0 flex h-screen items-center">
+        <div className="w-full px-1">
+          <SectionHeader />
+          <div className="mt-8 space-y-2">
+            {comparisonRows.map((row, i) => (
               <MobileAccordionItem
+                key={row.label}
                 row={row}
                 isOpen={activeIndex === i}
               />
-            </div>
-          ))}
-        </div>
-        {activeIndex >= 0 && (
-          <div className="flex justify-center gap-1.5 pt-3 pb-1">
-            {comparisonRows.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === activeIndex
-                    ? "w-4 bg-envrt-teal"
-                    : i < activeIndex
-                      ? "w-1.5 bg-envrt-teal/30"
-                      : "w-1.5 bg-envrt-charcoal/10"
-                }`}
-              />
             ))}
           </div>
-        )}
+          {activeIndex >= 0 && (
+            <div className="flex justify-center gap-1.5 pt-4">
+              {comparisonRows.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === activeIndex
+                      ? "w-4 bg-envrt-teal"
+                      : i < activeIndex
+                        ? "w-1.5 bg-envrt-teal/30"
+                        : "w-1.5 bg-envrt-charcoal/10"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
