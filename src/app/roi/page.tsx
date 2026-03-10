@@ -34,8 +34,6 @@ interface CalcResults {
   maxSaving: number;
   savingVsConsultant: number;
   savingVsInhouse: number;
-  hoursSaved: number;
-  daysSaved: number;
 }
 
 /* ================================================================
@@ -98,11 +96,6 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   const savingVsInhouse = Math.max(0, inhouseCost - envrtCost);
   const maxSaving = Math.max(savingVsConsultant, savingVsInhouse);
 
-  // Time savings: (current hours - 1 hour with ENVRT) per SKU per year
-  const hoursPerProduct = DATA_MATURITY_HOURS[inputs.dataMaturity];
-  const hoursSaved = Math.max(0, (hoursPerProduct - 1) * inputs.skuCount);
-  const daysSaved = Math.round(hoursSaved / 8);
-
   return {
     envrtCost,
     envrtPlan,
@@ -112,8 +105,6 @@ function calculateROI(inputs: CalcInputs): CalcResults {
     maxSaving: Math.round(maxSaving),
     savingVsConsultant: Math.round(savingVsConsultant),
     savingVsInhouse: Math.round(savingVsInhouse),
-    hoursSaved: Math.round(hoursSaved),
-    daysSaved,
   };
 }
 
@@ -719,15 +710,24 @@ export default function ROICalculatorPage() {
               <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <SectionCard>
                   <div className="p-6">
-                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                      Time Savings
+                    <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                      Why ENVRT
                     </h3>
-                    <p className="text-3xl font-bold text-envrt-teal">
-                      {results.hoursSaved.toLocaleString()}h
-                    </p>
-                    <p className="mt-1 text-sm text-envrt-muted">
-                      saved per year ({results.daysSaved} working days)
-                    </p>
+                    <ul className="space-y-2.5">
+                      {[
+                        "First DPP live same day",
+                        "Regulation updates built in",
+                        "Full dashboard included",
+                        "Scales with your plan",
+                      ].map((item) => (
+                        <li key={item} className="flex items-center gap-2">
+                          <svg className="h-4 w-4 flex-shrink-0 text-envrt-teal" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
+                          </svg>
+                          <span className="text-sm text-envrt-charcoal">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </SectionCard>
                 <SectionCard>
@@ -825,10 +825,6 @@ export default function ROICalculatorPage() {
                       <p>
                         <strong className="text-envrt-charcoal">In-house cost:</strong>{" "}
                         Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 25 products), £55k (26-100), £67k (100+).
-                      </p>
-                      <p>
-                        <strong className="text-envrt-charcoal">Time savings:</strong>{" "}
-                        Based on an estimated {DATA_MATURITY_HOURS[dataMaturity]}h per product at your current data maturity, reduced to approximately 1h per product with ENVRT, across {skuCount} products.
                       </p>
                       <p className="pt-2 text-envrt-muted/60">
                         These are estimates for illustration only and may vary based on your specific circumstances.
