@@ -133,109 +133,66 @@ function ColumnHeader({
   );
 }
 
-/* ── Mobile scroll-triggered accordion ──────────────────────────────────── */
-
-function ComparisonBar({
-  label,
-  value,
-  width,
-  animate,
-}: {
-  label: string;
-  value: string;
-  width: number;
-  animate: boolean;
-}) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-baseline justify-between">
-        <span className="text-xs text-envrt-muted">{label}</span>
-        <span className="text-xs text-envrt-muted">{value}</span>
-      </div>
-      <div className="h-2 w-full rounded-full bg-envrt-charcoal/[0.04]">
-        <div
-          className="h-full rounded-full bg-envrt-charcoal/20 transition-all duration-700 ease-out"
-          style={{ width: animate ? `${Math.max(width, 4)}%` : "0%" }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function MobileAccordionItem({ row, isOpen }: {
-  row: ComparisonRow;
-  isOpen: boolean;
-}) {
-  return (
-    <div className="rounded-xl border border-envrt-charcoal/5 bg-white overflow-hidden transition-shadow duration-300"
-      style={{ boxShadow: isOpen ? "0 4px 20px rgba(0,0,0,0.06)" : "none" }}
-    >
-      {/* Header — just the short label */}
-      <div className="flex items-center justify-between px-4 py-3.5">
-        <span className={`text-sm font-medium transition-colors duration-300 ${
-          isOpen ? "text-envrt-charcoal" : "text-envrt-charcoal/50"
-        }`}>
-          {row.shortLabel}
-        </span>
-        {/* Small dot indicator when closed */}
-        {!isOpen && (
-          <div className="h-1.5 w-1.5 rounded-full bg-envrt-teal/40" />
-        )}
-      </div>
-
-      {/* Expandable content */}
-      <div
-        className="grid transition-[grid-template-rows] duration-500 ease-out"
-        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-      >
-        <div className="overflow-hidden">
-          <div className="space-y-3 px-4 pb-4">
-            <ComparisonBar
-              label="Consultant"
-              value={row.consultant}
-              width={row.bars.consultant}
-              animate={isOpen}
-            />
-            <ComparisonBar
-              label="In-house"
-              value={row.inHouse}
-              width={row.bars.inHouse}
-              animate={isOpen}
-            />
-            {/* ENVRT result — highlighted */}
-            <div className="flex items-center justify-between rounded-lg bg-envrt-teal/[0.06] px-3 py-2">
-              <span className="flex items-center gap-1.5 text-xs font-medium text-envrt-teal">
-                <CheckIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                ENVRT
-              </span>
-              <span className="text-sm font-semibold text-envrt-teal">{row.envrt}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ── Mobile accordion ──────────────────────────────────────────────────── */
 
 function MobileComparisonCards() {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const toggle = (i: number) => {
-    setActiveIndex(activeIndex === i ? -1 : i);
-  };
-
   return (
     <div className="md:hidden space-y-2">
-      {comparisonRows.map((row, i) => (
-        <button
-          key={row.label}
-          type="button"
-          className="w-full text-left"
-          onClick={() => toggle(i)}
-        >
-          <MobileAccordionItem row={row} isOpen={activeIndex === i} />
-        </button>
-      ))}
+      {comparisonRows.map((row, i) => {
+        const isOpen = activeIndex === i;
+        return (
+          <div
+            key={row.label}
+            className="rounded-xl border border-envrt-charcoal/5 bg-white overflow-hidden"
+            style={{ boxShadow: isOpen ? "0 4px 20px rgba(0,0,0,0.06)" : "none" }}
+          >
+            <button
+              type="button"
+              className="flex w-full items-center justify-between px-4 py-3.5"
+              onClick={() => setActiveIndex(isOpen ? -1 : i)}
+            >
+              <span className={`text-sm font-medium ${isOpen ? "text-envrt-charcoal" : "text-envrt-charcoal/50"}`}>
+                {row.shortLabel}
+              </span>
+              <svg
+                className={`h-4 w-4 text-envrt-muted/40 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+              </svg>
+            </button>
+
+            <div
+              className="overflow-hidden transition-[max-height] duration-300 ease-out"
+              style={{ maxHeight: isOpen ? "300px" : "0px" }}
+            >
+              <div className="space-y-3 px-4 pb-4">
+                {/* Consultant */}
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs text-envrt-muted">Consultant</span>
+                  <span className="text-xs text-envrt-muted">{row.consultant}</span>
+                </div>
+                {/* In-house */}
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs text-envrt-muted">In-house</span>
+                  <span className="text-xs text-envrt-muted">{row.inHouse}</span>
+                </div>
+                {/* ENVRT */}
+                <div className="flex items-center justify-between rounded-lg bg-envrt-teal/[0.06] px-3 py-2">
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-envrt-teal">
+                    <CheckIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                    ENVRT
+                  </span>
+                  <span className="text-sm font-semibold text-envrt-teal">{row.envrt}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
