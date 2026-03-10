@@ -46,6 +46,15 @@ vi.mock("@/lib/collective/email-templates", () => ({
   buildConfirmationEmail: vi.fn().mockReturnValue("<html>confirm</html>"),
 }));
 
+// Mock form-security
+const mockVerifyTurnstile = vi.fn().mockResolvedValue(true);
+const mockRateLimit = vi.fn().mockReturnValue(true);
+vi.mock("@/lib/form-security", () => ({
+  verifyTurnstile: (...args: unknown[]) => mockVerifyTurnstile(...args),
+  rateLimit: (...args: unknown[]) => mockRateLimit(...args),
+  getClientIp: () => "127.0.0.1",
+}));
+
 import { POST } from "@/app/api/collective/subscribe/route";
 import { NextRequest } from "next/server";
 
@@ -60,18 +69,20 @@ function makeRequest(body: unknown): NextRequest {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.RESEND_API_KEY = "test-key";
+  mockVerifyTurnstile.mockResolvedValue(true);
+  mockRateLimit.mockReturnValue(true);
 });
 
 describe("POST /api/collective/subscribe", () => {
   it("returns 400 for missing email", async () => {
-    const res = await POST(makeRequest({}));
+    const res = await POST(makeRequest({ turnstileToken: "token" }));
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe("Valid email required");
   });
 
   it("returns 400 for invalid email", async () => {
-    const res = await POST(makeRequest({ email: "not-an-email" }));
+    const res = await POST(makeRequest({ email: "not-an-email", turnstileToken: "token" }));
     expect(res.status).toBe(400);
   });
 
@@ -79,7 +90,7 @@ describe("POST /api/collective/subscribe", () => {
     mockMaybeSingle.mockResolvedValue({ data: null });
     mockSingle.mockResolvedValue({ data: { token: "new-token-123" }, error: null });
 
-    const res = await POST(makeRequest({ email: "test@example.com" }));
+    const res = await POST(makeRequest({ email: "test@example.com", turnstileToken: "valid-token" }));
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -93,7 +104,7 @@ describe("POST /api/collective/subscribe", () => {
       data: { id: "existing-id", confirmed_at: "2024-01-01" },
     });
 
-    const res = await POST(makeRequest({ email: "existing@example.com" }));
+    const res = await POST(makeRequest({ email: "existing@example.com", turnstileToken: "token" }));
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -109,5 +120,34 @@ describe("POST /api/collective/subscribe", () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when Turnstile verification fails", async () => {
+    mockVerifyTurnstile.mockResolvedValue(false);
+
+    const res = await POST(makeRequest({ email: "test@example.com", turnstileToken: "bad-token" }));
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain("Verification failed");
+    expect(mockInsert).not.toHaveBeenCalled();
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("returns 429 when rate limited", async () => {
+    mockRateLimit.mockReturnValue(false);
+
+    const res = await POST(makeRequest({ email: "test@example.com", turnstileToken: "token" }));
+    expect(res.status).toBe(429);
+    const data = await res.json();
+    expect(data.error).toContain("Too many attempts");
+    expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  it("passes turnstile token to verifyTurnstile", async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null });
+    mockSingle.mockResolvedValue({ data: { token: "new-token" }, error: null });
+
+    await POST(makeRequest({ email: "test@example.com", turnstileToken: "my-token" }));
+    expect(mockVerifyTurnstile).toHaveBeenCalledWith("my-token");
   });
 });

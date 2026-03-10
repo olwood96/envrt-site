@@ -2,16 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { buildConfirmationEmail } from "@/lib/collective/email-templates";
+import { verifyTurnstile, rateLimit, getClientIp } from "@/lib/form-security";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FROM_ADDRESS = "ENVRT Collective <collective@envrt.com>";
 
 export async function POST(request: NextRequest) {
-  let body: { email?: string };
+  // Rate limit: 5 subscribe attempts per IP per 10 minutes
+  const ip = getClientIp(request.headers);
+  if (!rateLimit(`collective-subscribe:${ip}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
+  let body: { email?: string; turnstileToken?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  // Verify Turnstile token
+  const turnstileValid = await verifyTurnstile(body.turnstileToken);
+  if (!turnstileValid) {
+    return NextResponse.json(
+      { error: "Verification failed. Please try again." },
+      { status: 400 }
+    );
   }
 
   const email = body.email?.trim().toLowerCase();
