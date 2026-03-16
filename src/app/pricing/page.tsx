@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp, StaggerChildren, StaggerItem } from "@/components/ui/Motion";
+
+type PlanSlug = "starter" | "growth" | "pro";
 
 function CheckIcon() {
   return (
@@ -100,6 +102,7 @@ function Toggle({
 
 const pricingPlans = [
   {
+    slug: "starter" as PlanSlug,
     name: "Starter",
     subheading: "Your DPP Hub",
     priceGBP: 149,
@@ -119,6 +122,7 @@ const pricingPlans = [
     highlighted: false,
   },
   {
+    slug: "growth" as PlanSlug,
     name: "Growth",
     subheading: "Your Impact Analyst",
     priceGBP: 495,
@@ -142,6 +146,7 @@ const pricingPlans = [
     highlighted: true,
   },
   {
+    slug: "pro" as PlanSlug,
     name: "Pro",
     subheading: "Your Sustainability Team",
     priceGBP: 1295,
@@ -237,6 +242,43 @@ export default function PricingPage() {
   const { nudge, onEnter, onLeave } = useNudge(3500);
   const [currency, setCurrency] = useState<Currency>("GBP");
   const [interval, setInterval_] = useState<Interval>("monthly");
+  const [loadingPlan, setLoadingPlan] = useState<PlanSlug | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const handleBuyNow = useCallback(
+    async (planSlug: PlanSlug) => {
+      setLoadingPlan(planSlug);
+      setCheckoutError(null);
+
+      try {
+        const res = await fetch("/api/stripe/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan: planSlug,
+            interval: interval.toLowerCase(),
+            currency: currency.toLowerCase(),
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setCheckoutError(data.error || "Something went wrong");
+          return;
+        }
+
+        if (data.url) {
+          window.location.href = data.url;
+        }
+      } catch {
+        setCheckoutError("Failed to start checkout. Please try again.");
+      } finally {
+        setLoadingPlan(null);
+      }
+    },
+    [interval, currency]
+  );
 
   return (
     <div className="pt-28 pb-16">
@@ -344,7 +386,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <div className="mt-8">
+                <div className="mt-8 space-y-3">
                   <Button
                     href="/contact"
                     variant={plan.highlighted ? "primary" : "secondary"}
@@ -352,12 +394,41 @@ export default function PricingPage() {
                   >
                     {plan.cta}
                   </Button>
+                  <button
+                    onClick={() => handleBuyNow(plan.slug)}
+                    disabled={loadingPlan !== null}
+                    className={`flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-3 text-base font-medium transition-all duration-300 ${
+                      plan.highlighted
+                        ? "border-envrt-teal/30 bg-envrt-teal/5 text-envrt-teal hover:bg-envrt-teal/10"
+                        : "border-envrt-charcoal/10 bg-envrt-charcoal/[0.02] text-envrt-charcoal/70 hover:border-envrt-charcoal/20 hover:text-envrt-charcoal"
+                    } ${loadingPlan !== null ? "cursor-not-allowed opacity-50" : ""}`}
+                  >
+                    {loadingPlan === plan.slug ? (
+                      <>
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Loading...
+                      </>
+                    ) : (
+                      "Buy now"
+                    )}
+                  </button>
                 </div>
               </div>
             </StaggerItem>
               );
             })}
         </StaggerChildren>
+
+        {checkoutError && (
+          <FadeUp>
+            <div className="mx-auto mt-6 max-w-md rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+              {checkoutError}
+            </div>
+          </FadeUp>
+        )}
 
         <FadeUp delay={0.12}>
           <div className="mx-auto mt-10 max-w-3xl text-center">
