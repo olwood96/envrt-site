@@ -71,11 +71,11 @@ export function CollectiveProductJsonLd({ card, url }: Props) {
     });
   }
 
-  if (dpp.traceability_score != null) {
+  if (dpp.transparency_score != null) {
     additionalProperties.push({
       "@type": "PropertyValue",
-      name: "Traceability Score",
-      value: dpp.traceability_score,
+      name: "Transparency Score",
+      value: dpp.transparency_score,
       unitText: "percent",
     });
   }

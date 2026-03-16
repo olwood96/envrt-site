@@ -62,7 +62,7 @@ const makeCard = (
     garment_name: name,
     garment_mass_g: 200,
     garment_type: "T-shirt",
-    traceability_score: 80,
+    transparency_score: 80,
     total_emissions: emissions,
     total_water: water,
     total_emissions_reduction_pct: null,

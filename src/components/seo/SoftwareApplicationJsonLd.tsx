@@ -20,7 +20,7 @@ export function SoftwareApplicationJsonLd() {
           1
         ).toISOString().split("T")[0],
         description:
-          "Up to 25 DPP pages, QR-ready passport pages, traceability scores, CO₂e and water scarcity indicators.",
+          "Up to 25 DPP pages, QR-ready passport pages, transparency scores, CO₂e and water scarcity indicators.",
       },
       {
         "@type": "Offer",

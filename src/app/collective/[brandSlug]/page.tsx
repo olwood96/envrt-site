@@ -54,7 +54,7 @@ export default async function BrandProfilePage({ params }: PageProps) {
 
   const withEmissions = cards.filter((c) => c.dpp.total_emissions != null);
   const withWater = cards.filter((c) => c.dpp.total_water != null);
-  const withTrace = cards.filter((c) => c.dpp.traceability_score != null);
+  const withTrace = cards.filter((c) => c.dpp.transparency_score != null);
 
   return (
     <>
@@ -173,12 +173,12 @@ export default async function BrandProfilePage({ params }: PageProps) {
           {withTrace.length > 0 && (
             <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
               <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                Avg Traceability
+                Avg Transparency
               </p>
               <p className="mt-1 text-lg font-semibold text-envrt-teal">
                 {Math.round(
                   withTrace.reduce(
-                    (sum, c) => sum + c.dpp.traceability_score!,
+                    (sum, c) => sum + c.dpp.transparency_score!,
                     0
                   ) / withTrace.length
                 )}

@@ -30,7 +30,7 @@ export default async function CollectivePage() {
           <p className="mt-4 text-base text-envrt-muted sm:text-lg">
             Explore Digital Product Passports from brands using ENVRT. See real
             sustainability data, environmental metrics, and supply chain
-            traceability.
+            transparency.
           </p>
         </div>
 

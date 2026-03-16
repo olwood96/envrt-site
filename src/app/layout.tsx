@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     "sustainability data platform",
     "product transparency",
     "lifecycle assessment fashion",
-    "supply chain traceability",
+    "supply chain transparency",
     "fashion sustainability",
   ],
   robots: {

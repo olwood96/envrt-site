@@ -26,7 +26,7 @@ const PRICING_PLANS: PricingPlan[] = [
     features: [
       "Up to 25 DPP pages",
       "QR-ready passport pages",
-      "Traceability score per product",
+      "Transparency score per product",
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
       "CO\u2082e and AWARE water scarcity indicators",

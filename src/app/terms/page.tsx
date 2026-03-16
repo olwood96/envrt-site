@@ -134,7 +134,7 @@ export default function TermsPage() {
                 </li>
                 <li>
                   Generated Outputs, including modelled lifecycle metrics (such as
-                  CO2e and water scarcity estimates) and traceability visualisations
+                  CO2e and water scarcity estimates) and transparency visualisations
                 </li>
                 <li>Hosted public DPP pages</li>
                 <li>Hosted reports</li>

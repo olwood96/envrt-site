@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                 ENVRT (&quot;we,&quot; &quot;us,&quot; &quot;our&quot;) provides a
                 sustainability data platform for fashion brands. Our services include
                 Digital Product Passports (DPPs), modelled lifecycle metrics,
-                traceability visualisations, brand dashboards, collection forms, and
+                transparency visualisations, brand dashboards, collection forms, and
                 evidence uploads.
               </p>
               <p>
@@ -437,7 +437,7 @@ export default function PrivacyPage() {
               <p>
                 DPP pages on dpp.envrt.com are public by design. The content displayed
                 on a DPP page is controlled by the brand that created it. This may
-                include product details, material information, traceability data, and
+                include product details, material information, transparency data, and
                 modelled environmental metrics.
               </p>
               <p>

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 /* ——— Editable final metric values ——— */
 const FINAL_CO2 = 6.3; // kg CO₂-eq
 const FINAL_WATER = 12450; // L eq AWARE
-const FINAL_TRACEABILITY = 69; // %
+const FINAL_TRANSPARENCY = 69; // %
 
 /* ——— Animation timing ——— */
 const CYCLE_DURATION = 8;
@@ -99,7 +99,7 @@ export function SupplyChainFlowSection() {
       /* Counters */
       setCo2(Number((FINAL_CO2 * ease).toFixed(1)));
       setWater(Math.round(FINAL_WATER * ease));
-      setTrace(Math.round(FINAL_TRACEABILITY * ease));
+      setTrace(Math.round(FINAL_TRANSPARENCY * ease));
 
       /* Branch paths: draw over first 50% */
       const branchT = Math.min(t / 0.5, 1);
@@ -150,7 +150,7 @@ export function SupplyChainFlowSection() {
       /* Counters drain */
       setCo2(Number((FINAL_CO2 * remaining).toFixed(1)));
       setWater(Math.round(FINAL_WATER * remaining));
-      setTrace(Math.round(FINAL_TRACEABILITY * remaining));
+      setTrace(Math.round(FINAL_TRANSPARENCY * remaining));
 
       /* Reverse path drawing:
          Main path retracts first (0%–40% of drain),
@@ -379,7 +379,7 @@ export function SupplyChainFlowSection() {
               <span className="text-[9px] text-envrt-muted/40">L eq</span>
             </div>
             <div className="flex w-[96px] flex-col items-center rounded-lg border border-envrt-charcoal/[0.06] bg-white/60 px-3 py-3 backdrop-blur-sm">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/50">Traceability</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/50">Transparency</span>
               <span className="mt-0.5 text-lg font-semibold tabular-nums text-envrt-charcoal">{trace}</span>
               <span className="text-[9px] text-envrt-muted/40">%</span>
             </div>

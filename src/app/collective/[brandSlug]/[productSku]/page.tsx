@@ -156,9 +156,9 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
                   )}
                 </div>
               )}
-              {dpp.traceability_score != null && (
+              {dpp.transparency_score != null && (
                 <span className="inline-flex items-center rounded-full bg-envrt-teal/5 px-3 py-1.5 text-xs font-medium text-envrt-teal">
-                  {Math.round(dpp.traceability_score)}% traceability
+                  {Math.round(dpp.transparency_score)}% transparency
                 </span>
               )}
             </div>

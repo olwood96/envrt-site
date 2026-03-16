@@ -30,7 +30,7 @@ const validPayload = {
     { label: "Data Readiness", score: 80 },
     { label: "Supply Chain", score: 65 },
   ],
-  actions: ["Improve supply chain traceability"],
+  actions: ["Improve supply chain transparency"],
   timelineRisk: "Low risk",
   greenClaimsFlag: false,
   marketingConsent: true,

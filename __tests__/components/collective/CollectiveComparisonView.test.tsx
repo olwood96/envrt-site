@@ -54,7 +54,7 @@ const makeCard = (
     garment_name: name,
     garment_mass_g: 200,
     garment_type: "T-shirt",
-    traceability_score: 80,
+    transparency_score: 80,
     total_emissions: 3.0,
     total_water: 50,
     total_emissions_reduction_pct: null,
@@ -87,7 +87,7 @@ const mockCards: CollectiveCardData[] = [
     total_emissions: 3.0,
     total_water: 50,
     garment_mass_g: 200,
-    traceability_score: 85,
+    transparency_score: 85,
     total_emissions_reduction_pct: 32,
     total_water_reduction_pct: 18,
     constituents: [
@@ -99,7 +99,7 @@ const mockCards: CollectiveCardData[] = [
     total_emissions: 5.0,
     total_water: 30,
     garment_mass_g: 300,
-    traceability_score: 70,
+    transparency_score: 70,
     total_emissions_reduction_pct: null,
     total_water_reduction_pct: 25,
     constituents: [{ material: "Polyester", pct: 100 }],
@@ -142,7 +142,7 @@ describe("CollectiveComparisonView", () => {
     expect(screen.getByText("100.0")).toBeInTheDocument();
   });
 
-  it("renders traceability scores", () => {
+  it("renders transparency scores", () => {
     render(<CollectiveComparisonView cards={mockCards} />);
     expect(screen.getByText("85%")).toBeInTheDocument();
     expect(screen.getByText("70%")).toBeInTheDocument();
@@ -190,8 +190,8 @@ describe("CollectiveComparisonView", () => {
     // Radar renders twice (mobile + desktop), so labels appear multiple times
     expect(screen.getAllByText("Low emissions").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Low water").length).toBeGreaterThanOrEqual(1);
-    // "Traceability" in both radar label and metric table
-    expect(screen.getAllByText("Traceability").length).toBeGreaterThanOrEqual(2);
+    // "Transparency" in both radar label and metric table
+    expect(screen.getAllByText("Transparency").length).toBeGreaterThanOrEqual(2);
     // These labels appear in both radar and metric table
     expect(screen.getAllByText("Emissions / kg").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("Water / kg").length).toBeGreaterThanOrEqual(2);

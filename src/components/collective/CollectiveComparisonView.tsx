@@ -23,7 +23,7 @@ const METRIC_EXPLAINERS: Record<string, string> = {
     "Total freshwater consumed across the product lifecycle, weighted by local water scarcity.",
   "Water / kg":
     "Water usage normalised by product weight — enables fair comparison regardless of garment size.",
-  Traceability:
+  Transparency:
     "Percentage of the supply chain that can be traced back to source. Higher is better.",
   Mass: "The total weight of the finished garment in grams.",
 };
@@ -48,9 +48,9 @@ const RADAR_METRICS = [
     },
   },
   {
-    key: "traceability",
-    label: "Traceability",
-    score: (c: CollectiveCardData) => c.dpp.traceability_score,
+    key: "transparency",
+    label: "Transparency",
+    score: (c: CollectiveCardData) => c.dpp.transparency_score,
   },
   {
     key: "emissionsPerKg",
@@ -317,7 +317,7 @@ export function CollectiveComparisonView({ cards }: Props) {
     { label: "Emissions / kg", values: cards.map((c) => c.dpp.total_emissions != null ? c.dpp.total_emissions / (c.dpp.garment_mass_g / 1000) : null), unit: "kg CO₂e/kg", lowerIsBetter: true, format: (v) => v.toFixed(2) },
     { label: "Water usage", values: cards.map((c) => c.dpp.total_water), unit: "L", lowerIsBetter: true },
     { label: "Water / kg", values: cards.map((c) => c.dpp.total_water != null ? c.dpp.total_water / (c.dpp.garment_mass_g / 1000) : null), unit: "L/kg", lowerIsBetter: true, format: (v) => v.toFixed(1) },
-    { label: "Traceability", values: cards.map((c) => c.dpp.traceability_score), unit: "%", lowerIsBetter: false },
+    { label: "Transparency", values: cards.map((c) => c.dpp.transparency_score), unit: "%", lowerIsBetter: false },
     { label: "Mass", values: cards.map((c) => c.dpp.garment_mass_g), unit: "g", lowerIsBetter: false },
   ];
 

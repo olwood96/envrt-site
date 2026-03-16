@@ -29,10 +29,10 @@ function storageUrl(bucket: string, path: string | null): string | null {
 }
 
 const DPP_LIST_FIELDS =
-  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url, version";
+  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, transparency_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url, version";
 
 const DPP_DETAIL_FIELDS =
-  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, traceability_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url";
+  "id, brand_id, collection_name, product_sku, garment_name, garment_mass_g, garment_type, transparency_score, total_emissions, total_water, total_emissions_reduction_pct, total_water_reduction_pct, constituents, image_path, featured_at, purchase_url";
 
 const BRAND_FIELDS = "id, name, slug, logo_path, website_url, description, verified_at, tier";
 

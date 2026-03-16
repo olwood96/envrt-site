@@ -38,7 +38,7 @@ const mockCard: CollectiveCardData = {
     garment_name: "Organic Cotton Tee",
     garment_mass_g: 200,
     garment_type: "T-shirt",
-    traceability_score: 85,
+    transparency_score: 85,
     total_emissions: 3.2,
     total_water: 45.8,
     total_emissions_reduction_pct: 32,
@@ -98,7 +98,7 @@ describe("CollectiveCard", () => {
     expect(screen.getByText("45.8 L H₂O")).toBeInTheDocument();
   });
 
-  it("renders traceability score", () => {
+  it("renders transparency score", () => {
     render(
       <CollectiveCard
         card={mockCard}
@@ -108,7 +108,7 @@ describe("CollectiveCard", () => {
       />
     );
 
-    expect(screen.getByText("85% traceability")).toBeInTheDocument();
+    expect(screen.getByText("85% transparency")).toBeInTheDocument();
   });
 
   it("renders material tags", () => {

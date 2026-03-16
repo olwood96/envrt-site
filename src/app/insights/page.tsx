@@ -7,11 +7,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
   description:
-    "Guides and articles on Digital Product Passports, sustainability data, supply chain traceability, and fashion transparency. Expert insights from the ENVRT team.",
+    "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency. Expert insights from the ENVRT team.",
   openGraph: {
     title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
     description:
-      "Guides and articles on Digital Product Passports, sustainability data, supply chain traceability, and fashion transparency.",
+      "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency.",
     url: "https://envrt.com/insights",
     type: "website",
   },
@@ -37,7 +37,7 @@ export default function InsightsIndexPage() {
             Insights
           </h1>
           <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-            Insights on sustainability, traceability, and the future of fashion
+            Insights on sustainability, transparency, and the future of fashion
             transparency.
           </p>
 

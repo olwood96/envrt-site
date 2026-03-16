@@ -212,9 +212,9 @@ export function CollectiveCard({
                 )}
               </div>
             )}
-            {dpp.traceability_score != null && (
+            {dpp.transparency_score != null && (
               <span className="inline-flex items-center rounded-full bg-envrt-teal/5 px-2.5 py-1 text-[11px] font-medium text-envrt-teal">
-                {Math.round(dpp.traceability_score)}% traceability
+                {Math.round(dpp.transparency_score)}% transparency
               </span>
             )}
           </div>

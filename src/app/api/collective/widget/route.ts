@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     metrics: {
       totalEmissions: dpp.total_emissions,
       totalWater: dpp.total_water,
-      traceabilityScore: dpp.traceability_score,
+      transparencyScore: dpp.transparency_score,
       emissionsReductionPct: dpp.total_emissions_reduction_pct,
       waterReductionPct: dpp.total_water_reduction_pct,
     },

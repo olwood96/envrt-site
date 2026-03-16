@@ -130,7 +130,7 @@ export const outcomeCards = [
     stat: "Product-level",
     title: "Metrics your customers can see",
     description:
-      "CO₂e, water scarcity and traceability data attached to the product itself. Not buried in a brand report nobody reads.",
+      "CO₂e, water scarcity and transparency data attached to the product itself. Not buried in a brand report nobody reads.",
     cta: { label: "See live examples", href: "/collective" },
   },
   {
@@ -163,7 +163,7 @@ export const pricingPlans: PricingPlan[] = [
     features: [
       "Up to 25 DPP pages",
       "QR-ready passport pages",
-      "Traceability score per product",
+      "Transparency score per product",
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
       "CO₂e and AWARE water scarcity indicators",
@@ -229,9 +229,9 @@ export const pricingComparison = {
       ],
     },
     {
-      name: "Traceability and Evidence",
+      name: "Transparency and Evidence",
       features: [
-        { name: "Traceability score per product", starter: true, growth: true, pro: true },
+        { name: "Transparency score per product", starter: true, growth: true, pro: true },
         { name: "Evidence uploads and product documentation", starter: true, growth: true, pro: true },
         { name: "Stage-linked evidence library", starter: false, growth: true, pro: true },
       ],
@@ -322,7 +322,7 @@ export const pricingFaqItems = [
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes DPP creation, QR-ready passport pages, traceability scores, CO₂e indicators, and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
+      "Starter includes DPP creation, QR-ready passport pages, transparency scores, CO₂e indicators, and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",
@@ -360,7 +360,7 @@ export const roiFaqItems = [
   {
     question: "Can ENVRT replace a sustainability consultant?",
     answer:
-      "For DPP creation, lifecycle assessment metrics, and supply chain traceability, yes. The Pro plan includes a dedicated account specialist, supplier follow-up assistance, and eco-design strategy support, covering much of what an external consultant would provide.",
+      "For DPP creation, lifecycle assessment metrics, and supply chain transparency, yes. The Pro plan includes a dedicated account specialist, supplier follow-up assistance, and eco-design strategy support, covering much of what an external consultant would provide.",
   },
   {
     question: "How does the ROI calculator work?",

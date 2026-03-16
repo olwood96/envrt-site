@@ -7,7 +7,7 @@ export interface CollectiveDpp {
   garment_name: string;
   garment_mass_g: number;
   garment_type: string | null;
-  traceability_score: number | null;
+  transparency_score: number | null;
   total_emissions: number | null;
   total_water: number | null;
   total_emissions_reduction_pct: number | null;

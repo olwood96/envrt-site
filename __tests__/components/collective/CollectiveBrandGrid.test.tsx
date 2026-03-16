@@ -38,7 +38,7 @@ const makeCard = (id: string, name: string): CollectiveCardData => ({
     garment_name: name,
     garment_mass_g: 200,
     garment_type: "T-shirt",
-    traceability_score: 80,
+    transparency_score: 80,
     total_emissions: 3.0,
     total_water: 50,
     total_emissions_reduction_pct: null,

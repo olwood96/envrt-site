@@ -134,7 +134,7 @@ const sections: Section[] = [
   },
   {
     id: "supply-chain",
-    title: "Supply chain traceability",
+    title: "Supply chain transparency",
     description:
       "DPPs require verified data at every stage of production. This is where most brands fall short.",
     questions: [
@@ -536,7 +536,7 @@ function calculateScores(answers: Answers): Scores {
   const str = (key: string) => (a[key] as string) || "";
   const arr = (key: string) => (a[key] as string[]) || [];
 
-  // Dimension 1: Supply Chain Traceability (Q6-Q10)
+  // Dimension 1: Supply Chain Transparency (Q6-Q10)
   let sc = 0;
   sc += scoringRules.supplyChain.q6[str("q6")] ?? 0;
   sc += scoringRules.supplyChain.q7[str("q7")] ?? 0;
@@ -620,7 +620,7 @@ function getBand(overall: number) {
       headline:
         "You\u2019ve begun the compliance journey, but there\u2019s substantial ground to cover.",
       summary:
-        "Your brand has some foundations in place but significant gaps remain, particularly in supply chain traceability and structured product data. The good news is that brands at your stage typically achieve full compliance readiness within 3-6 months with the right tooling.",
+        "Your brand has some foundations in place but significant gaps remain, particularly in supply chain transparency and structured product data. The good news is that brands at your stage typically achieve full compliance readiness within 3-6 months with the right tooling.",
     };
   if (overall <= 65)
     return {
@@ -697,7 +697,7 @@ function getRecommendedActions(scores: Scores, answers: Answers): string[] {
   // Fill to at least 3 with general actions for lowest-scoring dimensions
   const generalActions: Record<string, string> = {
     supplyChain:
-      "Strengthen supplier relationships by establishing formal data-sharing agreements and gradually extending your traceability to deeper supply chain tiers.",
+      "Strengthen supplier relationships by establishing formal data-sharing agreements and gradually extending your transparency to deeper supply chain tiers.",
     productData:
       "Consolidate your product-level data into a single, structured format that can serve as the foundation for DPP generation as requirements crystallise.",
     regulatory:
@@ -1360,7 +1360,7 @@ export default function AssessmentPage() {
                     Dimension Scores
                   </h3>
                   <DimensionBar
-                    label="Supply Chain Traceability"
+                    label="Supply Chain Transparency"
                     score={scores.supplyChain}
                     animated={animateResults}
                     delay={200}

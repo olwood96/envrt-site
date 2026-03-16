@@ -88,9 +88,9 @@ export default async function WidgetPage({ params }: PageProps) {
                   {dpp.total_water.toFixed(1)} L H₂O
                 </span>
               )}
-              {dpp.traceability_score != null && (
+              {dpp.transparency_score != null && (
                 <span className="metric metric-trace">
-                  {Math.round(dpp.traceability_score)}% traceability
+                  {Math.round(dpp.transparency_score)}% transparency
                 </span>
               )}
             </div>

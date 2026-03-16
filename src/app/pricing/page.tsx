@@ -107,7 +107,7 @@ const pricingPlans = [
     features: [
       "Up to 25 DPP pages",
       "QR-ready passport pages",
-      "Traceability score per product",
+      "Transparency score per product",
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
       "CO\u2082e and AWARE water scarcity indicators",
@@ -176,9 +176,9 @@ const pricingComparison = {
       ],
     },
     {
-      name: "Traceability and Evidence",
+      name: "Transparency and Evidence",
       features: [
-        { name: "Traceability score per product", starter: true, growth: true, pro: true },
+        { name: "Transparency score per product", starter: true, growth: true, pro: true },
         { name: "Evidence uploads and product documentation", starter: true, growth: true, pro: true },
         { name: "Stage-linked evidence library", starter: false, growth: true, pro: true },
       ],
