@@ -27,7 +27,7 @@ export default function TermsPage() {
             Terms of service
           </h1>
           <p className="mt-4 text-sm text-envrt-muted">
-            Last updated: February 2026
+            Last updated: March 2026
           </p>
 
           <div className="mt-8 space-y-8 text-sm leading-relaxed text-envrt-charcoal/70">
@@ -328,6 +328,56 @@ export default function TermsPage() {
                   applicable law.
                 </li>
               </ul>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                Self-serve subscriptions
+              </h3>
+              <p>
+                Where you subscribe to a plan through our website, the following
+                additional terms apply:
+              </p>
+              <ul className="list-disc space-y-1 pl-5">
+                <li>
+                  Payments are processed securely by{" "}
+                  <a
+                    href="https://stripe.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-envrt-charcoal"
+                  >
+                    Stripe
+                  </a>
+                  . ENVRT does not store your card details. All payment data is handled
+                  in accordance with Stripe&apos;s security and privacy policies.
+                </li>
+                <li>
+                  Subscriptions are billed on a recurring basis (monthly or annually,
+                  depending on the plan selected at checkout).
+                </li>
+                <li>
+                  All subscriptions have a{" "}
+                  <strong>minimum commitment of 6&nbsp;months</strong>. You may not
+                  cancel your subscription before the minimum commitment period has
+                  elapsed. After the minimum commitment, subscriptions continue on a
+                  rolling basis until cancelled.
+                </li>
+                <li>
+                  If a scheduled payment fails, we will retry the charge in accordance
+                  with our payment provider&apos;s retry policy (typically up to
+                  4&nbsp;attempts within 7&nbsp;days). If all retry attempts fail, your
+                  subscription may be marked as overdue and access to the Services may
+                  be restricted until payment is resolved.
+                </li>
+                <li>
+                  You may update your payment method or billing details through the
+                  Stripe customer portal. A link can be provided on request.
+                </li>
+                <li>
+                  Pricing is displayed in the currency selected at checkout. Where a
+                  price is not available in the selected currency, we may charge in GBP
+                  at the equivalent rate.
+                </li>
+              </ul>
             </section>
 
             {/* ── 10. Disclaimers ── */}
@@ -421,6 +471,17 @@ export default function TermsPage() {
               </p>
               <ul className="list-disc space-y-1 pl-5">
                 <li>
+                  Self-serve subscriptions are subject to a minimum commitment period
+                  of 6&nbsp;months from the date of purchase (see Section&nbsp;9).
+                  Cancellation requests made before the minimum commitment period has
+                  elapsed will take effect at the end of the commitment period.
+                </li>
+                <li>
+                  After the minimum commitment period, you may cancel your subscription
+                  at any time. Cancellation will take effect at the end of the current
+                  billing period.
+                </li>
+                <li>
                   Either party may terminate for material breach if the breach is not
                   remedied within a reasonable period after written notice.
                 </li>
@@ -430,7 +491,7 @@ export default function TermsPage() {
                 </li>
                 <li>
                   On termination, your access to the dashboard will be removed. We
-                  will provide a reasonable window (30 days) for you to export your data.{" "}
+                  will provide a reasonable window (30&nbsp;days) for you to export your data.
                 </li>
                 <li>
                   After the export window, we will delete or anonymise your data in
