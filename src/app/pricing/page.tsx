@@ -387,20 +387,13 @@ export default function PricingPage() {
                 </ul>
 
                 <div className="mt-8 space-y-3">
-                  <Button
-                    href="/contact"
-                    variant={plan.highlighted ? "primary" : "secondary"}
-                    className="w-full"
-                  >
-                    {plan.cta}
-                  </Button>
                   <button
                     onClick={() => handleBuyNow(plan.slug)}
                     disabled={loadingPlan !== null}
-                    className={`flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-3 text-base font-medium transition-all duration-300 ${
+                    className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-base font-medium transition-all duration-300 ${
                       plan.highlighted
-                        ? "border-envrt-teal/30 bg-envrt-teal/5 text-envrt-teal hover:bg-envrt-teal/10"
-                        : "border-envrt-charcoal/10 bg-envrt-charcoal/[0.02] text-envrt-charcoal/70 hover:border-envrt-charcoal/20 hover:text-envrt-charcoal"
+                        ? "bg-envrt-teal text-white hover:bg-envrt-teal/90"
+                        : "bg-envrt-charcoal text-white hover:bg-envrt-charcoal/90"
                     } ${loadingPlan !== null ? "cursor-not-allowed opacity-50" : ""}`}
                   >
                     {loadingPlan === plan.slug ? (
@@ -415,6 +408,13 @@ export default function PricingPage() {
                       "Get started"
                     )}
                   </button>
+                  <Button
+                    href="/contact"
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    {plan.cta}
+                  </Button>
                 </div>
               </div>
             </StaggerItem>
