@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock Resend
-const mockSendEmail = vi.fn().mockResolvedValue({ id: "email-id" });
+const mockSendEmail = vi.fn().mockResolvedValue({ data: { id: "email-id" }, error: null });
 vi.mock("resend", () => ({
   Resend: class {
     emails = { send: mockSendEmail };
@@ -41,7 +41,7 @@ vi.mock("@/lib/supabase-admin", () => ({
   }),
 }));
 
-// Mock Stripe webhook verification
+// Mock Stripe webhook verification + validation functions
 vi.mock("@/lib/stripe", () => ({
   verifyWebhookSignature: (body: string, signature: string) => {
     if (signature === "valid-sig") {
@@ -49,6 +49,9 @@ vi.mock("@/lib/stripe", () => ({
     }
     return null;
   },
+  isValidPlan: (p: string) => ["starter", "growth", "pro"].includes(p),
+  isValidInterval: (i: string) => ["monthly", "annual"].includes(i),
+  isValidCurrency: (c: string) => ["gbp", "eur"].includes(c),
 }));
 
 import { POST } from "@/app/api/stripe/webhook/route";
@@ -68,53 +71,71 @@ function makeWebhookRequest(
   });
 }
 
-const checkoutCompletedEvent = {
-  type: "checkout.session.completed",
-  data: {
-    object: {
-      id: "cs_test_123",
-      customer_email: "brand@example.com",
-      customer: "cus_abc123",
-      subscription: "sub_xyz789",
-      metadata: {
-        plan: "growth",
-        interval: "monthly",
-        currency: "gbp",
-        term_months: "12",
+// Each event factory returns a fresh object with a unique ID for idempotency
+let eventCounter = 0;
+function uniqueId() {
+  return `evt_test_${++eventCounter}`;
+}
+
+function makeCheckoutCompletedEvent() {
+  return {
+    id: uniqueId(),
+    type: "checkout.session.completed",
+    data: {
+      object: {
+        id: "cs_test_123",
+        customer_email: "brand@example.com",
+        customer: "cus_abc123",
+        subscription: "sub_xyz789",
+        metadata: {
+          plan: "growth",
+          interval: "monthly",
+          currency: "gbp",
+          term_months: "12",
+        },
       },
     },
-  },
-};
+  };
+}
 
-const subscriptionUpdatedEvent = {
-  type: "customer.subscription.updated",
-  data: {
-    object: {
-      id: "sub_xyz789",
-      status: "past_due",
+function makeSubscriptionUpdatedEvent() {
+  return {
+    id: uniqueId(),
+    type: "customer.subscription.updated",
+    data: {
+      object: {
+        id: "sub_xyz789",
+        status: "past_due",
+      },
     },
-  },
-};
+  };
+}
 
-const subscriptionDeletedEvent = {
-  type: "customer.subscription.deleted",
-  data: {
-    object: {
-      id: "sub_xyz789",
-      status: "canceled",
+function makeSubscriptionDeletedEvent() {
+  return {
+    id: uniqueId(),
+    type: "customer.subscription.deleted",
+    data: {
+      object: {
+        id: "sub_xyz789",
+        status: "canceled",
+      },
     },
-  },
-};
+  };
+}
 
-const paymentFailedEvent = {
-  type: "invoice.payment_failed",
-  data: {
-    object: {
-      id: "in_test_456",
-      customer_email: "brand@example.com",
+function makePaymentFailedEvent() {
+  return {
+    id: uniqueId(),
+    type: "invoice.payment_failed",
+    data: {
+      object: {
+        id: "in_test_456",
+        customer_email: "brand@example.com",
+      },
     },
-  },
-};
+  };
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -127,7 +148,7 @@ describe("POST /api/stripe/webhook", () => {
     const req = new NextRequest("https://envrt.com/api/stripe/webhook", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(checkoutCompletedEvent),
+      body: JSON.stringify(makeCheckoutCompletedEvent()),
     });
     const res = await POST(req);
     expect(res.status).toBe(400);
@@ -137,14 +158,14 @@ describe("POST /api/stripe/webhook", () => {
 
   it("returns 400 for invalid signature", async () => {
     const res = await POST(
-      makeWebhookRequest(checkoutCompletedEvent, "invalid-sig")
+      makeWebhookRequest(makeCheckoutCompletedEvent(), "invalid-sig")
     );
     expect(res.status).toBe(400);
   });
 
   describe("checkout.session.completed", () => {
     it("writes subscription to Supabase", async () => {
-      const res = await POST(makeWebhookRequest(checkoutCompletedEvent));
+      const res = await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
       expect(res.status).toBe(200);
 
       expect(mockInsert).toHaveBeenCalledWith(
@@ -163,7 +184,7 @@ describe("POST /api/stripe/webhook", () => {
     });
 
     it("generates invite link via Supabase Auth", async () => {
-      await POST(makeWebhookRequest(checkoutCompletedEvent));
+      await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
       expect(mockGenerateLink).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "invite",
@@ -173,7 +194,7 @@ describe("POST /api/stripe/webhook", () => {
     });
 
     it("sends welcome email via Resend", async () => {
-      await POST(makeWebhookRequest(checkoutCompletedEvent));
+      await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
       // Welcome email + admin notification = 2 emails
       expect(mockSendEmail).toHaveBeenCalledTimes(2);
       // First call is welcome email
@@ -182,7 +203,7 @@ describe("POST /api/stripe/webhook", () => {
     });
 
     it("sends admin notification email", async () => {
-      await POST(makeWebhookRequest(checkoutCompletedEvent));
+      await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
       // Second call is admin notification
       const adminCall = mockSendEmail.mock.calls[1][0];
       expect(adminCall.to).toBe("info@envrt.com");
@@ -193,7 +214,7 @@ describe("POST /api/stripe/webhook", () => {
 
   describe("customer.subscription.updated", () => {
     it("updates subscription status in Supabase", async () => {
-      const res = await POST(makeWebhookRequest(subscriptionUpdatedEvent));
+      const res = await POST(makeWebhookRequest(makeSubscriptionUpdatedEvent()));
       expect(res.status).toBe(200);
       expect(mockUpdate).toHaveBeenCalled();
     });
@@ -201,7 +222,7 @@ describe("POST /api/stripe/webhook", () => {
 
   describe("customer.subscription.deleted", () => {
     it("marks subscription as cancelled", async () => {
-      const res = await POST(makeWebhookRequest(subscriptionDeletedEvent));
+      const res = await POST(makeWebhookRequest(makeSubscriptionDeletedEvent()));
       expect(res.status).toBe(200);
       expect(mockUpdate).toHaveBeenCalled();
     });
@@ -209,7 +230,7 @@ describe("POST /api/stripe/webhook", () => {
 
   describe("invoice.payment_failed", () => {
     it("sends admin notification", async () => {
-      const res = await POST(makeWebhookRequest(paymentFailedEvent));
+      const res = await POST(makeWebhookRequest(makePaymentFailedEvent()));
       expect(res.status).toBe(200);
       expect(mockSendEmail).toHaveBeenCalledTimes(1);
       expect(mockSendEmail.mock.calls[0][0].subject).toContain(
@@ -220,6 +241,7 @@ describe("POST /api/stripe/webhook", () => {
 
   it("acknowledges unhandled event types", async () => {
     const unknownEvent = {
+      id: uniqueId(),
       type: "some.unknown.event",
       data: { object: {} },
     };

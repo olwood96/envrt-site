@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import Stripe from "stripe";
-import { verifyWebhookSignature } from "@/lib/stripe";
+import { verifyWebhookSignature, isValidPlan, isValidInterval, isValidCurrency } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { escapeHtml } from "@/lib/form-security";
+
+// In-memory set of processed event IDs to prevent duplicate handling.
+// Stripe can retry webhooks, so we track which events we've already processed.
+const processedEvents = new Set<string>();
+const MAX_PROCESSED_EVENTS = 10_000;
+
+function markEventProcessed(eventId: string): boolean {
+  if (processedEvents.has(eventId)) return false; // already processed
+  if (processedEvents.size >= MAX_PROCESSED_EVENTS) {
+    // Evict oldest entries (Sets iterate in insertion order)
+    const first = processedEvents.values().next().value;
+    if (first) processedEvents.delete(first);
+  }
+  processedEvents.add(eventId);
+  return true; // first time processing
+}
 
 // Stripe sends the raw body; we must read it as text for signature verification
 export async function POST(request: NextRequest) {
@@ -16,6 +32,11 @@ export async function POST(request: NextRequest) {
   const event = verifyWebhookSignature(body, signature);
   if (!event) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
+  // Idempotency: skip events we've already processed
+  if (!markEventProcessed(event.id)) {
+    return NextResponse.json({ received: true, deduplicated: true });
   }
 
   try {
@@ -61,10 +82,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   const metadata = session.metadata || {};
-  const plan = metadata.plan || "starter";
-  const interval = metadata.interval || "monthly";
-  const currency = metadata.currency || "gbp";
+  const plan = isValidPlan(metadata.plan || "") ? metadata.plan! : "starter";
+  const interval = isValidInterval(metadata.interval || "") ? metadata.interval! : "monthly";
+  const currency = isValidCurrency(metadata.currency || "") ? metadata.currency! : "gbp";
   const termMonths = parseInt(metadata.term_months || "12", 10);
+
+  if (isNaN(termMonths) || termMonths < 1 || termMonths > 120) {
+    console.error("Invalid term_months in metadata:", metadata.term_months);
+    return;
+  }
 
   const stripeCustomerId =
     typeof session.customer === "string"
@@ -74,6 +100,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     typeof session.subscription === "string"
       ? session.subscription
       : session.subscription?.id;
+
+  if (!stripeCustomerId || !stripeSubscriptionId) {
+    console.error("Missing customer or subscription ID in checkout session", session.id);
+    return;
+  }
 
   const supabase = getSupabaseAdmin();
 
@@ -195,7 +226,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   const resend = new Resend(apiKey);
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: "ENVRT Payments <hello@envrt.com>",
     to: "info@envrt.com",
     bcc: ["charlie@envrt.com", "oliver@envrt.com"],
@@ -209,6 +240,10 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       </div>
     `,
   });
+
+  if (sendError) {
+    console.error("Failed to send payment failure notification:", sendError);
+  }
 }
 
 // ── Email helpers ─────────────────────────────────────────────────────────
@@ -233,12 +268,17 @@ async function sendWelcomeEmail(
   const resend = new Resend(apiKey);
   const planLabel = PLAN_LABELS[plan] || plan;
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: "ENVRT <hello@envrt.com>",
     to: email,
     subject: `Welcome to ENVRT — your ${planLabel} plan is active`,
     html: buildWelcomeHtml(email, planLabel, inviteUrl),
   });
+
+  if (sendError) {
+    console.error("Failed to send welcome email:", sendError);
+    throw new Error(`Welcome email failed for ${email}: ${sendError.message}`);
+  }
 }
 
 async function sendAdminNotification(
@@ -254,7 +294,7 @@ async function sendAdminNotification(
   const resend = new Resend(apiKey);
   const planLabel = PLAN_LABELS[plan] || plan;
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: "ENVRT Payments <hello@envrt.com>",
     to: "info@envrt.com",
     bcc: ["charlie@envrt.com", "oliver@envrt.com"],
@@ -272,6 +312,10 @@ async function sendAdminNotification(
       </div>
     `,
   });
+
+  if (sendError) {
+    console.error("Failed to send admin notification:", sendError);
+  }
 }
 
 function buildWelcomeHtml(

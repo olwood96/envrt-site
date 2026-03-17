@@ -73,3 +73,8 @@ CREATE TRIGGER subscriptions_updated_at
   BEFORE UPDATE ON subscriptions
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+
+-- 4. Ensure brand slug uniqueness (run if constraint doesn't already exist)
+-- This prevents race conditions in the onboarding approval flow
+ALTER TABLE brands ADD CONSTRAINT brands_slug_unique UNIQUE (slug);
