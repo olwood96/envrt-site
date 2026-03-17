@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
+import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -94,7 +94,7 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
                 if (status === "error") setStatus("idle");
               }}
               disabled={status === "submitting" || status === "success"}
-              className="min-w-0 flex-1 rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-2.5 text-sm text-envrt-charcoal placeholder:text-envrt-muted/50 focus:border-envrt-teal/30 focus:outline-none focus:ring-2 focus:ring-envrt-teal/10 disabled:opacity-60"
+              className="min-w-0 flex-1 rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-2.5 text-sm text-envrt-charcoal placeholder:text-envrt-muted focus:border-envrt-teal/30 focus:outline-none focus:ring-2 focus:ring-envrt-teal/10 disabled:opacity-60"
             />
             <button
               type="submit"
@@ -109,11 +109,7 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
                 "Subscribe"
               )}
             </button>
-            <div className="h-[36px] w-[165px] shrink-0 overflow-hidden">
-              <div className="origin-top-left scale-[0.55]">
-                <TurnstileWidget onToken={setTurnstileToken} />
-              </div>
-            </div>
+            <HiddenTurnstile onToken={setTurnstileToken} />
           </div>
         </form>
         {message && (
@@ -155,7 +151,7 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
               if (status === "error") setStatus("idle");
             }}
             disabled={status === "submitting" || status === "success"}
-            className="min-w-0 flex-1 rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-2 text-sm text-envrt-charcoal placeholder:text-envrt-muted/50 focus:border-envrt-teal/30 focus:outline-none focus:ring-2 focus:ring-envrt-teal/10 disabled:opacity-60"
+            className="min-w-0 flex-1 rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-2 text-sm text-envrt-charcoal placeholder:text-envrt-muted focus:border-envrt-teal/30 focus:outline-none focus:ring-2 focus:ring-envrt-teal/10 disabled:opacity-60"
           />
           <button
             type="submit"
@@ -170,11 +166,7 @@ export function CollectiveSubscribe({ variant = "compact" }: Props) {
               "Subscribe"
             )}
           </button>
-          <div className="h-[36px] w-[165px] shrink-0 overflow-hidden">
-            <div className="origin-top-left scale-[0.55]">
-              <TurnstileWidget onToken={setTurnstileToken} />
-            </div>
-          </div>
+          <HiddenTurnstile onToken={setTurnstileToken} />
         </div>
       </form>
       {status === "error" && message && (

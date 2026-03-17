@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
-import { TurnstileWidget } from "@/components/ui/TurnstileWidget";
+import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 /* ── Custom Dropdown ──────────────────────────────────────────────────── */
 
@@ -256,7 +256,7 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <TurnstileWidget onToken={setTurnstileToken} className="flex justify-center" />
+                  <HiddenTurnstile onToken={setTurnstileToken} className="justify-center" />
 
                   {error && (
                     <p className="text-center text-sm text-red-600">
