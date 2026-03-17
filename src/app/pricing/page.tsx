@@ -118,7 +118,7 @@ const pricingPlans = [
       "DPP scan and engagement analytics",
       "Email support with onboarding call",
     ],
-    cta: "Get Started",
+    cta: "Get in touch",
     highlighted: false,
   },
   {
@@ -142,7 +142,7 @@ const pricingPlans = [
       "Collection summaries with CSV/PDF exports",
       "Priority support",
     ],
-    cta: "Get Started",
+    cta: "Get in touch",
     highlighted: true,
   },
   {
@@ -162,7 +162,7 @@ const pricingPlans = [
       "Supplier follow-up and data-chasing assistance",
       "Fast-response SLA with weekly reviews",
     ],
-    cta: "Get Started",
+    cta: "Get in touch",
     highlighted: false,
   },
 ] as const;
@@ -412,7 +412,7 @@ export default function PricingPage() {
                         Loading...
                       </>
                     ) : (
-                      "Buy now"
+                      "Get started"
                     )}
                   </button>
                 </div>
