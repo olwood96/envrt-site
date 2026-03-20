@@ -167,13 +167,8 @@ export function CollectiveCard({
         <div className="flex flex-1 flex-col px-5 pb-5 pt-3">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-widest text-envrt-teal">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-teal">
                 {brand.name}
-                {brand.verified_at && (
-                  <svg className="h-3 w-3 text-envrt-teal" viewBox="0 0 20 20" fill="currentColor" aria-label="Verified brand">
-                    <path fillRule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
-                  </svg>
-                )}
               </p>
               <Link href={detailUrl}>
                 <h3 className="mt-1 text-[15px] font-semibold leading-snug text-envrt-charcoal group-hover:text-envrt-green">

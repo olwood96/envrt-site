@@ -6,12 +6,14 @@ import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { ComparisonSection } from "@/components/sections/ComparisonSection";
 import { TrustedBySection } from "@/components/sections/TrustedBySection";
+import { ImpactTrackerSection } from "@/components/sections/ImpactTrackerSection";
 import { PricingPreviewSection } from "@/components/sections/PricingPreviewSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { StickyNudge } from "@/components/ui/StickyNudge";
 import { faqItems } from "@/lib/config";
+import { getImpactData } from "@/lib/impact-tracker";
 
 export const metadata: Metadata = {
   alternates: {
@@ -19,7 +21,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export const revalidate = 3600;
+
+export default async function HomePage() {
+  const impactData = await getImpactData();
+
   return (
     <>
       <FAQJsonLd items={faqItems} />
@@ -30,6 +36,7 @@ export default function HomePage() {
       <OutcomesSection />
       <ComparisonSection />
       <TrustedBySection />
+      <ImpactTrackerSection data={impactData} />
       <PricingPreviewSection />
       <FAQSection />
       <FinalCTASection />

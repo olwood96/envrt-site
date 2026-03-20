@@ -93,20 +93,6 @@ export default async function BrandProfilePage({ params }: PageProps) {
               <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
                 {brand.name}
               </h1>
-              {brand.verified_at && (
-                <svg className="h-6 w-6 text-envrt-teal" viewBox="0 0 20 20" fill="currentColor" aria-label="Verified brand">
-                  <path fillRule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
-                </svg>
-              )}
-              {brand.tier !== "free" && (
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-                  brand.tier === "premium"
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-envrt-teal/10 text-envrt-teal"
-                }`}>
-                  {brand.tier}
-                </span>
-              )}
             </div>
             <p className="mt-1 text-sm text-envrt-muted">
               {cards.length} featured product{cards.length !== 1 ? "s" : ""} on ENVRT
