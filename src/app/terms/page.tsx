@@ -410,6 +410,40 @@ export default function TermsPage() {
                 We work to make the platform as useful and reliable as possible, but
                 we cannot promise that it will always be error-free or uninterrupted.
               </p>
+              <p>
+                <strong>Verification levels.</strong> Outputs may include
+                verification labels such as &quot;declared&quot;,
+                &quot;modelled&quot;, &quot;validated&quot;, or
+                &quot;verified&quot; to describe the basis of individual data
+                points within a product&apos;s supply chain. These labels reflect
+                the nature and quality of the supporting evidence available at the
+                time of assessment. &quot;Declared&quot; and &quot;modelled&quot;
+                indicate that the data was provided by the brand or derived from
+                secondary sources and industry databases.
+                &quot;Validated&quot; indicates that ENVRT has reviewed available
+                supporting evidence, which may include supplier engagement and
+                cross-referencing against known data sources, but this does not
+                constitute formal third-party certification.
+                &quot;Verified&quot; indicates that the data has been independently
+                verified by a qualified third party. ENVRT does not independently
+                verify the accuracy of data provided by brands or their supply
+                chains. Brands are responsible for ensuring that the information
+                they provide is accurate and supportable. Consumers viewing Digital
+                Product Passport pages should be aware that the environmental data
+                presented is based on the best available information at the time of
+                assessment and may be subject to change as new data becomes
+                available.
+              </p>
+              <p>
+                <strong>Methodology.</strong> ENVRT&apos;s lifecycle modelling
+                methodology is aligned with recognised frameworks including ISO
+                14040/14044 and the EU Product Environmental Footprint Category
+                Rules (PEFCR) for apparel and footwear. &quot;Aligned with&quot;
+                means the methodology follows the principles and structure of these
+                standards. It does not mean that ENVRT&apos;s methodology, platform,
+                or Outputs have been independently certified, accredited, or audited
+                against these standards by a third-party body.
+              </p>
             </section>
 
             {/* ── 11. Limitation of liability ── */}
