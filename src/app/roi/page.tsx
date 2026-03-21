@@ -748,6 +748,9 @@ export default function ROICalculatorPage() {
                         </li>
                       ))}
                     </ul>
+                    <p className="mt-5 border-t border-envrt-charcoal/5 pt-4 text-xs leading-relaxed text-envrt-muted">
+                      Most DPP platforms charge £300+/mo before lifecycle data. ENVRT includes it from £149.
+                    </p>
                   </div>
                 </SectionCard>
                 <SectionCard>
