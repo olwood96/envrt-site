@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ImpactStats } from "@/lib/impact-stats";
-import { supabase } from "@/lib/supabase";
 import { useIntersectionOnce } from "@/hooks/useIntersectionOnce";
 import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
@@ -12,8 +11,16 @@ import { FadeUp } from "../ui/Motion";
 function useCountUp(target: number, started: boolean, duration = 2000) {
   const [value, setValue] = useState(0);
   const rafRef = useRef(0);
+  const doneRef = useRef(false);
 
   useEffect(() => {
+    // After initial animation completes, pass through updates directly
+    // (FlipDigit handles the visual transition for incremental changes)
+    if (doneRef.current) {
+      setValue(target);
+      return;
+    }
+
     if (!started || target === 0) {
       setValue(target);
       return;
@@ -25,18 +32,22 @@ function useCountUp(target: number, started: boolean, duration = 2000) {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) {
       setValue(target);
+      doneRef.current = true;
       return;
     }
 
     const t0 = performance.now();
+    const animTarget = target;
     function tick() {
       const elapsed = performance.now() - t0;
       const progress = Math.min(elapsed / duration, 1);
       // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * target));
+      setValue(Math.round(eased * animTarget));
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
+      } else {
+        doneRef.current = true;
       }
     }
     rafRef.current = requestAnimationFrame(tick);
@@ -168,38 +179,27 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
   const animatedWater = useCountUp(water, visible);
   const animatedScans = useCountUp(scans, visible);
 
-  // Realtime subscription — increment counters on new DPP views
-  const lookupRef = useRef(initialStats.dppLookup);
+  // Poll for updated stats every 30s (server-side fetch, no anon SELECT needed)
   useEffect(() => {
-    lookupRef.current = initialStats.dppLookup;
-  }, [initialStats.dppLookup]);
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/impact-stats");
+        if (!res.ok) return;
+        const data: ImpactStats = await res.json();
+        setCo2(data.co2Kg);
+        setWater(data.waterLitres);
+        setScans(data.dppScans);
+      } catch {
+        // Silently ignore — next poll will retry
+      }
+    }, 30_000);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("impact-stats")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "dpp_views" },
-        (payload) => {
-          const row = payload.new as { dpp_generated_id?: string };
-          if (!row.dpp_generated_id) return;
-
-          const dpp = lookupRef.current[row.dpp_generated_id];
-          setScans((prev) => prev + 1);
-          if (dpp) {
-            setCo2((prev) => Math.round(prev + dpp.co2));
-            setWater((prev) => Math.round(prev + dpp.water));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => clearInterval(interval);
   }, []);
 
-  if (initialStats.dppScans === 0) return null;
+  if (initialStats.co2Kg === 0 && initialStats.waterLitres === 0 && initialStats.dppScans === 0) {
+    return null;
+  }
 
   return (
     <section ref={sectionRef} className="py-12 sm:py-16">
@@ -213,12 +213,12 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
             <StatColumn
               value={animatedCo2}
               unit="kg"
-              label="CO₂e impact explored"
+              label="CO₂e impact tracked"
             />
             <StatColumn
               value={animatedWater}
               unit="L"
-              label="Water impact explored"
+              label="Water impact tracked"
             />
             <StatColumn
               value={animatedScans}

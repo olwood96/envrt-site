@@ -107,6 +107,12 @@ export default async function WidgetPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+        {/* Record embed view */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `fetch("/api/dpp-view",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dppId:"${dpp.id.replace(/[^a-f0-9-]/gi, "")}"}),keepalive:true}).catch(function(){});`,
+          }}
+        />
       </body>
     </html>
   );
