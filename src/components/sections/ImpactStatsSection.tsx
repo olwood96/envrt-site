@@ -213,12 +213,12 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
             <StatColumn
               value={animatedCo2}
               unit="kg"
-              label="CO₂e impact tracked"
+              label="CO₂e impact explored"
             />
             <StatColumn
               value={animatedWater}
               unit="L"
-              label="Water impact tracked"
+              label="Water impact explored"
             />
             <StatColumn
               value={animatedScans}

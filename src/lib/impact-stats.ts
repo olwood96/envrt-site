@@ -16,30 +16,44 @@ export async function fetchImpactStats(): Promise<ImpactStats> {
   try {
     const supabase = getSupabaseAdmin();
 
-    // 1. Sum emissions/water across ALL DPPs created on the platform
+    // 1. Build lookup: DPP ID → { co2, water }
     const { data: dpps, error: dppsError } = await supabase
       .from("dpp_generated")
-      .select("total_emissions, total_water")
+      .select("id, total_emissions, total_water")
       .is("deleted_at", null);
 
     if (dppsError || !dpps?.length) return EMPTY;
 
-    let co2Kg = 0;
-    let waterLitres = 0;
+    const dppLookup: Record<string, { co2: number; water: number }> = {};
     for (const dpp of dpps) {
-      co2Kg += dpp.total_emissions ?? 0;
-      waterLitres += dpp.total_water ?? 0;
+      dppLookup[dpp.id] = {
+        co2: dpp.total_emissions ?? 0,
+        water: dpp.total_water ?? 0,
+      };
     }
 
-    // 2. Count all DPP views (QR scans + embed views)
-    const { count: dppScans } = await supabase
+    // 2. Get all views and sum emissions/water per scan ("explored" totals)
+    const { data: views, error: viewsError } = await supabase
       .from("dpp_views")
-      .select("id", { count: "exact", head: true });
+      .select("dpp_generated_id");
+
+    if (viewsError) return EMPTY;
+
+    const dppScans = views?.length ?? 0;
+    let co2Kg = 0;
+    let waterLitres = 0;
+    for (const view of views ?? []) {
+      const dpp = dppLookup[view.dpp_generated_id];
+      if (dpp) {
+        co2Kg += dpp.co2;
+        waterLitres += dpp.water;
+      }
+    }
 
     return {
       co2Kg: Math.round(co2Kg),
       waterLitres: Math.round(waterLitres),
-      dppScans: dppScans ?? 0,
+      dppScans,
     };
   } catch (err) {
     console.error("[impact-stats] unexpected error:", err);
