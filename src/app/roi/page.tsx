@@ -40,12 +40,20 @@ interface CalcResults {
    CALCULATION LOGIC
    ================================================================ */
 
-// Map data maturity to estimated hours per product
-const DATA_MATURITY_HOURS: Record<DataMaturity, number> = {
-  "not-started": 8,
-  manual: 6,
-  "some-systems": 4,
-  digitised: 2,
+// Data maturity affects how much work consultants/in-house need per product
+const DATA_MATURITY_MULTIPLIER: Record<DataMaturity, number> = {
+  "not-started": 1.4,
+  manual: 1.0,
+  "some-systems": 0.75,
+  digitised: 0.5,
+};
+
+// Current approach affects which comparison is most relevant
+const APPROACH_WEIGHT: Record<Approach, { consultant: number; inhouse: number }> = {
+  none: { consultant: 1.0, inhouse: 1.0 },
+  spreadsheets: { consultant: 1.0, inhouse: 1.0 },
+  consultant: { consultant: 1.0, inhouse: 0.7 },
+  inhouse: { consultant: 0.7, inhouse: 1.0 },
 };
 
 function calculateROI(inputs: CalcInputs): CalcResults {
@@ -82,14 +90,18 @@ function calculateROI(inputs: CalcInputs): CalcResults {
     inhouseSalary = 67000;
   }
 
-  // Consultant cost
+  // Consultant cost — diminishing returns at scale (batching, template reuse)
   const marketMultiplier = inputs.market === "both" ? 1.3 : 1.0;
-  const consultantDays = 5 + inputs.skuCount * 1.5;
+  const maturityMultiplier = DATA_MATURITY_MULTIPLIER[inputs.dataMaturity];
+  const approachWeight = APPROACH_WEIGHT[inputs.approach];
+  const effectiveDaysPerProduct = 1.5 * maturityMultiplier / (1 + inputs.skuCount / 120);
+  const consultantDays = 5 + inputs.skuCount * effectiveDaysPerProduct;
   const consultantCost =
-    consultantDays * consultantDayRate * marketMultiplier;
+    consultantDays * consultantDayRate * marketMultiplier * approachWeight.consultant;
 
-  // In-house cost (salary + overhead)
-  const inhouseCost = inhouseSalary;
+  // In-house cost (salary + overhead, adjusted by data maturity and approach)
+  const inhouseMaturityBonus = inputs.dataMaturity === "digitised" ? 0.85 : inputs.dataMaturity === "some-systems" ? 0.9 : 1.0;
+  const inhouseCost = Math.round(inhouseSalary * inhouseMaturityBonus * approachWeight.inhouse);
 
   // Savings
   const savingVsConsultant = Math.max(0, consultantCost - envrtCost);
@@ -540,7 +552,6 @@ export default function ROICalculatorPage() {
                               turnstileToken,
                               skuCount,
                               dataMaturity,
-                              hoursPerProduct: DATA_MATURITY_HOURS[dataMaturity],
                               market,
                               approach,
                               ...results,
@@ -713,18 +724,24 @@ export default function ROICalculatorPage() {
               <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <SectionCard>
                   <div className="p-6">
-                    <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                      Why ENVRT
+                    <h3 className="mb-1 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                      What&apos;s included at this price
                     </h3>
+                    <p className="mb-4 text-xs text-envrt-muted">
+                      Other platforms charge separately for LCA or don&apos;t offer it at all.
+                    </p>
                     <ul className="space-y-2.5">
                       {[
-                        "First DPP live same day",
-                        "Regulation updates built in",
-                        "Full dashboard included",
-                        "Scales with your plan",
+                        "Product-level LCA data included, not an add-on",
+                        "CO₂e and water scarcity metrics, not just material declarations",
+                        "Supply chain reconstruction built into every assessment",
+                        "Scan analytics and engagement data per product",
+                        ...(results.envrtPlan !== "Starter"
+                          ? ["Hotspot detection across lifecycle stages"]
+                          : []),
                       ].map((item) => (
-                        <li key={item} className="flex items-center gap-2">
-                          <svg className="h-4 w-4 flex-shrink-0 text-envrt-teal" viewBox="0 0 16 16" fill="currentColor">
+                        <li key={item} className="flex items-start gap-2">
+                          <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-envrt-teal" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
                           </svg>
                           <span className="text-sm text-envrt-charcoal">{item}</span>
@@ -823,11 +840,11 @@ export default function ROICalculatorPage() {
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">Consultant cost:</strong>{" "}
-                        Calculated as (5 setup days + {skuCount} products x 1.5 days each) x day rate{market === "both" ? " x 1.3 dual-market multiplier" : ""}. Day rates scale with brand size: £500/day (up to 50 products), £650/day (51-250), £800/day (250+).
+                        Based on 5 setup days plus per-product effort with diminishing returns at scale (reflecting template reuse and batching). Adjusted for data maturity and{market === "both" ? " a 1.3x dual-market multiplier" : " target market"}. Day rates scale with brand size: £500/day (up to 50 products), £650/day (51-250), £800/day (250+).
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">In-house cost:</strong>{" "}
-                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 50 products), £55k (51-250), £67k (250+).
+                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 50 products), £55k (51-250), £67k (250+). Adjusted for data maturity.
                       </p>
                       <p className="pt-2 text-envrt-muted/60">
                         These are estimates for illustration only and may vary based on your specific circumstances.
