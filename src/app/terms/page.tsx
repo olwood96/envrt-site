@@ -612,21 +612,11 @@ export default function TermsPage() {
               </p>
               <ul className="list-disc space-y-1 pl-5">
                 <li>
-                  <strong>Support:</strong>{" "}
                   <a
-                    href="mailto:hello@envrt.com"
+                    href="mailto:info@envrt.com"
                     className="underline hover:text-envrt-charcoal"
                   >
-                    hello@envrt.com
-                  </a>
-                </li>
-                <li>
-                  <strong>Legal and privacy:</strong>{" "}
-                  <a
-                    href="mailto:privacy@envrt.com"
-                    className="underline hover:text-envrt-charcoal"
-                  >
-                    privacy@envrt.com
+                    info@envrt.com
                   </a>
                 </li>
               </ul>

@@ -491,10 +491,10 @@ export default function PrivacyPage() {
               </p>
               <p>
                 <a
-                  href="mailto:privacy@envrt.com"
+                  href="mailto:info@envrt.com"
                   className="underline hover:text-envrt-charcoal"
                 >
-                  privacy@envrt.com
+                  info@envrt.com
                 </a>
               </p>
               {/* Replace with your registered company address */}
