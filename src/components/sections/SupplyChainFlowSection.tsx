@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useIntersectionOnce } from "@/hooks/useIntersectionOnce";
 
 /* ——— Editable final metric values ——— */
 const FINAL_CO2 = 6.3; // kg CO₂-eq
@@ -23,25 +24,6 @@ const FULL_LOWER_PATH = "M60 82 L180 82 L300 82 L300 55 L420 55 L540 55";
 const UPPER_LEN = 500;
 const LOWER_LEN = 500;
 const MAIN_LEN = 300;
-
-function useIntersectionOnce(ref: React.RefObject<HTMLElement | null>) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [ref]);
-  return visible;
-}
 
 /* Helper: get point at fractional length along an SVG path */
 function getPointAtFraction(
