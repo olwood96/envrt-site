@@ -161,7 +161,7 @@ export const pricingPlans: PricingPlan[] = [
     period: "/month",
     description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
-      "Up to 25 DPP pages",
+      "Up to 50 products/SKUs",
       "QR-ready passport pages",
       "Transparency score per product",
       "Evidence uploads and product documentation",
@@ -180,7 +180,7 @@ export const pricingPlans: PricingPlan[] = [
     period: "/month",
     description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
-      "Up to 100 DPP pages",
+      "Up to 250 products/SKUs",
       "Expanded product data in DPP",
       "Core LCA metrics beyond indicators",
       "Process-level supply chain reconstruction",
@@ -203,7 +203,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
-      "Custom DPP allocation",
+      "Custom product/SKU allocation",
       "Complete PEF-aligned metrics",
       "Advanced modelling and optimisation frameworks",
       "Seasonal product-line impact reports",
@@ -222,7 +222,7 @@ export const pricingComparison = {
     {
       name: "DPP Creation",
       features: [
-        { name: "DPP page allocation", starter: "Up to 25", growth: "Up to 100", pro: "Custom" },
+        { name: "Product/SKU allocation", starter: "Up to 50", growth: "Up to 250", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
         { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
@@ -317,7 +317,7 @@ export const pricingFaqItems = [
   {
     question: "How much does a Digital Product Passport cost?",
     answer:
-      "ENVRT offers three plans: Starter at £149/month for up to 25 DPPs, Growth at £495/month for up to 100 DPPs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support.",
+      "ENVRT offers three plans: Starter at £149/month for up to 50 products/SKUs, Growth at £495/month for up to 250 products/SKUs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support.",
   },
   {
     question: "What's included in each ENVRT plan?",

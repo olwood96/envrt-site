@@ -24,7 +24,7 @@ const PRICING_PLANS: PricingPlan[] = [
     description:
       "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
-      "Up to 25 DPP pages",
+      "Up to 50 products/SKUs",
       "QR-ready passport pages",
       "Transparency score per product",
       "Evidence uploads and product documentation",
@@ -42,7 +42,7 @@ const PRICING_PLANS: PricingPlan[] = [
     description:
       "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
-      "Up to 100 DPP pages",
+      "Up to 250 products/SKUs",
       "Expanded product data in DPP",
       "Core LCA metrics beyond indicators",
       "Process-level supply chain reconstruction",
@@ -62,7 +62,7 @@ const PRICING_PLANS: PricingPlan[] = [
     description:
       "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
-      "Custom DPP allocation",
+      "Custom product/SKU allocation",
       "Complete PEF-aligned metrics",
       "Advanced modelling and optimisation frameworks",
       "Seasonal product-line impact reports",

@@ -20,7 +20,7 @@ export function SoftwareApplicationJsonLd() {
           1
         ).toISOString().split("T")[0],
         description:
-          "Up to 25 DPP pages, QR-ready passport pages, transparency scores, CO₂e and water scarcity indicators.",
+          "Up to 50 products/SKUs, QR-ready passport pages, transparency scores, CO₂e and water scarcity indicators.",
       },
       {
         "@type": "Offer",
@@ -33,7 +33,7 @@ export function SoftwareApplicationJsonLd() {
           1
         ).toISOString().split("T")[0],
         description:
-          "Up to 100 DPP pages, core LCA metrics, hotspot detection, product comparisons, and priority support.",
+          "Up to 250 products/SKUs, core LCA metrics, hotspot detection, product comparisons, and priority support.",
       },
       {
         "@type": "Offer",
@@ -46,7 +46,7 @@ export function SoftwareApplicationJsonLd() {
           1
         ).toISOString().split("T")[0],
         description:
-          "Custom DPP allocation, complete PEF-aligned metrics, advanced modelling, dedicated account specialist.",
+          "Custom product/SKU allocation, complete PEF-aligned metrics, advanced modelling, dedicated account specialist.",
       },
     ],
   };

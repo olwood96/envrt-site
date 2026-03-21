@@ -53,11 +53,11 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   let envrtMonthly: number;
   let envrtPlan: string;
   let envrtPlanPrice: string;
-  if (inputs.skuCount <= 25) {
+  if (inputs.skuCount <= 50) {
     envrtMonthly = 149;
     envrtPlan = "Starter";
     envrtPlanPrice = "£149/mo";
-  } else if (inputs.skuCount <= 100) {
+  } else if (inputs.skuCount <= 250) {
     envrtMonthly = 495;
     envrtPlan = "Growth";
     envrtPlanPrice = "£495/mo";
@@ -71,10 +71,10 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   // Derive day rate and salary from SKU count (proxy for brand scale)
   let consultantDayRate: number;
   let inhouseSalary: number;
-  if (inputs.skuCount <= 25) {
+  if (inputs.skuCount <= 50) {
     consultantDayRate = 500;
     inhouseSalary = 43000;
-  } else if (inputs.skuCount <= 100) {
+  } else if (inputs.skuCount <= 250) {
     consultantDayRate = 650;
     inhouseSalary = 55000;
   } else {
@@ -270,7 +270,7 @@ export default function ROICalculatorPage() {
 
   // Calculator inputs
   const [turnstileToken, setTurnstileToken] = useState("");
-  const [skuCount, setSkuCount] = useState(25);
+  const [skuCount, setSkuCount] = useState(50);
   const [dataMaturity, setDataMaturity] = useState<DataMaturity>("manual");
   const [market, setMarket] = useState<Market>("both");
   const [approach, setApproach] = useState<Approach>("spreadsheets");
@@ -819,15 +819,15 @@ export default function ROICalculatorPage() {
                     <div className="space-y-3 text-xs leading-relaxed text-envrt-muted">
                       <p>
                         <strong className="text-envrt-charcoal">ENVRT pricing:</strong>{" "}
-                        Based on published plan rates. Starter (up to 25 products) at £149/mo, Growth (up to 100) at £495/mo, Pro (100+) at £1,295/mo.
+                        Based on published plan rates. Starter (up to 50 products) at £149/mo, Growth (up to 250) at £495/mo, Pro (250+) at £1,295/mo.
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">Consultant cost:</strong>{" "}
-                        Calculated as (5 setup days + {skuCount} products x 1.5 days each) x day rate{market === "both" ? " x 1.3 dual-market multiplier" : ""}. Day rates scale with brand size: £500/day (up to 25 products), £650/day (26-100), £800/day (100+).
+                        Calculated as (5 setup days + {skuCount} products x 1.5 days each) x day rate{market === "both" ? " x 1.3 dual-market multiplier" : ""}. Day rates scale with brand size: £500/day (up to 50 products), £650/day (51-250), £800/day (250+).
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">In-house cost:</strong>{" "}
-                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 25 products), £55k (26-100), £67k (100+).
+                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 50 products), £55k (51-250), £67k (250+).
                       </p>
                       <p className="pt-2 text-envrt-muted/60">
                         These are estimates for illustration only and may vary based on your specific circumstances.
