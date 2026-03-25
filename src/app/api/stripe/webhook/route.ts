@@ -227,7 +227,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   const resend = new Resend(apiKey);
 
   const { error: sendError } = await resend.emails.send({
-    from: "ENVRT Payments <hello@envrt.com>",
+    from: "ENVRT Payments <info@envrt.com>",
     to: "info@envrt.com",
     bcc: ["charlie@envrt.com", "oliver@envrt.com"],
     subject: `Payment failed: ${email || "unknown customer"}`,
@@ -269,7 +269,7 @@ async function sendWelcomeEmail(
   const planLabel = PLAN_LABELS[plan] || plan;
 
   const { error: sendError } = await resend.emails.send({
-    from: "ENVRT <hello@envrt.com>",
+    from: "ENVRT <info@envrt.com>",
     to: email,
     subject: `Welcome to ENVRT — your ${planLabel} plan is active`,
     html: buildWelcomeHtml(email, planLabel, inviteUrl),
@@ -295,7 +295,7 @@ async function sendAdminNotification(
   const planLabel = PLAN_LABELS[plan] || plan;
 
   const { error: sendError } = await resend.emails.send({
-    from: "ENVRT Payments <hello@envrt.com>",
+    from: "ENVRT Payments <info@envrt.com>",
     to: "info@envrt.com",
     bcc: ["charlie@envrt.com", "oliver@envrt.com"],
     subject: `New subscription: ${escapeHtml(email)} — ${planLabel}`,

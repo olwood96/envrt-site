@@ -260,7 +260,7 @@ export default function ContactPage() {
 
                   {error && (
                     <p className="text-center text-sm text-red-600">
-                      Something went wrong. Please try again or email us directly at hello@envrt.com.
+                      Something went wrong. Please try again or email us directly at info@envrt.com.
                     </p>
                   )}
 

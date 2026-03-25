@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await resend.emails.send({
-      from: "ENVRT <hello@envrt.com>",
+      from: "ENVRT <info@envrt.com>",
       to: data.email,
       subject: "Thanks for contacting ENVRT",
       html: buildConfirmationHtml(data.firstName),
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     const safeCompany = data.company ? sanitizeForSubject(data.company) : "";
 
     await resend.emails.send({
-      from: "ENVRT Contact <hello@envrt.com>",
+      from: "ENVRT Contact <info@envrt.com>",
       to: INTERNAL_EMAIL,
       bcc: ["charlie@envrt.com", "oliver@envrt.com"],
       subject: `Contact: ${safeName}${safeCompany ? ` @ ${safeCompany}` : ""}`,

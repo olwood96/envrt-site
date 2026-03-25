@@ -26,7 +26,7 @@ export default function PrivacyPage() {
             Privacy policy
           </h1>
           <p className="mt-4 text-sm text-envrt-muted">
-            Last updated: February 2026
+            Last updated: March 2026
           </p>
 
           <div className="mt-8 space-y-8 text-sm leading-relaxed text-envrt-charcoal/70">
@@ -81,21 +81,34 @@ export default function PrivacyPage() {
               <h3 className="text-base font-semibold text-envrt-charcoal">
                 Website visitors (envrt.com)
               </h3>
+              <p>
+                We collect anonymous analytics using a lightweight first-party
+                beacon. This includes:
+              </p>
               <ul className="list-disc space-y-1 pl-5">
-                <li>Browser type, operating system, screen resolution</li>
+                <li>Page path, referrer URL, and UTM parameters</li>
+                <li>Device type, screen resolution, and browser language</li>
                 <li>
-                  Pages visited, referring URL, approximate location (country/region
-                  level)
+                  Approximate location (country, region, and city) derived from
+                  server-side request headers provided by our hosting
+                  infrastructure, not from GPS, IP geolocation databases, or
+                  device-level location services
+                </li>
+                <li>Scroll depth and time on page</li>
+                <li>
+                  Session grouping via a sessionStorage identifier that is
+                  automatically cleared when the browser tab is closed
                 </li>
                 <li>
-                  IP address (which may be truncated or anonymised depending on
-                  analytics configuration)
-                </li>
-                <li>
-                  Information you submit through contact or signup forms (name, email,
-                  company)
+                  Information you submit through contact or signup forms (name,
+                  email, company)
                 </li>
               </ul>
+              <p>
+                We do not store IP addresses, use cookies, use localStorage
+                fingerprinting, or perform any cross-site tracking on the
+                marketing site.
+              </p>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
                 Dashboard users (dashboard.envrt.com)
@@ -110,19 +123,29 @@ export default function PrivacyPage() {
                   documents, PDFs, images
                 </li>
                 <li>
-                  Activity within the dashboard such as logins, form submissions, and
-                  file uploads
+                  Usage analytics associated with your account: page path, page
+                  title, session identifier (sessionStorage, cleared on tab
+                  close), time on page, scroll depth, device type, screen
+                  resolution, browser language, approximate location (from
+                  server-side request headers), and navigation flow
                 </li>
               </ul>
+              <p>
+                Dashboard analytics do not use cookies or localStorage for
+                tracking purposes. No IP addresses are stored.
+              </p>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
                 DPP visitors (dpp.envrt.com)
               </h3>
               <p>
-                DPP pages are public by design. See Section&nbsp;11 for more on public
-                and private information. We may log basic access data such as page
-                views, browser type, and approximate location at an aggregate level. We
-                aim to minimise the collection of personal data from DPP visitors.
+                DPP pages are public by design. See Section&nbsp;11 for more on
+                public and private information. We collect anonymous view data
+                including page path, referrer URL, UTM parameters, device type,
+                screen resolution, browser language, and approximate location
+                (country, region, and city from server-side request headers). We
+                do not store IP addresses, use cookies, use localStorage
+                fingerprinting, or perform any cross-site tracking on DPP pages.
               </p>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
@@ -130,8 +153,9 @@ export default function PrivacyPage() {
               </h3>
               <p>
                 If you access a report via a shared link, we may log basic access
-                information such as browser type, timestamp, and referring URL. If you
-                are a logged-in user, your access may be associated with your account.
+                information such as browser type, timestamp, and referring URL. If
+                you are a logged-in user, your access may be associated with your
+                account.
               </p>
             </section>
 
@@ -340,27 +364,43 @@ export default function PrivacyPage() {
                 Essential cookies
               </h3>
               <p>
-                We use essential cookies to keep the platform functioning. These handle
-                things like session management and authentication. They cannot be
-                disabled without breaking core functionality.
+                We use essential cookies only where required to keep the
+                platform functioning, such as session management and
+                authentication on the dashboard. These cannot be disabled
+                without breaking core functionality.
               </p>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
-                Analytics cookies
+                Analytics
               </h3>
               <p>
-                We may use analytics cookies or similar technologies on our marketing
-                site and dashboard to understand usage patterns. Where analytics cookies
-                are optional, we will ask for your consent before setting them.
+                We do not use analytics cookies anywhere on the platform. Our
+                analytics are entirely cookie-free and do not use localStorage
+                or any form of browser fingerprinting. Where session grouping
+                is needed, we use a sessionStorage identifier that is
+                automatically cleared when the browser tab is closed and cannot
+                be used to track users across sessions or sites.
               </p>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
-                Managing cookies
+                Third-party tracking
               </h3>
               <p>
-                {/* If you have a cookie settings panel, replace the next sentence with a link to it. */}
-                You can control cookies through your browser settings. Disabling certain
-                cookies may affect your experience on the platform.
+                We do not use third-party tracking scripts, advertising pixels,
+                retargeting tools, or any form of cross-site tracking. We do
+                not share analytics data with third parties. All analytics are
+                first-party and collected solely for platform improvement.
+              </p>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                Geographic data
+              </h3>
+              <p>
+                Approximate geographic location (country, region, and city) is
+                derived from server-side request headers provided by our
+                hosting infrastructure. This is not based on GPS, IP
+                geolocation databases, or device-level location services. No IP
+                addresses are stored in our analytics data.
               </p>
             </section>
 

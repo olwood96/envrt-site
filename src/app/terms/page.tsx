@@ -43,13 +43,17 @@ export default function TermsPage() {
                 dpp.envrt.com, and hosted reports at reports.envrt.com.
               </p>
               <p>
-                By creating an account or using our Services, you agree to these
-                terms. If you are using the Services on behalf of an organisation, you
-                confirm that you have authority to bind that organisation to these
-                terms.
+                By creating an account, subscribing to a plan, accepting an
+                invitation, or simply browsing or accessing any part of our
+                Services, you agree to these terms. These terms apply equally
+                to all users, including paying subscribers, free trial or pilot
+                users, admin users, and anonymous visitors to our websites and
+                public DPP pages. If you are using the Services on behalf of an
+                organisation, you confirm that you have authority to bind that
+                organisation to these terms.
               </p>
               <p>
-                We may update these terms from time to time. See Section&nbsp;17 for
+                We may update these terms from time to time. See Section&nbsp;18 for
                 details on how we communicate changes.
               </p>
 
@@ -142,7 +146,7 @@ export default function TermsPage() {
               <p>
                 Outputs are modelled estimates. They are generated from the data
                 available at the time of calculation. Their accuracy depends on the
-                quality and completeness of the inputs provided. See Section&nbsp;10
+                quality and completeness of the inputs provided. See Section&nbsp;11
                 for important disclaimers.
               </p>
               <p>
@@ -228,10 +232,110 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 7. Acceptable use ── */}
+            {/* ── 7. Analytics and data collection ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                7. Acceptable use
+                7. Analytics and data collection
+              </h2>
+              <p>
+                We collect anonymous usage data across the platform to improve
+                our services, monitor performance, and understand how the
+                platform is used. This section summarises what we collect. For
+                full details, see our{" "}
+                <Link
+                  href="/privacy"
+                  className="underline hover:text-envrt-charcoal"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                Public DPP pages
+              </h3>
+              <p>
+                We collect anonymous view data on public Digital Product
+                Passport pages. This includes page path, referrer URL, UTM
+                parameters, device type, screen resolution, browser language,
+                and approximate location (country, region, and city derived
+                from server-side request headers). We do not store IP
+                addresses, use cookies, use localStorage fingerprinting, or
+                perform any cross-site tracking on DPP pages.
+              </p>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                Marketing website
+              </h3>
+              <p>
+                We collect anonymous analytics on envrt.com using a lightweight
+                first-party beacon. This includes page path, referrer URL, UTM
+                parameters, device type, screen resolution, browser language,
+                approximate location (from server-side request headers), scroll
+                depth, and time on page. Sessions are grouped using a
+                sessionStorage identifier that is automatically cleared when
+                the browser tab is closed. We do not use cookies, localStorage
+                fingerprinting, or any form of cross-site tracking on the
+                marketing site.
+              </p>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                Dashboard
+              </h3>
+              <p>
+                For authenticated users on the brand dashboard, we collect
+                usage data associated with the user&apos;s account. This
+                includes page path, page title, session identifier
+                (sessionStorage, cleared on tab close), time on page, scroll
+                depth, device type, screen resolution, browser language,
+                approximate location (from server-side request headers), and
+                navigation flow. This data is used for product improvement and
+                to support the services we provide to our customers.
+              </p>
+
+              <h3 className="text-base font-semibold text-envrt-charcoal">
+                What we do not do
+              </h3>
+              <ul className="list-disc space-y-1 pl-5">
+                <li>
+                  We do not use third-party tracking scripts, advertising
+                  pixels, or retargeting tools anywhere on the platform.
+                </li>
+                <li>
+                  We do not store IP addresses in our analytics data.
+                </li>
+                <li>
+                  We do not use cookies or localStorage for analytics purposes.
+                  Session grouping relies solely on sessionStorage, which is
+                  cleared when the browser tab is closed.
+                </li>
+                <li>
+                  We do not perform cross-site tracking or share analytics data
+                  with third parties.
+                </li>
+                <li>
+                  Approximate geographic location is derived from server-side
+                  request headers provided by our hosting infrastructure, not
+                  from GPS, IP geolocation databases, or device-level location
+                  services.
+                </li>
+              </ul>
+
+              <p>
+                The legal basis for this data collection is legitimate interest
+                under GDPR Article 6(1)(f). We use first-party product
+                analytics to improve the platform, monitor reliability, and
+                understand usage patterns. For authenticated dashboard users,
+                analytics also fall within the scope of the existing
+                contractual relationship. By using any part of the Services,
+                you acknowledge and accept these data collection practices.
+              </p>
+            </section>
+
+            {/* ── 8. Acceptable use ── */}
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold text-envrt-charcoal">
+                8. Acceptable use
               </h2>
               <p>When using the Services, you must not:</p>
               <ul className="list-disc space-y-1 pl-5">
@@ -262,10 +366,10 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            {/* ── 8. Intellectual property ── */}
+            {/* ── 9. Intellectual property ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                8. Intellectual property
+                9. Intellectual property
               </h2>
 
               <h3 className="text-base font-semibold text-envrt-charcoal">
@@ -306,10 +410,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 9. Fees and payment ── */}
+            {/* ── 10. Fees and payment ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                9. Fees and payment
+                10. Fees and payment
               </h2>
               <ul className="list-disc space-y-1 pl-5">
                 <li>
@@ -380,10 +484,10 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            {/* ── 10. Disclaimers ── */}
+            {/* ── 11. Disclaimers ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                10. Disclaimers
+                11. Disclaimers
               </h2>
               <p>
                 Outputs generated by the platform are provided for informational and
@@ -446,10 +550,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 11. Limitation of liability ── */}
+            {/* ── 12. Limitation of liability ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                11. Limitation of liability
+                12. Limitation of liability
               </h2>
               <p>
                 To the maximum extent permitted by applicable law:
@@ -477,10 +581,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 12. Availability and maintenance ── */}
+            {/* ── 13. Availability and maintenance ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                12. Availability and maintenance
+                13. Availability and maintenance
               </h2>
               <p>
                 We aim to keep the Services available, but they may be temporarily
@@ -493,10 +597,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 13. Term and termination ── */}
+            {/* ── 14. Term and termination ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                13. Term and termination
+                14. Term and termination
               </h2>
               <p>
                 These terms take effect when you create an account or sign an order
@@ -506,7 +610,7 @@ export default function TermsPage() {
               <ul className="list-disc space-y-1 pl-5">
                 <li>
                   Self-serve subscriptions are subject to a minimum commitment period
-                  of 6&nbsp;months from the date of purchase (see Section&nbsp;9).
+                  of 6&nbsp;months from the date of purchase (see Section&nbsp;10).
                   Cancellation requests made before the minimum commitment period has
                   elapsed will take effect at the end of the commitment period.
                 </li>
@@ -541,10 +645,10 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            {/* ── 14. Third-party services ── */}
+            {/* ── 15. Third-party services ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                14. Third-party services
+                15. Third-party services
               </h2>
               <p>
                 We use third-party providers for hosting, storage, authentication,
@@ -554,10 +658,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 15. Changes to the Services ── */}
+            {/* ── 16. Changes to the Services ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                15. Changes to the Services
+                16. Changes to the Services
               </h2>
               <p>
                 We may update, modify, or add new features to the Services over time.
@@ -570,10 +674,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 16. Governing law and disputes ── */}
+            {/* ── 17. Governing law and disputes ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                16. Governing law and disputes
+                17. Governing law and disputes
               </h2>
               <p>
                 These terms are governed by the laws of England and Wales. Any
@@ -582,14 +686,14 @@ export default function TermsPage() {
               </p>
               <p>
                 If you have a concern, we encourage you to contact us first so we can
-                try to resolve it informally. See Section&nbsp;18 for contact details.
+                try to resolve it informally. See Section&nbsp;19 for contact details.
               </p>
             </section>
 
-            {/* ── 17. Updates to these terms ── */}
+            {/* ── 18. Updates to these terms ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                17. Updates to these terms
+                18. Updates to these terms
               </h2>
               <p>
                 We may revise these terms from time to time. When we make changes, we
@@ -602,10 +706,10 @@ export default function TermsPage() {
               </p>
             </section>
 
-            {/* ── 18. Contact ── */}
+            {/* ── 19. Contact ── */}
             <section className="space-y-3">
               <h2 className="text-lg font-semibold text-envrt-charcoal">
-                18. Contact
+                19. Contact
               </h2>
               <p>
                 If you have questions about these terms, contact us at:
