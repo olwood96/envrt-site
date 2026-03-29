@@ -141,23 +141,30 @@ function StatColumn({
   value,
   unit,
   label,
+  showDivider,
 }: {
   value: number;
   unit: string;
   label: string;
+  showDivider?: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center text-center">
-      <div className="flex items-baseline gap-1.5">
-        <FlipNumber value={value} />
-        <span className="text-sm font-medium text-envrt-muted sm:text-base">
-          {unit}
+    <>
+      <div className="flex flex-col items-center text-center py-2 sm:py-0">
+        <div className="flex items-baseline gap-1.5">
+          <FlipNumber value={value} />
+          <span className="text-sm font-medium text-envrt-muted sm:text-base">
+            {unit}
+          </span>
+        </div>
+        <span className="mt-1.5 text-xs font-medium uppercase tracking-wider text-envrt-muted/70">
+          {label}
         </span>
       </div>
-      <span className="mt-1.5 text-xs font-medium uppercase tracking-wider text-envrt-muted/70">
-        {label}
-      </span>
-    </div>
+      {showDivider && (
+        <hr className="mx-auto w-12 border-envrt-charcoal/[0.06] sm:hidden" />
+      )}
+    </>
   );
 }
 
@@ -209,16 +216,18 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
             Platform impact
           </p>
 
-          <div className="mt-8 grid grid-cols-3 gap-4 sm:gap-8">
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
             <StatColumn
               value={animatedCo2}
               unit="kg"
               label="CO₂e impact explored"
+              showDivider
             />
             <StatColumn
               value={animatedWater}
               unit="L"
               label="Water impact explored"
+              showDivider
             />
             <StatColumn
               value={animatedScans}
