@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toPng } from "html-to-image";
 import type { CollectiveCardData } from "@/lib/collective/types";
+import { deduplicateConstituents } from "@/lib/collective/utils";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -404,7 +405,7 @@ export function CollectiveComparisonView({ cards }: Props) {
         {/* ====== ROW: Materials ====== */}
         <div className="flex items-center py-3 px-2 text-sm font-medium text-envrt-muted">Materials</div>
         {cards.map((card) => {
-          const sorted = [...card.dpp.constituents].sort((a, b) => b.pct - a.pct);
+          const sorted = deduplicateConstituents(card.dpp.constituents);
           return (
             <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2 text-center text-xs font-medium text-envrt-teal">
               {sorted.length > 0 ? sorted.map((c) => `${c.material} ${c.pct}%`).join(", ") : <span className="text-envrt-muted">—</span>}

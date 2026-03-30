@@ -121,8 +121,9 @@ describe("CollectiveGrid", () => {
   it("filters by brand", () => {
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
 
-    const brandSelect = screen.getAllByRole("combobox")[0];
-    fireEvent.change(brandSelect, { target: { value: "b1" } });
+    // Open the brand dropdown and select BrandA
+    fireEvent.click(screen.getByText("All brands"));
+    fireEvent.click(screen.getByText("BrandA (2)"));
 
     expect(screen.getByText("Product A")).toBeInTheDocument();
     expect(screen.getByText("Product B")).toBeInTheDocument();
@@ -133,8 +134,9 @@ describe("CollectiveGrid", () => {
   it("filters by material", () => {
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
 
-    const materialSelect = screen.getAllByRole("combobox")[2];
-    fireEvent.change(materialSelect, { target: { value: "Polyester" } });
+    // Open the material dropdown and select Polyester
+    fireEvent.click(screen.getByText("All materials"));
+    fireEvent.click(screen.getByText("Polyester"));
 
     expect(screen.queryByText("Product A")).not.toBeInTheDocument();
     expect(screen.getByText("Product B")).toBeInTheDocument();
@@ -144,11 +146,13 @@ describe("CollectiveGrid", () => {
   it("shows empty state when no filters match", () => {
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
 
-    const brandSelect = screen.getAllByRole("combobox")[0];
-    fireEvent.change(brandSelect, { target: { value: "b2" } });
+    // Select BrandB
+    fireEvent.click(screen.getByText("All brands"));
+    fireEvent.click(screen.getByText("BrandB (1)"));
 
-    const materialSelect = screen.getAllByRole("combobox")[2];
-    fireEvent.change(materialSelect, { target: { value: "Polyester" } });
+    // Select Polyester (BrandB has no Polyester products)
+    fireEvent.click(screen.getByText("All materials"));
+    fireEvent.click(screen.getByText("Polyester"));
 
     expect(
       screen.getByText("No products match your filters.")

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { getMaterialDescription } from "@/lib/collective/material-info";
+import { deduplicateConstituents } from "@/lib/collective/utils";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -215,9 +216,11 @@ export function CollectiveCard({
           </div>
 
           {/* Material tags with tooltips */}
-          {dpp.constituents.length > 0 && (
+          {dpp.constituents.length > 0 && (() => {
+            const merged = deduplicateConstituents(dpp.constituents);
+            return (
             <div className="mt-3 flex flex-wrap gap-1">
-              {dpp.constituents.slice(0, 3).map((c) => {
+              {merged.slice(0, 3).map((c) => {
                 const desc = getMaterialDescription(c.material);
                 return (
                   <span
@@ -234,13 +237,14 @@ export function CollectiveCard({
                   </span>
                 );
               })}
-              {dpp.constituents.length > 3 && (
+              {merged.length > 3 && (
                 <span className="rounded-full border border-envrt-charcoal/5 bg-envrt-charcoal/5 px-2 py-0.5 text-[10px] font-medium text-envrt-muted">
-                  +{dpp.constituents.length - 3} more
+                  +{merged.length - 3} more
                 </span>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* Production journey map (collapsible) */}
           {hasJourney && (

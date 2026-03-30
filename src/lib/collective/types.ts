@@ -70,10 +70,6 @@ export interface CollectiveFilters {
 /** Sort options */
 export type CollectiveSortKey =
   | "featured_at"
-  | "emissions_asc"
-  | "emissions_desc"
-  | "water_asc"
-  | "water_desc"
   | "name"
   | "most_compared";
 

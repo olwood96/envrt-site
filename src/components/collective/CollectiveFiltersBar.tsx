@@ -4,6 +4,7 @@ import type {
   CollectiveFilters,
   CollectiveSortKey,
 } from "@/lib/collective/types";
+import { FilterDropdown } from "./FilterDropdown";
 
 interface Props {
   filters: CollectiveFilters;
@@ -23,15 +24,11 @@ interface Props {
 const SORT_OPTIONS: { value: CollectiveSortKey; label: string }[] = [
   { value: "featured_at", label: "Recently featured" },
   { value: "name", label: "Name (A-Z)" },
-  { value: "emissions_asc", label: "CO₂e (low to high)" },
-  { value: "emissions_desc", label: "CO₂e (high to low)" },
-  { value: "water_asc", label: "Water (low to high)" },
-  { value: "water_desc", label: "Water (high to low)" },
   { value: "most_compared", label: "Most compared" },
 ];
 
-const selectClasses =
-  "rounded-xl border border-envrt-charcoal/8 bg-envrt-cream/60 px-3 py-2 text-xs text-envrt-charcoal focus:border-envrt-teal/40 focus:outline-none focus:ring-2 focus:ring-envrt-teal/10";
+const searchInputClasses =
+  "h-9 rounded-xl border border-envrt-charcoal/8 bg-white px-3 py-2 text-xs text-envrt-charcoal placeholder:text-envrt-muted focus:border-envrt-charcoal/20 focus:outline-none focus:ring-2 focus:ring-envrt-charcoal/8";
 
 export function CollectiveFiltersBar({
   filters,
@@ -68,60 +65,49 @@ export function CollectiveFiltersBar({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search products..."
-          className={`${selectClasses} w-44 pl-8`}
+          className={`${searchInputClasses} w-44 pl-8`}
         />
       </div>
 
-      <select
+      <FilterDropdown
+        label="All brands"
         value={selectedBrand}
-        onChange={(e) => onBrandChange(e.target.value)}
-        className={selectClasses}
-      >
-        <option value="">All brands</option>
-        {filters.brands.map((b) => (
-          <option key={b.id} value={b.id}>
-            {b.name} ({b.count})
-          </option>
-        ))}
-      </select>
+        options={[
+          { value: "", label: "All brands" },
+          ...filters.brands.map((b) => ({
+            value: b.id,
+            label: `${b.name} (${b.count})`,
+          })),
+        ]}
+        onChange={onBrandChange}
+      />
 
-      <select
+      <FilterDropdown
+        label="All collections"
         value={selectedCollection}
-        onChange={(e) => onCollectionChange(e.target.value)}
-        className={selectClasses}
-      >
-        <option value="">All collections</option>
-        {filters.collections.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
+        options={[
+          { value: "", label: "All collections" },
+          ...filters.collections.map((c) => ({ value: c, label: c })),
+        ]}
+        onChange={onCollectionChange}
+      />
 
-      <select
+      <FilterDropdown
+        label="All materials"
         value={selectedMaterial}
-        onChange={(e) => onMaterialChange(e.target.value)}
-        className={selectClasses}
-      >
-        <option value="">All materials</option>
-        {filters.materialTypes.map((m) => (
-          <option key={m} value={m}>
-            {m}
-          </option>
-        ))}
-      </select>
+        options={[
+          { value: "", label: "All materials" },
+          ...filters.materialTypes.map((m) => ({ value: m, label: m })),
+        ]}
+        onChange={onMaterialChange}
+      />
 
-      <select
+      <FilterDropdown
+        label="Recently featured"
         value={sortKey}
-        onChange={(e) => onSortChange(e.target.value as CollectiveSortKey)}
-        className={selectClasses}
-      >
-        {SORT_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        options={SORT_OPTIONS}
+        onChange={(v) => onSortChange(v as CollectiveSortKey)}
+      />
 
       <span className="ml-auto text-xs text-envrt-muted">
         {resultCount} product{resultCount !== 1 ? "s" : ""}

@@ -98,25 +98,6 @@ export function CollectiveGrid({ cards, filters }: Props) {
           );
         case "name":
           return a.dpp.garment_name.localeCompare(b.dpp.garment_name);
-        case "emissions_asc":
-          return (
-            (a.dpp.total_emissions ?? Infinity) -
-            (b.dpp.total_emissions ?? Infinity)
-          );
-        case "emissions_desc":
-          return (
-            (b.dpp.total_emissions ?? -Infinity) -
-            (a.dpp.total_emissions ?? -Infinity)
-          );
-        case "water_asc":
-          return (
-            (a.dpp.total_water ?? Infinity) - (b.dpp.total_water ?? Infinity)
-          );
-        case "water_desc":
-          return (
-            (b.dpp.total_water ?? -Infinity) -
-            (a.dpp.total_water ?? -Infinity)
-          );
         case "most_compared":
           return (
             (compareCounts[b.dpp.id] ?? 0) - (compareCounts[a.dpp.id] ?? 0)
