@@ -193,6 +193,32 @@ describe("CollectiveGrid", () => {
     expect(screen.getByText(/3 remaining/)).toBeInTheDocument();
   });
 
+  it("reveals more cards when Show more is clicked", () => {
+    const manyCards = Array.from({ length: 15 }, (_, i) =>
+      makeCard(`id-${i}`, "b1", "BrandA", `Product ${i}`, 3.0, 50, "Cotton")
+    );
+    const manyFilters: CollectiveFilters = {
+      brands: [{ id: "b1", name: "BrandA", count: 15 }],
+      collections: ["Summer 2025"],
+      materialTypes: ["Cotton"],
+    };
+
+    render(<CollectiveGrid cards={manyCards} filters={manyFilters} />);
+
+    // Initially only first 12 visible
+    expect(screen.getByText("Product 0")).toBeInTheDocument();
+    expect(screen.getByText("Product 11")).toBeInTheDocument();
+    expect(screen.queryByText("Product 12")).not.toBeInTheDocument();
+
+    // Click Show more
+    fireEvent.click(screen.getByText(/Show more/));
+
+    // All 15 now visible, button gone
+    expect(screen.getByText("Product 12")).toBeInTheDocument();
+    expect(screen.getByText("Product 14")).toBeInTheDocument();
+    expect(screen.queryByText(/Show more/)).not.toBeInTheDocument();
+  });
+
   it("does not show Show more when all cards fit on one page", () => {
     render(<CollectiveGrid cards={mockCards} filters={mockFilters} />);
     expect(screen.queryByText(/Show more/)).not.toBeInTheDocument();

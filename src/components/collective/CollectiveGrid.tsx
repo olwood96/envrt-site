@@ -9,7 +9,7 @@ import type {
 import { CollectiveFiltersBar } from "./CollectiveFiltersBar";
 import { CollectiveCard } from "./CollectiveCard";
 import { CollectiveCompareBar } from "./CollectiveCompareBar";
-import { FadeUp, StaggerChildren, StaggerItem } from "@/components/ui/Motion";
+import { FadeUp } from "@/components/ui/Motion";
 
 const MAX_COMPARE = 3;
 const PAGE_SIZE = 12;
@@ -213,12 +213,9 @@ export function CollectiveGrid({ cards, filters }: Props) {
         </p>
       ) : (
         <>
-          <StaggerChildren
-            key={`${searchQuery}::${selectedBrand}::${selectedCollection}::${selectedMaterial}::${sortKey}`}
-            className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          >
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visibleCards.map((card) => (
-              <StaggerItem key={card.dpp.id}>
+              <FadeUp key={card.dpp.id}>
                 <CollectiveCard
                   card={card}
                   isSelected={compareIds.has(card.dpp.id)}
@@ -228,9 +225,9 @@ export function CollectiveGrid({ cards, filters }: Props) {
                   mapOpen={mapsOpen}
                   onToggleMap={() => setMapsOpen((prev) => !prev)}
                 />
-              </StaggerItem>
+              </FadeUp>
             ))}
-          </StaggerChildren>
+          </div>
 
           {hasMore && (
             <div className="mt-8 text-center">
