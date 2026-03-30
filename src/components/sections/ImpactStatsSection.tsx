@@ -5,10 +5,15 @@ import type { ImpactStats } from "@/lib/impact-stats";
 import { useIntersectionOnce } from "@/hooks/useIntersectionOnce";
 import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
+import {
+  IMPACT_POLL_INTERVAL_MS,
+  IMPACT_COUNT_UP_DURATION_MS,
+  IMPACT_MAX_CONSECUTIVE_ERRORS,
+} from "@/lib/constants";
 
 /* ── Count-up hook ── */
 
-function useCountUp(target: number, started: boolean, duration = 2000) {
+function useCountUp(target: number, started: boolean, duration = IMPACT_COUNT_UP_DURATION_MS) {
   const [value, setValue] = useState(0);
   const rafRef = useRef(0);
   const doneRef = useRef(false);
@@ -186,20 +191,26 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
   const animatedWater = useCountUp(water, visible);
   const animatedScans = useCountUp(scans, visible);
 
-  // Poll for updated stats every 30s (server-side fetch, no anon SELECT needed)
+  // Poll for updated stats with backoff on consecutive failures
   useEffect(() => {
-    const interval = setInterval(async () => {
+    let errorCount = 0;
+    const poll = async () => {
       try {
         const res = await fetch("/api/impact-stats");
-        if (!res.ok) return;
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: ImpactStats = await res.json();
         setCo2(data.co2Kg);
         setWater(data.waterLitres);
         setScans(data.dppScans);
+        errorCount = 0; // reset on success
       } catch {
-        // Silently ignore — next poll will retry
+        errorCount++;
+        if (errorCount >= IMPACT_MAX_CONSECUTIVE_ERRORS) {
+          clearInterval(interval);
+        }
       }
-    }, 30_000);
+    };
+    const interval = setInterval(poll, IMPACT_POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);

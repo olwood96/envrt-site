@@ -53,15 +53,24 @@ interface StaggerProps {
   children: ReactNode;
   className?: string;
   staggerDelay?: number;
+  as?: string;
+}
+
+// Helper to get a motion component for a given HTML tag
+function getMotionTag(tag: string) {
+  return (motion as unknown as Record<string, unknown>)[tag] ?? motion.div;
 }
 
 export function StaggerChildren({
   children,
   className = "",
   staggerDelay = 0.08,
+  as = "div",
 }: StaggerProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Component = getMotionTag(as) as any;
   return (
-    <motion.div
+    <Component
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
@@ -69,18 +78,20 @@ export function StaggerChildren({
       className={className}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 }
 
-export function StaggerItem({ children, className = "" }: MotionProps) {
+export function StaggerItem({ children, className = "", as = "div" }: MotionProps & { as?: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Component = getMotionTag(as) as any;
   return (
-    <motion.div
+    <Component
       variants={fadeUp}
       transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
       className={className}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 }

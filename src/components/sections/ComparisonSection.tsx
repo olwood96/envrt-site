@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Container } from "../ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "../ui/Motion";
 import { Button } from "../ui/Button";
+import { CheckIcon, UserIcon, UsersIcon, ZapIcon } from "../icons";
 
 /* ── Data ──────────────────────────────────────────────────────────────── */
 
@@ -68,46 +69,6 @@ const comparisonRows: ComparisonRow[] = [
     bars: { consultant: 95, inHouse: 70 },
   },
 ];
-
-/* ── Icons ─────────────────────────────────────────────────────────────── */
-
-function UserIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function UsersIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 00-3-3.87" />
-      <path d="M16 3.13a4 4 0 010 7.75" />
-    </svg>
-  );
-}
-
-function ZapIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  );
-}
-
-/* ── Check icon for ENVRT wins ─────────────────────────────────────────── */
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-      <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-    </svg>
-  );
-}
 
 /* ── Column header card ────────────────────────────────────────────────── */
 
@@ -193,72 +154,51 @@ function MobileComparisonCards() {
 
 function DesktopComparisonTable() {
   return (
-    <div className="hidden md:block mx-auto max-w-4xl rounded-2xl border border-envrt-charcoal/5 bg-white">
-      {/* Column headers */}
-      <div className="relative grid grid-cols-[1fr_1fr_1fr_1.1fr] border-b border-envrt-charcoal/5 bg-envrt-charcoal/[0.02] rounded-t-2xl">
-        <div className="flex items-end px-6 py-5">
-          <span className="text-xs font-medium uppercase tracking-widest text-envrt-muted/60">
-            Approach
-          </span>
-        </div>
-        <div className="flex justify-center px-4 py-5">
-          <ColumnHeader icon={UserIcon} title="Consultant" subtitle="External hire" />
-        </div>
-        <div className="flex justify-center px-4 py-5">
-          <ColumnHeader icon={UsersIcon} title="In-house" subtitle="Full-time team" />
-        </div>
-        <div className="relative flex justify-center px-4 py-5">
-          {/* Subtle teal background — inset from edges */}
-          <div className="pointer-events-none absolute inset-x-2 inset-y-0 rounded-t-xl bg-envrt-teal/[0.03]" />
-          <div className="relative flex flex-col items-center text-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-envrt-teal/[0.12]">
-              <ZapIcon className="h-5 w-5 text-envrt-teal" />
-            </div>
-            <Image
-              src="/brand/envrt-logo.png"
-              alt="ENVRT"
-              width={64}
-              height={20}
-              className="mt-3 h-5 w-auto object-contain"
-            />
-            <p className="mt-0.5 text-xs text-envrt-muted">Platform</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Rows */}
-      <StaggerChildren className="divide-y divide-envrt-charcoal/[0.04]">
-        {comparisonRows.map((row) => (
-          <StaggerItem key={row.label}>
-            <div className="grid grid-cols-[1fr_1fr_1fr_1.1fr]">
-              <div className="flex items-center px-6 py-4">
-                <span className="text-sm font-medium text-envrt-charcoal/70">{row.label}</span>
+    <div className="hidden md:block mx-auto max-w-4xl rounded-2xl border border-envrt-charcoal/5 bg-white overflow-hidden">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-envrt-charcoal/5 bg-envrt-charcoal/[0.02]">
+            <th scope="col" className="px-6 py-5 text-left text-xs font-medium uppercase tracking-widest text-envrt-muted/60">
+              Approach
+            </th>
+            <th scope="col" className="px-4 py-5">
+              <ColumnHeader icon={UserIcon} title="Consultant" subtitle="External hire" />
+            </th>
+            <th scope="col" className="px-4 py-5">
+              <ColumnHeader icon={UsersIcon} title="In-house" subtitle="Full-time team" />
+            </th>
+            <th scope="col" className="relative px-4 py-5">
+              <div className="pointer-events-none absolute inset-x-2 inset-y-0 rounded-t-xl bg-envrt-teal/[0.03]" />
+              <div className="relative flex flex-col items-center text-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-envrt-teal/[0.12]">
+                  <ZapIcon className="h-5 w-5 text-envrt-teal" />
+                </div>
+                <Image
+                  src="/brand/envrt-logo.png"
+                  alt="ENVRT"
+                  width={64}
+                  height={20}
+                  className="mt-3 h-5 w-auto object-contain"
+                />
+                <p className="mt-0.5 text-xs text-envrt-muted font-normal">Platform</p>
               </div>
-              <div className="flex items-center justify-center px-4 py-4 text-center">
-                <span className="text-sm text-envrt-muted">{row.consultant}</span>
-              </div>
-              <div className="flex items-center justify-center px-4 py-4 text-center">
-                <span className="text-sm text-envrt-muted">{row.inHouse}</span>
-              </div>
-              <div className="relative flex items-center justify-center px-4 py-4 text-center">
-                {/* Subtle teal background — inset */}
+            </th>
+          </tr>
+        </thead>
+        <StaggerChildren as="tbody" className="divide-y divide-envrt-charcoal/[0.04]">
+          {comparisonRows.map((row) => (
+            <StaggerItem as="tr" key={row.label}>
+              <td className="px-6 py-4 text-sm font-medium text-envrt-charcoal/70">{row.label}</td>
+              <td className="px-4 py-4 text-center text-sm text-envrt-muted">{row.consultant}</td>
+              <td className="px-4 py-4 text-center text-sm text-envrt-muted">{row.inHouse}</td>
+              <td className="relative px-4 py-4 text-center">
                 <div className="pointer-events-none absolute inset-x-2 inset-y-0 bg-envrt-teal/[0.03]" />
-                <span className="relative text-sm font-medium text-envrt-teal">
-                  {row.envrt}
-                </span>
-              </div>
-            </div>
-          </StaggerItem>
-        ))}
-      </StaggerChildren>
-
-      {/* Bottom cap for ENVRT column */}
-      <div className="grid grid-cols-[1fr_1fr_1fr_1.1fr] border-t border-envrt-charcoal/[0.04]">
-        <div className="col-span-3" />
-        <div className="relative h-3">
-          <div className="pointer-events-none absolute inset-x-2 inset-y-0 bg-envrt-teal/[0.03] rounded-b-xl" />
-        </div>
-      </div>
+                <span className="relative text-sm font-medium text-envrt-teal">{row.envrt}</span>
+              </td>
+            </StaggerItem>
+          ))}
+        </StaggerChildren>
+      </table>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { RESIZE_DEBOUNCE_MS } from "@/lib/constants";
 
 function makeRng(seed: number) {
   let s = seed;
@@ -132,13 +133,23 @@ function hexPts(cx: number, cy: number, r: number): string {
 
 export function SupplyChainBackground({ children }: { children: React.ReactNode }) {
   const [dims, setDims] = useState({ w: 0, h: 0 });
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
   useEffect(() => {
     const measure = () => setDims({ w: window.innerWidth, h: document.documentElement.scrollHeight });
-    measure();
-    window.addEventListener("resize", measure);
-    const mo = new MutationObserver(measure);
+    const debouncedMeasure = () => {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(measure, RESIZE_DEBOUNCE_MS);
+    };
+    measure(); // initial measurement is immediate
+    window.addEventListener("resize", debouncedMeasure);
+    const mo = new MutationObserver(debouncedMeasure);
     mo.observe(document.body, { childList: true, subtree: true });
-    return () => { window.removeEventListener("resize", measure); mo.disconnect(); };
+    return () => {
+      clearTimeout(debounceRef.current);
+      window.removeEventListener("resize", debouncedMeasure);
+      mo.disconnect();
+    };
   }, []);
 
   const pattern = useMemo(() => {

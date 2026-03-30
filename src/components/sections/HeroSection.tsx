@@ -5,9 +5,13 @@ import Image from "next/image";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { FadeUp } from "../ui/Motion";
-import { heroContent } from "@/lib/config";
-
-const IFRAME_SRC = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882/embed";
+import { heroContent, siteConfig } from "@/lib/config";
+import {
+  HERO_JACKET_HEIGHT_RATIO,
+  HERO_QR_HEIGHT_RATIO,
+  PHONE_VIEWPORT_WIDTH,
+  PHONE_VIEWPORT_HEIGHT,
+} from "@/lib/constants";
 
 // ─── Corner bracket for viewfinder ──────────────────────────────────────────
 function ViewfinderCorner({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
@@ -79,18 +83,6 @@ function QRScanOverlay({ visible }: { visible: boolean }) {
       >
         Scanning...
       </p>
-
-      {/* Keyframe animations */}
-      <style jsx>{`
-        @keyframes qr-scan {
-          0%, 100% { top: 0; }
-          50% { top: 100%; }
-        }
-        @keyframes qr-pulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -104,7 +96,7 @@ function PhoneMockup({ src }: { src: string }) {
   useEffect(() => {
     const update = () => {
       if (screenRef.current) {
-        setScale(screenRef.current.offsetWidth / 375);
+        setScale(screenRef.current.offsetWidth / PHONE_VIEWPORT_WIDTH);
       }
     };
     update();
@@ -157,8 +149,8 @@ function PhoneMockup({ src }: { src: string }) {
               style={{
                 top: 0,
                 left: 0,
-                width: "375px",
-                height: "812px",
+                width: `${PHONE_VIEWPORT_WIDTH}px`,
+                height: `${PHONE_VIEWPORT_HEIGHT}px`,
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
                 overflow: "auto",
@@ -198,8 +190,8 @@ export function HeroSection() {
     return () => observer.disconnect();
   }, [updateHeight]);
 
-  const jacketHeight = phoneHeight * 1.183;
-  const qrHeight = phoneHeight * 0.3;
+  const jacketHeight = phoneHeight * HERO_JACKET_HEIGHT_RATIO;
+  const qrHeight = phoneHeight * HERO_QR_HEIGHT_RATIO;
 
   return (
     <section className="relative mx-auto max-w-[1360px] px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 lg:px-16 lg:pb-24">
@@ -272,7 +264,7 @@ export function HeroSection() {
                 </div>
               )}
               <div className="relative z-10">
-                <PhoneMockup src={IFRAME_SRC} />
+                <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
               </div>
             </div>
           </div>

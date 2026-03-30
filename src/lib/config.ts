@@ -4,6 +4,9 @@ export const siteConfig = {
   description:
     "Digital Product Passports, lifecycle metrics and sustainability analytics, all in one place. Fast and simple.",
   url: "https://envrt.com",
+  dashboardUrl: "https://dashboard.envrt.com",
+  dppDemoUrl: "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882",
+  dppDemoEmbedUrl: "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882/embed",
   contact: {
     email: "info@envrt.com",
   },
@@ -142,23 +145,24 @@ export const outcomeCards = [
   },
 ];
 
+export type PlanSlug = "starter" | "growth" | "pro";
+
 export interface PricingPlan {
+  slug: PlanSlug;
   name: string;
   subheading: string;
-  price: string;
-  period: string;
+  priceGBP: number;
   description: string;
   features: string[];
-  cta: string;
   highlighted: boolean;
 }
 
 export const pricingPlans: PricingPlan[] = [
   {
+    slug: "starter",
     name: "Starter",
     subheading: "Your DPP Hub",
-    price: "£149",
-    period: "/month",
+    priceGBP: 149,
     description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
       "Up to 50 products/SKUs",
@@ -166,18 +170,18 @@ export const pricingPlans: PricingPlan[] = [
       "Transparency score per product",
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
-      "CO₂e and AWARE water scarcity indicators",
+      "CO\u2082e and AWARE water scarcity indicators",
       "Fibre-to-assembly supply chain reconstruction",
+      "DPP scan and engagement analytics",
       "Email support with onboarding call",
     ],
-    cta: "Get started",
     highlighted: false,
   },
   {
+    slug: "growth",
     name: "Growth",
     subheading: "Your Impact Analyst",
-    price: "£495",
-    period: "/month",
+    priceGBP: 495,
     description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
       "Up to 250 products/SKUs",
@@ -186,20 +190,20 @@ export const pricingPlans: PricingPlan[] = [
       "Process-level supply chain reconstruction",
       "Hotspot detection across lifecycle stages",
       "Product comparisons",
+      "AI-powered data ingestion",
       "Entry-level decarbonisation guidance",
       "Stage-linked evidence library",
-      "Collection summaries with CSV/PDF exports",
       "Hotspot insights with reduction opportunities",
+      "Collection summaries with CSV/PDF exports",
       "Priority support",
     ],
-    cta: "Get started",
     highlighted: true,
   },
   {
+    slug: "pro",
     name: "Pro",
     subheading: "Your Sustainability Team",
-    price: "£1,295",
-    period: "/month",
+    priceGBP: 1295,
     description:
       "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
@@ -212,7 +216,6 @@ export const pricingPlans: PricingPlan[] = [
       "Supplier follow-up and data-chasing assistance",
       "Fast-response SLA with weekly reviews",
     ],
-    cta: "Talk to us",
     highlighted: false,
   },
 ];
@@ -224,8 +227,10 @@ export const pricingComparison = {
       features: [
         { name: "Product/SKU allocation", starter: "Up to 50", growth: "Up to 250", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
+        { name: "Multi-language DPP pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
         { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
+        { name: "AI-powered data ingestion", starter: false, growth: true, pro: true },
       ],
     },
     {
@@ -247,7 +252,7 @@ export const pricingComparison = {
     {
       name: "Metrics",
       features: [
-        { name: "CO₂e indicators", starter: true, growth: true, pro: true },
+        { name: "CO\u2082e indicators", starter: true, growth: true, pro: true },
         { name: "AWARE water scarcity indicators", starter: true, growth: true, pro: true },
         { name: "Core LCA metrics beyond indicators", starter: false, growth: true, pro: true },
         { name: "Complete PEF-aligned metrics", starter: false, growth: false, pro: true },
@@ -256,6 +261,7 @@ export const pricingComparison = {
     {
       name: "Dashboard and Insights",
       features: [
+        { name: "DPP scan and engagement analytics", starter: true, growth: true, pro: true },
         { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
         { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
@@ -283,7 +289,7 @@ export const pricingComparison = {
       ],
     },
   ],
-};
+} as const;
 
 export const faqItems = [
   {

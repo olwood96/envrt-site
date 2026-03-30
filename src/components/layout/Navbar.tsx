@@ -2,15 +2,18 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "../ui/Container";
 import { Button } from "../ui/Button";
 import { GlitchLink } from "./GlitchLink";
 import { navLinks, siteConfig } from "@/lib/config";
+import { SCROLL_THRESHOLD } from "@/lib/constants";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   /* ── Sliding pill state ── */
@@ -39,7 +42,7 @@ export function Navbar() {
 
   /* ── Track scroll position ── */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > SCROLL_THRESHOLD);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -89,27 +92,24 @@ export function Navbar() {
               className="flex-shrink-0 flex items-center gap-2 text-xl font-bold tracking-tight text-envrt-charcoal"
             >
               <div className="relative flex h-6 sm:h-8 items-center">
-                <picture>
-                  <img
+                {logoFailed ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-envrt-green text-xs font-bold text-white">
+                      E
+                    </span>
+                    <span>{siteConfig.name}</span>
+                  </span>
+                ) : (
+                  <Image
                     src="/brand/envrt-logo.png"
                     alt={siteConfig.name}
+                    width={120}
+                    height={32}
                     className="h-6 sm:h-8 w-auto"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                      const parent = (e.target as HTMLImageElement).parentElement?.parentElement;
-                      if (parent) {
-                        const fallback = parent.querySelector(".logo-fallback");
-                        if (fallback) (fallback as HTMLElement).style.display = "flex";
-                      }
-                    }}
+                    priority
+                    onError={() => setLogoFailed(true)}
                   />
-                </picture>
-                <span className="logo-fallback hidden items-center gap-1.5">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-envrt-green text-xs font-bold text-white">
-                    E
-                  </span>
-                  <span>{siteConfig.name}</span>
-                </span>
+                )}
               </div>
             </Link>
 
@@ -151,7 +151,7 @@ export function Navbar() {
               ))}
 
               <div className="flex items-center gap-2.5 ml-2">
-                <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" data-cta="nav-dashboard">
+                <Button href={siteConfig.dashboardUrl} variant="secondary" size="sm" data-cta="nav-dashboard">
                   Dashboard
                 </Button>
                 <Button href="/contact" size="sm" data-cta="nav-book-demo">
@@ -254,7 +254,7 @@ export function Navbar() {
                     transition: { duration: 0.15 },
                   }}
                 >
-                  <Button href="https://dashboard.envrt.com" variant="secondary" size="sm" className="w-full" data-cta="mobile-nav-dashboard">
+                  <Button href={siteConfig.dashboardUrl} variant="secondary" size="sm" className="w-full" data-cta="mobile-nav-dashboard">
                     Dashboard
                   </Button>
                   <Button href="/contact" size="sm" className="w-full" data-cta="mobile-nav-book-demo">

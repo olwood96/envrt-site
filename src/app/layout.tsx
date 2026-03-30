@@ -90,7 +90,7 @@ export default function RootLayout({
         */}
         <link
           rel="prefetch"
-          href="https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882"
+          href={siteConfig.dppDemoUrl}
           as="document"
         />
       </head>

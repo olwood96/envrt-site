@@ -1,155 +1,20 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Container } from "../ui/Container";
 import { SectionCard } from "../ui/SectionCard";
 import { Button } from "../ui/Button";
 import { FadeUp, StaggerChildren, StaggerItem } from "../ui/Motion";
-
-type PricingPlan = {
-  name: string;
-  subheading: string;
-  priceGBP: number;
-  description: string;
-  features: string[];
-  cta: string;
-  highlighted?: boolean;
-};
-
-const PRICING_PLANS: PricingPlan[] = [
-  {
-    name: "Starter",
-    subheading: "Your DPP Hub",
-    priceGBP: 149,
-    description:
-      "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
-    features: [
-      "Up to 50 products/SKUs",
-      "QR-ready passport pages",
-      "Transparency score per product",
-      "Evidence uploads and product documentation",
-      "Auto-generated disclosures and templates",
-      "CO\u2082e and AWARE water scarcity indicators",
-      "Fibre-to-assembly supply chain reconstruction",
-      "Email support with onboarding call",
-    ],
-    cta: "View full comparison",
-  },
-  {
-    name: "Growth",
-    subheading: "Your Impact Analyst",
-    priceGBP: 495,
-    description:
-      "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
-    features: [
-      "Up to 250 products/SKUs",
-      "Expanded product data in DPP",
-      "Core LCA metrics beyond indicators",
-      "Process-level supply chain reconstruction",
-      "Hotspot detection across lifecycle stages",
-      "Entry-level decarbonisation guidance",
-      "Stage-linked evidence library",
-      "Hotspot insights with reduction opportunities",
-      "Priority support",
-    ],
-    cta: "View full comparison",
-    highlighted: true,
-  },
-  {
-    name: "Pro",
-    subheading: "Your Sustainability Team",
-    priceGBP: 1295,
-    description:
-      "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
-    features: [
-      "Custom product/SKU allocation",
-      "Complete PEF-aligned metrics",
-      "Advanced modelling and optimisation frameworks",
-      "Seasonal product-line impact reports",
-      "Eco-design strategy and claims support",
-      "Dedicated account specialist",
-      "Supplier follow-up and data-chasing assistance",
-      "Fast-response SLA with weekly reviews",
-    ],
-    cta: "View full comparison",
-  },
-];
-
-const GBP_TO_EUR = 1.18;
-const ANNUAL_DISCOUNT = 0.15;
-
-type Currency = "GBP" | "EUR";
-type Interval = "monthly" | "annual";
-
-function formatPrice(amount: number, currency: Currency): string {
-  const symbol = currency === "GBP" ? "\u00A3" : "\u20AC";
-  return `${symbol}${Math.round(amount).toLocaleString("en-GB")}`;
-}
-
-function Toggle({
-  options,
-  active,
-  onChange,
-  badge,
-}: {
-  options: [string, string];
-  active: 0 | 1;
-  onChange: (i: 0 | 1) => void;
-  badge?: string;
-}) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-envrt-charcoal/8 bg-envrt-cream/60 p-1">
-      {options.map((label, i) => (
-        <button
-          key={label}
-          onClick={() => onChange(i as 0 | 1)}
-          className={`relative rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-            active === i
-              ? "bg-white text-envrt-charcoal shadow-sm"
-              : "text-envrt-muted hover:text-envrt-charcoal/70"
-          }`}
-        >
-          {label}
-          {i === 1 && badge && active === 1 && (
-            <span className="ml-1.5 inline-block rounded-full bg-envrt-teal/10 px-1.5 py-0.5 text-[9px] font-semibold text-envrt-teal">
-              {badge}
-            </span>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function useNudge(intervalMs = 3500) {
-  const [nudge, setNudge] = useState(false);
-  const hoveredRef = useRef(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      if (hoveredRef.current) return;
-      setNudge(true);
-      setTimeout(() => setNudge(false), 700);
-    }, intervalMs);
-    return () => clearInterval(timerRef.current);
-  }, [intervalMs]);
-
-  const onEnter = () => {
-    hoveredRef.current = true;
-    setNudge(false);
-  };
-  const onLeave = () => {
-    hoveredRef.current = false;
-  };
-
-  return { nudge, onEnter, onLeave };
-}
+import { Toggle } from "../ui/Toggle";
+import { CheckIcon } from "../icons";
+import { pricingPlans } from "@/lib/config";
+import { formatPrice, computePrice, type Currency, type Interval } from "@/lib/pricing";
+import { useNudge } from "@/hooks/useNudge";
 
 export function PricingPreviewSection() {
   const [currency, setCurrency] = useState<Currency>("GBP");
   const [interval, setInterval_] = useState<Interval>("monthly");
-  const { nudge, onEnter, onLeave } = useNudge(3500);
+  const { nudge, onEnter, onLeave } = useNudge();
 
   return (
     <div className="px-4 py-8 sm:px-6" id="pricing-preview">
@@ -187,10 +52,8 @@ export function PricingPreviewSection() {
           </FadeUp>
 
           <StaggerChildren className="mt-14 grid gap-5 lg:grid-cols-3">
-            {PRICING_PLANS.map((plan) => {
-              let price = plan.priceGBP;
-              if (currency === "EUR") price = price * GBP_TO_EUR;
-              if (interval === "annual") price = price * (1 - ANNUAL_DISCOUNT);
+            {pricingPlans.map((plan) => {
+              const price = computePrice(plan.priceGBP, currency, interval);
 
               return (
                 <StaggerItem key={plan.name}>
@@ -237,13 +100,7 @@ export function PricingPreviewSection() {
                           key={f}
                           className="flex items-start gap-2 text-sm text-envrt-charcoal/80"
                         >
-                          <svg
-                            className="mt-0.5 h-4 w-4 flex-shrink-0 text-envrt-teal"
-                            viewBox="0 0 16 16"
-                            fill="currentColor"
-                          >
-                            <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-                          </svg>
+                          <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-envrt-teal" />
                           {f}
                         </li>
                       ))}
@@ -260,7 +117,7 @@ export function PricingPreviewSection() {
                         variant={plan.highlighted ? "primary" : "secondary"}
                         className="w-full"
                       >
-                        {plan.cta}
+                        View full comparison
                       </Button>
                     </div>
                   </div>
@@ -279,43 +136,6 @@ export function PricingPreviewSection() {
           </FadeUp>
         </Container>
       </SectionCard>
-
-      {/* Nudge keyframes */}
-      <style jsx global>{`
-        @keyframes nudge {
-          0%,
-          100% {
-            transform: translateX(0) rotate(0deg);
-          }
-          10% {
-            transform: translateX(-4px) rotate(-0.7deg);
-          }
-          20% {
-            transform: translateX(4px) rotate(0.7deg);
-          }
-          30% {
-            transform: translateX(-4px) rotate(-0.7deg);
-          }
-          40% {
-            transform: translateX(4px) rotate(0.7deg);
-          }
-          50% {
-            transform: translateX(-3px) rotate(-0.5deg);
-          }
-          60% {
-            transform: translateX(3px) rotate(0.5deg);
-          }
-          70% {
-            transform: translateX(-2px) rotate(-0.3deg);
-          }
-          80% {
-            transform: translateX(1px) rotate(0);
-          }
-        }
-        .animate-nudge {
-          animation: nudge 0.6s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }
