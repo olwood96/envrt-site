@@ -188,9 +188,10 @@ Use the `FilterDropdown` component (`src/components/collective/FilterDropdown.ts
 | `FadeUp` | 0.5s | `[0.25, 0.1, 0.25, 1]` |
 | `FadeIn` | 0.5s | `easeOut` |
 | `StaggerChildren` | 0.08s stagger | Parent controls children |
-| `PageTransition` | 0.3s | `easeInOut` |
 
 Use `whileInView` with `viewport={{ once: true }}` for scroll-triggered animations. Use individual `FadeUp` wrappers (not `StaggerChildren`) for dynamically loaded content (e.g. paginated grids).
+
+**No root-level page transitions.** `AnimatePresence` in the Next.js App Router root layout causes hydration flashes and breaks hash navigation. Per-section `FadeUp` animations provide visual polish instead.
 
 ### Keyframe animations (globals.css)
 
