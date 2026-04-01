@@ -135,7 +135,7 @@ export function StickyNudge() {
           {nudge.label}
           <span className={`ml-1.5 ${isTeal ? "text-white/80" : "text-envrt-teal"}`}>→</span>
         </span>
-        <span className={`text-[11px] ${isTeal ? "text-white/50" : "text-envrt-muted/60"}`}>
+        <span className={`text-[11px] ${isTeal ? "text-white/70" : "text-envrt-muted/60"}`}>
           {nudge.hint}
         </span>
       </Link>

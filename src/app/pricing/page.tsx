@@ -10,6 +10,7 @@ import { CheckIcon, XIcon } from "@/components/icons";
 import { pricingPlans, pricingComparison, type PlanSlug } from "@/lib/config";
 import { formatPrice, computePrice, type Currency, type Interval } from "@/lib/pricing";
 import { useNudge } from "@/hooks/useNudge";
+import { ScrollHint } from "@/components/ui/ScrollHint";
 
 function FeatureValue({ value }: { value: boolean | string }) {
   if (typeof value === "boolean")
@@ -229,7 +230,7 @@ export default function PricingPage() {
 
         <FadeUp delay={0.2}>
           <SectionCard className="mx-auto mt-10 max-w-5xl">
-            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+            <ScrollHint>
             <table className="w-full min-w-[600px] text-left text-sm">
               <thead>
                 <tr className="border-b border-envrt-charcoal/8">
@@ -259,7 +260,7 @@ export default function PricingPage() {
                 ))}
               </tbody>
             </table>
-            </div>
+            </ScrollHint>
           </SectionCard>
         </FadeUp>
       </Container>

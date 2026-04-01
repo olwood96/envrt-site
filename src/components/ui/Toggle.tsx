@@ -25,7 +25,7 @@ export function Toggle({
         >
           {label}
           {i === 1 && badge && active === 1 && (
-            <span className="ml-1.5 inline-block rounded-full bg-envrt-teal/10 px-1.5 py-0.5 text-[9px] font-semibold text-envrt-teal">
+            <span className="ml-1.5 inline-block rounded-full bg-envrt-teal/10 px-1.5 py-0.5 text-[10px] font-semibold text-envrt-teal">
               {badge}
             </span>
           )}

@@ -190,7 +190,7 @@ export function CollectiveCard({
                   {dpp.total_emissions.toFixed(1)} kg CO₂e
                 </span>
                 {dpp.total_emissions_reduction_pct != null && dpp.total_emissions_reduction_pct > 0 && (
-                  <span className="mt-0.5 text-center text-[9px] font-medium text-envrt-green">
+                  <span className="mt-0.5 text-center text-[10px] font-medium text-envrt-green">
                     ↓ {Math.round(dpp.total_emissions_reduction_pct)}% vs avg
                   </span>
                 )}
@@ -202,7 +202,7 @@ export function CollectiveCard({
                   {dpp.total_water.toFixed(1)} L H₂O
                 </span>
                 {dpp.total_water_reduction_pct != null && dpp.total_water_reduction_pct > 0 && (
-                  <span className="mt-0.5 text-center text-[9px] font-medium text-blue-600">
+                  <span className="mt-0.5 text-center text-[10px] font-medium text-blue-600">
                     ↓ {Math.round(dpp.total_water_reduction_pct)}% vs avg
                   </span>
                 )}

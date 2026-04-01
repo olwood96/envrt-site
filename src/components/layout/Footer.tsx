@@ -90,7 +90,7 @@ export function Footer() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-envrt-charcoal/5 pt-8 sm:flex-row">
           <p className="text-xs text-envrt-muted">&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
-          <p className="text-xs text-envrt-muted/50">Built for a more sustainable fashion industry.</p>
+          <p className="text-xs text-envrt-muted/70">Built for a more sustainable fashion industry.</p>
         </div>
       </Container>
     </footer>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
+import { PageTransition } from "@/components/ui/PageTransition";
 import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
@@ -131,7 +132,9 @@ export default function RootLayout({
 
         <main className="min-h-screen">
           <SupplyChainBackground>
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </SupplyChainBackground>
         </main>
         <Footer />

@@ -71,7 +71,7 @@ export function VideoFrame({ src, label, className = "" }: VideoFrameProps) {
                     <div key={step.label} className="flex items-center gap-2 rounded-lg border border-envrt-charcoal/5 bg-envrt-cream/40 px-2.5 py-2">
                       <span className="text-xs">{step.icon}</span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[9px] font-semibold text-envrt-charcoal leading-tight truncate">{step.label}</p>
+                        <p className="text-[10px] font-semibold text-envrt-charcoal leading-tight truncate">{step.label}</p>
                         <p className="text-[8px] text-envrt-muted leading-tight truncate">{step.loc}</p>
                       </div>
                     </div>
@@ -80,23 +80,23 @@ export function VideoFrame({ src, label, className = "" }: VideoFrameProps) {
                 <div className="mt-3 rounded-lg border border-envrt-charcoal/5 bg-envrt-cream/30 p-2.5">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px]">🌍</span>
-                    <span className="text-[9px] font-bold text-envrt-charcoal">Environmental Impact</span>
+                    <span className="text-[10px] font-bold text-envrt-charcoal">Environmental Impact</span>
                   </div>
                   <div className="mt-2 flex gap-2">
                     <div className="flex-1 rounded-md bg-white p-1.5">
-                      <p className="text-[7px] text-envrt-muted">Carbon Footprint</p>
+                      <p className="text-[10px] text-envrt-muted">Carbon Footprint</p>
                       <p className="text-[10px] font-bold text-envrt-charcoal">6.1kg CO₂-eq</p>
-                      <p className="text-[7px] text-envrt-teal">75% improvement</p>
+                      <p className="text-[10px] text-envrt-teal">75% improvement</p>
                     </div>
                     <div className="flex-1 rounded-md bg-white p-1.5">
-                      <p className="text-[7px] text-envrt-muted">Water Scarcity</p>
+                      <p className="text-[10px] text-envrt-muted">Water Scarcity</p>
                       <p className="text-[10px] font-bold text-envrt-charcoal">2.3m³</p>
-                      <p className="text-[7px] text-envrt-teal">62% improvement</p>
+                      <p className="text-[10px] text-envrt-teal">62% improvement</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex-1" />
-                <p className="pb-2 text-center text-[7px] text-envrt-muted/50">
+                <p className="pb-2 text-center text-[10px] text-envrt-muted/70">
                   Replace: /public/videos/dpp-demo.mp4
                 </p>
               </div>

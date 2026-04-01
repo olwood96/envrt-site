@@ -14,7 +14,7 @@ export function CollectiveProductionJourney({ stages }: Props) {
         {stages.map((stage, i) => (
           <div key={stage.key} className="flex items-start">
             <div className="flex flex-col items-center rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/40 px-3 py-2 sm:px-4">
-              <span className="text-[9px] font-medium uppercase tracking-widest text-envrt-muted">
+              <span className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
                 {stage.label}
               </span>
               <span className="mt-1 text-sm font-medium text-envrt-charcoal">

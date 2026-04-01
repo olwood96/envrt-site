@@ -351,19 +351,19 @@ export function SupplyChainFlowSection() {
           {/* ——— Metrics widgets ——— */}
           <div className="flex flex-shrink-0 items-center gap-3 sm:gap-4">
             <div className="flex w-[88px] flex-col items-center rounded-lg border border-envrt-charcoal/[0.06] bg-white/60 px-3 py-3 backdrop-blur-sm">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/50">CO₂e</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/70">CO₂e</span>
               <span className="mt-0.5 text-lg font-semibold tabular-nums text-envrt-charcoal">{co2.toFixed(1)}</span>
-              <span className="text-[9px] text-envrt-muted/40">kg</span>
+              <span className="text-[10px] text-envrt-muted/60">kg</span>
             </div>
             <div className="flex w-[96px] flex-col items-center rounded-lg border border-envrt-charcoal/[0.06] bg-white/60 px-3 py-3 backdrop-blur-sm">
-              <span className="text-[9px] font-medium uppercase tracking-wider text-envrt-muted/50">H₂O Scarcity</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/70">H₂O Scarcity</span>
               <span className="mt-0.5 text-lg font-semibold tabular-nums text-envrt-charcoal">{water.toLocaleString()}</span>
-              <span className="text-[9px] text-envrt-muted/40">L eq</span>
+              <span className="text-[10px] text-envrt-muted/60">L eq</span>
             </div>
             <div className="flex w-[96px] flex-col items-center rounded-lg border border-envrt-charcoal/[0.06] bg-white/60 px-3 py-3 backdrop-blur-sm">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/50">Transparency</span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-envrt-muted/70">Transparency</span>
               <span className="mt-0.5 text-lg font-semibold tabular-nums text-envrt-charcoal">{trace}</span>
-              <span className="text-[9px] text-envrt-muted/40">%</span>
+              <span className="text-[10px] text-envrt-muted/60">%</span>
             </div>
           </div>
         </div>

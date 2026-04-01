@@ -51,7 +51,7 @@ export function CollectiveCompareBar({
               </div>
               <button
                 onClick={() => onRemove(card.dpp.id)}
-                className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-envrt-charcoal text-[9px] font-bold text-white shadow-sm"
+                className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-envrt-charcoal text-[10px] font-bold text-white shadow-sm"
               >
                 X
               </button>

@@ -111,7 +111,7 @@ function PhoneMockup({ src }: { src: string }) {
       <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
         {/* Status bar */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5" style={{ height: 22 }}>
-          <span className="text-[9px] font-semibold leading-none text-envrt-charcoal">21:37</span>
+          <span className="text-[10px] font-semibold leading-none text-envrt-charcoal">21:37</span>
           <div className="w-[72px]" />
           <div className="flex items-center gap-[4px]">
             <svg width="12" height="9" viewBox="0 0 14 10" fill="none" className="text-envrt-charcoal">

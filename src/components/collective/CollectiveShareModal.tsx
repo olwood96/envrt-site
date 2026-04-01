@@ -255,7 +255,7 @@ export function CollectiveShareModal({
               <p className="text-[10px] text-envrt-muted">
                 Add this product card to your website.
               </p>
-              <pre className="overflow-x-auto rounded-lg bg-envrt-cream/60 p-3 text-[9px] leading-relaxed text-envrt-charcoal">
+              <pre className="overflow-x-auto rounded-lg bg-envrt-cream/60 p-3 text-[10px] leading-relaxed text-envrt-charcoal">
                 {embedSnippet}
               </pre>
               <button
