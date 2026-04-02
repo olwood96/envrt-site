@@ -222,20 +222,9 @@ body {
   animation-play-state: paused;
 }
 
-/* Flip-clock digit animations */
-@keyframes flip-out {
-  from { transform: rotateX(0); opacity: 1; }
-  to   { transform: rotateX(-90deg); opacity: 0; }
-}
-@keyframes flip-in {
-  from { transform: rotateX(90deg); opacity: 0; }
-  to   { transform: rotateX(0); opacity: 1; }
-}
-.flip-out-anim {
-  animation: flip-out 150ms ease-in forwards;
-}
-.flip-in-anim {
-  animation: flip-in 150ms ease-out forwards;
+/* Odometer digit slots */
+.odometer-strip {
+  will-change: transform;
 }
 
 /* QR scan overlay (moved from HeroSection inline JSX) */
@@ -271,9 +260,8 @@ body {
   .trusted-track {
     animation: none;
   }
-  .flip-out-anim,
-  .flip-in-anim {
-    animation: none !important;
+  .odometer-strip {
+    transition: none !important;
   }
   .animate-nudge {
     animation: none;

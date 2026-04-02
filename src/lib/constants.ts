@@ -6,7 +6,6 @@ export const RESIZE_DEBOUNCE_MS = 150;
 
 // Impact stats
 export const IMPACT_POLL_INTERVAL_MS = 30_000;
-export const IMPACT_COUNT_UP_DURATION_MS = 2_000;
 export const IMPACT_MAX_CONSECUTIVE_ERRORS = 5;
 
 // Pricing

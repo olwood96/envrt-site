@@ -7,135 +7,106 @@ import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
 import {
   IMPACT_POLL_INTERVAL_MS,
-  IMPACT_COUNT_UP_DURATION_MS,
   IMPACT_MAX_CONSECUTIVE_ERRORS,
 } from "@/lib/constants";
 
-/* ── Count-up hook ── */
+const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-function useCountUp(target: number, started: boolean, duration = IMPACT_COUNT_UP_DURATION_MS) {
-  const [value, setValue] = useState(0);
-  const rafRef = useRef(0);
-  const doneRef = useRef(false);
+/* ── OdometerDigit — single slot-machine column ── */
 
-  useEffect(() => {
-    // After initial animation completes, pass through updates directly
-    // (FlipDigit handles the visual transition for incremental changes)
-    if (doneRef.current) {
-      setValue(target);
-      return;
-    }
-
-    if (!started || target === 0) {
-      setValue(target);
-      return;
-    }
-
-    // Check reduced motion preference
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
-      setValue(target);
-      doneRef.current = true;
-      return;
-    }
-
-    const t0 = performance.now();
-    const animTarget = target;
-    function tick() {
-      const elapsed = performance.now() - t0;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * animTarget));
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        doneRef.current = true;
-      }
-    }
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [target, started, duration]);
-
-  return value;
-}
-
-/* ── FlipDigit — single character with flip animation ── */
-
-function FlipDigit({ char, isDigit }: { char: string; isDigit: boolean }) {
-  const [display, setDisplay] = useState(char);
-  const [flipping, setFlipping] = useState(false);
-  const prevRef = useRef(char);
-
-  useEffect(() => {
-    if (char === prevRef.current) return;
-    prevRef.current = char;
-
-    if (!isDigit) {
-      setDisplay(char);
-      return;
-    }
-
-    // Check reduced motion
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
-      setDisplay(char);
-      return;
-    }
-
-    setFlipping(true);
-    // After flip-out, swap the digit and flip-in
-    const timer = setTimeout(() => {
-      setDisplay(char);
-      setFlipping(false);
-    }, 150); // half of the 300ms flip cycle
-    return () => clearTimeout(timer);
-  }, [char, isDigit]);
-
-  if (!isDigit) {
-    return (
-      <span className="mx-[1px] inline-flex items-center text-envrt-charcoal/30">
-        {display}
-      </span>
-    );
-  }
+function OdometerDigit({
+  digit,
+  started,
+  delay,
+}: {
+  digit: number;
+  started: boolean;
+  delay: number;
+}) {
+  // The column shows 0-9 stacked vertically. We translate to show the target digit.
+  // translateY(-digit * 10%) scrolls to the right position.
+  const targetY = started ? `-${digit * 10}%` : "0%";
 
   return (
     <span
-      className="relative mx-[1px] inline-flex h-[1.4em] w-[0.7em] items-center justify-center overflow-hidden rounded bg-envrt-charcoal/[0.04]"
-      style={{ perspective: "200px" }}
+      className="odometer-slot relative mx-[1px] inline-flex h-[1.4em] w-[0.7em] overflow-hidden rounded bg-envrt-charcoal/[0.04]"
     >
       {/* Centre divider line */}
       <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-px bg-envrt-charcoal/[0.06]" />
+
       <span
-        className={flipping ? "flip-out-anim" : "flip-in-anim"}
+        className="odometer-strip flex flex-col items-center"
         style={{
-          display: "inline-block",
-          backfaceVisibility: "hidden",
-          transformOrigin: "center center",
+          height: "1000%", // 10 digits × 100% each
+          transform: `translateY(${targetY})`,
+          transitionProperty: "transform",
+          transitionDuration: started ? "1.6s" : "0s",
+          transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",
+          transitionDelay: started ? `${delay}s` : "0s",
         }}
       >
-        {display}
+        {DIGITS.map((d) => (
+          <span
+            key={d}
+            className="flex h-[10%] w-full items-center justify-center"
+          >
+            {d}
+          </span>
+        ))}
       </span>
     </span>
   );
 }
 
-/* ── Flipcard number display ── */
+/* ── Separator (comma / period) ── */
 
-function FlipNumber({ value }: { value: number }) {
+function OdometerSeparator({ char, started, delay }: { char: string; started: boolean; delay: number }) {
+  return (
+    <span
+      className="mx-[1px] inline-flex items-center text-envrt-charcoal/30"
+      style={{
+        opacity: started ? 1 : 0,
+        transition: `opacity 0.4s ease ${delay}s`,
+      }}
+    >
+      {char}
+    </span>
+  );
+}
+
+/* ── OdometerNumber — formats value and renders digit columns ── */
+
+function OdometerNumber({ value, started }: { value: number; started: boolean }) {
   const formatted = value.toLocaleString("en-GB");
   const chars = formatted.split("");
 
+  // Count total digit positions for stagger calculation (right-to-left)
+  const digitCount = chars.filter((c) => /\d/.test(c)).length;
+  let digitIndex = 0;
+
   return (
     <span className="inline-flex items-center text-3xl font-bold tabular-nums text-envrt-charcoal sm:text-4xl lg:text-5xl">
-      {chars.map((char, i) => (
-        <FlipDigit key={i} char={char} isDigit={/\d/.test(char)} />
-      ))}
+      {chars.map((char, i) => {
+        if (/\d/.test(char)) {
+          const posFromRight = digitCount - 1 - digitIndex;
+          // Stagger: rightmost digit has shortest delay, leftmost has longest
+          const delay = posFromRight * 0.08;
+          digitIndex++;
+          return (
+            <OdometerDigit
+              key={`d-${i}`}
+              digit={parseInt(char, 10)}
+              started={started}
+              delay={delay}
+            />
+          );
+        }
+        // Separator — fades in with the delay of the digit to its left
+        const delay = (digitCount - digitIndex) * 0.08;
+        return (
+          <OdometerSeparator key={`s-${i}`} char={char} started={started} delay={delay} />
+        );
+      })}
     </span>
   );
 }
@@ -146,18 +117,20 @@ function StatColumn({
   value,
   unit,
   label,
+  started,
   showDivider,
 }: {
   value: number;
   unit: string;
   label: string;
+  started: boolean;
   showDivider?: boolean;
 }) {
   return (
     <>
       <div className="flex flex-col items-center text-center py-2 sm:py-0">
         <div className="flex items-baseline gap-1.5">
-          <FlipNumber value={value} />
+          <OdometerNumber value={value} started={started} />
           <span className="text-sm font-medium text-envrt-muted sm:text-base">
             {unit}
           </span>
@@ -186,10 +159,6 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
   const [co2, setCo2] = useState(initialStats.co2Kg);
   const [water, setWater] = useState(initialStats.waterLitres);
   const [scans, setScans] = useState(initialStats.dppScans);
-
-  const animatedCo2 = useCountUp(co2, visible);
-  const animatedWater = useCountUp(water, visible);
-  const animatedScans = useCountUp(scans, visible);
 
   // Poll for updated stats with backoff on consecutive failures
   useEffect(() => {
@@ -229,21 +198,24 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
 
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
             <StatColumn
-              value={animatedCo2}
+              value={co2}
               unit="kg"
               label="CO₂e impact explored"
+              started={visible}
               showDivider
             />
             <StatColumn
-              value={animatedWater}
+              value={water}
               unit="L"
               label="Water impact explored"
+              started={visible}
               showDivider
             />
             <StatColumn
-              value={animatedScans}
+              value={scans}
               unit=""
               label="DPP scans worldwide"
+              started={visible}
             />
           </div>
 
