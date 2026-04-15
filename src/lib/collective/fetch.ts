@@ -7,6 +7,7 @@ import type {
   CollectiveFilters,
   CollectiveProductionStage,
   CollectiveVerification,
+  CollectiveEcoscore,
   BrandEngagement,
 } from "./types";
 
@@ -236,6 +237,46 @@ export async function getFeaturedDpp(
 
   const resolvedSlug = brand.slug || slugify(brand.name);
 
+  // Fetch ecoscore if available (via garment_id from garments table)
+  let ecoscore: CollectiveEcoscore | null = null;
+  try {
+    // Find the garment record for this brand + sku
+    const { data: garment } = await supabase
+      .from("garments")
+      .select("id, garment_mass_g")
+      .eq("brand_id", brand.id)
+      .eq("product_sku", productSku)
+      .maybeSingle();
+
+    if (garment) {
+      // Get latest ecoscore result
+      const { data: ecoscoreRow } = await supabase
+        .from("ecoscore_results")
+        .select("ecoscore_pts")
+        .eq("garment_id", garment.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (ecoscoreRow) {
+        const massKg = Number(garment.garment_mass_g ?? 0) / 1000;
+        const pts = Number(ecoscoreRow.ecoscore_pts);
+
+        // Fetch official label SVG from the portal (public, no auth)
+        let labelSvg: string | null = null;
+        try {
+          const labelRes = await fetch(
+            `https://affichage-environnemental.ecobalyse.beta.gouv.fr/api/image?type=score&score=${Math.round(pts)}&masse=${massKg}`,
+            { next: { revalidate: 86400 } } // cache for 24h
+          );
+          if (labelRes.ok) labelSvg = await labelRes.text();
+        } catch { /* non-critical */ }
+
+        ecoscore = { ecoscore_pts: pts, mass_kg: massKg, label_svg: labelSvg };
+      }
+    }
+  } catch { /* non-critical, ecoscore is optional */ }
+
   return {
     dpp: {
       ...dpp,
@@ -247,6 +288,7 @@ export async function getFeaturedDpp(
     brandLogoUrl: storageUrl("brand-assets", brand.logo_path),
     embedUrl: `https://dpp.envrt.com/${resolvedSlug}/${slugify(dpp.collection_name)}/${slugify(dpp.product_sku)}/embed`,
     detailUrl: `/collective/${resolvedSlug}/${dpp.product_sku}`,
+    ecoscore,
   };
 }
 

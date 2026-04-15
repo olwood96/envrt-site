@@ -156,7 +156,25 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
                   {Math.round(dpp.transparency_score)}% transparency
                 </span>
               )}
+              {card.ecoscore && (
+                <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700">
+                  {Math.round(card.ecoscore.ecoscore_pts)} Pts ecoscore
+                </span>
+              )}
             </div>
+
+            {/* French ecoscore label */}
+            {card.ecoscore?.label_svg && (
+              <div className="mt-4">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted mb-2">
+                  French environmental cost (Ecobalyse)
+                </p>
+                <div
+                  className="inline-block [&>svg]:w-[180px] [&>svg]:h-auto"
+                  dangerouslySetInnerHTML={{ __html: card.ecoscore.label_svg }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Iframe embed */}
