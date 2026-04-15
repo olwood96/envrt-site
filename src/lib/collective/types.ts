@@ -50,13 +50,6 @@ export interface CollectiveBrand {
   tier: "free" | "verified" | "premium";
 }
 
-/** Ecoscore data from the ecoscore_results table (if available) */
-export interface CollectiveEcoscore {
-  ecoscore_pts: number;
-  mass_kg: number;
-  label_svg: string | null;
-}
-
 /** Combined card data for the grid */
 export interface CollectiveCardData {
   dpp: CollectiveDpp;
@@ -65,7 +58,6 @@ export interface CollectiveCardData {
   brandLogoUrl: string | null;
   embedUrl: string;
   detailUrl: string;
-  ecoscore?: CollectiveEcoscore | null;
 }
 
 /** Available filter options derived from the featured set */
