@@ -25,7 +25,7 @@ export const heroContent = {
   badge: "Onboard in 30 minutes. Generate DPPs today.",
   headline: "Your GARMENTS.\nTheir IMPACT.\nOne PLATFORM.",
   subheadline:
-    "Create regulation-ready Digital Product Passports, calculate CO₂e and water scarcity metrics and share sustainability data with your customers, all in one place.",
+    "Create regulation-ready Digital Product Passports. Calculate emissions, water scarcity and French Eco-Score ratings. Share it all with your customers.",
   ctaPrimary: { label: "Book a demo", href: "/contact" },
   ctaSecondary: { label: "View example DPP", href: "/demo" },
   videoLabel: "Example Digital Product Passport",
@@ -69,7 +69,7 @@ export const howItWorksSteps = [
     bullets: [
       "Guided data entry with smart defaults",
       "Support for complex multi-material garments",
-      "Bulk upload for large collections",
+      "Smart gap-filling from your existing data",
     ],
     mockImage: "/mock/howitworks-collect.png",
   },
@@ -93,8 +93,9 @@ export const howItWorksSteps = [
     description:
       "We compute CO₂e emissions and water scarcity footprints across the full garment lifecycle, from fibre to finished product.",
     bullets: [
-      "Full lifecycle CO₂e assessment",
+      "Full lifecycle CO\u2082e assessment",
       "Water scarcity (AWARE method)",
+      "French Eco-Score (co\u00fbt environnemental)",
       "Comparison against category benchmarks",
     ],
     mockImage: "/mock/howitworks-calculate.png",
@@ -119,7 +120,7 @@ export const outcomeCards = [
     stat: "100%",
     title: "Regulation-ready from day one",
     description:
-      "Your DPPs meet EU ESPR requirements out of the box. No second-guessing whether you're compliant.",
+      "Your DPPs meet EU ESPR requirements out of the box, including French Eco-Score compliance. No second-guessing.",
     cta: { label: "See how it works", href: "/#how-it-works" },
   },
   {
@@ -171,6 +172,7 @@ export const pricingPlans: PricingPlan[] = [
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
       "CO\u2082e and AWARE water scarcity indicators",
+      "French Eco-Score rating",
       "Fibre-to-assembly supply chain reconstruction",
       "DPP scan and engagement analytics",
       "Email support with onboarding call",
@@ -194,7 +196,7 @@ export const pricingPlans: PricingPlan[] = [
       "Entry-level decarbonisation guidance",
       "Stage-linked evidence library",
       "Hotspot insights with reduction opportunities",
-      "Collection summaries with CSV/PDF exports",
+      "Exportable sustainability reports and collection analytics",
       "Priority support",
     ],
     highlighted: true,
@@ -238,6 +240,7 @@ export const pricingComparison = {
       features: [
         { name: "Transparency score per product", starter: true, growth: true, pro: true },
         { name: "Evidence uploads and product documentation", starter: true, growth: true, pro: true },
+        { name: "Multi-level supply chain verification", starter: true, growth: true, pro: true },
         { name: "Stage-linked evidence library", starter: false, growth: true, pro: true },
       ],
     },
@@ -254,6 +257,7 @@ export const pricingComparison = {
       features: [
         { name: "CO\u2082e indicators", starter: true, growth: true, pro: true },
         { name: "AWARE water scarcity indicators", starter: true, growth: true, pro: true },
+        { name: "French Eco-Score (co\u00fbt environnemental)", starter: true, growth: true, pro: true },
         { name: "Core LCA metrics beyond indicators", starter: false, growth: true, pro: true },
         { name: "Complete PEF-aligned metrics", starter: false, growth: false, pro: true },
       ],
@@ -265,7 +269,7 @@ export const pricingComparison = {
         { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
         { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
-        { name: "Collection summaries with CSV/PDF exports", starter: false, growth: true, pro: true },
+        { name: "Exportable sustainability reports and collection analytics", starter: false, growth: true, pro: true },
         { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true },
       ],
     },
@@ -328,7 +332,7 @@ export const pricingFaqItems = [
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes DPP creation, QR-ready passport pages, transparency scores, CO₂e indicators, and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy, and a dedicated account specialist.",
+      "Starter includes DPP creation, QR-ready passport pages, transparency scores, CO\u2082e indicators, French Eco-Score ratings and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",
@@ -344,6 +348,11 @@ export const pricingFaqItems = [
     question: "Do you offer annual billing?",
     answer:
       "Yes, annual billing saves you 15% compared to monthly pricing across all plans.",
+  },
+  {
+    question: "Do you support the French Eco-Score (affichage environnemental)?",
+    answer:
+      "Yes. All plans include French Eco-Score ratings calculated using the official co\u00fbt environnemental methodology via Ecobalyse. You can calculate scores for your garments and display them on your DPPs.",
   },
 ];
 
