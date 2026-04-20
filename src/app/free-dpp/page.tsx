@@ -5,6 +5,9 @@ import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
+import { Badge } from "@/components/ui/Badge";
+import { Toggle } from "@/components/ui/Toggle";
+import { FilterDropdown } from "@/components/collective/FilterDropdown";
 import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 /* ================================================================
@@ -26,25 +29,19 @@ const GARMENT_TYPES = [
 ];
 
 const MATERIALS = [
-  { group: "Natural", options: [
-    { value: "cotton", label: "Cotton" },
-    { value: "organic cotton", label: "Organic Cotton" },
-    { value: "linen", label: "Linen" },
-    { value: "wool", label: "Wool" },
-    { value: "silk", label: "Silk" },
-  ]},
-  { group: "Synthetic", options: [
-    { value: "polyester", label: "Polyester" },
-    { value: "recycled polyester", label: "Recycled Polyester" },
-    { value: "nylon", label: "Nylon" },
-    { value: "recycled nylon", label: "Recycled Nylon" },
-    { value: "elastane", label: "Elastane / Spandex" },
-  ]},
-  { group: "Regenerated", options: [
-    { value: "viscose", label: "Viscose" },
-    { value: "lyocell", label: "Lyocell / Tencel" },
-    { value: "modal", label: "Modal" },
-  ]},
+  { value: "cotton", label: "Cotton" },
+  { value: "organic cotton", label: "Organic Cotton" },
+  { value: "linen", label: "Linen" },
+  { value: "wool", label: "Wool" },
+  { value: "silk", label: "Silk" },
+  { value: "polyester", label: "Polyester" },
+  { value: "recycled polyester", label: "Recycled Polyester" },
+  { value: "nylon", label: "Nylon" },
+  { value: "recycled nylon", label: "Recycled Nylon" },
+  { value: "elastane", label: "Elastane / Spandex" },
+  { value: "viscose", label: "Viscose" },
+  { value: "lyocell", label: "Lyocell / Tencel" },
+  { value: "modal", label: "Modal" },
 ];
 
 const COUNTRIES = [
@@ -91,7 +88,6 @@ const DEADSTOCK_OPTIONS = [
   { value: "7", label: "5 - 10%" },
   { value: "15", label: "10 - 20%" },
   { value: "25", label: "20%+" },
-  { value: "", label: "Not sure" },
 ];
 
 const WASTE_OPTIONS = [
@@ -99,7 +95,6 @@ const WASTE_OPTIONS = [
   { value: "7", label: "5 - 10%" },
   { value: "12", label: "10 - 15%" },
   { value: "20", label: "15%+" },
-  { value: "", label: "Not sure" },
 ];
 
 /* ================================================================
@@ -109,7 +104,6 @@ const WASTE_OPTIONS = [
 type Step = "product" | "boost" | "contact" | "done";
 
 interface FormData {
-  // Section A
   garment_type: string;
   material_1: string;
   material_1_pct: number;
@@ -118,18 +112,21 @@ interface FormData {
   weight_g: string;
   country_assembly: string;
   fabric_process: string;
-  // Section B
   number_of_references: string;
   price_eur: string;
   business_type: string;
   dead_stock_pct: string;
   making_waste_pct: string;
-  // Contact
   contact_name: string;
   brand_name: string;
   contact_email: string;
   product_url: string;
 }
+
+const inputClasses =
+  "w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm text-envrt-charcoal placeholder:text-envrt-muted/60 outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20";
+
+const labelClasses = "block text-xs font-medium text-envrt-muted mb-2";
 
 export default function FreeDppPage() {
   const [step, setStep] = useState<Step>("product");
@@ -162,12 +159,9 @@ export default function FreeDppPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Only garment type, material and weight are truly required by the ecoscore API
   const canContinueProduct = () =>
-    form.garment_type &&
-    form.material_1 &&
-    form.weight_g &&
-    form.country_assembly &&
-    form.fabric_process;
+    form.garment_type && form.material_1 && form.weight_g;
 
   const canSubmit = () =>
     form.contact_name && form.brand_name && form.contact_email && turnstileToken;
@@ -192,8 +186,8 @@ export default function FreeDppPage() {
           garment_type: form.garment_type,
           materials,
           weight_g: parseInt(form.weight_g),
-          country_assembly: form.country_assembly,
-          fabric_process: form.fabric_process,
+          country_assembly: form.country_assembly || null,
+          fabric_process: form.fabric_process || null,
           number_of_references: form.number_of_references ? parseInt(form.number_of_references) : null,
           price_eur: form.price_eur ? parseFloat(form.price_eur) : null,
           business_type: form.business_type || null,
@@ -219,92 +213,105 @@ export default function FreeDppPage() {
     setSubmitting(false);
   }
 
-  /* ────────── Shared styles ────────── */
+  /* ──────── HERO ──────── */
 
-  const inputClasses =
-    "w-full rounded-xl border border-envrt-charcoal/15 bg-white px-4 py-3 text-sm text-envrt-charcoal placeholder:text-envrt-muted/60 focus:outline-none focus:ring-2 focus:ring-envrt-teal/30 focus:border-envrt-teal transition-all";
-
-  const labelClasses = "block text-sm font-medium text-envrt-charcoal mb-1.5";
-
-  const selectClasses = `${inputClasses} appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat pr-10`;
-
-  /* ────────── STEP: Product Details ────────── */
-
-  if (step === "product") {
+  if (step === "product" || step === "boost" || step === "contact") {
     return (
-      <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container className="max-w-lg">
+      <div className="pb-20 pt-28 sm:pt-32">
+        <Container className="max-w-[640px]">
+          {/* Header */}
           <FadeUp>
-            <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-4xl font-semibold text-envrt-charcoal">
+            <div className="mb-10 text-center">
+              <Badge className="mb-6">Free Eco-Score DPP</Badge>
+              <h1 className="text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-3xl">
                 Get your free eco-score DPP
               </h1>
-              <p className="mt-3 text-envrt-muted text-base max-w-md mx-auto">
-                Tell us about one product. We will generate a Digital Product Passport with its environmental score and send it to you.
+              <p className="mx-auto mt-3 max-w-md text-sm text-envrt-muted">
+                Tell us about one product. We will generate a Digital Product
+                Passport with its environmental score and send it to you.
               </p>
             </div>
           </FadeUp>
 
-          <FadeUp delay={0.1}>
-            <SectionCard className="p-6 md:p-8">
-              <div className="space-y-5">
-                {/* Garment type */}
-                <div>
-                  <label className={labelClasses}>Garment type</label>
-                  <select
-                    className={selectClasses}
-                    value={form.garment_type}
-                    onChange={(e) => update("garment_type", e.target.value)}
-                  >
-                    <option value="">Select type</option>
-                    {GARMENT_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
-                    ))}
-                  </select>
-                </div>
+          {/* Step 1: Product details */}
+          {step === "product" && (
+            <FadeUp delay={0.1}>
+              <SectionCard>
+                <div className="space-y-6 p-6 sm:p-8">
+                  {/* Garment type */}
+                  <div>
+                    <label className={labelClasses}>Garment type</label>
+                    <FilterDropdown
+                      label="Select type"
+                      value={form.garment_type}
+                      options={GARMENT_TYPES}
+                      onChange={(v) => update("garment_type", v)}
+                      className="w-full"
+                    />
+                  </div>
 
-                {/* Main material */}
-                <div>
-                  <label className={labelClasses}>Main material</label>
-                  <select
-                    className={selectClasses}
-                    value={form.material_1}
-                    onChange={(e) => update("material_1", e.target.value)}
-                  >
-                    <option value="">Select material</option>
-                    {MATERIALS.map((group) => (
-                      <optgroup key={group.group} label={group.group}>
-                        {group.options.map((m) => (
-                          <option key={m.value} value={m.value}>{m.label}</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
+                  {/* Main material */}
+                  <div>
+                    <label className={labelClasses}>Main material</label>
+                    <FilterDropdown
+                      label="Select material"
+                      value={form.material_1}
+                      options={MATERIALS}
+                      onChange={(v) => update("material_1", v)}
+                      className="w-full"
+                    />
+                  </div>
 
-                {/* Material percentage */}
-                <div>
-                  <label className={labelClasses}>
-                    Material percentage
-                    <span className="ml-2 text-envrt-muted font-normal">{form.material_1_pct}%</span>
-                  </label>
-                  <input
-                    type="range"
-                    min={showSecondMaterial ? 10 : 100}
-                    max={100}
-                    value={form.material_1_pct}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value);
-                      update("material_1_pct", val);
-                      update("material_2_pct", 100 - val);
-                    }}
-                    className="w-full accent-envrt-teal"
-                    disabled={!showSecondMaterial}
-                  />
-                  {!showSecondMaterial && (
+                  {/* Material percentage + second material */}
+                  {showSecondMaterial ? (
+                    <div className="space-y-4 rounded-xl border border-envrt-charcoal/5 bg-envrt-cream/30 p-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-envrt-muted">
+                          Material split
+                          <span className="ml-2 text-envrt-charcoal">
+                            {form.material_1_pct}% / {form.material_2_pct}%
+                          </span>
+                        </label>
+                        <button
+                          type="button"
+                          className="text-xs text-red-400 hover:underline"
+                          onClick={() => {
+                            setShowSecondMaterial(false);
+                            update("material_1_pct", 100);
+                            update("material_2", "");
+                            update("material_2_pct", 0);
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <input
+                        type="range"
+                        min={10}
+                        max={90}
+                        value={form.material_1_pct}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          update("material_1_pct", val);
+                          update("material_2_pct", 100 - val);
+                        }}
+                        className="w-full accent-envrt-teal"
+                      />
+                      <div>
+                        <label className={labelClasses}>Second material</label>
+                        <FilterDropdown
+                          label="Select material"
+                          value={form.material_2}
+                          options={MATERIALS}
+                          onChange={(v) => update("material_2", v)}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      className="mt-2 text-xs text-envrt-teal hover:underline"
+                      className="text-xs text-envrt-teal hover:underline"
                       onClick={() => {
                         setShowSecondMaterial(true);
                         update("material_1_pct", 80);
@@ -314,375 +321,287 @@ export default function FreeDppPage() {
                       + Add another material
                     </button>
                   )}
-                </div>
 
-                {/* Second material (conditional) */}
-                {showSecondMaterial && (
-                  <div className="pl-4 border-l-2 border-envrt-teal/20 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <label className={labelClasses}>Second material ({form.material_2_pct}%)</label>
-                      <button
-                        type="button"
-                        className="text-xs text-red-400 hover:underline"
-                        onClick={() => {
-                          setShowSecondMaterial(false);
-                          update("material_1_pct", 100);
-                          update("material_2", "");
-                          update("material_2_pct", 0);
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    <select
-                      className={selectClasses}
-                      value={form.material_2}
-                      onChange={(e) => update("material_2", e.target.value)}
-                    >
-                      <option value="">Select material</option>
-                      {MATERIALS.map((group) => (
-                        <optgroup key={group.group} label={group.group}>
-                          {group.options.map((m) => (
-                            <option key={m.value} value={m.value}>{m.label}</option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
+                  {/* Weight */}
+                  <div>
+                    <label className={labelClasses}>Weight (grams)</label>
+                    <input
+                      type="number"
+                      className={inputClasses}
+                      placeholder="e.g. 180"
+                      value={form.weight_g}
+                      onChange={(e) => update("weight_g", e.target.value)}
+                      min={10}
+                      max={5000}
+                    />
+                    <p className="mt-1.5 text-[11px] text-envrt-muted/70">
+                      A t-shirt is ~150g, jeans ~800g, a coat ~1200g
+                    </p>
                   </div>
-                )}
 
-                {/* Weight */}
-                <div>
-                  <label className={labelClasses}>Weight (grams)</label>
-                  <input
-                    type="number"
-                    className={inputClasses}
-                    placeholder="e.g. 180"
-                    value={form.weight_g}
-                    onChange={(e) => update("weight_g", e.target.value)}
-                    min={10}
-                    max={5000}
-                  />
-                  <p className="mt-1 text-xs text-envrt-muted">
-                    A t-shirt is ~150g, jeans ~800g, a coat ~1200g
-                  </p>
-                </div>
-
-                {/* Country of assembly */}
-                <div>
-                  <label className={labelClasses}>Country of assembly</label>
-                  <select
-                    className={selectClasses}
-                    value={form.country_assembly}
-                    onChange={(e) => update("country_assembly", e.target.value)}
-                  >
-                    <option value="">Select country</option>
-                    {COUNTRIES.map((c) => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Knit or woven */}
-                <div>
-                  <label className={labelClasses}>Fabric type</label>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-                        form.fabric_process === "knit"
-                          ? "border-envrt-teal bg-envrt-teal/5 text-envrt-teal"
-                          : "border-envrt-charcoal/15 text-envrt-charcoal hover:border-envrt-charcoal/30"
-                      }`}
-                      onClick={() => update("fabric_process", "knit")}
-                    >
-                      Knit
-                    </button>
-                    <button
-                      type="button"
-                      className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-                        form.fabric_process === "woven"
-                          ? "border-envrt-teal bg-envrt-teal/5 text-envrt-teal"
-                          : "border-envrt-charcoal/15 text-envrt-charcoal hover:border-envrt-charcoal/30"
-                      }`}
-                      onClick={() => update("fabric_process", "woven")}
-                    >
-                      Woven
-                    </button>
+                  {/* Country of assembly (optional) */}
+                  <div>
+                    <label className={labelClasses}>
+                      Country of assembly
+                      <span className="ml-1 font-normal text-envrt-muted/60">(optional)</span>
+                    </label>
+                    <FilterDropdown
+                      label="Select country"
+                      value={form.country_assembly}
+                      options={COUNTRIES}
+                      onChange={(v) => update("country_assembly", v)}
+                      className="w-full"
+                    />
                   </div>
-                </div>
-              </div>
 
-              <div className="mt-8 flex justify-end">
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => setStep("boost")}
-                  className={!canContinueProduct() ? "opacity-50 pointer-events-none" : ""}
-                >
-                  Continue
-                </Button>
-              </div>
-            </SectionCard>
-          </FadeUp>
-        </Container>
-      </main>
-    );
-  }
-
-  /* ────────── STEP: Boost Your Score ────────── */
-
-  if (step === "boost") {
-    return (
-      <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container className="max-w-lg">
-          <FadeUp>
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-semibold text-envrt-charcoal">
-                Help us calculate a more accurate score
-              </h2>
-              <p className="mt-3 text-envrt-muted text-base max-w-md mx-auto">
-                These are optional. Each one helps produce a more representative result for your product.
-              </p>
-            </div>
-          </FadeUp>
-
-          <FadeUp delay={0.1}>
-            <SectionCard className="p-6 md:p-8">
-              <div className="space-y-5">
-                {/* Catalogue size */}
-                <div>
-                  <label className={labelClasses}>How many products in your catalogue?</label>
-                  <select
-                    className={selectClasses}
-                    value={form.number_of_references}
-                    onChange={(e) => update("number_of_references", e.target.value)}
-                  >
-                    <option value="">Skip</option>
-                    {CATALOGUE_SIZES.map((c) => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Retail price */}
-                <div>
-                  <label className={labelClasses}>Retail price range (EUR)</label>
-                  <select
-                    className={selectClasses}
-                    value={form.price_eur}
-                    onChange={(e) => update("price_eur", e.target.value)}
-                  >
-                    <option value="">Skip</option>
-                    {PRICE_RANGES.map((p) => (
-                      <option key={p.value} value={p.value}>{p.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Business size */}
-                <div>
-                  <label className={labelClasses}>Business size</label>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-                        form.business_type === "small-business"
-                          ? "border-envrt-teal bg-envrt-teal/5 text-envrt-teal"
-                          : "border-envrt-charcoal/15 text-envrt-charcoal hover:border-envrt-charcoal/30"
-                      }`}
-                      onClick={() => update("business_type", "small-business")}
-                    >
-                      Small brand
-                    </button>
-                    <button
-                      type="button"
-                      className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-                        form.business_type === "large-business-without-services"
-                          ? "border-envrt-teal bg-envrt-teal/5 text-envrt-teal"
-                          : "border-envrt-charcoal/15 text-envrt-charcoal hover:border-envrt-charcoal/30"
-                      }`}
-                      onClick={() => update("business_type", "large-business-without-services")}
-                    >
-                      Large brand
-                    </button>
+                  {/* Knit or woven (optional) */}
+                  <div>
+                    <label className={labelClasses}>
+                      Fabric type
+                      <span className="ml-1 font-normal text-envrt-muted/60">(optional)</span>
+                    </label>
+                    <Toggle
+                      options={["Knit", "Woven"]}
+                      active={form.fabric_process === "woven" ? 1 : 0}
+                      onChange={(i) => update("fabric_process", i === 0 ? "knit" : "woven")}
+                    />
                   </div>
                 </div>
 
-                {/* Dead stock */}
-                <div>
-                  <label className={labelClasses}>Estimated unsold stock</label>
-                  <select
-                    className={selectClasses}
-                    value={form.dead_stock_pct}
-                    onChange={(e) => update("dead_stock_pct", e.target.value)}
+                <div className="flex justify-end border-t border-envrt-charcoal/5 px-6 py-4 sm:px-8">
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={() => {
+                      setStep("boost");
+                      window.scrollTo(0, 0);
+                    }}
+                    className={!canContinueProduct() ? "opacity-40 pointer-events-none" : ""}
                   >
-                    <option value="">Skip</option>
-                    {DEADSTOCK_OPTIONS.map((d) => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Cutting waste */}
-                <div>
-                  <label className={labelClasses}>Estimated cutting waste</label>
-                  <select
-                    className={selectClasses}
-                    value={form.making_waste_pct}
-                    onChange={(e) => update("making_waste_pct", e.target.value)}
-                  >
-                    <option value="">Skip</option>
-                    {WASTE_OPTIONS.map((w) => (
-                      <option key={w.value} value={w.value}>{w.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-between">
-                <Button variant="ghost" size="md" onClick={() => setStep("product")}>
-                  Back
-                </Button>
-                <div className="flex gap-3">
-                  <Button variant="secondary" size="md" onClick={() => setStep("contact")}>
-                    Skip
-                  </Button>
-                  <Button variant="primary" size="md" onClick={() => setStep("contact")}>
                     Continue
                   </Button>
                 </div>
-              </div>
-            </SectionCard>
-          </FadeUp>
-        </Container>
-      </main>
-    );
-  }
+              </SectionCard>
+            </FadeUp>
+          )}
 
-  /* ────────── STEP: Contact Details ────────── */
-
-  if (step === "contact") {
-    return (
-      <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container className="max-w-lg">
-          <FadeUp>
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-semibold text-envrt-charcoal">
-                Where should we send your DPP?
-              </h2>
-              <p className="mt-3 text-envrt-muted text-base max-w-md mx-auto">
-                We will email you a link to your eco-score DPP within 24 hours.
-              </p>
-            </div>
-          </FadeUp>
-
-          <FadeUp delay={0.1}>
-            <SectionCard className="p-6 md:p-8">
-              <div className="space-y-5">
-                <div>
-                  <label className={labelClasses}>Your name</label>
-                  <input
-                    type="text"
-                    className={inputClasses}
-                    placeholder="First name"
-                    value={form.contact_name}
-                    onChange={(e) => update("contact_name", e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClasses}>Brand name</label>
-                  <input
-                    type="text"
-                    className={inputClasses}
-                    placeholder="Your brand"
-                    value={form.brand_name}
-                    onChange={(e) => update("brand_name", e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClasses}>Email</label>
-                  <input
-                    type="email"
-                    className={inputClasses}
-                    placeholder="you@brand.com"
-                    value={form.contact_email}
-                    onChange={(e) => update("contact_email", e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClasses}>
-                    Product URL
-                    <span className="ml-2 text-envrt-muted font-normal">(optional)</span>
-                  </label>
-                  <input
-                    type="url"
-                    className={inputClasses}
-                    placeholder="https://yourbrand.com/products/..."
-                    value={form.product_url}
-                    onChange={(e) => update("product_url", e.target.value)}
-                  />
-                  <p className="mt-1 text-xs text-envrt-muted">
-                    Helps us verify details and add your product image to the DPP
+          {/* Step 2: Boost your score */}
+          {step === "boost" && (
+            <FadeUp delay={0.1}>
+              <SectionCard>
+                <div className="space-y-6 p-6 sm:p-8">
+                  <p className="text-xs text-envrt-muted">
+                    These are optional. Each one helps produce a more accurate result for your product.
                   </p>
+
+                  {/* Catalogue size */}
+                  <div>
+                    <label className={labelClasses}>How many products in your catalogue?</label>
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.number_of_references}
+                      options={CATALOGUE_SIZES}
+                      onChange={(v) => update("number_of_references", v)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Retail price */}
+                  <div>
+                    <label className={labelClasses}>Retail price range (EUR)</label>
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.price_eur}
+                      options={PRICE_RANGES}
+                      onChange={(v) => update("price_eur", v)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Business size */}
+                  <div>
+                    <label className={labelClasses}>Business size</label>
+                    <Toggle
+                      options={["Small brand", "Large brand"]}
+                      active={form.business_type === "large-business-without-services" ? 1 : 0}
+                      onChange={(i) =>
+                        update(
+                          "business_type",
+                          i === 0 ? "small-business" : "large-business-without-services"
+                        )
+                      }
+                    />
+                  </div>
+
+                  {/* Dead stock */}
+                  <div>
+                    <label className={labelClasses}>Estimated unsold stock</label>
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.dead_stock_pct}
+                      options={DEADSTOCK_OPTIONS}
+                      onChange={(v) => update("dead_stock_pct", v)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Cutting waste */}
+                  <div>
+                    <label className={labelClasses}>Estimated cutting waste</label>
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.making_waste_pct}
+                      options={WASTE_OPTIONS}
+                      onChange={(v) => update("making_waste_pct", v)}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <HiddenTurnstile onToken={setTurnstileToken} />
+                <div className="flex items-center justify-between border-t border-envrt-charcoal/5 px-6 py-4 sm:px-8">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setStep("product"); window.scrollTo(0, 0); }}
+                  >
+                    Back
+                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="secondary"
+                      size="md"
+                      onClick={() => { setStep("contact"); window.scrollTo(0, 0); }}
+                    >
+                      Skip
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={() => { setStep("contact"); window.scrollTo(0, 0); }}
+                    >
+                      Continue
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              </SectionCard>
+            </FadeUp>
+          )}
 
-              {error && (
-                <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                  {error}
+          {/* Step 3: Contact details */}
+          {step === "contact" && (
+            <FadeUp delay={0.1}>
+              <SectionCard>
+                <div className="space-y-5 p-6 sm:p-8">
+                  <p className="text-xs text-envrt-muted">
+                    We will email you a link to your eco-score DPP within 24 hours.
+                  </p>
+
+                  <div>
+                    <label className={labelClasses}>Your name</label>
+                    <input
+                      type="text"
+                      className={inputClasses}
+                      placeholder="First name"
+                      value={form.contact_name}
+                      onChange={(e) => update("contact_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClasses}>Brand name</label>
+                    <input
+                      type="text"
+                      className={inputClasses}
+                      placeholder="Your brand"
+                      value={form.brand_name}
+                      onChange={(e) => update("brand_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClasses}>Email</label>
+                    <input
+                      type="email"
+                      className={inputClasses}
+                      placeholder="you@brand.com"
+                      value={form.contact_email}
+                      onChange={(e) => update("contact_email", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClasses}>
+                      Product URL
+                      <span className="ml-1 font-normal text-envrt-muted/60">(optional)</span>
+                    </label>
+                    <input
+                      type="url"
+                      className={inputClasses}
+                      placeholder="https://yourbrand.com/products/..."
+                      value={form.product_url}
+                      onChange={(e) => update("product_url", e.target.value)}
+                    />
+                    <p className="mt-1.5 text-[11px] text-envrt-muted/70">
+                      Helps us verify details and add your product image to the DPP
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <HiddenTurnstile onToken={setTurnstileToken} />
+                  </div>
+
+                  {error && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                      {error}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <div className="mt-8 flex justify-between">
-                <Button variant="ghost" size="md" onClick={() => setStep("boost")}>
-                  Back
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={handleSubmit}
-                  className={!canSubmit() || submitting ? "opacity-50 pointer-events-none" : ""}
-                >
-                  {submitting ? "Submitting..." : "Get my free DPP"}
-                </Button>
-              </div>
-            </SectionCard>
-          </FadeUp>
+                <div className="flex items-center justify-between border-t border-envrt-charcoal/5 px-6 py-4 sm:px-8">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setStep("boost"); window.scrollTo(0, 0); }}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={handleSubmit}
+                    className={!canSubmit() || submitting ? "opacity-40 pointer-events-none" : ""}
+                  >
+                    {submitting ? "Submitting..." : "Get my free DPP"}
+                  </Button>
+                </div>
+              </SectionCard>
+            </FadeUp>
+          )}
         </Container>
-      </main>
+      </div>
     );
   }
 
-  /* ────────── STEP: Done ────────── */
+  /* ──────── DONE ──────── */
 
   return (
-    <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-      <Container className="max-w-lg">
-        <FadeUp>
-          <SectionCard className="p-8 md:p-12 text-center">
-            <div className="text-4xl mb-4">&#10003;</div>
-            <h2 className="text-2xl font-semibold text-envrt-charcoal mb-3">
-              Request received
-            </h2>
-            <p className="text-envrt-muted text-base max-w-sm mx-auto">
-              We will generate your eco-score DPP and email it to you within 24 hours.
-            </p>
-            <div className="mt-8">
-              <Button href="/" variant="secondary" size="md">
-                Back to ENVRT
-              </Button>
-            </div>
-          </SectionCard>
-        </FadeUp>
-      </Container>
-    </main>
+    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-5 py-20 text-center">
+      <FadeUp>
+        <SectionCard className="mx-auto max-w-md p-8 sm:p-12">
+          <div className="text-3xl mb-4">&#10003;</div>
+          <h2 className="text-xl font-bold tracking-tight text-envrt-charcoal mb-3">
+            Request received
+          </h2>
+          <p className="text-sm text-envrt-muted">
+            We will generate your eco-score DPP and email it to you within 24 hours.
+          </p>
+          <div className="mt-8">
+            <Button href="/" variant="secondary" size="md">
+              Back to ENVRT
+            </Button>
+          </div>
+        </SectionCard>
+      </FadeUp>
+    </div>
   );
 }

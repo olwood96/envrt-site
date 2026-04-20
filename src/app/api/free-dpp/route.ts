@@ -32,13 +32,11 @@ export async function POST(req: NextRequest) {
   try {
     const body: FreeDppPayload = await req.json();
 
-    // Validate required fields
+    // Validate required fields (only garment type, materials, weight and contact)
     if (
       !body.garment_type ||
       !body.materials?.length ||
       !body.weight_g ||
-      !body.country_assembly ||
-      !body.fabric_process ||
       !body.contact_name ||
       !body.brand_name ||
       !body.contact_email
@@ -116,8 +114,8 @@ export async function POST(req: NextRequest) {
         garment_type: body.garment_type,
         materials: body.materials,
         weight_g: body.weight_g,
-        country_assembly: body.country_assembly,
-        fabric_process: body.fabric_process,
+        country_assembly: body.country_assembly || "Unknown",
+        fabric_process: body.fabric_process || "unknown",
         number_of_references: body.number_of_references,
         price_eur: body.price_eur,
         business_type: body.business_type,
