@@ -6,7 +6,6 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 import { Badge } from "@/components/ui/Badge";
-import { Toggle } from "@/components/ui/Toggle";
 import { FilterDropdown } from "@/components/collective/FilterDropdown";
 import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
@@ -375,10 +374,15 @@ export default function FreeDppPage() {
                       Fabric type
                       <span className="ml-1 font-normal text-envrt-muted/60">(optional)</span>
                     </label>
-                    <Toggle
-                      options={["Knit", "Woven"]}
-                      active={form.fabric_process === "woven" ? 1 : 0}
-                      onChange={(i) => update("fabric_process", i === 0 ? "knit" : "woven")}
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.fabric_process}
+                      options={[
+                        { value: "knit", label: "Knit" },
+                        { value: "woven", label: "Woven" },
+                      ]}
+                      onChange={(v) => update("fabric_process", v)}
+                      className="w-full"
                     />
                   </div>
                 </div>
@@ -436,15 +440,15 @@ export default function FreeDppPage() {
                   {/* Business size */}
                   <div>
                     <label className={labelClasses}>Business size</label>
-                    <Toggle
-                      options={["Small brand", "Large brand"]}
-                      active={form.business_type === "large-business-without-services" ? 1 : 0}
-                      onChange={(i) =>
-                        update(
-                          "business_type",
-                          i === 0 ? "small-business" : "large-business-without-services"
-                        )
-                      }
+                    <FilterDropdown
+                      label="Skip"
+                      value={form.business_type}
+                      options={[
+                        { value: "small-business", label: "Small brand" },
+                        { value: "large-business-without-services", label: "Large brand" },
+                      ]}
+                      onChange={(v) => update("business_type", v)}
+                      className="w-full"
                     />
                   </div>
 
