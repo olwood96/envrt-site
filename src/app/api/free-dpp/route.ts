@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
+  escapeHtml,
   isValidEmail,
   rateLimit,
   getClientIp,
@@ -133,6 +135,40 @@ export async function POST(req: NextRequest) {
         { error: "Failed to submit request. Please try again." },
         { status: 500 }
       );
+    }
+
+    // Send internal notification email (non-blocking)
+    try {
+      const resendKey = process.env.RESEND_API_KEY;
+      if (resendKey) {
+        const resend = new Resend(resendKey);
+        const materialsSummary = body.materials
+          .map((m) => `${escapeHtml(m.name)} (${m.share}%)`)
+          .join(", ");
+
+        await resend.emails.send({
+          from: "ENVRT System <noreply@envrt.com>",
+          to: ["oliver@envrt.com", "charlie@envrt.com"],
+          subject: `New trial DPP request: ${body.brand_name}`,
+          html: `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px 16px;">
+              <p style="font-size: 14px; color: #374151;"><strong>${escapeHtml(body.contact_name)}</strong> from <strong>${escapeHtml(body.brand_name)}</strong> has submitted a free DPP request.</p>
+              <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
+                <tr><td style="padding: 6px 0; color: #6b7280;">Email</td><td style="padding: 6px 0;">${escapeHtml(body.contact_email)}</td></tr>
+                ${body.garment_name ? `<tr><td style="padding: 6px 0; color: #6b7280;">Product</td><td style="padding: 6px 0;">${escapeHtml(body.garment_name)}</td></tr>` : ""}
+                <tr><td style="padding: 6px 0; color: #6b7280;">Type</td><td style="padding: 6px 0;">${escapeHtml(body.garment_type)}</td></tr>
+                <tr><td style="padding: 6px 0; color: #6b7280;">Materials</td><td style="padding: 6px 0;">${materialsSummary}</td></tr>
+                <tr><td style="padding: 6px 0; color: #6b7280;">Weight</td><td style="padding: 6px 0;">${body.weight_g}g</td></tr>
+                ${body.country_assembly ? `<tr><td style="padding: 6px 0; color: #6b7280;">Assembly</td><td style="padding: 6px 0;">${escapeHtml(body.country_assembly)}</td></tr>` : ""}
+                ${body.product_url ? `<tr><td style="padding: 6px 0; color: #6b7280;">URL</td><td style="padding: 6px 0;"><a href="${escapeHtml(body.product_url)}" style="color: #0d9488;">${escapeHtml(body.product_url.slice(0, 60))}</a></td></tr>` : ""}
+              </table>
+              <p style="font-size: 13px; color: #9ca3af;">Process this in the <a href="https://dashboard.envrt.com/admin/trial-requests" style="color: #0d9488;">dashboard</a>.</p>
+            </div>
+          `,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to send internal notification (non-fatal):", e);
     }
 
     return NextResponse.json({ success: true });
