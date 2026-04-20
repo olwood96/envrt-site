@@ -230,7 +230,7 @@ export function HeroSection() {
             <div ref={phoneRef} className="relative mx-auto max-w-md lg:max-w-none">
               {phoneHeight > 0 && (
                 <div
-                  className="absolute z-0 -rotate-[18deg]"
+                  className="pointer-events-none absolute z-0 -rotate-[18deg]"
                   style={{ height: jacketHeight, top: "-25%", left: "-28%" }}
                 >
                   <Image

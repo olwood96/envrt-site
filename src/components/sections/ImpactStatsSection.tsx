@@ -221,7 +221,7 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
 
           <div className="mt-6 flex items-center justify-center gap-2">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-40" />
+              <span className="pointer-events-none absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-40" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-envrt-teal" />
             </span>
             <span className="text-[11px] text-envrt-muted/70">
