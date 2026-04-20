@@ -104,6 +104,7 @@ const WASTE_OPTIONS = [
 type Step = "product" | "boost" | "contact" | "done";
 
 interface FormData {
+  garment_name: string;
   garment_type: string;
   material_1: string;
   material_1_pct: number;
@@ -136,6 +137,7 @@ export default function FreeDppPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState<FormData>({
+    garment_name: "",
     garment_type: "",
     material_1: "",
     material_1_pct: 100,
@@ -159,9 +161,9 @@ export default function FreeDppPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Only garment type, material and weight are truly required by the ecoscore API
+  // Garment name, type, material and weight are required
   const canContinueProduct = () =>
-    form.garment_type && form.material_1 && form.weight_g;
+    form.garment_name && form.garment_type && form.material_1 && form.weight_g;
 
   const canSubmit = () =>
     form.contact_name && form.brand_name && form.contact_email && turnstileToken;
@@ -183,6 +185,7 @@ export default function FreeDppPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          garment_name: form.garment_name,
           garment_type: form.garment_type,
           materials,
           weight_g: parseInt(form.weight_g),
@@ -238,6 +241,18 @@ export default function FreeDppPage() {
             <FadeUp delay={0.1}>
               <SectionCard>
                 <div className="space-y-6 p-6 sm:p-8">
+                  {/* Garment name */}
+                  <div>
+                    <label className={labelClasses}>Product name</label>
+                    <input
+                      type="text"
+                      className={inputClasses}
+                      placeholder="e.g. Classic Organic Tee"
+                      value={form.garment_name}
+                      onChange={(e) => update("garment_name", e.target.value)}
+                    />
+                  </div>
+
                   {/* Garment type */}
                   <div>
                     <label className={labelClasses}>Garment type</label>

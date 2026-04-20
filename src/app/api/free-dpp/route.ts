@@ -11,6 +11,7 @@ const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 interface FreeDppPayload {
+  garment_name: string;
   garment_type: string;
   materials: { name: string; share: number }[];
   weight_g: number;
@@ -111,6 +112,7 @@ export async function POST(req: NextRequest) {
         brand_name: body.brand_name.trim(),
         contact_email: body.contact_email.trim().toLowerCase(),
         product_url: body.product_url?.trim() || null,
+        garment_name: body.garment_name?.trim() || null,
         garment_type: body.garment_type,
         materials: body.materials,
         weight_g: body.weight_g,

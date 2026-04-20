@@ -41,3 +41,6 @@ drafts/
 
 # Claude Code local config
 CLAUDE.md
+
+# Local planning docs
+docs/TODO.md
