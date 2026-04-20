@@ -233,7 +233,7 @@ export default function FreeDppPage() {
   if (step === "product") {
     return (
       <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container size="sm">
+        <Container className="max-w-lg">
           <FadeUp>
             <div className="text-center mb-10">
               <h1 className="text-3xl md:text-4xl font-semibold text-envrt-charcoal">
@@ -435,7 +435,7 @@ export default function FreeDppPage() {
   if (step === "boost") {
     return (
       <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container size="sm">
+        <Container className="max-w-lg">
           <FadeUp>
             <div className="text-center mb-10">
               <h2 className="text-2xl md:text-3xl font-semibold text-envrt-charcoal">
@@ -565,7 +565,7 @@ export default function FreeDppPage() {
   if (step === "contact") {
     return (
       <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-        <Container size="sm">
+        <Container className="max-w-lg">
           <FadeUp>
             <div className="text-center mb-10">
               <h2 className="text-2xl md:text-3xl font-semibold text-envrt-charcoal">
@@ -665,7 +665,7 @@ export default function FreeDppPage() {
 
   return (
     <main className="min-h-screen bg-envrt-offwhite py-16 md:py-24">
-      <Container size="sm">
+      <Container className="max-w-lg">
         <FadeUp>
           <SectionCard className="p-8 md:p-12 text-center">
             <div className="text-4xl mb-4">&#10003;</div>
