@@ -16,7 +16,7 @@ export const navLinks = [
   { label: "Product", href: "/#how-it-works" },
   { label: "Collective", href: "/collective" },
   { label: "Why ENVRT?", href: "/roi" },
-  { label: "Assessment", href: "/assessment" },
+  { label: "Free DPP", href: "/free-dpp" },
   { label: "Pricing", href: "/pricing" },
   { label: "Insights", href: "/insights" },
 ];
@@ -128,7 +128,7 @@ export const outcomeCards = [
     title: "Your first DPP can be live today",
     description:
       "No consultants and no months of setup. Our streamlined process means your first passport can be live the same day you start.",
-    cta: { label: "Take the assessment", href: "/assessment" },
+    cta: { label: "Try it free", href: "/free-dpp" },
   },
   {
     stat: "Product-level",
@@ -384,33 +384,36 @@ export const roiFaqItems = [
   },
 ];
 
-export const assessmentFaqItems = [
+export const freeDppFaqItems = [
   {
-    question: "How long does the DPP readiness assessment take?",
+    question: "What is the free eco-score DPP?",
     answer:
-      "The assessment takes approximately 10 minutes to complete. You'll receive an instant personalised report with your DPP readiness score and recommended next steps.",
+      "It's a real Digital Product Passport for one of your products showing its environmental score. Free, no account needed.",
   },
   {
-    question: "What do I need to complete the assessment?",
+    question: "What do I need to fill in?",
     answer:
-      "Just a basic understanding of your supply chain and current sustainability practices. No detailed data or technical knowledge is required.",
+      "Basic product details: garment type, main material, weight and where it's assembled. Takes about 2 minutes.",
   },
   {
-    question: "Is the DPP readiness assessment free?",
+    question: "How do I receive my DPP?",
     answer:
-      "Yes, the assessment is completely free with no obligation. You'll receive an instant personalised report highlighting your readiness level, key gaps, and actionable next steps.",
+      "We'll email you a link to your live eco-score DPP within 24 hours of submitting.",
   },
   {
-    question: "What will I learn from the assessment?",
+    question: "What does the eco-score show?",
     answer:
-      "You'll receive a DPP readiness score, a breakdown of where your brand stands across key compliance areas, identification of gaps in your current processes, and prioritised recommendations for getting regulation-ready.",
+      "A standardised environmental impact score based on your product's materials and manufacturing. It uses the official French environmental labelling methodology.",
   },
   {
-    question: "Do I need to share sensitive business data?",
+    question: "What if I want full DPPs for my whole collection?",
     answer:
-      "No. The assessment only asks for high-level information about your processes and supply chain approach. No proprietary supplier details or financial data is required.",
+      "Get in touch after receiving your trial DPP. We offer full lifecycle DPPs with supply chain mapping, emissions data and water impact at collection level.",
   },
 ];
+
+/** @deprecated Use freeDppFaqItems */
+export const assessmentFaqItems = freeDppFaqItems;
 
 export const teamMembers = [
   {

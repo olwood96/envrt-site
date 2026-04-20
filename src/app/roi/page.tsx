@@ -734,7 +734,7 @@ export default function ROICalculatorPage() {
                       {[
                         "Product-level LCA data included, not an add-on",
                         "CO₂e and water scarcity metrics, not just material declarations",
-                        "Supply chain reconstruction built into every assessment",
+                        "Supply chain reconstruction built into every DPP",
                         "Scan analytics and engagement data per product",
                         ...(results.envrtPlan !== "Starter"
                           ? ["Hotspot detection across lifecycle stages"]

@@ -25,10 +25,10 @@ interface NudgeConfig {
 }
 
 const ASSESSMENT_NUDGE: NudgeConfig = {
-  label: "Test your DPP readiness",
-  href: "/assessment",
-  stat: "90% of brands aren't ready",
-  hint: "2 min quiz",
+  label: "Get your free DPP",
+  href: "/free-dpp",
+  stat: "See your product's eco-score",
+  hint: "2 min form",
   variant: "light",
   icon: "clipboard",
 };
