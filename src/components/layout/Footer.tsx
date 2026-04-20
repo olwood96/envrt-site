@@ -22,6 +22,7 @@ const footerLinks = [
     links: [
       { label: "Team", href: "/team" },
       { label: "Contact", href: "/contact" },
+      { label: "FAQ", href: "/faq" },
     ],
   },
   {

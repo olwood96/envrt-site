@@ -4,6 +4,11 @@ import matter from "gray-matter";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 export interface InsightsPost {
   slug: string;
   title: string;
@@ -16,6 +21,7 @@ export interface InsightsPost {
   ogImage?: string; // path relative to /public, e.g. "/insights/og/my-post.jpg"
   featured?: boolean;
   draft?: boolean;
+  faq?: FAQItem[]; // optional per-article FAQ items
   content: string; // raw markdown body
   readingTime: number; // minutes
 }
@@ -55,6 +61,7 @@ function parseFrontmatter(filePath: string): InsightsPost | null {
     ogImage: data.ogImage ?? undefined,
     featured: data.featured ?? false,
     draft: data.draft ?? false,
+    faq: data.faq ?? undefined,
     content,
     readingTime: calculateReadingTime(content),
   };

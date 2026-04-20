@@ -13,12 +13,16 @@ module.exports = {
         allow: "/",
       },
     ],
+    additionalSitemaps: [],
   },
+  additionalPaths: async (config) => [
+    { loc: "/llms.txt", changefreq: "monthly", priority: 0.5 },
+  ],
   transform: async (config, path) => {
     if (path === "/") {
       return { loc: path, changefreq: "weekly", priority: 1.0, lastmod: new Date().toISOString() };
     }
-    if (["/pricing", "/contact", "/demo", "/insights", "/collective", "/roi", "/assessment"].includes(path)) {
+    if (["/pricing", "/contact", "/demo", "/insights", "/collective", "/roi", "/assessment", "/faq", "/glossary"].includes(path)) {
       return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() };
     }
     if (path.startsWith("/collective/")) {

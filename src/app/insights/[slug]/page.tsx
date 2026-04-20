@@ -3,9 +3,11 @@ import { Container } from "@/components/ui/Container";
 import { getAllSlugs, getPostBySlug } from "@/lib/insights";
 import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { TableOfContents } from "@/components/insights/TableOfContents";
 import { MdxContent } from "@/components/insights/MdxContent";
 import { RelatedPosts } from "@/components/insights/RelatedPosts";
+import { Accordion } from "@/components/ui/Accordion";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -145,6 +147,21 @@ export default async function InsightsPostPage({ params }: PageProps) {
           <div className="mt-8">
             <MdxContent content={post.content} />
           </div>
+
+          {/* Per-article FAQ */}
+          {post.faq && post.faq.length > 0 && (
+            <>
+              <FAQJsonLd items={post.faq} />
+              <div className="mt-16">
+                <h2 className="text-xl font-semibold text-envrt-charcoal">
+                  Frequently asked questions
+                </h2>
+                <div className="mt-4">
+                  <Accordion items={post.faq} />
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Related posts */}
           <RelatedPosts currentSlug={post.slug} tags={post.tags} />

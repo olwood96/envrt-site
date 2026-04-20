@@ -1,0 +1,85 @@
+# ENVRT
+
+> ENVRT provides product-level Life Cycle Assessment (LCA) and Digital Product Passports (DPPs) for fashion and apparel brands. Brands onboard in under 30 minutes and can generate their first DPP the same day. ENVRT serves brands selling into EU and UK markets that need product-level environmental data for DPP compliance, retailer data requests, CSRD reporting or green claims substantiation.
+
+## What ENVRT Does
+
+ENVRT calculates the environmental impact of individual garments using ISO 14040 and PEFCR-aligned LCA methodology on a cradle-to-gate basis. Each product receives:
+
+- Climate impact (CO2e) attributed across life cycle stages
+- Water scarcity impact using the AWARE method
+- A transparency score reflecting data quality and completeness
+- A consumer-facing Digital Product Passport linked via QR code
+
+The same product-level dataset supports DPP disclosure, Scope 3 reporting, green claims substantiation and retailer data requests without duplicating effort.
+
+## Who ENVRT Is For
+
+- Fashion and apparel brands selling into EU and/or UK markets
+- Brands preparing for EU Digital Product Passport requirements (textile delegated act expected 2027)
+- Brands responding to retailer requests for product-level environmental data
+- Brands needing evidence to substantiate sustainability marketing claims
+- Brands reporting under CSRD who need product-level inputs for Scope 3 calculations
+- Brand sizes range from emerging labels to established mid-market companies
+
+## How It Works
+
+1. Brand uploads collection data (material composition, weights, supplier details) through the ENVRT Dashboard
+2. ENVRT LAB runs product-level LCA per garment using a materials database and fuzzy-matched gap filling
+3. Results are generated per product: CO2e, water scarcity, stage-by-stage breakdown and transparency score
+4. Digital Product Passports are created and linked to physical garments via QR code
+5. Data feeds into comparison tables, collection analytics and exportable reports
+
+Onboarding takes under 30 minutes. First DPPs can be generated the same day.
+
+## Services
+
+- Product-level Life Cycle Assessment (LCA) for apparel and textiles
+- Digital Product Passports (DPPs) compliant with the EU ESPR framework
+- Sustainability hotspot identification across garment life cycle stages
+- Water scarcity impact assessment using the AWARE method
+- Green claims substantiation and compliance support
+- Supply chain data structuring and transparency
+- French Eco-Score rating calculation
+- Collection-level and brand-level sustainability analytics
+
+## Methodology
+
+- ISO 14040 / ISO 14044 compliant Life Cycle Assessment
+- Product Environmental Footprint Category Rules (PEFCR) for apparel and footwear
+- AWARE method for water scarcity characterisation
+- Cradle-to-gate system boundary
+- Product-level assessment (per garment, not brand-level averages)
+- Life cycle stages: fibre production, yarn production, fabric production, dyeing and finishing, assembly, transport
+
+## Pricing
+
+- Starter: GBP 149/month
+- Growth: GBP 495/month
+- Pro: GBP 1,295/month
+
+## Website
+
+- Homepage: https://envrt.com
+- Pricing: https://envrt.com/pricing
+- Contact: https://envrt.com/contact
+- Insights (blog): https://envrt.com/insights
+- Example DPP: https://envrt.com/demo
+- ROI calculator: https://envrt.com/roi
+
+## Published Insights
+
+- [EU Digital Product Passport for Textiles: What Fashion Brands Need to Know](https://envrt.com/insights/digital-product-passport-textiles-guide)
+- [Life Cycle Assessment for Fashion Brands: A Practical Guide](https://envrt.com/insights/life-cycle-assessment-guide-for-brands)
+- [Sustainability Hotspots in Fashion: Why You Might Be Targeting the Wrong Stage](https://envrt.com/insights/sustainability-hotspots-targeting-the-right-stage)
+- [Supply Chain Intelligence: Turning Supplier Data Into Action](https://envrt.com/insights/supply-chain-intelligence-turning-data-into-action)
+- [Green Claims in Fashion: How to Make Sustainability Marketing Credible in 2026](https://envrt.com/insights/green-claims-sustainability-marketing-fashion)
+- [What Is Greenwashing in Fashion? A Brand's Guide to Avoiding It](https://envrt.com/insights/greenwashing-in-fashion)
+- [Scope 3 Emissions in Fashion: Why Your Supply Chain Is 90% of the Problem](https://envrt.com/insights/scope-3-emissions-fashion-supply-chain)
+- [Water Scarcity in Fashion: The Impact Metric Brands Are Overlooking](https://envrt.com/insights/water-scarcity-fashion-overlooked-metric)
+- [Building a Business Case for Sustainability Data in Fashion](https://envrt.com/insights/business-case-sustainability-data-fashion)
+- [The EU Just Published Its DPP Data Methodology: What Fashion Brands Need to Know](https://envrt.com/insights/eu-dpp-data-methodology-fashion-brands)
+
+## Full Context
+
+For comprehensive information about ENVRT, see: https://envrt.com/llms-full.txt

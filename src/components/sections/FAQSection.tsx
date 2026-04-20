@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Container } from "../ui/Container";
 import { Accordion } from "../ui/Accordion";
 import { FadeUp } from "../ui/Motion";
@@ -23,6 +24,25 @@ export function FAQSection() {
           <FadeUp delay={0.1}>
             <div className="mt-12">
               <Accordion items={faqItems} />
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <div className="mt-8 text-center">
+              <Link
+                href="/faq"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-envrt-teal transition-colors hover:text-envrt-teal/80"
+              >
+                See all FAQs
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </div>
           </FadeUp>
         </div>
