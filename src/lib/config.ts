@@ -128,7 +128,7 @@ export const outcomeCards = [
     title: "Your first DPP can be live today",
     description:
       "No consultants and no months of setup. Our streamlined process means your first passport can be live the same day you start.",
-    cta: { label: "Try it free", href: "/free-dpp" },
+    cta: { label: "Get a free DPP", href: "/free-dpp" },
   },
   {
     stat: "Product-level",

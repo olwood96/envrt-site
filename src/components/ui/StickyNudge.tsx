@@ -25,7 +25,7 @@ interface NudgeConfig {
 }
 
 const ASSESSMENT_NUDGE: NudgeConfig = {
-  label: "Get your free DPP",
+  label: "Get a free DPP",
   href: "/free-dpp",
   stat: "See your product's eco-score",
   hint: "2 min form",

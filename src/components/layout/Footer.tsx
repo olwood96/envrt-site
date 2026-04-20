@@ -11,7 +11,7 @@ const footerLinks = [
     links: [
       { label: "How it works", href: "/#how-it-works" },
       { label: "Why ENVRT?", href: "/roi" },
-      { label: "Try a free DPP", href: "/free-dpp" },
+      { label: "Get a free DPP", href: "/free-dpp" },
       { label: "Pricing", href: "/pricing" },
       { label: "The Collective", href: "/collective" },
       { label: "Insights", href: "/insights" },

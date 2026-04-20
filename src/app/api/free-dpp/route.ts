@@ -96,6 +96,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check for duplicate submission (same email with pending/processing request)
+    const supabase = getSupabaseAdmin();
+    const { data: existing } = await supabase
+      .from("trial_dpp_requests")
+      .select("id")
+      .eq("contact_email", body.contact_email.trim().toLowerCase())
+      .in("status", ["pending", "processing"])
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      return NextResponse.json(
+        { error: "You already have a request being processed. We will be in touch soon." },
+        { status: 409 }
+      );
+    }
+
     // Validate materials sum to ~100%
     const totalShare = body.materials.reduce((sum, m) => sum + m.share, 0);
     if (totalShare < 95 || totalShare > 105) {
@@ -106,7 +122,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert into trial_dpp_requests
-    const supabase = getSupabaseAdmin();
     const { error: insertError } = await supabase
       .from("trial_dpp_requests")
       .insert({
@@ -118,8 +133,8 @@ export async function POST(req: NextRequest) {
         garment_type: body.garment_type,
         materials: body.materials,
         weight_g: body.weight_g,
-        country_assembly: body.country_assembly || "Unknown",
-        fabric_process: body.fabric_process || "unknown",
+        country_assembly: body.country_assembly || null,
+        fabric_process: body.fabric_process || null,
         number_of_references: body.number_of_references,
         price_eur: body.price_eur,
         business_type: body.business_type,

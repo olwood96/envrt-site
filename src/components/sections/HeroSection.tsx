@@ -211,7 +211,7 @@ export function HeroSection() {
           <FadeUp delay={0.3}>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href="/free-dpp" size="md" className="sm:px-8 sm:py-4 sm:text-lg" data-cta="hero-free-dpp">
-                Get a free eco-score DPP<span className="ml-2">→</span>
+                Get a free DPP<span className="ml-2">→</span>
               </Button>
               <Button href={heroContent.ctaPrimary.href} variant="secondary" size="md" className="sm:px-8 sm:py-4 sm:text-lg" data-cta="hero-book-demo">
                 {heroContent.ctaPrimary.label}

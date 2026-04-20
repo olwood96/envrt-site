@@ -161,8 +161,9 @@ export default function FreeDppPage() {
   };
 
   // Garment name, type, material and weight are required
+  const weightNum = parseInt(form.weight_g) || 0;
   const canContinueProduct = () =>
-    form.garment_name && form.garment_type && form.material_1 && form.weight_g;
+    form.garment_name && form.garment_type && form.material_1 && weightNum >= 10 && weightNum <= 5000;
 
   const canSubmit = () =>
     form.contact_name && form.brand_name && form.contact_email && turnstileToken;
@@ -231,6 +232,10 @@ export default function FreeDppPage() {
               <p className="mx-auto mt-3 max-w-md text-sm text-envrt-muted">
                 Tell us about one product. We will generate a Digital Product
                 Passport with its environmental score and send it to you.
+              </p>
+              <p className="mt-2 text-xs text-envrt-muted/60">
+                The score uses the official French environmental labelling methodology.{" "}
+                <a href="#faq" className="text-envrt-teal hover:underline">Learn more</a>
               </p>
             </div>
           </FadeUp>
@@ -596,6 +601,25 @@ export default function FreeDppPage() {
               </SectionCard>
             </FadeUp>
           )}
+
+          {/* FAQ */}
+          <div id="faq" className="mt-12">
+            <FadeUp delay={0.2}>
+              <h3 className="text-sm font-semibold text-envrt-charcoal mb-4">Common questions</h3>
+              <div className="space-y-3">
+                {[
+                  { q: "What is the eco-score?", a: "A standardised environmental impact score based on your product's materials and manufacturing. It uses the official French environmental labelling methodology." },
+                  { q: "How do I receive my DPP?", a: "We will email you a link to your live eco-score DPP within 24 hours of submitting." },
+                  { q: "What if I want full DPPs?", a: "Get in touch after receiving your trial DPP. We offer full lifecycle DPPs with supply chain mapping, emissions data and water impact." },
+                ].map((item) => (
+                  <div key={item.q} className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
+                    <p className="text-xs font-medium text-envrt-charcoal">{item.q}</p>
+                    <p className="mt-1 text-xs text-envrt-muted">{item.a}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeUp>
+          </div>
         </Container>
       </div>
     );
