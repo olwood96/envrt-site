@@ -7,6 +7,7 @@ import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { TableOfContents } from "@/components/insights/TableOfContents";
 import { MdxContent } from "@/components/insights/MdxContent";
 import { RelatedPosts } from "@/components/insights/RelatedPosts";
+import { NewsletterSubscribe } from "@/components/insights/NewsletterSubscribe";
 import { Accordion } from "@/components/ui/Accordion";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -162,6 +163,9 @@ export default async function InsightsPostPage({ params }: PageProps) {
               </div>
             </>
           )}
+
+          {/* Newsletter signup */}
+          <NewsletterSubscribe variant="inline" />
 
           {/* Related posts */}
           <RelatedPosts currentSlug={post.slug} tags={post.tags} />

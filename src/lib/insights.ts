@@ -44,9 +44,15 @@ function parseFrontmatter(filePath: string): InsightsPost | null {
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
 
-  // Skip drafts in production
+  // Skip drafts and future-dated posts in production
   if (data.draft && process.env.NODE_ENV === "production") {
     return null;
+  }
+  if (process.env.NODE_ENV === "production" && data.date) {
+    const postDate = new Date(data.date + "T00:00:00");
+    if (postDate > new Date()) {
+      return null;
+    }
   }
 
   return {
@@ -104,15 +110,10 @@ export function getPostBySlug(slug: string): InsightsPost | null {
 }
 
 /**
- * Get all slugs (for generateStaticParams).
+ * Get all slugs (for generateStaticParams). Respects draft and date gating.
  */
 export function getAllSlugs(): string[] {
-  if (!fs.existsSync(CONTENT_DIR)) return [];
-
-  return fs
-    .readdirSync(CONTENT_DIR)
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.mdx$/, ""));
+  return getAllPosts().map((post) => post.slug);
 }
 
 /**

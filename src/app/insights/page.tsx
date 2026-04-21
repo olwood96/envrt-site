@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { InsightsCard } from "@/components/insights/InsightCard";
 import { Accordion } from "@/components/ui/Accordion";
+import { NewsletterSubscribe } from "@/components/insights/NewsletterSubscribe";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { getAllPostsMeta } from "@/lib/insights";
@@ -98,6 +99,9 @@ export default function InsightsIndexPage() {
               ))}
             </div>
           )}
+
+          {/* Newsletter signup */}
+          <NewsletterSubscribe variant="card" />
 
           {/* Topic FAQs */}
           <div className="mt-20">

@@ -1,0 +1,59 @@
+---
+title: "Model, Batch or Item: How DPP Granularity Will Affect Your Costs"
+description: "The ESPR allows DPPs at model, batch or item level. The EU's DPP data specification methodology identifies granularity as a key cost driver for fashion brands. Here is what each level means in practice."
+date: "2026-05-01"
+author: "ENVRT"
+tags: ["DPP", "Strategy", "Data"]
+keywords: ["DPP granularity level textiles", "digital product passport cost fashion", "DPP model batch item level", "ESPR granularity requirements apparel", "fashion DPP implementation cost"]
+featured: false
+draft: false
+faq:
+  - question: "Will every garment need its own individual DPP?"
+    answer: "Not necessarily. The ESPR allows DPPs at model, batch or item level. For most textile data, model-level or batch-level granularity is likely sufficient. Item-level is only justified where data like repair history accumulates per unit."
+  - question: "Is item-level DPP granularity more expensive?"
+    answer: "Yes, significantly. The EU methodology explicitly identifies granularity as a key cost driver. Item-level tracking for high-volume, low-value products could be unsustainable unless there is a clear use-case justification."
+---
+
+One of the most consequential decisions in the EU's Digital Product Passport framework is also one of the least discussed: at what level of granularity should the DPP operate? The answer has significant cost implications for fashion brands, and the EU's newly published [DPP data specification methodology](https://publications.jrc.ec.europa.eu/repository/handle/JRC145830) provides the first structured guidance on how this decision will be made.
+
+## The Three Levels
+
+The ESPR allows DPPs to be established at three levels of granularity:
+
+**Model level.** One DPP entry represents an entire product model. Every unit of that model shares the same passport data. For a t-shirt produced in a single design and composition, all units would reference the same DPP.
+
+**Batch level.** DPP data is specific to a group of products produced under similar conditions. Units within the same production batch share a passport, but different batches of the same model may have different data if sourcing or manufacturing conditions varied.
+
+**Item level.** Each individual product gets its own passport record, identified by a unique ID. This allows tracking of item-specific information like repair history or use-stage performance data.
+
+## Why Granularity Is a Cost Driver
+
+The methodology is direct about this: granularity is "a key cost driver in the implementation of digital product information systems." Requirements that diverge from existing industry practices can "significantly increase implementation complexity and compliance costs."
+
+The cost difference between levels is substantial. A model-level DPP for a brand with 200 product models means 200 passport records. A batch-level approach for the same brand, producing 50 batches per model per year, means 10,000 records. Item-level, for a brand producing 500,000 units per year, means 500,000 individual records, each requiring unique identification, data storage and potentially ongoing updates.
+
+For inexpensive, mass-produced garments, the methodology explicitly questions whether item-level granularity is justified. It warns that the administrative burden could be "unsustainable" for high-volume, low-value products unless there is a clear use-case justification.
+
+## What This Means for Textiles
+
+For most textile data points, model-level or batch-level granularity is likely to be sufficient. Fibre composition, material sourcing and [environmental footprint](/insights/life-cycle-assessment-guide-for-brands) data are typically consistent within a product model or production batch. A cotton t-shirt's carbon footprint does not change from unit to unit within the same batch.
+
+Batch-level granularity becomes relevant where production conditions vary between batches of the same model. If one batch of a garment is manufactured in a facility powered by renewable energy and another batch in a facility on a coal-heavy grid, the [carbon profile differs](/insights/sustainability-hotspots-targeting-the-right-stage) between batches. Whether this difference justifies batch-level tracking depends on whether consumers or regulators can meaningfully act on it.
+
+Item-level granularity is most relevant for data that accumulates over a product's life. Repair history, component replacement and refurbishment records are inherently item-specific. The methodology's textile self-repair use case illustrates this: tracking whether a specific jacket has been repaired requires item-level identification.
+
+## The Hybrid Approach
+
+The methodology supports a hybrid model where different data points within the same DPP operate at different granularity levels. Static product data (composition, footprint, manufacturer information) could sit at model level, while dynamic life-cycle data (repair events, condition assessments) could be logged at item level.
+
+This approach is consistent with the standards being developed by CEN/CENELEC JTC 24 and is also supported by the UN Transparency Protocol, which states that a passport must have a related model and may have a related batch and item.
+
+For brands, this hybrid model offers a practical path: start with model-level data for the core [DPP requirements](/insights/digital-product-passport-textiles-guide) and add item-level capability only where specific use cases justify it.
+
+## How ENVRT Approaches DPP Data
+
+ENVRT LAB™ generates climate impact (CO₂e) and water scarcity impact at the product level, on a cradle-to-gate basis and aligned with ISO 14040 and PEFCR methodology. The data is structured at the product model level, which aligns with the granularity the methodology identifies as the most proportionate starting point for textiles.
+
+This means brands can build their DPP data foundation at model level now, without over-investing in infrastructure that may not be required in the first wave of textile requirements.
+
+If you want to understand what DPP data preparation looks like at a practical level, [get in touch](/contact) with the ENVRT team.

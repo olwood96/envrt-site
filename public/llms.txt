@@ -79,6 +79,13 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 - [Water Scarcity in Fashion: The Impact Metric Brands Are Overlooking](https://envrt.com/insights/water-scarcity-fashion-overlooked-metric)
 - [Building a Business Case for Sustainability Data in Fashion](https://envrt.com/insights/business-case-sustainability-data-fashion)
 - [The EU Just Published Its DPP Data Methodology: What Fashion Brands Need to Know](https://envrt.com/insights/eu-dpp-data-methodology-fashion-brands)
+- [Textiles Are Officially in the 2027 DPP Wave: Here's What the Scope Looks Like](https://envrt.com/insights/textile-dpp-scope-2027)
+- [Product-Level Data Is Now the EU's Default: Why Brand-Level Claims Won't Cut It](https://envrt.com/insights/product-level-data-dpp-requirement)
+- [Model, Batch or Item: How DPP Granularity Will Affect Your Costs](https://envrt.com/insights/dpp-granularity-cost-fashion)
+- [Water Scarcity Is in the DPP Framework: Why Carbon-Only Data Won't Be Enough](https://envrt.com/insights/water-scarcity-dpp-framework)
+- [Who Can See What: The EU's Tiered Access Model for DPP Data](https://envrt.com/insights/dpp-data-access-tiers)
+- [The DPP Won't Be Static: How Life-Cycle Data Will Follow Your Products](https://envrt.com/insights/dpp-life-cycle-data-updates)
+- [Substances of Concern in Textiles: What the DPP Will Require You to Disclose](https://envrt.com/insights/substances-of-concern-textile-dpp)
 
 ## Full Context
 

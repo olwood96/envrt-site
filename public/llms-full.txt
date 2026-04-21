@@ -171,6 +171,34 @@ ENVRT publishes in-depth articles on its insights page covering DPP regulation, 
     URL: https://envrt.com/insights/eu-dpp-data-methodology-fashion-brands
     Topics: JRC DPP methodology, ESPR preparatory study, textile DPP scope, data prioritisation
 
+11. **Textiles Are Officially in the 2027 DPP Wave: Here's What the Scope Looks Like**
+    URL: https://envrt.com/insights/textile-dpp-scope-2027
+    Topics: Textile DPP scope, garment categories, 2027 timeline, ESPR exclusions
+
+12. **Product-Level Data Is Now the EU's Default: Why Brand-Level Claims Won't Cut It**
+    URL: https://envrt.com/insights/product-level-data-dpp-requirement
+    Topics: Product-level LCA, PEF methodology, multi-indicator assessment, brand vs product data
+
+13. **Model, Batch or Item: How DPP Granularity Will Affect Your Costs**
+    URL: https://envrt.com/insights/dpp-granularity-cost-fashion
+    Topics: DPP granularity levels, implementation cost, model vs batch vs item, textile DPP
+
+14. **Water Scarcity Is in the DPP Framework: Why Carbon-Only Data Won't Be Enough**
+    URL: https://envrt.com/insights/water-scarcity-dpp-framework
+    Topics: Water scarcity in DPP, AWARE method, PEF water use, multi-indicator requirements
+
+15. **Who Can See What: The EU's Tiered Access Model for DPP Data**
+    URL: https://envrt.com/insights/dpp-data-access-tiers
+    Topics: DPP data access rights, tiered access, confidential business information, role-based access
+
+16. **The DPP Won't Be Static: How Life-Cycle Data Will Follow Your Products**
+    URL: https://envrt.com/insights/dpp-life-cycle-data-updates
+    Topics: Core DPP, Life-cycle Log, repair history, dynamic DPP, product life cycle
+
+17. **Substances of Concern in Textiles: What the DPP Will Require You to Disclose**
+    URL: https://envrt.com/insights/substances-of-concern-textile-dpp
+    Topics: Chemical disclosure, substances of concern, REACH, CAS numbers, textile DPP
+
 ## Frequently Asked Questions
 
 **Do I need a Digital Product Passport for my fashion brand?**
