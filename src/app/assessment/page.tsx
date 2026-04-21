@@ -56,7 +56,7 @@ const sections: Section[] = [
     id: "business-profile",
     title: "Tell us about your brand",
     description:
-      "This helps us calibrate your regulatory exposure and timeline risk accurately.",
+      "This helps us understand your regulatory exposure and timeline risk.",
     questions: [
       {
         id: "q1",
@@ -401,7 +401,7 @@ const sections: Section[] = [
     id: "infrastructure",
     title: "Your current infrastructure",
     description:
-      "The tools and processes you currently use determine how quickly you can become compliant.",
+      "The tools and processes you currently use determine how quickly you can become regulation-ready.",
     questions: [
       {
         id: "q21",
@@ -685,7 +685,7 @@ function getRecommendedActions(scores: Scores, answers: Answers): string[] {
   }
   if (scores.regulatory < 50) {
     actions.push(
-      "Commission a formal regulatory briefing for your specific product categories and markets. Understanding your exact deadlines is the prerequisite for any compliance strategy."
+      "Commission a formal regulatory briefing for your specific product categories and markets. Understanding your likely deadlines is the prerequisite for any compliance strategy."
     );
   }
   if (scores.infrastructure < 40) {
@@ -1460,7 +1460,7 @@ export default function AssessmentPage() {
                       Ready to close your compliance gaps?
                     </h2>
                     <p className="mt-4 text-base leading-relaxed text-white/60">
-                      ENVRT generates fully compliant Digital Product Passports
+                      ENVRT generates regulation-aligned Digital Product Passports
                       from your existing data. Get in touch and we will walk you
                       through how it works.
                     </p>

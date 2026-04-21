@@ -512,7 +512,7 @@ export default function TermsPage() {
               </ul>
               <p>
                 We work to make the platform as useful and reliable as possible, but
-                we cannot promise that it will always be error-free or uninterrupted.
+                we do not guarantee that the platform will always be error-free or uninterrupted.
               </p>
               <p>
                 <strong>Verification levels.</strong> Outputs may include

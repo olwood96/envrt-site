@@ -24,7 +24,7 @@ const faqSections = [
       {
         question: "Do I need to have complete supply chain data before starting?",
         answer:
-          "No. ENVRT's smart gap filler uses a materials database with fuzzy matching to fill in missing data points automatically. You can start with what you have and improve data quality over time as supplier information becomes available.",
+          "No. ENVRT reconstructs your supply chain from the data you provide, filling in missing data points automatically using our materials database. You can start with what you have and improve data quality over time as supplier information becomes available.",
       },
       {
         question: "Can I try ENVRT before committing to a plan?",
@@ -39,7 +39,7 @@ const faqSections = [
       {
         question: "How does ENVRT calculate the environmental impact of a garment?",
         answer:
-          "ENVRT uses ISO 14040/14044 compliant Life Cycle Assessment on a cradle-to-gate basis, aligned with the PEFCR for apparel and footwear. Each garment is individually assessed to produce climate impact (CO\u2082e) and water scarcity impact (AWARE method), attributed across six life cycle stages: fibre production, yarn production, fabric production, dyeing and finishing, assembly and transport.",
+          "ENVRT uses Life Cycle Assessment aligned with ISO 14040/14044 on a cradle-to-gate basis, aligned with the PEFCR for apparel and footwear. Each garment is individually assessed to produce climate impact (CO\u2082e) and water scarcity impact (AWARE method), attributed across six life cycle stages: fibre production, yarn production, fabric production, dyeing and finishing, assembly and transport.",
       },
       {
         question: "What is the AWARE method for water scarcity?",

@@ -69,7 +69,7 @@ export const howItWorksSteps = [
     bullets: [
       "Guided data entry with smart defaults",
       "Support for complex multi-material garments",
-      "Smart gap-filling from your existing data",
+      "Supply chain reconstruction from your existing data",
     ],
     mockImage: "/mock/howitworks-collect.png",
   },
@@ -120,7 +120,7 @@ export const outcomeCards = [
     stat: "100%",
     title: "Regulation-ready from day one",
     description:
-      "Your DPPs meet EU ESPR requirements out of the box, including French Eco-Score compliance. No second-guessing.",
+      "Your DPPs are aligned with the EU ESPR framework and include French Eco-Score ratings as standard.",
     cta: { label: "See how it works", href: "/#how-it-works" },
   },
   {

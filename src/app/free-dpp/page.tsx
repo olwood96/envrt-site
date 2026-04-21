@@ -415,7 +415,7 @@ export default function FreeDppPage() {
               <SectionCard>
                 <div className="space-y-6 p-6 sm:p-8">
                   <p className="text-xs text-envrt-muted">
-                    These are optional. Each one helps produce a more accurate result for your product.
+                    These are optional. Each one helps produce a more representative result for your product.
                   </p>
 
                   {/* Catalogue size */}
