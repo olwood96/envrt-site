@@ -27,7 +27,7 @@ export const heroContent = {
   subheadline:
     "Create regulation-ready Digital Product Passports. Calculate emissions, water scarcity and French Eco-Score ratings. Share it all with your customers.",
   ctaPrimary: { label: "Book a demo", href: "/contact" },
-  ctaSecondary: { label: "View example DPP", href: "/demo" },
+  ctaSecondary: { label: "View example DPP", href: "/collective" },
   videoLabel: "Example Digital Product Passport",
   videoSrc: "/videos/dpp-demo.mp4",
 };

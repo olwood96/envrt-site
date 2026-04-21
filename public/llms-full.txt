@@ -33,7 +33,7 @@ ENVRT addresses this by making product-level LCA fast, affordable and structured
 
 1. **Upload collection data.** Brand provides material composition, garment weights and supplier details through the ENVRT Dashboard. The platform accepts spreadsheet uploads and manual entry.
 
-2. **Automated gap filling.** ENVRT LAB's materials database contains emission and water factors per material. A smart gap filler uses fuzzy matching to fill missing data points against the database when supplier-specific data is not available, so brands do not need complete primary data to get started.
+2. **Automated supply chain reconstruction.** ENVRT LAB's materials database contains emission and water factors per material. The platform automatically reconstructs supply chain data and fills missing data points using the database when supplier-specific data is not available, so brands do not need complete primary data to get started.
 
 3. **Product-level LCA.** Each garment is individually assessed on a cradle-to-gate basis, producing CO2e (climate impact) and water scarcity impact (AWARE method) attributed across six life cycle stages: fibre production, yarn production, fabric production, dyeing and finishing, assembly and transport.
 
@@ -58,14 +58,14 @@ For each garment assessed:
 
 ENVRT LAB is the proprietary assessment engine. Key methodological characteristics:
 
-- **Standard:** ISO 14040 / ISO 14044 compliant Life Cycle Assessment
+- **Standard:** Life Cycle Assessment aligned with ISO 14040 / ISO 14044
 - **Category rules:** Aligned with the Product Environmental Footprint Category Rules (PEFCR) for apparel and footwear
 - **System boundary:** Cradle-to-gate (raw material extraction through finished product at factory gate)
 - **Climate impact method:** IPCC Global Warming Potential characterisation factors, expressed in kg CO2e
 - **Water scarcity method:** AWARE (Available WAter REmaining), the recommended method under the EU Product Environmental Footprint (PEF) framework and EF 3.0/3.1 characterisation methods
 - **Granularity:** Product-level (individual garment assessment, not brand-level or category averages)
 - **Life cycle stages assessed:** Fibre production, yarn production, fabric production, dyeing and finishing, assembly, transport
-- **Data infrastructure:** Materials database with emission and water factors per material, smart gap filler using fuzzy matching for missing data points
+- **Data infrastructure:** Materials database with emission and water factors per material, automated supply chain reconstruction for missing data points
 
 ## Services
 

@@ -24,6 +24,16 @@ const nextConfig = {
         destination: "/#how-it-works",
         permanent: true,
       },
+      {
+        source: "/home",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/demo",
+        destination: "/contact",
+        permanent: true,
+      },
     ];
   },
 

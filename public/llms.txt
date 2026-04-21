@@ -25,7 +25,7 @@ The same product-level dataset supports DPP disclosure, Scope 3 reporting, green
 ## How It Works
 
 1. Brand uploads collection data (material composition, weights, supplier details) through the ENVRT Dashboard
-2. ENVRT LAB runs product-level LCA per garment using a materials database and fuzzy-matched gap filling
+2. ENVRT LAB runs product-level LCA per garment using a materials database and automated supply chain reconstruction
 3. Results are generated per product: CO2e, water scarcity, stage-by-stage breakdown and transparency score
 4. Digital Product Passports are created and linked to physical garments via QR code
 5. Data feeds into comparison tables, collection analytics and exportable reports
@@ -35,7 +35,7 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 ## Services
 
 - Product-level Life Cycle Assessment (LCA) for apparel and textiles
-- Digital Product Passports (DPPs) compliant with the EU ESPR framework
+- Digital Product Passports (DPPs) aligned with the EU ESPR framework
 - Sustainability hotspot identification across garment life cycle stages
 - Water scarcity impact assessment using the AWARE method
 - Green claims substantiation and compliance support
@@ -45,7 +45,7 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 
 ## Methodology
 
-- ISO 14040 / ISO 14044 compliant Life Cycle Assessment
+- Life Cycle Assessment aligned with ISO 14040 / ISO 14044
 - Product Environmental Footprint Category Rules (PEFCR) for apparel and footwear
 - AWARE method for water scarcity characterisation
 - Cradle-to-gate system boundary
@@ -64,7 +64,7 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 - Pricing: https://envrt.com/pricing
 - Contact: https://envrt.com/contact
 - Insights (blog): https://envrt.com/insights
-- Example DPP: https://envrt.com/demo
+- Collective (live DPPs): https://envrt.com/collective
 - ROI calculator: https://envrt.com/roi
 
 ## Published Insights
