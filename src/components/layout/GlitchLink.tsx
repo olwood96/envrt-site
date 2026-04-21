@@ -83,7 +83,7 @@ export function GlitchLink({ href, label, className = "", onClick }: GlitchLinkP
       <span
         ref={spanRef}
         className="inline-block whitespace-nowrap"
-        style={lockedWidth ? { minWidth: lockedWidth } : undefined}
+        style={lockedWidth ? { width: lockedWidth, overflow: "visible" } : undefined}
       >
         {display}
       </span>
