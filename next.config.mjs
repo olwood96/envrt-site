@@ -34,6 +34,11 @@ const nextConfig = {
         destination: "/contact",
         permanent: true,
       },
+      {
+        source: "/dashboard-demo",
+        destination: "/contact",
+        permanent: true,
+      },
     ];
   },
 
