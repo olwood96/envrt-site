@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ENVRT — Digital Product Passports in minutes, not months.",
+    name: "ENVRT - Digital Product Passports in minutes, not months.",
     short_name: "ENVRT",
     description:
       "Digital Product Passports, lifecycle metrics and sustainability analytics, all in one place. Fast and simple.",

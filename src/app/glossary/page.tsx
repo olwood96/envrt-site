@@ -131,7 +131,7 @@ const glossaryTerms = [
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Glossary — Fashion Sustainability Terms | ENVRT",
+  title: "Glossary - Fashion Sustainability Terms | ENVRT",
   description:
     "Definitions of key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment, environmental regulation and supply chain transparency.",
   keywords: [
@@ -145,7 +145,7 @@ export const metadata: Metadata = {
     "scope 3 emissions definition",
   ],
   openGraph: {
-    title: "Glossary — Fashion Sustainability Terms | ENVRT",
+    title: "Glossary - Fashion Sustainability Terms | ENVRT",
     description:
       "Definitions of key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment, environmental regulation and supply chain transparency.",
     url: "https://envrt.com/glossary",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Our Team — Meet the People Behind ENVRT",
+  title: "Our Team - Meet the People Behind ENVRT",
   description:
     "Meet the founders and advisors behind ENVRT. Deep expertise in environmental science, AI, astrophysics and fashion technology, building the future of product transparency.",
   keywords: [
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "sustainability technology team UK",
   ],
   openGraph: {
-    title: "Our Team — Meet the People Behind ENVRT",
+    title: "Our Team - Meet the People Behind ENVRT",
     description:
       "Deep expertise in environmental science, AI and fashion technology, building the future of product transparency.",
     url: "https://envrt.com/team",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Our Team — Meet the People Behind ENVRT",
+    title: "Our Team - Meet the People Behind ENVRT",
     description:
       "Deep expertise in environmental science, AI and fashion technology.",
   },

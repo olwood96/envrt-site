@@ -34,6 +34,13 @@ const CONTENT_DIR = path.join(process.cwd(), "content", "insights");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+/**
+ * Convert a tag to a URL-safe slug (lowercase, spaces to hyphens).
+ */
+export function tagSlug(tag: string): string {
+  return tag.toLowerCase().replace(/\s+/g, "-");
+}
+
 function calculateReadingTime(text: string): number {
   const wordsPerMinute = 230;
   const words = text.trim().split(/\s+/).length;
@@ -130,6 +137,6 @@ export function getAllTags(): string[] {
  */
 export function getPostsByTag(tag: string): InsightsPostMeta[] {
   return getAllPostsMeta().filter((post) =>
-    post.tags.map((t) => t.toLowerCase()).includes(tag.toLowerCase())
+    post.tags.map((t) => tagSlug(t)).includes(tagSlug(tag))
   );
 }

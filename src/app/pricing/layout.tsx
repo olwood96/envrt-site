@@ -5,9 +5,9 @@ import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJ
 import { pricingFaqItems } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Pricing — Digital Product Passport Plans | ENVRT",
+  title: "Pricing - Digital Product Passport Plans | ENVRT",
   description:
-    "Digital Product Passport pricing from £149/month. Compare Starter, Growth, and Pro plans — DPP creation, lifecycle metrics, analytics, and AI-powered data ingestion included.",
+    "Digital Product Passport pricing from £149/month. Compare Starter, Growth and Pro plans - DPP creation, lifecycle metrics, analytics and automated data processing included.",
   keywords: [
     "Digital Product Passport pricing",
     "DPP platform pricing",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "ENVRT pricing",
   ],
   openGraph: {
-    title: "Pricing — Digital Product Passport Plans | ENVRT",
+    title: "Pricing - Digital Product Passport Plans | ENVRT",
     description:
       "Digital Product Passport plans from £149/month. DPP creation, lifecycle metrics, analytics, and AI-powered data ingestion.",
     url: "https://envrt.com/pricing",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing — Digital Product Passport Plans | ENVRT",
+    title: "Pricing - Digital Product Passport Plans | ENVRT",
     description:
       "Digital Product Passport plans from £149/month. DPP creation, analytics, and sustainability insights.",
   },

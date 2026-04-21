@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Payment Confirmed — ENVRT",
+  title: "Payment Confirmed | ENVRT",
   description: "Your ENVRT subscription is now active.",
   robots: { index: false },
 };

@@ -4,9 +4,9 @@ import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { roiFaqItems } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
+  title: "ROI Calculator - What Does DPP Compliance Cost? | ENVRT",
   description:
-    "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams. Get your personalised savings estimate in under 3 minutes.",
+    "DPP compliance cost calculator - compare ENVRT against consultants or in-house teams. Get your personalised savings estimate in under 3 minutes.",
   keywords: [
     "DPP compliance cost",
     "Digital Product Passport ROI",
@@ -16,17 +16,17 @@ export const metadata: Metadata = {
     "ESPR compliance budget",
   ],
   openGraph: {
-    title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
+    title: "ROI Calculator - What Does DPP Compliance Cost? | ENVRT",
     description:
-      "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams. Personalised savings estimate in under 3 minutes.",
+      "DPP compliance cost calculator - compare ENVRT against consultants or in-house teams. Personalised savings estimate in under 3 minutes.",
     url: "https://envrt.com/roi",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ROI Calculator — What Does DPP Compliance Cost? | ENVRT",
+    title: "ROI Calculator - What Does DPP Compliance Cost? | ENVRT",
     description:
-      "DPP compliance cost calculator — compare ENVRT against consultants or in-house teams.",
+      "DPP compliance cost calculator - compare ENVRT against consultants or in-house teams.",
   },
   alternates: {
     canonical: "https://envrt.com/roi",

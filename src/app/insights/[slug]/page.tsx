@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
-import { getAllSlugs, getPostBySlug } from "@/lib/insights";
+import { getAllSlugs, getPostBySlug, tagSlug } from "@/lib/insights";
 import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
@@ -113,7 +113,7 @@ export default async function InsightsPostPage({ params }: PageProps) {
                 {post.tags.map((tag) => (
                   <Link
                     key={tag}
-                    href={`/insights/tag/${tag.toLowerCase()}`}
+                    href={`/insights/tag/${tagSlug(tag)}`}
                     className="rounded-full bg-envrt-teal/5 px-2.5 py-0.5 text-xs font-medium text-envrt-teal transition-colors hover:bg-envrt-teal/10"
                   >
                     {tag}

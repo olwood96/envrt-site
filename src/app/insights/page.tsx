@@ -43,7 +43,7 @@ const insightsFaqItems = [
 ];
 
 export const metadata: Metadata = {
-  title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
+  title: "Insights - DPP Guides & Sustainability Articles | ENVRT",
   description:
     "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency. Expert insights from the ENVRT team.",
   keywords: [
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     "green claims fashion",
   ],
   openGraph: {
-    title: "Insights — DPP Guides & Sustainability Articles | ENVRT",
+    title: "Insights - DPP Guides & Sustainability Articles | ENVRT",
     description:
       "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency.",
     url: "https://envrt.com/insights",

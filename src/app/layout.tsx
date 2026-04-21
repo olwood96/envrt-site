@@ -9,14 +9,14 @@ import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  title: `${siteConfig.name} | ${siteConfig.tagline}`,
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
   verification: {
     google: "j62BTjUf_jbiWVEIwjZhno6IFF9ePefSNWiBCLciaUc",
   },
   openGraph: {
-    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    title: `${siteConfig.name} | ${siteConfig.tagline}`,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
@@ -25,14 +25,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 3072,
         height: 4096,
-        alt: "ENVRT — The Infrastructure Layer For Product Transparency",
+        alt: "ENVRT - The Infrastructure Layer For Product Transparency",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    title: `${siteConfig.name} | ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: ["/og-image.png"],
   },

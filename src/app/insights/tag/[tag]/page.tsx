@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { InsightsCard } from "@/components/insights/InsightCard";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
-import { getAllTags, getPostsByTag } from "@/lib/insights";
+import { getAllTags, getPostsByTag, tagSlug } from "@/lib/insights";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
-  return getAllTags().map((tag) => ({ tag: tag.toLowerCase() }));
+  return getAllTags().map((tag) => ({ tag: tagSlug(tag) }));
 }
 
 interface PageProps {
@@ -20,12 +20,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (posts.length === 0) return {};
 
   const displayTag = posts[0]?.tags.find(
-    (t) => t.toLowerCase() === tag.toLowerCase()
+    (t) => tagSlug(t) === tagSlug(tag)
   ) ?? tag;
 
-  const title = `${displayTag} — Insights | ENVRT`;
+  const title = `${displayTag} - Insights | ENVRT`;
   const description = `Articles and guides about ${displayTag.toLowerCase()} from ENVRT. Digital Product Passports, sustainability data, and fashion transparency.`;
-  const url = `https://envrt.com/insights/tag/${tag.toLowerCase()}`;
+  const url = `https://envrt.com/insights/tag/${tagSlug(tag)}`;
 
   return {
     title,
@@ -49,7 +49,7 @@ export default async function TagPage({ params }: PageProps) {
   if (posts.length === 0) notFound();
 
   const displayTag = posts[0]?.tags.find(
-    (t) => t.toLowerCase() === tag.toLowerCase()
+    (t) => tagSlug(t) === tagSlug(tag)
   ) ?? tag;
 
   return (
@@ -60,7 +60,7 @@ export default async function TagPage({ params }: PageProps) {
           { name: "Insights", url: "https://envrt.com/insights" },
           {
             name: displayTag,
-            url: `https://envrt.com/insights/tag/${tag.toLowerCase()}`,
+            url: `https://envrt.com/insights/tag/${tagSlug(tag)}`,
           },
         ]}
       />
