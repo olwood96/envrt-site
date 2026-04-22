@@ -30,8 +30,6 @@ const config: Config = {
       animation: {
         "glitch-1": "glitch1 0.3s ease-in-out",
         "glitch-2": "glitch2 0.3s ease-in-out",
-        "map-pulse": "mapPulse 3s ease-in-out infinite",
-        "map-dot": "mapDotIn 0.8s ease-out forwards",
       },
       keyframes: {
         glitch1: {
@@ -47,14 +45,6 @@ const config: Config = {
           "40%": { clipPath: "inset(40% 0 20% 0)" },
           "60%": { clipPath: "inset(60% 0 10% 0)" },
           "80%": { clipPath: "inset(10% 0 40% 0)" },
-        },
-        mapPulse: {
-          "0%, 100%": { opacity: "0.15", transform: "scale(1)" },
-          "50%": { opacity: "0.4", transform: "scale(1.3)" },
-        },
-        mapDotIn: {
-          "0%": { opacity: "0", transform: "scale(0)" },
-          "100%": { opacity: "0.7", transform: "scale(1)" },
         },
       },
     },

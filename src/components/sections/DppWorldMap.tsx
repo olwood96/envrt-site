@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { geoMercator, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
@@ -59,17 +59,22 @@ const HEIGHT = 480;
 const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const API_URL = "https://dashboard.envrt.com/api/public/dpp-map";
 
-interface CountryViews {
-  country: string;
-  views: number;
+// How long each dot's glow lasts (ms) and gap between dots
+const GLOW_DURATION = 600;
+const GLOW_GAP = 200;
+
+interface DotData {
+  cx: number;
+  cy: number;
+  r: number;
 }
 
 export function DppWorldMap() {
   const [countries, setCountries] = useState<string | null>(null);
-  const [dots, setDots] = useState<
-    { cx: number; cy: number; r: number; delay: number }[]
-  >([]);
+  const [dots, setDots] = useState<DotData[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const fetched = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load TopoJSON country shapes
   useEffect(() => {
@@ -93,7 +98,7 @@ export function DppWorldMap() {
       .catch(() => {});
   }, []);
 
-  // Fetch DPP view data and project dots
+  // Fetch DPP view data and project dots (sorted left to right by cx)
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
@@ -105,27 +110,54 @@ export function DppWorldMap() {
 
     fetch(API_URL)
       .then((r) => r.json())
-      .then((data: CountryViews[]) => {
+      .then((data: { country: string; views: number }[]) => {
         if (!Array.isArray(data) || data.length === 0) return;
 
-        const maxViews = data[0].views; // already sorted desc
+        const maxViews = data[0].views;
 
         const projected = data
-          .map((d, i) => {
+          .map((d) => {
             const coords = CENTROIDS[d.country];
             if (!coords) return null;
             const [cx, cy] = projection(coords) ?? [0, 0];
-            // Log scale: 3px min, 10px max
             const t = Math.log(d.views + 1) / Math.log(maxViews + 1);
             const r = 3 + t * 7;
-            return { cx, cy, r, delay: i * 0.12 };
+            return { cx, cy, r };
           })
-          .filter(Boolean) as { cx: number; cy: number; r: number; delay: number }[];
+          .filter(Boolean) as DotData[];
 
+        // Sort left to right for the sweep effect
+        projected.sort((a, b) => a.cx - b.cx);
         setDots(projected);
       })
       .catch(() => {});
   }, []);
+
+  // Cyclical glow sweep: left to right, one dot at a time
+  const advance = useCallback(() => {
+    setActiveIndex((prev) => {
+      if (dots.length === 0) return -1;
+      const next = prev + 1;
+      return next >= dots.length ? 0 : next;
+    });
+  }, [dots.length]);
+
+  useEffect(() => {
+    if (dots.length === 0) return;
+
+    // Start the first glow
+    setActiveIndex(0);
+
+    const tick = () => {
+      advance();
+      timerRef.current = setTimeout(tick, GLOW_DURATION + GLOW_GAP);
+    };
+    timerRef.current = setTimeout(tick, GLOW_DURATION + GLOW_GAP);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [dots.length, advance]);
 
   return (
     <svg
@@ -151,31 +183,32 @@ export function DppWorldMap() {
         />
       )}
 
-      {/* Scan dots with pulse animation */}
-      {dots.map((dot, i) => (
-        <g key={i}>
-          {/* Glow halo */}
-          <circle
-            cx={dot.cx}
-            cy={dot.cy}
-            r={dot.r * 2.5}
-            fill="url(#dot-glow)"
-            opacity={0}
-            className="animate-map-pulse"
-            style={{ animationDelay: `${dot.delay}s` }}
-          />
-          {/* Solid dot */}
-          <circle
-            cx={dot.cx}
-            cy={dot.cy}
-            r={dot.r}
-            fill="#34d399"
-            opacity={0}
-            className="animate-map-dot"
-            style={{ animationDelay: `${dot.delay}s` }}
-          />
-        </g>
-      ))}
+      {/* Dots with sequential glow */}
+      {dots.map((dot, i) => {
+        const isActive = i === activeIndex;
+        return (
+          <g key={i}>
+            {/* Glow halo — only visible on active dot */}
+            <circle
+              cx={dot.cx}
+              cy={dot.cy}
+              r={isActive ? dot.r * 3 : dot.r * 2}
+              fill="url(#dot-glow)"
+              opacity={isActive ? 0.6 : 0}
+              style={{ transition: "opacity 0.3s ease, r 0.3s ease" }}
+            />
+            {/* Solid dot */}
+            <circle
+              cx={dot.cx}
+              cy={dot.cy}
+              r={isActive ? dot.r * 1.4 : dot.r}
+              fill="#34d399"
+              opacity={isActive ? 0.95 : 0.55}
+              style={{ transition: "opacity 0.3s ease, r 0.3s ease" }}
+            />
+          </g>
+        );
+      })}
     </svg>
   );
 }
