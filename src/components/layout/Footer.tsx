@@ -15,6 +15,7 @@ const footerLinks = [
       { label: "Pricing", href: "/pricing" },
       { label: "The Collective", href: "/collective" },
       { label: "Insights", href: "/insights" },
+      { label: "DPP Readiness Assessment", href: "/assessment" },
     ],
   },
   {

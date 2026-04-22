@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
-
-export default function AssessmentLayout() {
-  redirect("/free-dpp");
+export default function AssessmentLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
 }
