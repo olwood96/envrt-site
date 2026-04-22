@@ -186,25 +186,35 @@ export function DppWorldMap() {
       {/* Dots with sequential glow */}
       {dots.map((dot, i) => {
         const isActive = i === activeIndex;
+        const scale = isActive ? 1.4 : 1;
+        const glowScale = isActive ? 3 : 2;
         return (
           <g key={i}>
             {/* Glow halo — only visible on active dot */}
             <circle
               cx={dot.cx}
               cy={dot.cy}
-              r={isActive ? dot.r * 3 : dot.r * 2}
+              r={dot.r}
               fill="url(#dot-glow)"
               opacity={isActive ? 0.6 : 0}
-              style={{ transition: "opacity 0.3s ease, r 0.3s ease" }}
+              style={{
+                transition: "opacity 0.3s ease, transform 0.3s ease",
+                transform: `scale(${glowScale})`,
+                transformOrigin: `${dot.cx}px ${dot.cy}px`,
+              }}
             />
             {/* Solid dot */}
             <circle
               cx={dot.cx}
               cy={dot.cy}
-              r={isActive ? dot.r * 1.4 : dot.r}
+              r={dot.r}
               fill="#34d399"
               opacity={isActive ? 0.95 : 0.55}
-              style={{ transition: "opacity 0.3s ease, r 0.3s ease" }}
+              style={{
+                transition: "opacity 0.3s ease, transform 0.3s ease",
+                transform: `scale(${scale})`,
+                transformOrigin: `${dot.cx}px ${dot.cy}px`,
+              }}
             />
           </g>
         );
