@@ -4,12 +4,19 @@ import Link from "next/link";
 import { Container } from "../ui/Container";
 import { SectionCard } from "../ui/SectionCard";
 import { FadeUp } from "../ui/Motion";
+import { DppWorldMap } from "./DppWorldMap";
 
 export function FinalCTASection() {
   return (
     <div className="px-4 py-8 sm:px-6">
       <SectionCard dark className="mx-auto max-w-[1360px]">
-        <Container className="py-20 sm:py-28">
+        {/* Ambient map backdrop */}
+        <div className="absolute inset-0 overflow-hidden">
+          <DppWorldMap />
+        </div>
+
+        {/* Content on top */}
+        <Container className="relative z-10 py-20 sm:py-28">
           <FadeUp>
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-white">
