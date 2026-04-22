@@ -10,6 +10,10 @@ export const siteConfig = {
   contact: {
     email: "info@envrt.com",
   },
+  social: {
+    linkedin: "https://www.linkedin.com/company/envrt/",
+    instagram: "https://www.instagram.com/weareenvrt/",
+  },
 };
 
 export const navLinks = [

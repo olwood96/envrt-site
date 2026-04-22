@@ -14,7 +14,10 @@ export function OrganizationJsonLd() {
       contactType: "sales",
       availableLanguage: "English",
     },
-    sameAs: ["https://www.linkedin.com/company/envrt/"],
+    sameAs: [
+      "https://www.linkedin.com/company/envrt/",
+      "https://www.instagram.com/weareenvrt/",
+    ],
     foundingDate: "2024",
     founders: [
       {
