@@ -14,6 +14,7 @@ import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { StickyNudge } from "@/components/ui/StickyNudge";
 import { faqItems } from "@/lib/config";
 import { fetchImpactStats } from "@/lib/impact-stats";
+import { getFeaturedDpps } from "@/lib/collective/fetch";
 
 export const metadata: Metadata = {
   alternates: {
@@ -24,7 +25,10 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const impactStats = await fetchImpactStats();
+  const [impactStats, { cards: featuredCards }] = await Promise.all([
+    fetchImpactStats(),
+    getFeaturedDpps(),
+  ]);
 
   return (
     <>
@@ -39,7 +43,7 @@ export default async function HomePage() {
       <ImpactStatsSection stats={impactStats} />
       <PricingPreviewSection />
       <FAQSection />
-      <FinalCTASection />
+      <FinalCTASection featuredCards={featuredCards} />
       <StickyNudge />
       <div className="h-12" />
     </>
