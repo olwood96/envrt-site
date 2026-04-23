@@ -34,6 +34,9 @@ interface CalcResults {
   maxSaving: number;
   savingVsConsultant: number;
   savingVsInhouse: number;
+  hoursPerProduct: number;
+  hoursSaved: number;
+  daysSaved: number;
 }
 
 /* ================================================================
@@ -108,6 +111,12 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   const savingVsInhouse = Math.max(0, inhouseCost - envrtCost);
   const maxSaving = Math.max(savingVsConsultant, savingVsInhouse);
 
+  // Time savings — hours per product without ENVRT vs with
+  const hoursPerProduct = Math.round(8 * maturityMultiplier);
+  const envrtHoursPerProduct = 0.5;
+  const hoursSaved = Math.round((hoursPerProduct - envrtHoursPerProduct) * inputs.skuCount);
+  const daysSaved = Math.round(hoursSaved / 8);
+
   return {
     envrtCost,
     envrtPlan,
@@ -117,6 +126,9 @@ function calculateROI(inputs: CalcInputs): CalcResults {
     maxSaving: Math.round(maxSaving),
     savingVsConsultant: Math.round(savingVsConsultant),
     savingVsInhouse: Math.round(savingVsInhouse),
+    hoursPerProduct,
+    hoursSaved,
+    daysSaved,
   };
 }
 
