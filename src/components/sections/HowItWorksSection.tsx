@@ -64,7 +64,7 @@ function StepCard({
         {/* Desktop: text left (1/4), image right (3/4) */}
         {/* Mobile: text only, no screenshot */}
         <div className="hidden min-h-0 flex-1 lg:grid lg:grid-cols-[1fr_3fr]">
-          <div className="flex flex-col justify-center border-r border-envrt-charcoal/[0.04] p-5 sm:p-6">
+          <div className="flex flex-col border-r border-envrt-charcoal/[0.04] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-envrt-charcoal">
               {step.title}
             </h3>
@@ -85,7 +85,7 @@ function StepCard({
           </div>
 
           <div className="overflow-hidden bg-envrt-cream/30 p-4 sm:p-5">
-            <div className="flex h-full items-center justify-center overflow-hidden rounded-lg">
+            <div className="flex h-full items-start justify-center overflow-hidden rounded-lg">
               {isVideo ? (
                 <video
                   src={step.mockImage}
@@ -108,7 +108,7 @@ function StepCard({
         </div>
 
         {/* Mobile content: text only, full width */}
-        <div className="flex flex-1 flex-col justify-center p-5 lg:hidden">
+        <div className="flex flex-1 flex-col p-5 lg:hidden">
           <h3 className="text-base font-semibold text-envrt-charcoal">
             {step.title}
           </h3>
