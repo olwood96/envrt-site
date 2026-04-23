@@ -7,9 +7,18 @@ import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
 import { PhoneFrame } from "../ui/PhoneFrame";
 import { LaptopFrame } from "../ui/LaptopFrame";
-import { DppWorldMap } from "./DppWorldMap";
+import { DppWorldMap, type ActiveCountry } from "./DppWorldMap";
 import { DppCarouselCard } from "./DppCarouselCard";
 import type { CollectiveCardData } from "@/lib/collective/types";
+
+function countryFlag(code: string): string {
+  if (!code || code.length !== 2) return "\u{1F30D}";
+  const base = 0x1f1e6;
+  return (
+    String.fromCodePoint(base + code.charCodeAt(0) - 65) +
+    String.fromCodePoint(base + code.charCodeAt(1) - 65)
+  );
+}
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -71,11 +80,17 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
     totalDurationSeconds: number;
     countryCount: number;
   } | null>(null);
+  const [activeCountry, setActiveCountry] = useState<ActiveCountry | null>(null);
 
   const handleStatsLoaded = useCallback(
     (s: { totalDurationSeconds: number; countryCount: number }) => {
       setStats(s);
     },
+    []
+  );
+
+  const handleCountryActive = useCallback(
+    (c: ActiveCountry | null) => { setActiveCountry(c); },
     []
   );
 
@@ -154,8 +169,49 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
             <div className="relative mt-10 w-full max-w-xl mx-auto lg:mt-0 lg:mx-0">
               {/* Laptop */}
               <LaptopFrame>
-                <DppWorldMap onStatsLoaded={handleStatsLoaded} />
+                <DppWorldMap
+                  onStatsLoaded={handleStatsLoaded}
+                  onCountryActive={handleCountryActive}
+                />
               </LaptopFrame>
+
+              {/* Stat box — top-right of laptop, hidden on mobile */}
+              <div className="absolute -top-3 -right-3 z-20 hidden sm:block lg:-top-4 lg:-right-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeCountry?.code ?? "aggregate"}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.3 }}
+                    className="rounded-xl border border-envrt-charcoal/8 bg-white px-3.5 py-2 shadow-lg"
+                  >
+                    {activeCountry ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{countryFlag(activeCountry.code)}</span>
+                        <div>
+                          <p className="text-xs font-semibold text-envrt-charcoal">
+                            {activeCountry.views.toLocaleString()} views
+                          </p>
+                          <p className="text-[10px] text-envrt-muted">
+                            {activeCountry.name}
+                          </p>
+                        </div>
+                      </div>
+                    ) : caption ? (
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
+                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
+                        </span>
+                        <p className="text-[10px] font-medium text-envrt-muted">
+                          {caption}
+                        </p>
+                      </div>
+                    ) : null}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
               {/* Phone — overlaps laptop upper-left */}
               {carouselCards.length > 0 && currentCard && (
