@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
 import { howItWorksSteps } from "@/lib/config";
@@ -13,28 +13,31 @@ const TOTAL = howItWorksSteps.length;
 function StepCard({
   step,
   index,
+  containerProgress,
 }: {
   step: (typeof howItWorksSteps)[number];
   index: number;
+  containerProgress: MotionValue<number>;
 }) {
   const stickyTop = NAV_H + 8 + index * HEADER_H;
   const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(step.mockImage);
   const isLast = index === TOTAL - 1;
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end start"],
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.95]);
-  const opacity = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.5]);
+  // Earlier cards scale down more when fully covered — creates depth
+  // Card 0 → 0.88, Card 1 → 0.92, Card 2 → 0.96, Card 3 → 1.0
+  const targetScale = isLast ? 1 : 1 - (TOTAL - 1 - index) * 0.04;
+  const rangeStart = index / TOTAL;
+  const scale = useTransform(containerProgress, [rangeStart, 1], [1, targetScale]);
+  const opacity = useTransform(
+    containerProgress,
+    [rangeStart, 1],
+    isLast ? [1, 1] : [1, 0.4]
+  );
 
   return (
-    <div
-      ref={wrapperRef}
-      style={{ paddingBottom: isLast ? 0 : "12vh" }}
-    >
+    // Wrapper height provides scroll runway — the empty space is covered
+    // by the next sticky card so it's never visible
+    <div style={{ height: isLast ? "auto" : "100vh" }}>
       <motion.div
         className="sticky"
         style={{
@@ -43,10 +46,11 @@ function StepCard({
           scale,
           opacity,
           transformOrigin: "top center",
+          willChange: "transform",
         }}
       >
         <div className="overflow-hidden rounded-2xl border border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.04]">
-          {/* Header strip - stays visible when next card covers the body */}
+          {/* Header strip — stays visible when next card covers the body */}
           <div className="flex items-center gap-3 border-b border-envrt-charcoal/[0.04] bg-envrt-cream/40 px-5 py-3 sm:px-7">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-envrt-teal/10 text-xs font-bold text-envrt-teal">
               {index + 1}
@@ -59,8 +63,7 @@ function StepCard({
             </span>
           </div>
 
-          {/* Content */}
-          {/* Image - large, prominent */}
+          {/* Image — full width centrepiece */}
           <div className="overflow-hidden border-b border-envrt-charcoal/[0.04] bg-envrt-cream/30 p-4 sm:p-6">
             <div className="overflow-hidden rounded-lg">
               {isVideo ? (
@@ -110,9 +113,14 @@ function StepCard({
 }
 
 export function HowItWorksSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
   return (
     <section className="px-4 py-8 sm:px-6" id="how-it-works">
-      {/* No scene-card wrapper here - overflow:hidden kills sticky */}
       <div
         className="noise-overlay mx-auto max-w-[1360px] rounded-scene"
         style={{
@@ -134,9 +142,14 @@ export function HowItWorksSection() {
             </div>
           </FadeUp>
 
-          <div className="mt-14">
+          <div ref={containerRef} className="mt-14">
             {howItWorksSteps.map((step, i) => (
-              <StepCard key={step.id} step={step} index={i} />
+              <StepCard
+                key={step.id}
+                step={step}
+                index={i}
+                containerProgress={scrollYProgress}
+              />
             ))}
           </div>
         </Container>

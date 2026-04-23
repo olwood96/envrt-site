@@ -67,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth overflow-x-hidden">
+    <html lang="en" className="scroll-smooth" style={{ overflowX: "clip" }}>
       <head>
         {/* ── Critical font preloads ── */}
         <link rel="preload" href="/fonts/n27/n27-regular-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
@@ -94,7 +94,7 @@ export default function RootLayout({
           as="document"
         />
       </head>
-      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased overflow-x-hidden">
+      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased" style={{ overflowX: "clip" }}>
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <Navbar />
