@@ -3,7 +3,6 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { Container } from "../ui/Container";
-import { SectionCard } from "../ui/SectionCard";
 import { FadeUp } from "../ui/Motion";
 import { DppWorldMap } from "./DppWorldMap";
 
@@ -35,24 +34,37 @@ export function FinalCTASection() {
       : null;
 
   return (
-    <div className="px-4 py-8 sm:px-6">
-      <SectionCard dark className="mx-auto max-w-[1360px]">
-        {/* Ambient map backdrop */}
-        <div className="absolute inset-0 overflow-hidden">
-          <DppWorldMap onStatsLoaded={handleStatsLoaded} />
-        </div>
+    <section
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, var(--envrt-green) 0%, #0f2219 100%)",
+      }}
+    >
+      {/* Map fills the right side on desktop, full width on mobile */}
+      <div className="absolute inset-0 lg:left-[40%] overflow-hidden">
+        <DppWorldMap onStatsLoaded={handleStatsLoaded} />
+      </div>
 
-        {/* Title above map, buttons below */}
-        <Container className="relative z-10 flex min-h-[380px] flex-col items-center py-10 sm:min-h-[480px] sm:py-14">
+      {/* Gradient fade from left so text has a clean backdrop */}
+      <div
+        className="absolute inset-y-0 left-0 w-full lg:w-[55%] pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to right, var(--envrt-green) 30%, transparent 100%)",
+        }}
+      />
+
+      <Container className="relative z-10">
+        <div className="flex min-h-[420px] flex-col justify-center py-16 sm:py-20 lg:max-w-[45%] lg:py-28">
           <FadeUp>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-4xl sm:whitespace-nowrap lg:text-5xl text-white text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-white">
               Ready to show the world your impact?
             </h2>
           </FadeUp>
 
           {/* Stats caption */}
           {caption && (
-            <div className="mt-5 flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-sm">
+            <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-sm">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -63,7 +75,7 @@ export function FinalCTASection() {
             </div>
           )}
 
-          <div className="mt-auto pt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 sm:pt-10">
+          <div className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
             <Link
               href="/contact"
               data-cta="footer-cta-book-demo"
@@ -80,8 +92,8 @@ export function FinalCTASection() {
               View pricing
             </Link>
           </div>
-        </Container>
-      </SectionCard>
-    </div>
+        </div>
+      </Container>
+    </section>
   );
 }
