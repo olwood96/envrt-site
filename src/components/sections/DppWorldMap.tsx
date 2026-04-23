@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { geoMercator, geoPath, geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
