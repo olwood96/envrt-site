@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
-import { PhoneIframe } from "../ui/PhoneFrame";
+import { PhoneFrame } from "../ui/PhoneFrame";
 import { LaptopFrame } from "../ui/LaptopFrame";
 import { DppWorldMap } from "./DppWorldMap";
+import { DppCarouselCard } from "./DppCarouselCard";
 import type { CollectiveCardData } from "@/lib/collective/types";
 
 function formatDuration(seconds: number): string {
@@ -25,7 +27,6 @@ function formatDuration(seconds: number): string {
 function interleaveByBrand(cards: CollectiveCardData[]): CollectiveCardData[] {
   if (cards.length <= 1) return cards;
 
-  // Group by brand
   const byBrand = new Map<string, CollectiveCardData[]>();
   for (const card of cards) {
     const key = card.brand.id;
@@ -33,7 +34,6 @@ function interleaveByBrand(cards: CollectiveCardData[]): CollectiveCardData[] {
     byBrand.get(key)!.push(card);
   }
 
-  // Round-robin across brands
   const queues = Array.from(byBrand.values());
   const result: CollectiveCardData[] = [];
   let idx = 0;
@@ -44,7 +44,6 @@ function interleaveByBrand(cards: CollectiveCardData[]): CollectiveCardData[] {
       result.push(queue.shift()!);
     }
     idx++;
-    // Remove empty queues
     if (idx % queues.length === 0) {
       for (let i = queues.length - 1; i >= 0; i--) {
         if (queues[i].length === 0) queues.splice(i, 1);
@@ -91,14 +90,11 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
     if (carouselCards.length <= 1) return;
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % carouselCards.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, [carouselCards.length]);
 
-  // Pre-render current + next iframe to avoid blank flash on transition
-  const currentUrl = carouselCards[activeSlide]?.embedUrl;
-  const nextIdx = (activeSlide + 1) % carouselCards.length;
-  const nextUrl = carouselCards[nextIdx]?.embedUrl;
+  const currentCard = carouselCards[activeSlide];
 
   return (
     <section className="py-16 sm:py-20 lg:py-28">
@@ -156,18 +152,51 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
               </LaptopFrame>
 
               {/* Phone — overlaps laptop upper-left */}
-              {carouselCards.length > 0 && (
+              {carouselCards.length > 0 && currentCard && (
                 <div className="absolute -top-6 -left-2 z-10 w-[120px] sm:-top-8 sm:-left-4 sm:w-[140px] lg:-top-12 lg:-left-8 lg:w-[160px]">
-                  {/* Current DPP (visible) */}
-                  <PhoneIframe
-                    key={`phone-${activeSlide}`}
-                    src={currentUrl}
-                  />
+                  <PhoneFrame>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeSlide}
+                        initial={{ opacity: 0, x: 40 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -40 }}
+                        transition={{
+                          duration: 0.45,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        }}
+                        className="h-full"
+                      >
+                        <DppCarouselCard
+                          productImageUrl={currentCard.productImageUrl}
+                          brandLogoUrl={currentCard.brandLogoUrl}
+                          garmentName={currentCard.dpp.garment_name}
+                          brandName={currentCard.brand.name}
+                          productSku={currentCard.dpp.product_sku}
+                          totalEmissions={currentCard.dpp.total_emissions}
+                          totalWater={currentCard.dpp.total_water}
+                          totalEmissionsReductionPct={currentCard.dpp.total_emissions_reduction_pct}
+                          totalWaterReductionPct={currentCard.dpp.total_water_reduction_pct}
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                  </PhoneFrame>
 
-                  {/* Preload next DPP (hidden) */}
-                  {nextUrl && nextUrl !== currentUrl && (
-                    <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
-                      <PhoneIframe src={nextUrl} />
+                  {/* Slide indicators */}
+                  {carouselCards.length > 1 && (
+                    <div className="mt-2 flex justify-center gap-1">
+                      {carouselCards.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveSlide(i)}
+                          className={`h-1 rounded-full transition-all duration-300 ${
+                            i === activeSlide
+                              ? "w-4 bg-envrt-teal"
+                              : "w-1 bg-envrt-charcoal/15"
+                          }`}
+                          aria-label={`Show DPP ${i + 1}`}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
