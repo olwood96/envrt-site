@@ -105,7 +105,51 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
     <section className="py-16 sm:py-20 lg:py-28">
       <Container>
         <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
-          {/* ── Left: Device mockups ── */}
+          {/* ── Left (desktop) / Top (mobile): CTA text + stats ── */}
+          <div className="max-w-lg">
+            <FadeUp>
+              <h2 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl lg:text-5xl">
+                Ready to show the world your impact?
+              </h2>
+            </FadeUp>
+
+            {caption && (
+              <FadeUp delay={0.1}>
+                <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-envrt-charcoal/8 bg-envrt-charcoal/[0.03] px-4 py-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
+                  </span>
+                  <p className="text-[11px] font-medium tracking-wide text-envrt-muted sm:text-xs">
+                    {caption}
+                  </p>
+                </div>
+              </FadeUp>
+            )}
+
+            {/* Buttons: desktop only (mobile buttons below devices) */}
+            <FadeUp delay={0.2}>
+              <div className="mt-10 hidden flex-wrap items-center gap-3 sm:gap-4 lg:flex">
+                <Link
+                  href="/contact"
+                  data-cta="footer-cta-book-demo"
+                  className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md sm:px-8 sm:py-4 sm:text-lg"
+                >
+                  Book a demo
+                  <span className="ml-2">→</span>
+                </Link>
+                <Link
+                  href="/pricing"
+                  data-cta="footer-cta-view-pricing"
+                  className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03] sm:px-8 sm:py-4 sm:text-lg"
+                >
+                  View pricing
+                </Link>
+              </div>
+            </FadeUp>
+          </div>
+
+          {/* ── Right (desktop) / Middle (mobile): Device mockups ── */}
           <FadeUp delay={0.15}>
             <div className="relative mt-10 w-full max-w-xl mx-auto lg:mt-0 lg:mx-0">
               {/* Laptop */}
@@ -165,47 +209,23 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
             </div>
           </FadeUp>
 
-          {/* ── Right: CTA text + buttons ── */}
-          <div className="mt-10 max-w-lg lg:mt-0">
-            <FadeUp>
-              <h2 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl lg:text-5xl">
-                Ready to show the world your impact?
-              </h2>
-            </FadeUp>
-
-            {caption && (
-              <FadeUp delay={0.1}>
-                <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-envrt-charcoal/8 bg-envrt-charcoal/[0.03] px-4 py-1.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
-                  </span>
-                  <p className="text-[11px] font-medium tracking-wide text-envrt-muted sm:text-xs">
-                    {caption}
-                  </p>
-                </div>
-              </FadeUp>
-            )}
-
-            <FadeUp delay={0.2}>
-              <div className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
-                <Link
-                  href="/contact"
-                  data-cta="footer-cta-book-demo"
-                  className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md sm:px-8 sm:py-4 sm:text-lg"
-                >
-                  Book a demo
-                  <span className="ml-2">→</span>
-                </Link>
-                <Link
-                  href="/pricing"
-                  data-cta="footer-cta-view-pricing"
-                  className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03] sm:px-8 sm:py-4 sm:text-lg"
-                >
-                  View pricing
-                </Link>
-              </div>
-            </FadeUp>
+          {/* ── Mobile-only buttons (below devices) ── */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:hidden">
+            <Link
+              href="/contact"
+              data-cta="footer-cta-book-demo"
+              className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md"
+            >
+              Book a demo
+              <span className="ml-2">→</span>
+            </Link>
+            <Link
+              href="/pricing"
+              data-cta="footer-cta-view-pricing"
+              className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03]"
+            >
+              View pricing
+            </Link>
           </div>
         </div>
       </Container>
