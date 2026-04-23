@@ -21,23 +21,20 @@ function StepCard({
   const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(step.mockImage);
   const isLast = index === TOTAL - 1;
 
-  // Each card lives inside a tall wrapper that gives scroll runway
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
-    // "start start" = when top of wrapper hits top of viewport
-    // "end start"   = when bottom of wrapper hits top of viewport
     offset: ["start start", "end start"],
   });
 
-  // Once you scroll past this card's wrapper the card is "covered" by the next.
-  // Scale down from 1 -> 0.94 and dim from 1 -> 0.55 as scroll progresses.
-  // Last card stays at full scale/opacity since nothing covers it.
-  const scale = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.94]);
-  const opacity = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.55]);
+  const scale = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.95]);
+  const opacity = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, 0.5]);
 
   return (
-    <div ref={wrapperRef} style={{ height: isLast ? "auto" : "70vh" }}>
+    <div
+      ref={wrapperRef}
+      style={{ paddingBottom: isLast ? 0 : "12vh" }}
+    >
       <motion.div
         className="sticky"
         style={{
@@ -49,7 +46,7 @@ function StepCard({
         }}
       >
         <div className="overflow-hidden rounded-2xl border border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.04]">
-          {/* Header strip -- stays visible when next card covers the body */}
+          {/* Header strip - stays visible when next card covers the body */}
           <div className="flex items-center gap-3 border-b border-envrt-charcoal/[0.04] bg-envrt-cream/40 px-5 py-3 sm:px-7">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-envrt-teal/10 text-xs font-bold text-envrt-teal">
               {index + 1}
@@ -63,28 +60,9 @@ function StepCard({
           </div>
 
           {/* Content */}
-          <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-10">
-            <div className="flex flex-col justify-center">
-              <h3 className="text-xl font-semibold text-envrt-charcoal sm:text-2xl">
-                {step.title}
-              </h3>
-              <p className="mt-3 text-base leading-relaxed text-envrt-muted">
-                {step.description}
-              </p>
-              <ul className="mt-5 space-y-2.5">
-                {step.bullets.map((b) => (
-                  <li
-                    key={b}
-                    className="flex items-start gap-2.5 text-sm text-envrt-charcoal/80"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-envrt-teal" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="overflow-hidden rounded-xl border border-envrt-charcoal/[0.04] bg-envrt-cream/30">
+          {/* Image - large, prominent */}
+          <div className="overflow-hidden border-b border-envrt-charcoal/[0.04] bg-envrt-cream/30 p-4 sm:p-6">
+            <div className="overflow-hidden rounded-lg">
               {isVideo ? (
                 <video
                   src={step.mockImage}
@@ -92,17 +70,38 @@ function StepCard({
                   muted
                   loop
                   playsInline
-                  className="h-full w-full object-contain"
+                  className="w-full object-contain"
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={step.mockImage}
                   alt={`${step.verb} step`}
-                  className="h-full w-full object-contain"
+                  className="w-full object-contain"
                 />
               )}
             </div>
+          </div>
+
+          {/* Text */}
+          <div className="p-6 sm:p-8">
+            <h3 className="text-xl font-semibold text-envrt-charcoal sm:text-2xl">
+              {step.title}
+            </h3>
+            <p className="mt-3 text-base leading-relaxed text-envrt-muted">
+              {step.description}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {step.bullets.map((b) => (
+                <li
+                  key={b}
+                  className="flex items-start gap-2 text-sm text-envrt-charcoal/80"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-envrt-teal" />
+                  {b}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </motion.div>
@@ -112,8 +111,17 @@ function StepCard({
 
 export function HowItWorksSection() {
   return (
-    <div className="px-4 py-8 sm:px-6" id="how-it-works">
-      <div className="scene-card noise-overlay mx-auto max-w-[1360px] overflow-visible rounded-scene">
+    <section className="px-4 py-8 sm:px-6" id="how-it-works">
+      {/* No scene-card wrapper here - overflow:hidden kills sticky */}
+      <div
+        className="noise-overlay mx-auto max-w-[1360px] rounded-scene"
+        style={{
+          overflow: "visible",
+          background: "linear-gradient(135deg, #faf9f7 0%, #f6f5f2 100%)",
+          border: "1px solid rgba(0, 0, 0, 0.04)",
+          position: "relative",
+        }}
+      >
         <Container className="py-16 sm:py-20">
           <FadeUp>
             <div className="mx-auto max-w-2xl text-center">
@@ -133,6 +141,6 @@ export function HowItWorksSection() {
           </div>
         </Container>
       </div>
-    </div>
+    </section>
   );
 }
