@@ -47,7 +47,7 @@ export function PhoneFrame({ children, className = "" }: PhoneFrameProps) {
         <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
 
         {/* Screen */}
-        <div className="relative w-full overflow-hidden rounded-[2.3rem] bg-[#FAF9F6]" style={{ aspectRatio: "9 / 19" }}>
+        <div className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ aspectRatio: "9 / 19" }}>
           <div className="absolute inset-0 overflow-hidden pt-[22px]">
             {children}
           </div>

@@ -273,6 +273,15 @@ body {
   position: relative;
 }
 
+/* DPP snapshot wobble — matches dpp-styles.css dpp-wobble-in */
+@keyframes dpp-snapshot-wobble {
+  0%   { opacity: 0; transform: perspective(800px) rotateY(-30deg) scale(0.92); }
+  25%  { opacity: 1; transform: perspective(800px) rotateY(14deg) scale(1.0); }
+  50%  { opacity: 1; transform: perspective(800px) rotateY(-7deg) scale(1.0); }
+  75%  { opacity: 1; transform: perspective(800px) rotateY(3deg) scale(1.0); }
+  100% { opacity: 1; transform: perspective(800px) rotateY(0deg) scale(1.0); }
+}
+
 /* Assessment section fade-in */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }

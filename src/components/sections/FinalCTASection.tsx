@@ -171,7 +171,6 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                           productImageUrl={currentCard.productImageUrl}
                           brandLogoUrl={currentCard.brandLogoUrl}
                           garmentName={currentCard.dpp.garment_name}
-                          brandName={currentCard.brand.name}
                           productSku={currentCard.dpp.product_sku}
                           totalEmissions={currentCard.dpp.total_emissions}
                           totalWater={currentCard.dpp.total_water}
