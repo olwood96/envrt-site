@@ -36,8 +36,8 @@ export function FinalCTASection() {
   return (
     <div className="px-4 py-8 sm:px-6">
       <SectionCard dark className="mx-auto max-w-[1360px]">
-        {/* Ambient map backdrop — pushed down so title has clear space above */}
-        <div className="absolute inset-0 top-16 sm:top-20 overflow-hidden">
+        {/* Ambient map backdrop */}
+        <div className="absolute inset-0 overflow-hidden">
           <DppWorldMap onStatsLoaded={handleStatsLoaded} />
         </div>
 

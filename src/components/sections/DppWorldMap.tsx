@@ -90,7 +90,7 @@ export function DppWorldMap({ onStatsLoaded }: DppWorldMapProps) {
 
         const projection = geoMercator()
           .scale(140)
-          .center([10, 30])
+          .center([10, 18])
           .translate([WIDTH / 2, HEIGHT / 2]);
 
         const pathGen = geoPath().projection(projection);
@@ -107,12 +107,12 @@ export function DppWorldMap({ onStatsLoaded }: DppWorldMapProps) {
 
     const projection = geoMercator()
       .scale(140)
-      .center([10, 30])
+      .center([10, 18])
       .translate([WIDTH / 2, HEIGHT / 2]);
 
     fetch("/api/impact-stats")
       .then((r) => r.json())
-      .then((data) => {
+      .then(async (data) => {
         // Surface stats to parent for caption
         if (onStatsLoaded && data.totalDurationSeconds != null) {
           onStatsLoaded({
@@ -121,7 +121,19 @@ export function DppWorldMap({ onStatsLoaded }: DppWorldMapProps) {
           });
         }
 
-        const byCountry: { country: string; views: number }[] = data.byCountry ?? [];
+        let byCountry: { country: string; views: number }[] = data.byCountry ?? [];
+
+        // Fallback: if platform_stats isn't seeded yet, try the old endpoint
+        if (byCountry.length === 0) {
+          try {
+            const fallback = await fetch("https://dashboard.envrt.com/api/public/dpp-map");
+            if (fallback.ok) {
+              const fallbackData = await fallback.json();
+              if (Array.isArray(fallbackData)) byCountry = fallbackData;
+            }
+          } catch { /* silent */ }
+        }
+
         if (byCountry.length === 0) return;
 
         const maxViews = Math.max(...byCountry.map((d) => d.views));
