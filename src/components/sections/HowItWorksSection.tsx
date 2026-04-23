@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import { howItWorksSteps } from "@/lib/config";
 
 const NAV_H = 72;
@@ -41,7 +41,7 @@ function StepCard({
         bottom: 0,
         zIndex: index,
         y,
-        willChange: "transform",
+        willChange: index === 0 ? "auto" : "transform",
       }}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-xl border border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.06]">
@@ -139,6 +139,13 @@ export function HowItWorksSection() {
     offset: ["start start", "end end"],
   });
 
+  // Spring-dampen the raw scroll value for buttery smooth animation
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
   return (
     <section className="px-4 py-8 sm:px-6" id="how-it-works">
       <div
@@ -178,7 +185,7 @@ export function HowItWorksSection() {
                     key={step.id}
                     step={step}
                     index={i}
-                    progress={scrollYProgress}
+                    progress={smoothProgress}
                   />
                 ))}
               </div>
