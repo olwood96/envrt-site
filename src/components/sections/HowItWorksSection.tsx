@@ -20,10 +20,11 @@ function StepCard({
 }) {
   const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(step.mockImage);
 
-  // 3 transitions spread evenly across 0-1.
-  // y starts just outside the clipped container so the card appears immediately.
-  const phaseStart = (index - 1) / TRANSITIONS;
-  const phaseEnd = index / TRANSITIONS;
+  // Transitions fill 0-0.7 of the scroll. The remaining 0.3 is hold time
+  // so the spring can settle before the section unpins.
+  const END = 0.7;
+  const phaseStart = ((index - 1) / TRANSITIONS) * END;
+  const phaseEnd = (index / TRANSITIONS) * END;
 
   const y = useTransform(
     progress,
@@ -141,8 +142,8 @@ export function HowItWorksSection() {
 
   // Spring-dampen the raw scroll value for buttery smooth animation
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 150,
+    damping: 25,
     restDelta: 0.001,
   });
 
