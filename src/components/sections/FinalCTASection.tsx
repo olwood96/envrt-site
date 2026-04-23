@@ -21,35 +21,40 @@ function formatDuration(seconds: number): string {
 }
 
 /**
- * Reorder cards so consecutive entries come from different brands.
- * Round-robins through brands to maximise variety.
+ * Sort by newest first (featured_at desc), then interleave so consecutive
+ * entries always come from different brands. Newest DPPs appear first,
+ * never the same brand twice in a row.
  */
 function interleaveByBrand(cards: CollectiveCardData[]): CollectiveCardData[] {
   if (cards.length <= 1) return cards;
 
+  // Sort newest first
+  const sorted = [...cards].sort((a, b) => {
+    const aDate = a.dpp.featured_at ?? "";
+    const bDate = b.dpp.featured_at ?? "";
+    return bDate.localeCompare(aDate);
+  });
+
+  // Group by brand, preserving age order within each brand
   const byBrand = new Map<string, CollectiveCardData[]>();
-  for (const card of cards) {
+  for (const card of sorted) {
     const key = card.brand.id;
     if (!byBrand.has(key)) byBrand.set(key, []);
     byBrand.get(key)!.push(card);
   }
 
+  // Round-robin across brands
   const queues = Array.from(byBrand.values());
   const result: CollectiveCardData[] = [];
-  let idx = 0;
 
-  while (result.length < cards.length) {
-    const queue = queues[idx % queues.length];
-    if (queue.length > 0) {
-      result.push(queue.shift()!);
-    }
-    idx++;
-    if (idx % queues.length === 0) {
-      for (let i = queues.length - 1; i >= 0; i--) {
-        if (queues[i].length === 0) queues.splice(i, 1);
+  while (queues.length > 0) {
+    for (let i = queues.length - 1; i >= 0; i--) {
+      if (queues[i].length > 0) {
+        result.push(queues[i].shift()!);
       }
-      if (queues.length === 0) break;
-      idx = 0;
+      if (queues[i].length === 0) {
+        queues.splice(i, 1);
+      }
     }
   }
 
@@ -100,51 +105,7 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
     <section className="py-16 sm:py-20 lg:py-28">
       <Container>
         <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
-          {/* ── Left: CTA text + buttons ── */}
-          <div className="max-w-lg">
-            <FadeUp>
-              <h2 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl lg:text-5xl">
-                Ready to show the world your impact?
-              </h2>
-            </FadeUp>
-
-            {caption && (
-              <FadeUp delay={0.1}>
-                <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-envrt-charcoal/8 bg-envrt-charcoal/[0.03] px-4 py-1.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
-                  </span>
-                  <p className="text-[11px] font-medium tracking-wide text-envrt-muted sm:text-xs">
-                    {caption}
-                  </p>
-                </div>
-              </FadeUp>
-            )}
-
-            {/* Buttons: visible on desktop, hidden on mobile (shown below devices instead) */}
-            <FadeUp delay={0.2}>
-              <div className="mt-10 hidden flex-wrap items-center gap-3 sm:gap-4 lg:flex">
-                <Link
-                  href="/contact"
-                  data-cta="footer-cta-book-demo"
-                  className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md sm:px-8 sm:py-4 sm:text-lg"
-                >
-                  Book a demo
-                  <span className="ml-2">→</span>
-                </Link>
-                <Link
-                  href="/pricing"
-                  data-cta="footer-cta-view-pricing"
-                  className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03] sm:px-8 sm:py-4 sm:text-lg"
-                >
-                  View pricing
-                </Link>
-              </div>
-            </FadeUp>
-          </div>
-
-          {/* ── Right (desktop) / Middle (mobile): Device mockups ── */}
+          {/* ── Left: Device mockups ── */}
           <FadeUp delay={0.15}>
             <div className="relative mt-10 w-full max-w-xl mx-auto lg:mt-0 lg:mx-0">
               {/* Laptop */}
@@ -204,23 +165,47 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
             </div>
           </FadeUp>
 
-          {/* ── Mobile-only buttons (below devices) ── */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:hidden">
-            <Link
-              href="/contact"
-              data-cta="footer-cta-book-demo"
-              className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md"
-            >
-              Book a demo
-              <span className="ml-2">→</span>
-            </Link>
-            <Link
-              href="/pricing"
-              data-cta="footer-cta-view-pricing"
-              className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03]"
-            >
-              View pricing
-            </Link>
+          {/* ── Right: CTA text + buttons ── */}
+          <div className="mt-10 max-w-lg lg:mt-0">
+            <FadeUp>
+              <h2 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl lg:text-5xl">
+                Ready to show the world your impact?
+              </h2>
+            </FadeUp>
+
+            {caption && (
+              <FadeUp delay={0.1}>
+                <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-envrt-charcoal/8 bg-envrt-charcoal/[0.03] px-4 py-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
+                  </span>
+                  <p className="text-[11px] font-medium tracking-wide text-envrt-muted sm:text-xs">
+                    {caption}
+                  </p>
+                </div>
+              </FadeUp>
+            )}
+
+            <FadeUp delay={0.2}>
+              <div className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
+                <Link
+                  href="/contact"
+                  data-cta="footer-cta-book-demo"
+                  className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md sm:px-8 sm:py-4 sm:text-lg"
+                >
+                  Book a demo
+                  <span className="ml-2">→</span>
+                </Link>
+                <Link
+                  href="/pricing"
+                  data-cta="footer-cta-view-pricing"
+                  className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03] sm:px-8 sm:py-4 sm:text-lg"
+                >
+                  View pricing
+                </Link>
+              </div>
+            </FadeUp>
           </div>
         </div>
       </Container>
