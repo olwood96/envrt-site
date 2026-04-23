@@ -19,9 +19,10 @@ function StepCard({
 }) {
   const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(step.mockImage);
 
-  // Each card has an equal slice of the scroll. As one lands, the next begins.
-  const phaseStart = index === 0 ? 0 : index / TOTAL;
-  const phaseEnd = (index + 1) / TOTAL;
+  // 3 transitions spread evenly across 0-1. No dead scroll zones.
+  const transitions = TOTAL - 1;
+  const phaseStart = (index - 1) / transitions;
+  const phaseEnd = index / transitions;
 
   const y = useTransform(
     progress,
@@ -42,7 +43,7 @@ function StepCard({
         willChange: "transform",
       }}
     >
-      <div className="flex h-full flex-col overflow-hidden rounded-t-xl border border-b-0 border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.06]">
+      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.06]">
         {/* Tab - just the title, stays visible when covered */}
         <div
           className="flex flex-shrink-0 items-center gap-3 border-b border-envrt-charcoal/[0.04] bg-envrt-cream/40 px-5 sm:px-7"
