@@ -57,8 +57,6 @@ const CENTROIDS: Record<string, [number, number]> = {
 const WIDTH = 960;
 const HEIGHT = 480;
 const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-const API_URL = "https://dashboard.envrt.com/api/public/dpp-map";
-
 // How long each dot's glow lasts (ms) and gap between dots
 const GLOW_DURATION = 600;
 const GLOW_GAP = 200;
@@ -69,7 +67,11 @@ interface DotData {
   r: number;
 }
 
-export function DppWorldMap() {
+interface DppWorldMapProps {
+  onStatsLoaded?: (stats: { totalDurationSeconds: number; countryCount: number }) => void;
+}
+
+export function DppWorldMap({ onStatsLoaded }: DppWorldMapProps) {
   const [countries, setCountries] = useState<string | null>(null);
   const [dots, setDots] = useState<DotData[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -98,7 +100,7 @@ export function DppWorldMap() {
       .catch(() => {});
   }, []);
 
-  // Fetch DPP view data and project dots (sorted left to right by cx)
+  // Fetch platform stats (country data + engagement time) via local API
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
@@ -108,14 +110,23 @@ export function DppWorldMap() {
       .center([10, 30])
       .translate([WIDTH / 2, HEIGHT / 2]);
 
-    fetch(API_URL)
+    fetch("/api/impact-stats")
       .then((r) => r.json())
-      .then((data: { country: string; views: number }[]) => {
-        if (!Array.isArray(data) || data.length === 0) return;
+      .then((data) => {
+        // Surface stats to parent for caption
+        if (onStatsLoaded && data.totalDurationSeconds != null) {
+          onStatsLoaded({
+            totalDurationSeconds: data.totalDurationSeconds,
+            countryCount: data.countryCount,
+          });
+        }
 
-        const maxViews = data[0].views;
+        const byCountry: { country: string; views: number }[] = data.byCountry ?? [];
+        if (byCountry.length === 0) return;
 
-        const projected = data
+        const maxViews = Math.max(...byCountry.map((d) => d.views));
+
+        const projected = byCountry
           .map((d) => {
             const coords = CENTROIDS[d.country];
             if (!coords) return null;
@@ -131,7 +142,7 @@ export function DppWorldMap() {
         setDots(projected);
       })
       .catch(() => {});
-  }, []);
+  }, [onStatsLoaded]);
 
   // Cyclical glow sweep: left to right, one dot at a time
   const advance = useCallback(() => {
