@@ -7,6 +7,7 @@ import { howItWorksSteps } from "@/lib/config";
 const NAV_H = 72;
 const TAB_H = 44;
 const TOTAL = howItWorksSteps.length;
+const TRANSITIONS = TOTAL - 1;
 
 function StepCard({
   step,
@@ -19,15 +20,15 @@ function StepCard({
 }) {
   const isVideo = /\.(mp4|mov|webm|m4v)$/i.test(step.mockImage);
 
-  // 3 transitions spread evenly across 0-1. No dead scroll zones.
-  const transitions = TOTAL - 1;
-  const phaseStart = (index - 1) / transitions;
-  const phaseEnd = index / transitions;
+  // 3 transitions spread evenly across 0-1.
+  // y starts just outside the clipped container so the card appears immediately.
+  const phaseStart = (index - 1) / TRANSITIONS;
+  const phaseEnd = index / TRANSITIONS;
 
   const y = useTransform(
     progress,
     index === 0 ? [0, 1] : [phaseStart, phaseEnd],
-    index === 0 ? [0, 0] : [2000, 0],
+    index === 0 ? [0, 0] : [800, 0],
   );
 
   return (
@@ -44,9 +45,9 @@ function StepCard({
       }}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-xl border border-envrt-charcoal/[0.06] bg-white shadow-lg shadow-envrt-green/[0.06]">
-        {/* Tab - just the title, stays visible when covered */}
+        {/* Tab */}
         <div
-          className="flex flex-shrink-0 items-center gap-3 border-b border-envrt-charcoal/[0.04] bg-envrt-cream/40 px-5 sm:px-7"
+          className="flex flex-shrink-0 items-center gap-3 border-b border-envrt-charcoal/[0.04] bg-envrt-cream/40 px-4 sm:px-7"
           style={{ height: TAB_H }}
         >
           <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-envrt-teal/10 text-xs font-bold text-envrt-teal">
@@ -60,8 +61,9 @@ function StepCard({
           </p>
         </div>
 
-        {/* Content: text left (1/4), image right (3/4) */}
-        <div className="grid min-h-0 flex-1 grid-cols-[1fr_3fr]">
+        {/* Desktop: text left (1/4), image right (3/4) */}
+        {/* Mobile: text only, no screenshot */}
+        <div className="hidden min-h-0 flex-1 lg:grid lg:grid-cols-[1fr_3fr]">
           <div className="flex flex-col justify-center border-r border-envrt-charcoal/[0.04] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-envrt-charcoal">
               {step.title}
@@ -104,6 +106,27 @@ function StepCard({
             </div>
           </div>
         </div>
+
+        {/* Mobile content: text only, full width */}
+        <div className="flex flex-1 flex-col justify-center p-5 lg:hidden">
+          <h3 className="text-base font-semibold text-envrt-charcoal">
+            {step.title}
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-envrt-muted">
+            {step.description}
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {step.bullets.map((b) => (
+              <li
+                key={b}
+                className="flex items-start gap-2 text-xs text-envrt-charcoal/80"
+              >
+                <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-envrt-teal" />
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </motion.div>
   );
@@ -139,17 +162,17 @@ export function HowItWorksSection() {
               position: "relative",
             }}
           >
-            <div className="flex h-full flex-col px-5 sm:px-8">
-              <div className="flex-shrink-0 pb-6 pt-10 text-center">
+            <div className="flex h-full flex-col px-4 sm:px-8">
+              <div className="flex-shrink-0 pb-4 pt-8 text-center sm:pb-6 sm:pt-10">
                 <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
                   How it works
                 </p>
-                <h2 className="mt-3 text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
                   Onboard once. Generate DPPs in minutes.
                 </h2>
               </div>
 
-              <div className="relative mb-6 min-h-0 flex-1">
+              <div className="relative mb-4 min-h-0 flex-1 sm:mb-6">
                 {howItWorksSteps.map((step, i) => (
                   <StepCard
                     key={step.id}
