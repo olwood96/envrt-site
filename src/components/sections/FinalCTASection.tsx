@@ -99,9 +99,9 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
   return (
     <section className="py-16 sm:py-20 lg:py-28">
       <Container>
-        <div className="flex flex-col items-center gap-12 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
-          {/* ── Left: CTA text ── */}
-          <div className="order-2 max-w-lg lg:order-1">
+        <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
+          {/* ── Left: CTA text + buttons ── */}
+          <div className="max-w-lg">
             <FadeUp>
               <h2 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl lg:text-5xl">
                 Ready to show the world your impact?
@@ -122,8 +122,9 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
               </FadeUp>
             )}
 
+            {/* Buttons: visible on desktop, hidden on mobile (shown below devices instead) */}
             <FadeUp delay={0.2}>
-              <div className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="mt-10 hidden flex-wrap items-center gap-3 sm:gap-4 lg:flex">
                 <Link
                   href="/contact"
                   data-cta="footer-cta-book-demo"
@@ -143,9 +144,9 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
             </FadeUp>
           </div>
 
-          {/* ── Right: Device mockups ── */}
+          {/* ── Right (desktop) / Middle (mobile): Device mockups ── */}
           <FadeUp delay={0.15}>
-            <div className="order-1 relative w-full max-w-xl mx-auto lg:order-2 lg:mx-0">
+            <div className="relative mt-10 w-full max-w-xl mx-auto lg:mt-0 lg:mx-0">
               {/* Laptop */}
               <LaptopFrame>
                 <DppWorldMap onStatsLoaded={handleStatsLoaded} />
@@ -202,6 +203,25 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
               )}
             </div>
           </FadeUp>
+
+          {/* ── Mobile-only buttons (below devices) ── */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:hidden">
+            <Link
+              href="/contact"
+              data-cta="footer-cta-book-demo"
+              className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-envrt-green/90 shadow-sm hover:shadow-md"
+            >
+              Book a demo
+              <span className="ml-2">→</span>
+            </Link>
+            <Link
+              href="/pricing"
+              data-cta="footer-cta-view-pricing"
+              className="inline-flex items-center justify-center rounded-xl border border-envrt-charcoal/15 px-6 py-3 text-base font-medium text-envrt-charcoal transition-all duration-300 hover:border-envrt-charcoal/30 hover:bg-envrt-charcoal/[0.03]"
+            >
+              View pricing
+            </Link>
+          </div>
         </div>
       </Container>
     </section>
