@@ -184,9 +184,9 @@ export function DppWorldMap({ onStatsLoaded }: DppWorldMapProps) {
 
   return (
     <svg
-      viewBox={`0 -100 ${WIDTH} ${HEIGHT + 100}`}
+      viewBox={`0 -40 ${WIDTH} ${HEIGHT + 40}`}
       className="absolute inset-0 h-full w-full"
-      preserveAspectRatio="xMidYMin slice"
+      preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
       <defs>

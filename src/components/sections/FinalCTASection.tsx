@@ -9,10 +9,11 @@ import { DppWorldMap } from "./DppWorldMap";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h === 0) return `${m} minutes`;
-  if (m === 0) return `${h} hours`;
-  return `${h} hours ${m} minutes`;
+  if (h === 0) {
+    const m = Math.floor(seconds / 60);
+    return `over ${m} minutes`;
+  }
+  return `over ${h} hours`;
 }
 
 export function FinalCTASection() {
@@ -51,9 +52,15 @@ export function FinalCTASection() {
 
           {/* Stats caption */}
           {caption && (
-            <p className="mt-4 text-xs tracking-wide text-white/40 sm:text-sm">
-              {caption}
-            </p>
+            <div className="mt-5 flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-sm">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              </span>
+              <p className="text-[11px] font-medium tracking-wide text-white/50 sm:text-xs">
+                {caption}
+              </p>
+            </div>
           )}
 
           <div className="mt-auto pt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 sm:pt-10">
