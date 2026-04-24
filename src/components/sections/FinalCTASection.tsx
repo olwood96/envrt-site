@@ -175,8 +175,8 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                 />
               </LaptopFrame>
 
-              {/* Stat box — top-right of laptop, hidden on mobile */}
-              <div className="absolute -top-3 -right-3 z-20 hidden sm:block lg:-top-4 lg:-right-4">
+              {/* Stat box — top-right of laptop */}
+              <div className="absolute -top-3 -right-3 z-20 lg:-top-4 lg:-right-4">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeCountry?.code ?? "aggregate"}
