@@ -44,7 +44,7 @@ const NUM_TO_ALPHA2: Record<string, string> = {
 const WIDTH = 960;
 const HEIGHT = 480;
 const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-const CYCLE_MS = 3000;
+const CYCLE_MS = 4000;
 const TOP_N = 12;
 
 interface CountryPath {
@@ -138,8 +138,7 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
 
       for (const f of geo.features) {
         const numericId = String((f as Feature & { id?: string | number }).id ?? "");
-        const alpha2 = NUM_TO_ALPHA2[numericId];
-        if (!alpha2) continue;
+        const alpha2 = NUM_TO_ALPHA2[numericId] ?? `_${numericId}`;
 
         const d = pathGen(f);
         if (!d) continue;
@@ -217,13 +216,19 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
                 ? "rgba(52, 211, 153, 0.5)"
                 : hasViews
                 ? "rgba(52, 211, 153, 0.15)"
-                : "rgba(255, 255, 255, 0.04)"
+                : "rgba(255, 255, 255, 0.06)"
             }
-            stroke={hasViews ? "rgba(52, 211, 153, 0.3)" : "rgba(255, 255, 255, 0.08)"}
-            strokeWidth={0.5}
+            stroke={
+              isActive
+                ? "rgba(52, 211, 153, 0.6)"
+                : hasViews
+                ? "rgba(52, 211, 153, 0.35)"
+                : "rgba(255, 255, 255, 0.18)"
+            }
+            strokeWidth={0.7}
             style={{
               transition: "fill 0.5s ease, transform 0.5s ease",
-              transform: isActive ? "scale(1.12)" : "scale(1)",
+              transform: isActive ? "scale(1.5)" : "scale(1)",
               transformOrigin: `${c.cx}px ${c.cy}px`,
             }}
           />

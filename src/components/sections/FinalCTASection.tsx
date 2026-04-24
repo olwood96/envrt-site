@@ -215,7 +215,7 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
 
               {/* Phone — overlaps laptop upper-left */}
               {carouselCards.length > 0 && currentCard && (
-                <div className="absolute -top-6 -left-2 z-10 w-[120px] sm:-top-8 sm:-left-4 sm:w-[140px] lg:-top-12 lg:-left-8 lg:w-[160px]">
+                <div className="absolute -top-6 -left-8 z-10 w-[120px] sm:-top-8 sm:-left-12 sm:w-[140px] lg:-top-12 lg:-left-20 lg:w-[160px]">
                   <PhoneFrame>
                     <AnimatePresence mode="wait">
                       <motion.div
