@@ -17,7 +17,7 @@ export const siteConfig = {
 };
 
 export const navLinks = [
-  { label: "Product", href: "/pricing" },
+  { label: "Are you ready?", href: "/assessment" },
   { label: "Collective", href: "/collective" },
   { label: "Why ENVRT?", href: "/roi" },
   { label: "Free DPP", href: "/free-dpp" },
