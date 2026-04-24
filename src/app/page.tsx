@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { WhyNowSection } from "@/components/sections/WhyNowSection";
 import { SupplyChainFlowSection } from "@/components/sections/SupplyChainFlowSection";
-import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { ComparisonSection } from "@/components/sections/ComparisonSection";
 import { TrustedBySection } from "@/components/sections/TrustedBySection";
@@ -36,7 +35,6 @@ export default async function HomePage() {
       <HeroSection />
       <WhyNowSection />
       <SupplyChainFlowSection />
-      <HowItWorksSection />
       <OutcomesSection />
       <ComparisonSection />
       <TrustedBySection />

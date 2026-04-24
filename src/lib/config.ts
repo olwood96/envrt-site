@@ -17,7 +17,7 @@ export const siteConfig = {
 };
 
 export const navLinks = [
-  { label: "Product", href: "/#how-it-works" },
+  { label: "Product", href: "/pricing" },
   { label: "Collective", href: "/collective" },
   { label: "Why ENVRT?", href: "/roi" },
   { label: "Free DPP", href: "/free-dpp" },
@@ -125,7 +125,7 @@ export const outcomeCards = [
     title: "Regulation-ready from day one",
     description:
       "Your DPPs are aligned with the EU ESPR framework and include French Eco-Score ratings as standard.",
-    cta: { label: "See how it works", href: "/#how-it-works" },
+    cta: { label: "See pricing", href: "/pricing" },
   },
   {
     stat: "< 1 day",

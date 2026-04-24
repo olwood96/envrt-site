@@ -9,7 +9,7 @@ const footerLinks = [
   {
     heading: "Product",
     links: [
-      { label: "How it works", href: "/#how-it-works" },
+      { label: "Pricing", href: "/pricing" },
       { label: "Why ENVRT?", href: "/roi" },
       { label: "Get a free DPP", href: "/free-dpp" },
       { label: "Pricing", href: "/pricing" },
