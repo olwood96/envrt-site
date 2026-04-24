@@ -26,7 +26,7 @@ function formatDuration(seconds: number): string {
     const m = Math.floor(seconds / 60);
     return `over ${m} minutes`;
   }
-  return `over ${h} hours`;
+  return `over ${h} ${h === 1 ? "hour" : "hours"}`;
 }
 
 /**
@@ -193,7 +193,7 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                           <p className="text-xs font-semibold text-envrt-charcoal">
                             {activeCountry.views.toLocaleString()} views
                           </p>
-                          {activeCountry.durationSeconds > 0 && (
+                          {activeCountry.durationSeconds >= 3600 && (
                             <p className="text-[10px] text-envrt-muted">
                               {formatDuration(activeCountry.durationSeconds)}
                             </p>
