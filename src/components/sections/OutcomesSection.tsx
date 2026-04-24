@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Container } from "../ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "../ui/Motion";
 import { outcomeCards } from "@/lib/config";
@@ -53,18 +52,8 @@ const cardIcons = [ShieldCheckIcon, RocketIcon, BarChartIcon, LightbulbIcon];
 
 export function OutcomesSection() {
   return (
-    <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24" id="outcomes">
-      {/* Subtle radial background glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(45, 212, 168, 0.04) 0%, transparent 70%)",
-        }}
-      />
-
-      <Container className="relative">
+    <section className="px-4 py-16 sm:px-6 sm:py-24" id="outcomes">
+      <Container>
         <FadeUp>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
@@ -76,53 +65,21 @@ export function OutcomesSection() {
           </div>
         </FadeUp>
 
-        <StaggerChildren className="mt-14 grid gap-5 sm:grid-cols-2">
+        <StaggerChildren className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {outcomeCards.map((card, i) => {
             const Icon = cardIcons[i];
             return (
               <StaggerItem key={card.title}>
-                <div
-                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-envrt-charcoal/5 bg-white p-8 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5 sm:p-10"
-                >
-                  {/* Icon */}
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-envrt-teal/[0.07] transition-colors group-hover:bg-envrt-teal/[0.12]">
+                <div className="group rounded-2xl border border-envrt-charcoal/5 bg-white p-6 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-envrt-teal/[0.07] transition-colors group-hover:bg-envrt-teal/[0.12]">
                     <Icon className="h-5 w-5 text-envrt-teal" />
                   </span>
-
-                  {/* Stat */}
-                  <div className="mt-5 border-l-2 border-envrt-teal/30 pl-4">
-                    <p className="text-2xl font-bold tracking-tight text-envrt-teal sm:text-3xl">
-                      {card.stat}
-                    </p>
-                  </div>
-
-                  <h3 className="mt-5 text-lg font-semibold text-envrt-charcoal">
+                  <h3 className="mt-4 text-base font-semibold text-envrt-charcoal">
                     {card.title}
                   </h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-envrt-muted">
+                  <p className="mt-2 text-sm leading-relaxed text-envrt-muted">
                     {card.description}
                   </p>
-
-                  {/* CTA link */}
-                  <Link
-                    href={card.cta.href}
-                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-envrt-teal transition-colors hover:text-envrt-green"
-                  >
-                    {card.cta.label}
-                    <svg
-                      className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
                 </div>
               </StaggerItem>
             );
