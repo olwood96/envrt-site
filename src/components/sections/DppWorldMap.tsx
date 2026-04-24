@@ -59,6 +59,7 @@ export interface ActiveCountry {
   code: string;
   name: string;
   views: number;
+  durationSeconds: number;
 }
 
 interface DppWorldMapProps {
@@ -80,7 +81,7 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
   const [topCodes, setTopCodes] = useState<string[]>([]);
   const fetched = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const viewMapRef = useRef<Map<string, number>>(new Map());
+  const viewMapRef = useRef<Map<string, { views: number; durationSeconds: number }>>(new Map());
 
   // Stable projection
   const projectionRef = useRef(
@@ -100,8 +101,8 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
       fetch("/api/impact-stats").then((r) => r.json()).catch(() => null),
     ]).then(async ([topo, statsData]: [Topology, Record<string, unknown> | null]) => {
       // Parse view data
-      let byCountry: { country: string; views: number }[] =
-        (statsData as Record<string, unknown>)?.byCountry as { country: string; views: number }[] ?? [];
+      let byCountry: { country: string; views: number; durationSeconds?: number }[] =
+        (statsData as Record<string, unknown>)?.byCountry as { country: string; views: number; durationSeconds?: number }[] ?? [];
 
       // Fallback
       if (byCountry.length === 0) {
@@ -126,7 +127,8 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
       }
 
       const viewMap = new Map(byCountry.map((d) => [d.country, d.views]));
-      viewMapRef.current = viewMap;
+      const dataMap = new Map(byCountry.map((d) => [d.country, { views: d.views, durationSeconds: d.durationSeconds ?? 0 }]));
+      viewMapRef.current = dataMap;
 
       // Build individual country paths
       const geo = feature(
@@ -186,11 +188,12 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
   useEffect(() => {
     if (activeIdx < 0 || topCodes.length === 0) return;
     const code = topCodes[activeIdx];
-    const views = viewMapRef.current.get(code) ?? 0;
+    const data = viewMapRef.current.get(code) ?? { views: 0, durationSeconds: 0 };
     onCountryActive?.({
       code,
       name: getCountryName(code),
-      views,
+      views: data.views,
+      durationSeconds: data.durationSeconds,
     });
   }, [activeIdx, topCodes, onCountryActive]);
 

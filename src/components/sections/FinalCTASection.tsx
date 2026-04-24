@@ -193,6 +193,11 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                           <p className="text-xs font-semibold text-envrt-charcoal">
                             {activeCountry.views.toLocaleString()} views
                           </p>
+                          {activeCountry.durationSeconds > 0 && (
+                            <p className="text-[10px] text-envrt-muted">
+                              {formatDuration(activeCountry.durationSeconds)}
+                            </p>
+                          )}
                           <p className="text-[10px] text-envrt-muted">
                             {activeCountry.name}
                           </p>

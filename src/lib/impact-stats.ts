@@ -7,7 +7,7 @@ export interface ImpactStats {
 export interface PlatformStats extends ImpactStats {
   totalDurationSeconds: number;
   countryCount: number;
-  byCountry: { country: string; views: number }[];
+  byCountry: { country: string; views: number; durationSeconds: number }[];
 }
 
 const EMPTY: PlatformStats = {
