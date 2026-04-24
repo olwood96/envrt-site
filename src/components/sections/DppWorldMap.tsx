@@ -80,6 +80,7 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
   const [topCodes, setTopCodes] = useState<string[]>([]);
   const fetched = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const viewMapRef = useRef<Map<string, number>>(new Map());
 
   // Stable projection
   const projectionRef = useRef(
@@ -125,6 +126,7 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
       }
 
       const viewMap = new Map(byCountry.map((d) => [d.country, d.views]));
+      viewMapRef.current = viewMap;
 
       // Build individual country paths
       const geo = feature(
@@ -185,13 +187,13 @@ export function DppWorldMap({ onStatsLoaded, onCountryActive }: DppWorldMapProps
   useEffect(() => {
     if (activeIdx < 0 || topCodes.length === 0) return;
     const code = topCodes[activeIdx];
-    const views = countryPaths.find((c) => c.code === code)?.views ?? 0;
+    const views = viewMapRef.current.get(code) ?? 0;
     onCountryActive?.({
       code,
       name: getCountryName(code),
       views,
     });
-  }, [activeIdx, topCodes, countryPaths, onCountryActive]);
+  }, [activeIdx, topCodes, onCountryActive]);
 
   const activeCode = topCodes[activeIdx] ?? null;
 
