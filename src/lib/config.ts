@@ -125,7 +125,7 @@ export const outcomeCards = [
     title: "Regulation-ready from day one",
     description:
       "Your DPPs are aligned with the EU ESPR framework and include French Eco-Score ratings as standard.",
-    cta: { label: "See pricing", href: "/pricing" },
+    cta: { label: "Read the FAQ", href: "/faq" },
   },
   {
     stat: "< 1 day",
@@ -146,7 +146,7 @@ export const outcomeCards = [
     title: "Turn data into decisions",
     description:
       "Compare materials, spot hotspots and benchmark products. Use the same data that powers your DPPs to make smarter sourcing choices.",
-    cta: { label: "See pricing", href: "/pricing" },
+    cta: { label: "Try the ROI calculator", href: "/roi" },
   },
 ];
 
