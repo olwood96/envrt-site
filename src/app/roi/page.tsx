@@ -528,8 +528,8 @@ export default function ROICalculatorPage() {
                       Your savings report is ready
                     </h2>
                     <p className="mt-2 text-sm text-envrt-muted">
-                      Enter your details to view your results. We will also
-                      email you a copy.
+                      Enter your details to view your results and receive a
+                      copy by email.
                     </p>
                   </div>
 
@@ -651,13 +651,6 @@ export default function ROICalculatorPage() {
                     </p>
                   </form>
 
-                  <button
-                    type="button"
-                    onClick={showResults}
-                    className="mx-auto mt-5 block text-xs text-envrt-muted underline transition-colors hover:text-envrt-teal"
-                  >
-                    Skip and view results without saving
-                  </button>
                 </div>
               </SectionCard>
             </FadeUp>

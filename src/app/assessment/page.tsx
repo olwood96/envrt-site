@@ -1210,8 +1210,8 @@ export default function AssessmentPage() {
                   Your report is ready
                 </h2>
                 <p className="mt-3 text-sm text-envrt-muted">
-                  Enter your email to receive your full personalised DPP
-                  Readiness Report plus a free compliance checklist.
+                  Enter your details to view your results and receive your
+                  full personalised DPP Readiness Report by email.
                 </p>
 
                 <form
@@ -1314,13 +1314,6 @@ export default function AssessmentPage() {
                   </p>
                 </form>
 
-                <button
-                  type="button"
-                  onClick={showResults}
-                  className="mt-5 text-xs text-envrt-muted underline transition-colors hover:text-envrt-teal"
-                >
-                  Skip and view results without saving
-                </button>
               </div>
             </SectionCard>
           </FadeUp>
