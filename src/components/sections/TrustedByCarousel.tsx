@@ -7,9 +7,12 @@
   Animation styles are in globals.css (trusted-scroll keyframe + .trusted-track).
 */
 
+import Link from "next/link";
+
 interface Logo {
   src: string;
   alt: string;
+  slug: string;
 }
 
 // How many copies of the logo set to render.
@@ -42,8 +45,9 @@ export function TrustedByCarousel({ logos }: { logos: Logo[] }) {
           {/* Scrolling track */}
           <div className="trusted-track flex items-center gap-16 sm:gap-20 w-max">
             {track.map((logo, i) => (
-              <div
-                key={`${logo.alt}-${i}`}
+              <Link
+                key={`${logo.slug}-${i}`}
+                href={`/collective/${logo.slug}`}
                 className="flex h-10 w-28 flex-shrink-0 items-center justify-center sm:h-12 sm:w-32"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -55,7 +59,7 @@ export function TrustedByCarousel({ logos }: { logos: Logo[] }) {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
                 />
-              </div>
+              </Link>
             ))}
           </div>
         </div>

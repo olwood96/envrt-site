@@ -5,22 +5,20 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { TrustedByCarousel } from "./TrustedByCarousel";
 
-function getLogos(): { src: string; alt: string }[] {
+function getLogos(): { src: string; alt: string; slug: string }[] {
   try {
     const dir = join(process.cwd(), "public", "brand", "logos");
     return readdirSync(dir)
       .filter((f) => /\.(png|svg|jpg|jpeg|webp)$/i.test(f))
-      .map((f) => ({
-        src: `/brand/logos/${f}`,
-        // Convert filename to readable brand name:
-        // "acme-corp.png" → "Acme Corp"
-        alt: f
-          .replace(/\.[^.]+$/, "")
-          .replace(/[-_]/g, " ")
-          .replace(/\b\w/g, (c) => c.toUpperCase()),
-      }));
+      .map((f) => {
+        const slug = f.replace(/\.[^.]+$/, "");
+        return {
+          src: `/brand/logos/${f}`,
+          alt: slug.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          slug,
+        };
+      });
   } catch {
-    // Folder doesn't exist yet — return empty array, carousel won't render
     return [];
   }
 }

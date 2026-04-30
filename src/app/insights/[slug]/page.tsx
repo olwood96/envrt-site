@@ -141,6 +141,18 @@ export default async function InsightsPostPage({ params }: PageProps) {
             </div>
           </header>
 
+          {/* TL;DR summary */}
+          {post.description && (
+            <div className="mt-8 rounded-xl border border-envrt-teal/10 bg-envrt-teal/[0.03] px-5 py-4">
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-widest text-envrt-teal">
+                TL;DR
+              </p>
+              <p className="text-sm leading-relaxed text-envrt-charcoal/80">
+                {post.description}
+              </p>
+            </div>
+          )}
+
           {/* Table of contents */}
           <TableOfContents content={post.content} />
 

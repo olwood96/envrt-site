@@ -7,15 +7,17 @@ interface Props {
   title: string;
   productName: string;
   embedSnippet: string;
+  badgeSnippet: string;
 }
 
-type Tab = "share" | "qr" | "embed";
+type Tab = "share" | "qr" | "embed" | "badge";
 
 export function CollectiveShareModal({
   url,
   title,
   productName,
   embedSnippet,
+  badgeSnippet,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("share");
@@ -136,6 +138,7 @@ export function CollectiveShareModal({
     { key: "share", label: "Share" },
     { key: "qr", label: "QR Code" },
     { key: "embed", label: "Embed" },
+    { key: "badge", label: "Badge" },
   ];
 
   return (
@@ -276,6 +279,66 @@ export function CollectiveShareModal({
                   />
                 </svg>
                 {copied === "embed" ? "Copied!" : "Copy embed code"}
+              </button>
+            </div>
+          )}
+
+          {/* Badge tab */}
+          {activeTab === "badge" && (
+            <div className="mt-4 space-y-3">
+              <p className="text-[10px] text-envrt-muted">
+                Add a link badge to your product page. Creates a backlink to this DPP.
+              </p>
+              {/* Preview */}
+              <div className="flex justify-center rounded-lg bg-envrt-cream/40 p-4">
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "8px 14px",
+                    borderRadius: "10px",
+                    border: "1px solid rgba(27,58,45,0.1)",
+                    backgroundColor: "#ffffff",
+                    color: "#1b3a2d",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    fontFamily: "system-ui, sans-serif",
+                    transition: "border-color 0.2s",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7a6d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                    <path d="M8 12h8M12 8v8" />
+                  </svg>
+                  View Digital Product Passport
+                </a>
+              </div>
+              <pre className="overflow-x-auto rounded-lg bg-envrt-cream/60 p-3 text-[10px] leading-relaxed text-envrt-charcoal">
+                {badgeSnippet}
+              </pre>
+              <button
+                onClick={() => copyToClipboard(badgeSnippet, "badge")}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-envrt-charcoal/8 px-3 py-1.5 text-[11px] font-medium text-envrt-charcoal transition-colors hover:border-envrt-teal/20 hover:text-envrt-teal"
+              >
+                <svg
+                  className="h-3 w-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                  />
+                </svg>
+                {copied === "badge" ? "Copied!" : "Copy badge code"}
               </button>
             </div>
           )}

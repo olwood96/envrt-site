@@ -69,6 +69,19 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" style={{ overflowX: "clip" }}>
       <head>
+        {/* ── Google Analytics (GA4) ── */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-NN09SER129" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-NN09SER129');
+            `,
+          }}
+        />
+
         {/* ── Critical font preloads ── */}
         <link rel="preload" href="/fonts/n27/n27-regular-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/n27/n27-bold-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />

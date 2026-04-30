@@ -21,12 +21,12 @@ interface MdxImgProps extends MdxProps {
  */
 export const mdxComponents = {
   h1: ({ children, ...rest }: MdxProps) => (
-    <h1
+    <h2
       {...rest}
       className="text-3xl font-bold tracking-tight text-envrt-charcoal mt-10 mb-4 first:mt-0"
     >
       {children}
-    </h1>
+    </h2>
   ),
 
   h2: ({ children, ...rest }: MdxProps) => {
