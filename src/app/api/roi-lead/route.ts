@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   escapeHtml,
   sanitizeForSubject,
@@ -208,6 +209,31 @@ export async function POST(request: NextRequest) {
 
   if (!isValidEmail(data.email)) {
     return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+  }
+
+  // Persist lead to Supabase before sending emails
+  try {
+    const supabase = getSupabaseAdmin();
+    await supabase.from("roi_leads").insert({
+      first_name: data.firstName,
+      brand_name: data.brandName,
+      email: data.email,
+      marketing_consent: data.marketingConsent,
+      sku_count: data.skuCount,
+      data_maturity: data.dataMaturity,
+      hours_per_product: data.hoursPerProduct,
+      market: data.market,
+      approach: data.approach,
+      envrt_cost: data.envrtCost,
+      envrt_plan: data.envrtPlan,
+      consultant_cost: data.consultantCost,
+      inhouse_cost: data.inhouseCost,
+      max_saving: data.maxSaving,
+      hours_saved: data.hoursSaved,
+      days_saved: data.daysSaved,
+    });
+  } catch (err) {
+    console.error("Supabase insert failed (non-blocking):", err);
   }
 
   const resend = new Resend(apiKey);

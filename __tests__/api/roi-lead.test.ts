@@ -7,6 +7,13 @@ vi.mock("resend", () => ({
   },
 }));
 
+const mockInsert = vi.fn().mockResolvedValue({ error: null });
+vi.mock("@/lib/supabase-admin", () => ({
+  getSupabaseAdmin: () => ({
+    from: () => ({ insert: mockInsert }),
+  }),
+}));
+
 import { POST } from "@/app/api/roi-lead/route";
 import { NextRequest } from "next/server";
 
@@ -42,6 +49,7 @@ const validPayload = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockInsert.mockResolvedValue({ error: null });
   process.env.RESEND_API_KEY = "test-key";
 });
 
@@ -71,5 +79,25 @@ describe("POST /api/roi-lead", () => {
     expect(mockSendEmail.mock.calls[0][0].to).toBe("test@example.com");
     // Second call: internal notification
     expect(mockSendEmail.mock.calls[1][0].to).toBe("info@envrt.com");
+  });
+
+  it("persists lead to Supabase before sending emails", async () => {
+    await POST(makeRequest(validPayload));
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "test@example.com",
+        first_name: "Test",
+        brand_name: "TestBrand",
+        sku_count: 50,
+      })
+    );
+  });
+
+  it("still sends emails if Supabase insert fails", async () => {
+    mockInsert.mockRejectedValueOnce(new Error("db down"));
+    const res = await POST(makeRequest(validPayload));
+    expect(res.status).toBe(200);
+    expect(mockSendEmail).toHaveBeenCalledTimes(2);
   });
 });

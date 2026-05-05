@@ -111,10 +111,15 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   const savingVsInhouse = Math.max(0, inhouseCost - envrtCost);
   const maxSaving = Math.max(savingVsConsultant, savingVsInhouse);
 
-  // Time savings — hours per product without ENVRT vs with
-  const hoursPerProduct = Math.round(8 * maturityMultiplier);
-  const envrtHoursPerProduct = 0.5;
-  const hoursSaved = Math.round((hoursPerProduct - envrtHoursPerProduct) * inputs.skuCount);
+  // Time savings: estimated hours per product without ENVRT vs with
+  const DATA_MATURITY_HOURS: Record<DataMaturity, number> = {
+    "not-started": 8,
+    manual: 6,
+    "some-systems": 4,
+    digitised: 2,
+  };
+  const hoursPerProduct = DATA_MATURITY_HOURS[inputs.dataMaturity];
+  const hoursSaved = Math.max(0, (hoursPerProduct - 1) * inputs.skuCount);
   const daysSaved = Math.round(hoursSaved / 8);
 
   return {
