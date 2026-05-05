@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   escapeHtml,
   sanitizeForSubject,
@@ -209,6 +210,27 @@ export async function POST(request: NextRequest) {
 
   if (!isValidEmail(data.email)) {
     return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+  }
+
+  // Persist lead to Supabase before sending emails
+  try {
+    const supabase = getSupabaseAdmin();
+    await supabase.from("assessment_leads").insert({
+      first_name: data.firstName,
+      brand_name: data.brandName,
+      email: data.email,
+      marketing_consent: data.marketingConsent,
+      overall_score: data.overall,
+      band: data.band,
+      headline: data.headline,
+      summary: data.summary,
+      dimensions: data.dimensions,
+      actions: data.actions,
+      timeline_risk: data.timelineRisk,
+      green_claims_flag: data.greenClaimsFlag,
+    });
+  } catch (err) {
+    console.error("Supabase insert failed (non-blocking):", err);
   }
 
   const resend = new Resend(apiKey);

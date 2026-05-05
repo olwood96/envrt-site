@@ -7,6 +7,13 @@ vi.mock("resend", () => ({
   },
 }));
 
+const mockInsert = vi.fn().mockResolvedValue({ error: null });
+vi.mock("@/lib/supabase-admin", () => ({
+  getSupabaseAdmin: () => ({
+    from: () => ({ insert: mockInsert }),
+  }),
+}));
+
 import { POST } from "@/app/api/contact/route";
 import { NextRequest } from "next/server";
 
@@ -30,6 +37,7 @@ const validPayload = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockInsert.mockResolvedValue({ error: null });
   process.env.RESEND_API_KEY = "test-key";
 });
 
@@ -117,5 +125,25 @@ describe("POST /api/contact", () => {
     // 6th request should be rate-limited
     const res = await POST(makeRequest(validPayload, ip));
     expect(res.status).toBe(429);
+  });
+
+  it("persists lead to Supabase before sending emails", async () => {
+    await POST(makeRequest(validPayload, "6.6.6.6"));
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "oliver@example.com",
+        first_name: "Oliver",
+        last_name: "Wood",
+        company: "ENVRT",
+      })
+    );
+  });
+
+  it("still sends emails if Supabase insert fails", async () => {
+    mockInsert.mockRejectedValueOnce(new Error("db down"));
+    const res = await POST(makeRequest(validPayload, "7.7.7.7"));
+    expect(res.status).toBe(200);
+    expect(mockSendEmail).toHaveBeenCalledTimes(2);
   });
 });
