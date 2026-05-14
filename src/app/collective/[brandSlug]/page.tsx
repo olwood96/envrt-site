@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { getFeaturedDppsByBrand, getBrandEngagement } from "@/lib/collective/fetch";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { CollectiveBrandGrid } from "@/components/collective/CollectiveBrandGrid";
+import CollectiveBeacon from "@/components/CollectiveBeacon";
 
 export const revalidate = 300;
 
@@ -58,6 +59,7 @@ export default async function BrandProfilePage({ params }: PageProps) {
 
   return (
     <>
+    <CollectiveBeacon brandId={brand.id} brandSlug={brandSlug} />
     <BreadcrumbJsonLd
       items={[
         { name: "Home", url: "https://envrt.com" },
