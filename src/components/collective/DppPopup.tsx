@@ -8,13 +8,6 @@ interface Props {
   embedUrl: string;
   fallbackUrl: string;
   garmentName: string;
-  /**
-   * Tailwind class(es) controlling the drawer's top position. Defaults to
-   * `top-0` (full height). Consumers that want to leave a header visible
-   * can pass e.g. `"top-16 sm:top-20"`. For Phase 2 (embed.js on brand
-   * sites) the default is correct — drawer covers full viewport.
-   */
-  topOffsetClass?: string;
 }
 
 const ANIMATION_MS = 300;
@@ -30,7 +23,6 @@ export function DppPopup({
   embedUrl,
   fallbackUrl,
   garmentName,
-  topOffsetClass = "top-0",
 }: Props) {
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
@@ -121,7 +113,7 @@ export function DppPopup({
         onMouseMove={handleBackdropMouseMove}
         onMouseEnter={() => setCursorOnBackdrop(true)}
         onMouseLeave={() => setCursorOnBackdrop(false)}
-        className={`fixed inset-x-0 bottom-0 ${topOffsetClass} z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
+        className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -151,13 +143,26 @@ export function DppPopup({
         </svg>
       </div>
 
-      {/* Drawer */}
+      {/* Drawer / sheet.
+          Mobile (<sm): bottom sheet, slides up from the bottom, rounded top.
+          Desktop (sm+): right-side drawer, slides in from the right. */}
       <div
         data-testid="dpp-popup-content"
-        className={`fixed bottom-0 right-0 ${topOffsetClass} z-[100] flex w-full max-w-2xl flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out ${
-          visible ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed z-[100] flex flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out
+          inset-x-0 bottom-0 h-[92vh] rounded-t-2xl
+          sm:inset-x-auto sm:right-0 sm:top-0 sm:h-auto sm:w-full sm:max-w-2xl sm:rounded-t-none
+          ${
+            visible
+              ? "translate-x-0 translate-y-0"
+              : "translate-y-full sm:translate-y-0 sm:translate-x-full"
+          }`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
+        {/* Mobile drag handle (visual only). */}
+        <div className="flex justify-center pt-2 pb-1 sm:hidden">
+          <div className="h-1 w-12 rounded-full bg-envrt-charcoal/20" />
+        </div>
+
         {/* Always-visible internal close button (primary discoverable action). */}
         <button
           onClick={onClose}
