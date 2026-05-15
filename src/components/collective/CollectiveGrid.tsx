@@ -51,10 +51,28 @@ export function CollectiveGrid({ cards, filters }: Props) {
   const [compareCounts, setCompareCounts] = useState<Record<string, number>>(
     {}
   );
+  // Open production-journey cards (by id). Synced per-row so an opened
+  // card never leaves its row-mates stretched-but-empty.
+  const [openMapIds, setOpenMapIds] = useState<Set<string>>(new Set());
+  const [columns, setColumns] = useState(1);
 
   // Load compare counts from localStorage on mount
   useEffect(() => {
     setCompareCounts(getCompareCounts());
+  }, []);
+
+  // Track current Tailwind grid breakpoint so we can compute row mates.
+  // Matches grid-cols-1 / sm:grid-cols-2 / lg:grid-cols-3 on the grid.
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const update = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setColumns(3);
+      else if (window.matchMedia("(min-width: 640px)").matches) setColumns(2);
+      else setColumns(1);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   // Filter + sort
@@ -168,6 +186,23 @@ export function CollectiveGrid({ cards, filters }: Props) {
     [compareIds.size, compareBrandId]
   );
 
+  const toggleRowMaps = useCallback(
+    (cardIdx: number) => {
+      const rowStart = Math.floor(cardIdx / columns) * columns;
+      const rowIds = visibleCards
+        .slice(rowStart, rowStart + columns)
+        .map((c) => c.dpp.id);
+      setOpenMapIds((prev) => {
+        const next = new Set(prev);
+        const anyOpen = rowIds.some((id) => next.has(id));
+        if (anyOpen) rowIds.forEach((id) => next.delete(id));
+        else rowIds.forEach((id) => next.add(id));
+        return next;
+      });
+    },
+    [columns, visibleCards]
+  );
+
   return (
     <div>
       <FadeUp>
@@ -194,7 +229,7 @@ export function CollectiveGrid({ cards, filters }: Props) {
       ) : (
         <>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {visibleCards.map((card) => (
+            {visibleCards.map((card, idx) => (
               <FadeUp key={card.dpp.id}>
                 <CollectiveCard
                   card={card}
@@ -202,6 +237,8 @@ export function CollectiveGrid({ cards, filters }: Props) {
                   onToggleCompare={toggleCompare}
                   compareDisabled={isCompareDisabled(card)}
                   crossBrandDisabled={!!compareBrandId && card.brand.id !== compareBrandId}
+                  mapOpen={openMapIds.has(card.dpp.id)}
+                  onToggleMap={() => toggleRowMaps(idx)}
                 />
               </FadeUp>
             ))}

@@ -21,6 +21,9 @@ interface Props {
   compareDisabled: boolean;
   /** True when this card is from a different brand than the first selected compare item */
   crossBrandDisabled?: boolean;
+  /** Controlled production-journey state. If omitted, falls back to internal state. */
+  mapOpen?: boolean;
+  onToggleMap?: () => void;
 }
 
 function isNew(featuredAt: string | null): boolean {
@@ -35,13 +38,18 @@ export function CollectiveCard({
   onToggleCompare,
   compareDisabled,
   crossBrandDisabled = false,
+  mapOpen: controlledMapOpen,
+  onToggleMap,
 }: Props) {
   const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl, embedUrl } = card;
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
-  // Per-card map state so opening one card's production journey doesn't
-  // expand every other card and shove the page around.
-  const [mapOpen, setMapOpen] = useState(false);
+  // Map state is normally controlled by the parent grid (which syncs all cards
+  // in the same visual row so the row doesn't have empty stretched space when
+  // one card opens). Falls back to internal state if the prop is omitted.
+  const [internalMapOpen, setInternalMapOpen] = useState(false);
+  const mapOpen = controlledMapOpen ?? internalMapOpen;
+  const toggleMap = onToggleMap ?? (() => setInternalMapOpen((prev) => !prev));
   // Tap-to-toggle tooltip state — hover still works on desktop via CSS,
   // this lets the same tooltips appear on tap for touch devices.
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
@@ -300,7 +308,7 @@ export function CollectiveCard({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setMapOpen((prev) => !prev);
+                  toggleMap();
                 }}
                 className="flex w-full items-center gap-1.5 text-[10px] font-medium text-envrt-muted transition-colors hover:text-envrt-teal"
               >
