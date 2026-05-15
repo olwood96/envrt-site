@@ -21,8 +21,6 @@ interface Props {
   compareDisabled: boolean;
   /** True when this card is from a different brand than the first selected compare item */
   crossBrandDisabled?: boolean;
-  mapOpen?: boolean;
-  onToggleMap?: () => void;
 }
 
 function isNew(featuredAt: string | null): boolean {
@@ -37,13 +35,13 @@ export function CollectiveCard({
   onToggleCompare,
   compareDisabled,
   crossBrandDisabled = false,
-  mapOpen: externalMapOpen,
-  onToggleMap,
 }: Props) {
   const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl, embedUrl } = card;
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
-  const mapOpen = externalMapOpen ?? false;
+  // Per-card map state so opening one card's production journey doesn't
+  // expand every other card and shove the page around.
+  const [mapOpen, setMapOpen] = useState(false);
 
   const openPopup = (e: React.MouseEvent) => {
     // Allow ctrl/cmd-click and middle-click to open in new tab as normal
@@ -274,7 +272,7 @@ export function CollectiveCard({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  onToggleMap?.();
+                  setMapOpen((prev) => !prev);
                 }}
                 className="flex w-full items-center gap-1.5 text-[10px] font-medium text-envrt-muted transition-colors hover:text-envrt-teal"
               >

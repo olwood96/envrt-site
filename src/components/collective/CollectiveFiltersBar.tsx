@@ -45,8 +45,8 @@ export function CollectiveFiltersBar({
   onSortChange,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <div className="relative">
+    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+      <div className="relative w-full sm:w-auto">
         <svg
           className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-envrt-muted"
           fill="none"
@@ -65,7 +65,7 @@ export function CollectiveFiltersBar({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search products..."
-          className={`${searchInputClasses} w-44 pl-8`}
+          className={`${searchInputClasses} w-full pl-8 sm:w-44`}
         />
       </div>
 
@@ -109,7 +109,7 @@ export function CollectiveFiltersBar({
         onChange={(v) => onSortChange(v as CollectiveSortKey)}
       />
 
-      <span className="ml-auto text-xs text-envrt-muted">
+      <span className="text-right text-xs text-envrt-muted sm:ml-auto sm:text-left">
         {resultCount} product{resultCount !== 1 ? "s" : ""}
       </span>
     </div>

@@ -48,7 +48,6 @@ export function CollectiveGrid({ cards, filters }: Props) {
   const [sortKey, setSortKey] = useState<CollectiveSortKey>("featured_at");
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [mapsOpen, setMapsOpen] = useState(false);
   const [compareCounts, setCompareCounts] = useState<Record<string, number>>(
     {}
   );
@@ -203,8 +202,6 @@ export function CollectiveGrid({ cards, filters }: Props) {
                   onToggleCompare={toggleCompare}
                   compareDisabled={isCompareDisabled(card)}
                   crossBrandDisabled={!!compareBrandId && card.brand.id !== compareBrandId}
-                  mapOpen={mapsOpen}
-                  onToggleMap={() => setMapsOpen((prev) => !prev)}
                 />
               </FadeUp>
             ))}

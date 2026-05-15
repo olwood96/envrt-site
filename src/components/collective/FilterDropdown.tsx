@@ -50,11 +50,11 @@ export function FilterDropdown({
   }, [open]);
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div ref={ref} className={`relative w-full sm:w-auto ${className}`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`flex h-9 min-w-[140px] cursor-pointer items-center justify-between gap-2 rounded-xl border bg-white pl-3 pr-2.5 text-left text-xs transition-all ${
+        className={`flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border bg-white pl-3 pr-2.5 text-left text-xs transition-all sm:w-auto sm:min-w-[140px] ${
           open
             ? "border-envrt-charcoal/20 ring-2 ring-envrt-charcoal/8"
             : "border-envrt-charcoal/8 hover:border-envrt-charcoal/15"
