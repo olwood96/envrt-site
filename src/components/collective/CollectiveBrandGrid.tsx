@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { CollectiveCard } from "./CollectiveCard";
 import { CollectiveCompareBar } from "./CollectiveCompareBar";
@@ -15,17 +15,30 @@ export function CollectiveBrandGrid({ cards }: Props) {
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [openMapIds, setOpenMapIds] = useState<Set<string>>(new Set());
   const [columns, setColumns] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
 
+  // Measure actual column count from the rendered grid (see CollectiveGrid).
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-    const update = () => {
-      if (window.matchMedia("(min-width: 1024px)").matches) setColumns(3);
-      else if (window.matchMedia("(min-width: 640px)").matches) setColumns(2);
-      else setColumns(1);
+    if (typeof window === "undefined" || typeof ResizeObserver === "undefined") return;
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const measure = () => {
+      const children = grid.children;
+      if (children.length === 0) return;
+      const firstTop = (children[0] as HTMLElement).offsetTop;
+      let count = 0;
+      for (let i = 0; i < children.length; i++) {
+        if ((children[i] as HTMLElement).offsetTop === firstTop) count++;
+        else break;
+      }
+      setColumns(Math.max(1, count));
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    return () => observer.disconnect();
   }, []);
 
   const toggleRowMaps = useCallback(
@@ -64,7 +77,7 @@ export function CollectiveBrandGrid({ cards }: Props) {
 
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+      <div ref={gridRef} className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
         {cards.map((card, idx) => (
           <CollectiveCard
             key={card.dpp.id}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type {
   CollectiveCardData,
   CollectiveFilters,
@@ -55,24 +55,37 @@ export function CollectiveGrid({ cards, filters }: Props) {
   // card never leaves its row-mates stretched-but-empty.
   const [openMapIds, setOpenMapIds] = useState<Set<string>>(new Set());
   const [columns, setColumns] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Load compare counts from localStorage on mount
   useEffect(() => {
     setCompareCounts(getCompareCounts());
   }, []);
 
-  // Track current Tailwind grid breakpoint so we can compute row mates.
-  // Matches grid-cols-1 / sm:grid-cols-2 / lg:grid-cols-3 on the grid.
+  // Measure actual column count from the rendered grid so row-mate sync
+  // works regardless of CSS breakpoint config or browser quirks. Counts
+  // how many child cards share the same offsetTop as the first card.
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-    const update = () => {
-      if (window.matchMedia("(min-width: 1024px)").matches) setColumns(3);
-      else if (window.matchMedia("(min-width: 640px)").matches) setColumns(2);
-      else setColumns(1);
+    if (typeof window === "undefined" || typeof ResizeObserver === "undefined") return;
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const measure = () => {
+      const children = grid.children;
+      if (children.length === 0) return;
+      const firstTop = (children[0] as HTMLElement).offsetTop;
+      let count = 0;
+      for (let i = 0; i < children.length; i++) {
+        if ((children[i] as HTMLElement).offsetTop === firstTop) count++;
+        else break;
+      }
+      setColumns(Math.max(1, count));
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    return () => observer.disconnect();
   }, []);
 
   // Filter + sort
@@ -228,7 +241,7 @@ export function CollectiveGrid({ cards, filters }: Props) {
         </p>
       ) : (
         <>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          <div ref={gridRef} className="mt-8 grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {visibleCards.map((card, idx) => (
               <FadeUp key={card.dpp.id}>
                 <CollectiveCard
