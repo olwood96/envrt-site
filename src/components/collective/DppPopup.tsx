@@ -80,21 +80,23 @@ export function DppPopup({
     body.style.overflow = "hidden";
 
     return () => {
-      // Temporarily override the global `html { scroll-behavior: smooth }`
-      // so the restore is instant, not animated. Otherwise the page
-      // appears to "scroll itself back" when the popup closes.
-      const html = document.documentElement;
-      const prevScrollBehavior = html.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-
       body.style.position = "";
       body.style.top = "";
       body.style.left = "";
       body.style.right = "";
       body.style.overflow = "";
-      window.scrollTo(0, scrollY);
 
-      html.style.scrollBehavior = prevScrollBehavior;
+      // `behavior: 'instant'` is the spec-defined way to force an
+      // instantaneous jump regardless of CSS scroll-behavior. Without it,
+      // the global `html { scroll-behavior: smooth }` rule was making the
+      // restore animate, looking like "the page scrolls itself back".
+      // Cast required because some @types/lib.dom versions don't list
+      // 'instant' yet, but every modern browser accepts it.
+      window.scrollTo({
+        top: scrollY,
+        left: 0,
+        behavior: "instant" as ScrollBehavior,
+      });
     };
   }, [open]);
 
