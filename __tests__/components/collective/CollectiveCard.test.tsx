@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CollectiveCard } from "@/components/collective/CollectiveCard";
 import type { CollectiveCardData } from "@/lib/collective/types";
@@ -295,7 +295,7 @@ describe("CollectiveCard", () => {
       expect(brandLink).toBeDefined();
     });
 
-    it("closes popup when close button is clicked", () => {
+    it("closes popup when close button is clicked", async () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -309,7 +309,11 @@ describe("CollectiveCard", () => {
       expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
 
       fireEvent.click(screen.getByLabelText("Close popup"));
-      expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument();
+      await waitFor(() =>
+        expect(
+          screen.queryByTestId("dpp-popup-overlay")
+        ).not.toBeInTheDocument()
+      );
     });
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   open: boolean;
@@ -8,7 +8,16 @@ interface Props {
   embedUrl: string;
   fallbackUrl: string;
   garmentName: string;
+  /**
+   * Tailwind class(es) controlling the drawer's top position. Defaults to
+   * `top-0` (full height). Consumers with a fixed top nav should pass a
+   * matching offset, e.g. `"top-16 sm:top-20"`. For Phase 2 (embed.js on
+   * brand sites) the default is correct — drawer covers full viewport.
+   */
+  topOffsetClass?: string;
 }
+
+const ANIMATION_MS = 300;
 
 function appendSourceParam(url: string): string {
   const separator = url.includes("?") ? "&" : "?";
@@ -21,9 +30,24 @@ export function DppPopup({
   embedUrl,
   fallbackUrl,
   garmentName,
+  topOffsetClass = "top-0",
 }: Props) {
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Mount/unmount lifecycle so the slide-out animation can play before unmount
+  useEffect(() => {
+    if (open) {
+      setMounted(true);
+      const raf = requestAnimationFrame(() => setVisible(true));
+      return () => cancelAnimationFrame(raf);
+    } else {
+      setVisible(false);
+      const t = setTimeout(() => setMounted(false), ANIMATION_MS);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -64,22 +88,26 @@ export function DppPopup({
     if (open) setIsLoading(true);
   }, [open, embedUrl]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const iframeSrc = appendSourceParam(embedUrl);
 
   return (
-    <div
-      data-testid="dpp-popup-overlay"
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
+    <>
       <div
-        ref={contentRef}
+        data-testid="dpp-popup-overlay"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        className={`fixed inset-x-0 bottom-0 ${topOffsetClass} z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div
         data-testid="dpp-popup-content"
-        className="relative h-full max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className={`fixed bottom-0 right-0 ${topOffsetClass} z-40 flex w-full max-w-2xl flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out ${
+          visible ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={onClose}
@@ -110,11 +138,11 @@ export function DppPopup({
         <iframe
           src={iframeSrc}
           title={`Digital Product Passport — ${garmentName}`}
-          className="h-full w-full border-0"
+          className="h-full w-full flex-1 border-0"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           onLoad={() => setIsLoading(false)}
         />
       </div>
-    </div>
+    </>
   );
 }

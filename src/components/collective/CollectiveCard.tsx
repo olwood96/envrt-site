@@ -371,13 +371,15 @@ export function CollectiveCard({
         </div>
       </div>
 
-      {/* DPP popup */}
+      {/* DPP popup. topOffsetClass keeps the envrt.com nav (fixed, ~64-80px tall)
+          visible above the drawer. Brand-site embeds (Phase 2) will omit this. */}
       <DppPopup
         open={popupOpen}
         onClose={() => setPopupOpen(false)}
         embedUrl={embedUrl}
         fallbackUrl={detailUrl}
         garmentName={dpp.garment_name}
+        topOffsetClass="top-16 sm:top-20"
       />
 
       {/* Lightbox */}
