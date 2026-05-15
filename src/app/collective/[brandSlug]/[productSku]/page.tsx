@@ -59,12 +59,8 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
 
   const { dpp, brand, embedUrl } = card;
   const shareUrl = `https://envrt.com/collective/${brandSlug}/${productSku}`;
-  const widgetUrl = `https://envrt.com/collective/${brandSlug}/${productSku}/widget`;
-  const embedSnippet = `<iframe src="${widgetUrl}" width="300" height="400" frameborder="0" style="border:none;border-radius:16px;"></iframe>`;
-  const badgeSnippet = `<a href="${shareUrl}?utm_source=badge&utm_medium=referral" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid rgba(27,58,45,0.1);background:#fff;color:#1b3a2d;font-size:12px;font-weight:500;text-decoration:none;font-family:system-ui,sans-serif;">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7a6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 12h8M12 8v8"/></svg>
-  View Digital Product Passport
-</a>`;
+  const popupSnippet = `<a href="${shareUrl}" class="envrt-dpp-link" target="_blank" rel="noopener">View Digital Product Passport</a>
+<script src="https://envrt.com/embed.js" async defer></script>`;
 
   return (
     <>
@@ -124,8 +120,7 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
                   url={shareUrl}
                   title={`${dpp.garment_name} by ${brand.name}`}
                   productName={dpp.garment_name}
-                  embedSnippet={embedSnippet}
-                  badgeSnippet={badgeSnippet}
+                  popupSnippet={popupSnippet}
                 />
               </div>
             </div>
