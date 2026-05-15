@@ -80,12 +80,21 @@ export function DppPopup({
     body.style.overflow = "hidden";
 
     return () => {
+      // Temporarily override the global `html { scroll-behavior: smooth }`
+      // so the restore is instant, not animated. Otherwise the page
+      // appears to "scroll itself back" when the popup closes.
+      const html = document.documentElement;
+      const prevScrollBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+
       body.style.position = "";
       body.style.top = "";
       body.style.left = "";
       body.style.right = "";
       body.style.overflow = "";
       window.scrollTo(0, scrollY);
+
+      html.style.scrollBehavior = prevScrollBehavior;
     };
   }, [open]);
 
