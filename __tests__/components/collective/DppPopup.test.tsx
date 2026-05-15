@@ -75,19 +75,11 @@ describe("DppPopup", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("calls onClose when any close button is clicked", () => {
+  it("calls onClose when the close button is clicked", () => {
     const onClose = vi.fn();
     render(<DppPopup {...defaultProps} onClose={onClose} />);
-    const closeButtons = screen.getAllByLabelText("Close popup");
-    expect(closeButtons.length).toBeGreaterThanOrEqual(1);
-    fireEvent.click(closeButtons[0]);
+    fireEvent.click(screen.getByLabelText("Close popup"));
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it("renders both an internal and an external close button", () => {
-    render(<DppPopup {...defaultProps} />);
-    const closeButtons = screen.getAllByLabelText("Close popup");
-    expect(closeButtons.length).toBe(2);
   });
 
   it("locks body scroll while open and restores on close", () => {
