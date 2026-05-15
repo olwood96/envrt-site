@@ -49,6 +49,7 @@ export function CollectiveCard({
     // Allow ctrl/cmd-click and middle-click to open in new tab as normal
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
+    e.stopPropagation();
     setPopupOpen(true);
   };
   const hasJourney =
@@ -77,6 +78,25 @@ export function CollectiveCard({
           <div className="absolute right-3 top-3 z-20 rounded-full bg-envrt-teal px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-sm">
             New
           </div>
+        )}
+
+        {/* Brand logo overlay — sibling of the image anchor (NOT nested inside)
+            to avoid invalid nested <a> tags. Nested anchors get normalised
+            unpredictably by browsers and break the parent's click handler on
+            mobile, sending the user to the detail page instead of the popup. */}
+        {brandLogoUrl && (
+          <Link
+            href={`/collective/${brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+            className="absolute left-3 top-3 z-30 rounded-lg bg-white/90 p-1.5 shadow-sm backdrop-blur transition-transform duration-300 hover:scale-110"
+          >
+            <Image
+              src={brandLogoUrl}
+              alt={brand.name}
+              width={28}
+              height={28}
+              className="h-7 w-7 object-contain"
+            />
+          </Link>
         )}
 
         {/* Image */}
@@ -131,23 +151,6 @@ export function CollectiveCard({
 
             {/* Gradient blend into content */}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-white to-transparent" />
-
-            {/* Brand logo overlay — clickable to brand page */}
-            {brandLogoUrl && (
-              <Link
-                href={`/collective/${brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute left-3 top-3 z-20 rounded-lg bg-white/90 p-1.5 shadow-sm backdrop-blur transition-transform duration-300 hover:scale-110"
-              >
-                <Image
-                  src={brandLogoUrl}
-                  alt={brand.name}
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 object-contain"
-                />
-              </Link>
-            )}
 
             {/* Expand button for lightbox */}
             {productImageUrl && (
