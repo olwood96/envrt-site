@@ -64,14 +64,28 @@ export function DppPopup({
     return () => document.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
+  // iOS-proof scroll lock. `overflow: hidden` alone doesn't stop iOS Safari
+  // from scrolling the body on touchmove. Pinning body to a fixed position
+  // and offsetting by the current scrollY keeps the visual page in place
+  // while making it physically un-scrollable for the duration of the popup.
   useEffect(() => {
-    if (!open) {
-      document.body.style.overflow = "";
-      return;
-    }
-    document.body.style.overflow = "hidden";
+    if (!open) return;
+
+    const scrollY = window.scrollY;
+    const body = document.body;
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.overflow = "";
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
@@ -166,6 +180,7 @@ export function DppPopup({
         onMouseMove={handleBackdropMouseMove}
         onMouseEnter={() => setCursorOnBackdrop(true)}
         onMouseLeave={() => setCursorOnBackdrop(false)}
+        style={{ touchAction: "none" }}
         className={`fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
           visible ? "opacity-100" : "opacity-0"
         }`}
@@ -230,6 +245,7 @@ export function DppPopup({
           onTouchStart={handleDragStart}
           onTouchMove={handleDragMove}
           onTouchEnd={handleDragEnd}
+          style={{ touchAction: "none" }}
           className="absolute inset-x-0 top-0 z-20 flex h-9 justify-center pt-2 sm:hidden"
           aria-label="Drag to dismiss"
         >
