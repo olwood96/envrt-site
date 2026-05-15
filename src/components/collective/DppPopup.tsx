@@ -30,6 +30,9 @@ export function DppPopup({
   const [isLoading, setIsLoading] = useState(true);
   const [cursorOnBackdrop, setCursorOnBackdrop] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef<number | null>(null);
+  const dragOffsetRef = useRef(0);
 
   // Mount/unmount lifecycle. Double RAF on open ensures the browser paints
   // the drawer at translateX(100%) before we flip visible→true; otherwise
@@ -97,6 +100,51 @@ export function DppPopup({
     }
   };
 
+  // Mobile swipe-to-dismiss. Touch handlers are attached only to the drag
+  // strip at the top of the sheet so the iframe content below still
+  // receives normal touch events for scrolling/interaction.
+  const handleDragStart = (e: React.TouchEvent) => {
+    dragStartY.current = e.touches[0].clientY;
+    if (sheetRef.current) {
+      // Disable CSS transition during drag so the sheet tracks the finger.
+      sheetRef.current.style.transition = "none";
+    }
+  };
+
+  const handleDragMove = (e: React.TouchEvent) => {
+    if (dragStartY.current === null || !sheetRef.current) return;
+    const delta = e.touches[0].clientY - dragStartY.current;
+    if (delta > 0) {
+      dragOffsetRef.current = delta;
+      sheetRef.current.style.transform = `translateY(${delta}px)`;
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (!sheetRef.current) return;
+    sheetRef.current.style.transition = "transform 250ms ease-out";
+
+    if (dragOffsetRef.current > 100) {
+      // Past the dismiss threshold — slide the sheet the rest of the way
+      // down, then trigger onClose. The class-based animation will then
+      // pick up to keep the sheet hidden until unmount.
+      sheetRef.current.style.transform = "translateY(100%)";
+      window.setTimeout(() => onClose(), 200);
+    } else {
+      // Snap back to resting position.
+      sheetRef.current.style.transform = "";
+    }
+
+    // Clear the inline transition after the animation so future class
+    // transitions (slide-out via onClose) work normally.
+    window.setTimeout(() => {
+      if (sheetRef.current) sheetRef.current.style.transition = "";
+    }, 260);
+
+    dragStartY.current = null;
+    dragOffsetRef.current = 0;
+  };
+
   if (!mounted || typeof document === "undefined") return null;
 
   const iframeSrc = appendSourceParam(embedUrl);
@@ -149,26 +197,46 @@ export function DppPopup({
       </div>
 
       {/* Drawer / sheet.
-          Mobile (<sm): bottom sheet, slides up from the bottom, rounded top.
+          Mobile (<sm): bottom sheet at fixed 92svh — `svh` (small viewport
+          height) prevents the sheet from resizing when iOS Safari collapses
+          its address bar, which was causing the "jumps to fullscreen" jank.
           Desktop (sm+): right-side drawer, slides in from the right. */}
       <div
+        ref={sheetRef}
         data-testid="dpp-popup-content"
-        className={`fixed z-[9999] flex flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out
-          inset-x-0 bottom-0 h-[92vh] rounded-t-2xl
-          sm:inset-x-auto sm:right-0 sm:top-0 sm:h-auto sm:w-full sm:max-w-2xl sm:rounded-t-none
+        className={`fixed z-[9999] overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out
+          inset-x-0 bottom-0 h-[92svh] max-h-[92svh] rounded-t-2xl
+          sm:inset-x-auto sm:right-0 sm:top-0 sm:h-auto sm:max-h-none sm:w-full sm:max-w-2xl sm:rounded-t-none
           ${
             visible
               ? "translate-x-0 translate-y-0"
               : "translate-y-full sm:translate-y-0 sm:translate-x-full"
           }`}
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {/* Mobile drag handle (visual only). */}
-        <div className="flex justify-center pt-2 pb-1 sm:hidden">
-          <div className="h-1 w-12 rounded-full bg-envrt-charcoal/20" />
+        {/* iframe fills the entire sheet — the rounded top corners clip
+            it slightly, which the user has accepted as the trade-off for
+            a flush full-bleed DPP view. */}
+        <iframe
+          src={iframeSrc}
+          title={`Digital Product Passport — ${garmentName}`}
+          className="h-full w-full border-0"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          onLoad={() => setIsLoading(false)}
+        />
+
+        {/* Mobile drag strip: absolute overlay on top of the iframe.
+            The strip is 36px tall to give a generous touch target. */}
+        <div
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
+          className="absolute inset-x-0 top-0 z-20 flex h-9 justify-center pt-2 sm:hidden"
+          aria-label="Drag to dismiss"
+        >
+          <div className="h-1 w-12 rounded-full bg-envrt-charcoal/30 shadow-sm" />
         </div>
 
-        {/* Always-visible internal close button (primary discoverable action). */}
+        {/* Always-visible internal close button. */}
         <button
           onClick={onClose}
           aria-label="Close popup"
@@ -194,14 +262,6 @@ export function DppPopup({
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-envrt-teal border-t-transparent" />
           </div>
         )}
-
-        <iframe
-          src={iframeSrc}
-          title={`Digital Product Passport — ${garmentName}`}
-          className="h-full w-full flex-1 border-0"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-          onLoad={() => setIsLoading(false)}
-        />
       </div>
     </>,
     document.body
