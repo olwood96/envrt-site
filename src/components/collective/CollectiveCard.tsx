@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { getMaterialDescription } from "@/lib/collective/material-info";
 import { deduplicateConstituents } from "@/lib/collective/utils";
+import { DppPopup } from "./DppPopup";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -39,9 +40,17 @@ export function CollectiveCard({
   mapOpen: externalMapOpen,
   onToggleMap,
 }: Props) {
-  const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl } = card;
+  const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl, embedUrl } = card;
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
   const mapOpen = externalMapOpen ?? false;
+
+  const openPopup = (e: React.MouseEvent) => {
+    // Allow ctrl/cmd-click and middle-click to open in new tab as normal
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    setPopupOpen(true);
+  };
   const hasJourney =
     dpp.production_stages &&
     dpp.production_stages.length > 0 &&
@@ -71,7 +80,12 @@ export function CollectiveCard({
         )}
 
         {/* Image */}
-        <Link href={detailUrl} className="block">
+        <a
+          href={detailUrl}
+          data-testid="dpp-link-image"
+          onClick={openPopup}
+          className="block"
+        >
           <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-envrt-cream/40">
             {productImageUrl ? (
               <>
@@ -162,7 +176,7 @@ export function CollectiveCard({
               </button>
             )}
           </div>
-        </Link>
+        </a>
 
         {/* Content */}
         <div className="flex flex-1 flex-col px-5 pb-5 pt-3">
@@ -171,11 +185,15 @@ export function CollectiveCard({
               <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-teal">
                 {brand.name}
               </p>
-              <Link href={detailUrl}>
+              <a
+                href={detailUrl}
+                data-testid="dpp-link-name"
+                onClick={openPopup}
+              >
                 <h3 className="mt-1 text-[15px] font-semibold leading-snug text-envrt-charcoal group-hover:text-envrt-green">
                   {dpp.garment_name}
                 </h3>
-              </Link>
+              </a>
               <p className="mt-0.5 text-xs text-envrt-muted">
                 {dpp.collection_name}
               </p>
@@ -336,8 +354,10 @@ export function CollectiveCard({
                   </svg>
                 </a>
               )}
-              <Link
+              <a
                 href={detailUrl}
+                data-testid="dpp-link-cta"
+                onClick={openPopup}
                 className="inline-flex items-center gap-1 text-xs font-medium text-envrt-muted transition-colors group-hover:text-envrt-teal"
                 data-cta="view-dpp"
               >
@@ -345,11 +365,20 @@ export function CollectiveCard({
                 <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
       </div>
+
+      {/* DPP popup */}
+      <DppPopup
+        open={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        embedUrl={embedUrl}
+        fallbackUrl={detailUrl}
+        garmentName={dpp.garment_name}
+      />
 
       {/* Lightbox */}
       {lightboxOpen && productImageUrl && (

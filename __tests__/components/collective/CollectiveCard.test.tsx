@@ -169,7 +169,7 @@ describe("CollectiveCard", () => {
     expect(checkbox).not.toBeDisabled();
   });
 
-  it("links to the detail page", () => {
+  it("links to the detail page (SEO: real href preserved for crawlers and right-click)", () => {
     render(
       <CollectiveCard
         card={mockCard}
@@ -184,6 +184,133 @@ describe("CollectiveCard", () => {
       (l) => l.getAttribute("href") === "/collective/ecobrand/tee-001"
     );
     expect(detailLinks.length).toBeGreaterThan(0);
+  });
+
+  describe("DPP popup", () => {
+    it("opens popup when garment image link is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument();
+      const imageLink = screen.getByTestId("dpp-link-image");
+      fireEvent.click(imageLink);
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("opens popup when garment name link is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      const nameLink = screen.getByTestId("dpp-link-name");
+      fireEvent.click(nameLink);
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("opens popup when 'View DPP' CTA is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      const ctaLink = screen.getByTestId("dpp-link-cta");
+      fireEvent.click(ctaLink);
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("popup iframe points to the embedUrl from card data", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("dpp-link-cta"));
+      const iframe = screen.getByTitle(
+        /Digital Product Passport — Organic Cotton Tee/
+      );
+      expect(iframe.getAttribute("src")).toContain(mockCard.embedUrl);
+    });
+
+    it("all three DPP links preserve detail URL as href (SEO)", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByTestId("dpp-link-image")).toHaveAttribute(
+        "href",
+        "/collective/ecobrand/tee-001"
+      );
+      expect(screen.getByTestId("dpp-link-name")).toHaveAttribute(
+        "href",
+        "/collective/ecobrand/tee-001"
+      );
+      expect(screen.getByTestId("dpp-link-cta")).toHaveAttribute(
+        "href",
+        "/collective/ecobrand/tee-001"
+      );
+    });
+
+    it("brand logo link still navigates to brand page (not popup)", () => {
+      const cardWithLogo: CollectiveCardData = {
+        ...mockCard,
+        brandLogoUrl: "https://example.com/logo.png",
+      };
+      render(
+        <CollectiveCard
+          card={cardWithLogo}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      const links = screen.getAllByRole("link");
+      const brandLink = links.find(
+        (l) => l.getAttribute("href") === "/collective/ecobrand"
+      );
+      expect(brandLink).toBeDefined();
+    });
+
+    it("closes popup when close button is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("dpp-link-cta"));
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByLabelText("Close popup"));
+      expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument();
+    });
   });
 
   describe("New badge", () => {
