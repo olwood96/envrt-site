@@ -42,6 +42,23 @@ export function CollectiveCard({
   // Per-card map state so opening one card's production journey doesn't
   // expand every other card and shove the page around.
   const [mapOpen, setMapOpen] = useState(false);
+  // Tap-to-toggle tooltip state — hover still works on desktop via CSS,
+  // this lets the same tooltips appear on tap for touch devices.
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activeTooltip) return;
+    const closeTooltip = () => setActiveTooltip(null);
+    // Defer the listener by a tick so the click that opened the tooltip
+    // doesn't immediately close it.
+    const t = window.setTimeout(() => {
+      document.addEventListener("click", closeTooltip);
+    }, 0);
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener("click", closeTooltip);
+    };
+  }, [activeTooltip]);
 
   const openPopup = (e: React.MouseEvent) => {
     // Allow ctrl/cmd-click and middle-click to open in new tab as normal
@@ -70,7 +87,7 @@ export function CollectiveCard({
 
   return (
     <>
-      <div className={`group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 ${crossBrandDisabled ? "opacity-40 grayscale pointer-events-auto" : "hover:-translate-y-1 hover:border-envrt-teal/20 hover:shadow-xl hover:shadow-envrt-teal/8"}`}>
+      <div className={`group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 ${crossBrandDisabled ? "opacity-40 grayscale pointer-events-auto" : "sm:hover:-translate-y-1 sm:hover:border-envrt-teal/20 sm:hover:shadow-xl sm:hover:shadow-envrt-teal/8"}`}>
         {/* New badge */}
         {isNew(dpp.featured_at) && (
           <div className="absolute right-3 top-3 z-20 rounded-full bg-envrt-teal px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-sm">
@@ -158,7 +175,7 @@ export function CollectiveCard({
                   e.stopPropagation();
                   setLightboxOpen(true);
                 }}
-                className="absolute bottom-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-envrt-muted opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:opacity-100 hover:text-envrt-charcoal"
+                className="absolute bottom-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-envrt-muted shadow-sm backdrop-blur transition-opacity hover:text-envrt-charcoal sm:opacity-0 sm:group-hover:opacity-100"
                 aria-label="View full image"
               >
                 <svg
@@ -180,7 +197,7 @@ export function CollectiveCard({
         </a>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col px-5 pb-5 pt-3">
+        <div className="flex flex-1 flex-col px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-teal">
@@ -241,14 +258,25 @@ export function CollectiveCard({
             <div className="mt-3 flex flex-wrap gap-1">
               {merged.slice(0, 3).map((c) => {
                 const desc = getMaterialDescription(c.material);
+                const tooltipKey = `material:${c.material}`;
+                const tooltipActive = activeTooltip === tooltipKey;
                 return (
                   <span
                     key={c.material}
-                    className="group/tip relative cursor-default rounded-full border border-envrt-teal/10 bg-envrt-teal/5 px-2 py-0.5 text-[10px] font-medium text-envrt-teal"
+                    onClick={(e) => {
+                      if (!desc) return;
+                      e.stopPropagation();
+                      setActiveTooltip(tooltipActive ? null : tooltipKey);
+                    }}
+                    className={`group/tip relative rounded-full border border-envrt-teal/10 bg-envrt-teal/5 px-2 py-0.5 text-[10px] font-medium text-envrt-teal ${desc ? "cursor-pointer" : "cursor-default"}`}
                   >
                     {c.material} {c.pct}%
                     {desc && (
-                      <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-48 -translate-x-1/2 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg group-hover/tip:block">
+                      <span
+                        className={`pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-48 -translate-x-1/2 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg ${
+                          tooltipActive ? "block" : "hidden group-hover/tip:block"
+                        }`}
+                      >
                         {desc}
                         <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-white" />
                       </span>
@@ -321,7 +349,16 @@ export function CollectiveCard({
 
           {/* Footer: compare + view CTA */}
           <div className="mt-4 flex items-center justify-between border-t border-envrt-charcoal/5 pt-3">
-            <div className="group/compare relative">
+            <div
+              className="group/compare relative"
+              onClick={(e) => {
+                if (!crossBrandDisabled) return;
+                e.stopPropagation();
+                setActiveTooltip(
+                  activeTooltip === "compare-blocked" ? null : "compare-blocked"
+                );
+              }}
+            >
               <label className={`flex items-center gap-2 text-xs ${crossBrandDisabled ? "cursor-not-allowed text-envrt-muted/50" : "cursor-pointer text-envrt-muted"}`}>
                 <input
                   type="checkbox"
@@ -333,7 +370,13 @@ export function CollectiveCard({
                 Compare
               </label>
               {crossBrandDisabled && (
-                <span className="pointer-events-none absolute bottom-full left-0 z-30 mb-2 hidden w-52 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] leading-relaxed text-envrt-charcoal shadow-lg group-hover/compare:block">
+                <span
+                  className={`pointer-events-none absolute bottom-full left-0 z-30 mb-2 w-52 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] leading-relaxed text-envrt-charcoal shadow-lg ${
+                    activeTooltip === "compare-blocked"
+                      ? "block"
+                      : "hidden group-hover/compare:block"
+                  }`}
+                >
                   Cross-brand comparisons aren&apos;t available yet — you can compare products from the same brand only.
                   <span className="absolute left-4 top-full border-4 border-transparent border-t-white" />
                 </span>

@@ -27,7 +27,7 @@ export function CollectiveCompareBar({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-envrt-teal/20 bg-white/95 shadow-xl backdrop-blur">
-      <div className="mx-auto flex max-w-[1280px] items-center gap-4 px-5 py-3 sm:px-8">
+      <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-3 sm:gap-4 sm:px-8">
         <div className="flex items-center gap-2">
           {selectedCards.map((card) => (
             <div
@@ -59,11 +59,11 @@ export function CollectiveCompareBar({
           ))}
         </div>
 
-        <span className="text-xs text-envrt-muted">
+        <span className="hidden text-xs text-envrt-muted sm:inline">
           {selectedCards.length} selected
         </span>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <button
             onClick={onClear}
             className="text-xs text-envrt-muted hover:text-envrt-charcoal"
@@ -72,7 +72,7 @@ export function CollectiveCompareBar({
           </button>
           <Link
             href={`/collective/compare?products=${products}`}
-            className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-envrt-green/90"
+            className="inline-flex items-center justify-center rounded-xl bg-envrt-green px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-envrt-green/90 sm:px-5 sm:text-sm"
           >
             Compare
             <span className="ml-1.5">→</span>

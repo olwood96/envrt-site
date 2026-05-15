@@ -78,9 +78,9 @@ export default async function BrandProfilePage({ params }: PageProps) {
         </Link>
 
         {/* Brand header */}
-        <div className="mt-8 flex items-center gap-5">
+        <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
           {brandLogoUrl && (
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-envrt-charcoal/5 bg-white p-2">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-envrt-charcoal/5 bg-white p-2">
               <Image
                 src={brandLogoUrl}
                 alt={brand.name}
@@ -90,7 +90,7 @@ export default async function BrandProfilePage({ params }: PageProps) {
               />
             </div>
           )}
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
                 {brand.name}
