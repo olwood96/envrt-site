@@ -308,7 +308,7 @@ describe("CollectiveCard", () => {
       fireEvent.click(screen.getByTestId("dpp-link-cta"));
       expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
 
-      fireEvent.click(screen.getByLabelText("Close popup"));
+      fireEvent.click(screen.getAllByLabelText("Close popup")[0]);
       await waitFor(() =>
         expect(
           screen.queryByTestId("dpp-popup-overlay")
