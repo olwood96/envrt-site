@@ -108,7 +108,7 @@ export function DppPopup({
   return createPortal(
     <>
       {/* Backdrop: covers everything including the host site's navbar.
-          z-[100] is safely above the envrt.com navbar (z-50) and most
+          z-[9999] is safely above the envrt.com navbar (z-50) and most
           brand-site overlays. */}
       <div
         data-testid="dpp-popup-overlay"
@@ -118,7 +118,7 @@ export function DppPopup({
         onMouseMove={handleBackdropMouseMove}
         onMouseEnter={() => setCursorOnBackdrop(true)}
         onMouseLeave={() => setCursorOnBackdrop(false)}
-        className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
+        className={`fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -128,7 +128,7 @@ export function DppPopup({
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed left-0 top-0 z-[110] hidden h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/95 text-envrt-charcoal shadow-lg backdrop-blur transition-opacity duration-150 sm:flex ${
+        className={`pointer-events-none fixed left-0 top-0 z-[10000] hidden h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/95 text-envrt-charcoal shadow-lg backdrop-blur transition-opacity duration-150 sm:flex ${
           cursorOnBackdrop && visible ? "opacity-100" : "opacity-0"
         }`}
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
@@ -153,7 +153,7 @@ export function DppPopup({
           Desktop (sm+): right-side drawer, slides in from the right. */}
       <div
         data-testid="dpp-popup-content"
-        className={`fixed z-[100] flex flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out
+        className={`fixed z-[9999] flex flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out
           inset-x-0 bottom-0 h-[92vh] rounded-t-2xl
           sm:inset-x-auto sm:right-0 sm:top-0 sm:h-auto sm:w-full sm:max-w-2xl sm:rounded-t-none
           ${
