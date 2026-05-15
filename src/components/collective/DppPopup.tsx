@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   open: boolean;
@@ -96,11 +97,15 @@ export function DppPopup({
     }
   };
 
-  if (!mounted) return null;
+  if (!mounted || typeof document === "undefined") return null;
 
   const iframeSrc = appendSourceParam(embedUrl);
 
-  return (
+  // Portal to document.body so the popup escapes any parent stacking context.
+  // Without this, an ancestor with `transform`, `opacity`, `filter`, or other
+  // stacking-context-creating styles can trap the popup beneath higher-z
+  // elements like the navbar.
+  return createPortal(
     <>
       {/* Backdrop: covers everything including the host site's navbar.
           z-[100] is safely above the envrt.com navbar (z-50) and most
@@ -198,6 +203,7 @@ export function DppPopup({
           onLoad={() => setIsLoading(false)}
         />
       </div>
-    </>
+    </>,
+    document.body
   );
 }
