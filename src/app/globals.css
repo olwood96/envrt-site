@@ -66,6 +66,9 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Always reserve the vertical scrollbar gutter so the page doesn't shift
+     horizontally when something locks body scroll (e.g. the DPP popup). */
+  scrollbar-gutter: stable;
 }
 
 body {
