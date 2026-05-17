@@ -7,11 +7,10 @@ interface Props {
   title: string;
   productName: string;
   /** Snippet brands paste on their site: <a> link + <script> that opens the
-      DPP in a popup iframe via envrt.com/embed.js. */
+      DPP in a popup iframe via envrt.com/embed.js. This is per-garment —
+      the SKU is hardcoded so the brand pastes a different snippet for each
+      product. */
   popupSnippet: string;
-  /** Shopify-flavoured variant of popupSnippet using {{ product.handle }}
-      so one paste covers every product when added to a Custom Liquid block. */
-  shopifySnippet: string;
 }
 
 type Tab = "share" | "qr" | "popup";
@@ -21,7 +20,6 @@ export function CollectiveShareModal({
   title,
   productName,
   popupSnippet,
-  shopifySnippet,
 }: Props) {
   const [shopifyHelpOpen, setShopifyHelpOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -313,6 +311,15 @@ export function CollectiveShareModal({
 
                 {shopifyHelpOpen && (
                   <div className="mt-3 space-y-3 text-[10px] leading-relaxed text-envrt-charcoal">
+                    <p className="text-envrt-muted">
+                      You&apos;ll do this once per product. The snippet above
+                      is specific to{" "}
+                      <strong className="text-envrt-charcoal">
+                        {productName}
+                      </strong>{" "}
+                      &mdash; open each garment&apos;s DPP page on ENVRT to
+                      grab its own snippet.
+                    </p>
                     <ol className="list-inside list-decimal space-y-1.5 text-envrt-muted [&_strong]:text-envrt-charcoal">
                       <li>
                         Approve your domain in your ENVRT dashboard at{" "}
@@ -320,58 +327,30 @@ export function CollectiveShareModal({
                       </li>
                       <li>
                         In Shopify admin go to{" "}
-                        <strong>Online Store &rarr; Themes</strong> and click{" "}
-                        <strong>Customize</strong> on your Focal theme.
+                        <strong>Products</strong> and open the product that
+                        matches this garment.
                       </li>
                       <li>
-                        In the top dropdown, switch to{" "}
-                        <strong>Products</strong> so the change applies to
-                        every product.
+                        In the <strong>Description</strong> field, click{" "}
+                        <strong>&lt;&gt;</strong> to switch to HTML view.
                       </li>
                       <li>
-                        In the left sidebar, find the{" "}
-                        <strong>Product information</strong> section and click{" "}
-                        <strong>Add block &rarr; Custom Liquid</strong>.
+                        Paste the snippet above at the end of the description.
                       </li>
                       <li>
-                        Drag the new block to where you want the link (under
-                        the description works well).
-                      </li>
-                      <li>
-                        Paste this Shopify-specific snippet (it auto-fills the
-                        right DPP per product):
+                        Click <strong>Save</strong>.
                       </li>
                     </ol>
-
-                    <pre className="overflow-x-auto rounded-lg bg-envrt-cream/60 p-3 text-[10px] leading-relaxed text-envrt-charcoal">
-                      {shopifySnippet}
-                    </pre>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(shopifySnippet, "shopify")
-                      }
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-envrt-charcoal/8 px-3 py-1.5 text-[11px] font-medium text-envrt-charcoal transition-colors hover:border-envrt-teal/20 hover:text-envrt-teal"
-                    >
-                      <svg
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
-                        />
-                      </svg>
-                      {copied === "shopify" ? "Copied!" : "Copy Shopify snippet"}
-                    </button>
-                    <p className="text-[10px] leading-relaxed text-envrt-muted">
-                      <strong className="text-envrt-charcoal">Heads up:</strong>{" "}
-                      your Shopify product handles need to match the SKUs you
-                      uploaded to ENVRT so the link resolves to the right DPP.
-                      Contact us if you need an alias.
+                    <p className="text-envrt-muted">
+                      <strong className="text-envrt-charcoal">
+                        Cleaner option (Focal theme editor):
+                      </strong>{" "}
+                      open <strong>Online Store &rarr; Themes &rarr;
+                      Customize</strong>, navigate to this specific product
+                      via the top dropdown, then add a{" "}
+                      <strong>Custom Liquid</strong> block and paste the
+                      snippet there. Keeps the description clean and lets you
+                      place the link anywhere on the page.
                     </p>
                   </div>
                 )}
