@@ -61,6 +61,18 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
   const shareUrl = `https://envrt.com/collective/${brandSlug}/${productSku}`;
   const popupSnippet = `<a href="${shareUrl}" class="envrt-dpp-link" target="_blank" rel="noopener">View Digital Product Passport</a>
 <script src="https://envrt.com/embed.js" async defer></script>`;
+  // Shopify-specific variant for use inside a product template's
+  // Custom Liquid block. {{ product.handle }} resolves per-product so
+  // one paste covers every product in the catalogue.
+  const shopifySnippet = `<a
+  href="https://envrt.com/collective/${brandSlug}/{{ product.handle }}"
+  class="envrt-dpp-link"
+  target="_blank"
+  rel="noopener"
+>
+  View Digital Product Passport
+</a>
+<script src="https://envrt.com/embed.js" async defer></script>`;
 
   return (
     <>
@@ -121,6 +133,7 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
                   title={`${dpp.garment_name} by ${brand.name}`}
                   productName={dpp.garment_name}
                   popupSnippet={popupSnippet}
+                  shopifySnippet={shopifySnippet}
                 />
               </div>
             </div>
