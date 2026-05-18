@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { getMaterialDescription } from "@/lib/collective/material-info";
-import { deduplicateConstituents } from "@/lib/collective/utils";
+import { deduplicateConstituents, showReductionFor } from "@/lib/collective/utils";
 import { DppPopup } from "./DppPopup";
 
 const CollectiveProductionMap = lazy(() =>
@@ -233,7 +233,7 @@ export function CollectiveCard({
                 <span className="inline-flex items-center rounded-full bg-envrt-green/5 px-2.5 py-1 text-[11px] font-medium text-envrt-green">
                   {dpp.total_emissions.toFixed(1)} kg CO₂e
                 </span>
-                {dpp.total_emissions_reduction_pct != null && dpp.total_emissions_reduction_pct > 0 && (
+                {showReductionFor(dpp) && dpp.total_emissions_reduction_pct != null && dpp.total_emissions_reduction_pct > 0 && (
                   <span className="mt-0.5 text-center text-[10px] font-medium text-envrt-green">
                     ↓ {Math.round(dpp.total_emissions_reduction_pct)}% vs avg
                   </span>
@@ -245,7 +245,7 @@ export function CollectiveCard({
                 <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700">
                   {dpp.total_water.toFixed(1)} L H₂O
                 </span>
-                {dpp.total_water_reduction_pct != null && dpp.total_water_reduction_pct > 0 && (
+                {showReductionFor(dpp) && dpp.total_water_reduction_pct != null && dpp.total_water_reduction_pct > 0 && (
                   <span className="mt-0.5 text-center text-[10px] font-medium text-blue-600">
                     ↓ {Math.round(dpp.total_water_reduction_pct)}% vs avg
                   </span>

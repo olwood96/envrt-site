@@ -1,3 +1,11 @@
+/** Granularity controls which figures the DPP snapshot is allowed to show */
+export type CollectiveGranularity = "total" | "total+reduction" | "full";
+
+/** Subset of dpp_generated.display_options needed to mirror the live DPP's display rules */
+export interface CollectiveDisplayOptions {
+  granularity?: CollectiveGranularity | null;
+}
+
 /** Lightweight DPP record for the collective listing */
 export interface CollectiveDpp {
   id: string;
@@ -18,6 +26,8 @@ export interface CollectiveDpp {
   purchase_url: string | null;
   /** Production stages with countries (only populated on detail pages) */
   production_stages: CollectiveProductionStage[] | null;
+  /** Admin-configured display rules from the DPP snapshot. Missing means defaults apply (granularity "total"). */
+  display_options?: CollectiveDisplayOptions | null;
 }
 
 /** Material constituent — just material name and percentage */

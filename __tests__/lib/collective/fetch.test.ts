@@ -113,4 +113,19 @@ describe("collective/fetch", () => {
     expect(mockEq).toHaveBeenCalledWith("featured_on_site", true);
     expect(mockIs).toHaveBeenCalledWith("deleted_at", null);
   });
+
+  it("selects display_options so the snapshot's display rules are respected", async () => {
+    const { getFeaturedDpps } = await import("@/lib/collective/fetch");
+    await getFeaturedDpps();
+
+    // display_options must be in the field list so reduction badges
+    // can be gated by the DPP's stored granularity rather than raw garment data
+    const dppSelectCalls = mockSelect.mock.calls
+      .map((args) => String(args[0] ?? ""))
+      .filter((s) => s.includes("total_emissions_reduction_pct"));
+    expect(dppSelectCalls.length).toBeGreaterThan(0);
+    for (const fields of dppSelectCalls) {
+      expect(fields).toContain("display_options");
+    }
+  });
 });

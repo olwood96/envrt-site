@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { deduplicateConstituents } from "@/lib/collective/utils";
+import { deduplicateConstituents, showReductionFor } from "@/lib/collective/utils";
 
 describe("deduplicateConstituents", () => {
   it("returns empty array for empty input", () => {
@@ -58,5 +58,31 @@ describe("deduplicateConstituents", () => {
       { material: "Cotton", pct: 55 },
       { material: "Nylon", pct: 45 },
     ]);
+  });
+});
+
+describe("showReductionFor", () => {
+  it("hides reductions when display_options is missing (default total)", () => {
+    expect(showReductionFor({ display_options: undefined })).toBe(false);
+    expect(showReductionFor({ display_options: null })).toBe(false);
+  });
+
+  it("hides reductions when granularity is total", () => {
+    expect(showReductionFor({ display_options: { granularity: "total" } })).toBe(false);
+  });
+
+  it("hides reductions when granularity is missing on display_options", () => {
+    expect(showReductionFor({ display_options: {} })).toBe(false);
+    expect(showReductionFor({ display_options: { granularity: null } })).toBe(false);
+  });
+
+  it("shows reductions when granularity is total+reduction", () => {
+    expect(
+      showReductionFor({ display_options: { granularity: "total+reduction" } })
+    ).toBe(true);
+  });
+
+  it("shows reductions when granularity is full", () => {
+    expect(showReductionFor({ display_options: { granularity: "full" } })).toBe(true);
   });
 });

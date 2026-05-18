@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toPng } from "html-to-image";
 import type { CollectiveCardData } from "@/lib/collective/types";
-import { deduplicateConstituents } from "@/lib/collective/utils";
+import { deduplicateConstituents, showReductionFor } from "@/lib/collective/utils";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -324,8 +324,9 @@ export function CollectiveComparisonView({ cards }: Props) {
 
   const hasAnyReduction = cards.some(
     (c) =>
-      (c.dpp.total_emissions_reduction_pct != null && c.dpp.total_emissions_reduction_pct > 0) ||
-      (c.dpp.total_water_reduction_pct != null && c.dpp.total_water_reduction_pct > 0)
+      showReductionFor(c.dpp) &&
+      ((c.dpp.total_emissions_reduction_pct != null && c.dpp.total_emissions_reduction_pct > 0) ||
+        (c.dpp.total_water_reduction_pct != null && c.dpp.total_water_reduction_pct > 0))
   );
 
   const hasAnyJourney = cards.some((c) => c.dpp.production_stages?.some((s) => s.country));
@@ -460,10 +461,11 @@ export function CollectiveComparisonView({ cards }: Props) {
               </span>
             </div>
             {cards.map((card) => {
+              const allowed = showReductionFor(card.dpp);
               const pct = card.dpp.total_emissions_reduction_pct;
               return (
                 <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2">
-                  {pct != null && pct > 0 ? (
+                  {allowed && pct != null && pct > 0 ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-envrt-green/8 px-3 py-1 text-xs font-semibold text-envrt-green">
                       ↓ {Math.round(pct)}%
                     </span>
@@ -482,10 +484,11 @@ export function CollectiveComparisonView({ cards }: Props) {
               </span>
             </div>
             {cards.map((card) => {
+              const allowed = showReductionFor(card.dpp);
               const pct = card.dpp.total_water_reduction_pct;
               return (
                 <div key={card.dpp.id} className="flex items-center justify-center py-3 px-2">
-                  {pct != null && pct > 0 ? (
+                  {allowed && pct != null && pct > 0 ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
                       ↓ {Math.round(pct)}%
                     </span>

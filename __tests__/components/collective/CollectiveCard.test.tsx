@@ -51,6 +51,7 @@ const mockCard: CollectiveCardData = {
     featured_at: "2025-01-01T00:00:00Z",
     purchase_url: null,
     production_stages: null,
+    display_options: { granularity: "total+reduction" },
   },
   brand: {
     id: "brand-1",
@@ -383,6 +384,74 @@ describe("CollectiveCard", () => {
     );
 
     expect(screen.getByText("↓ 18% vs avg")).toBeInTheDocument();
+  });
+
+  describe("granularity gating for reductions", () => {
+    it("hides reduction badges when granularity is 'total'", () => {
+      const totalOnlyCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          display_options: { granularity: "total" },
+        },
+      };
+      render(
+        <CollectiveCard
+          card={totalOnlyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByText(/↓ 32% vs avg/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/↓ 18% vs avg/)).not.toBeInTheDocument();
+      // The raw totals must still render
+      expect(screen.getByText("3.2 kg CO₂e")).toBeInTheDocument();
+      expect(screen.getByText("45.8 L H₂O")).toBeInTheDocument();
+    });
+
+    it("hides reduction badges when display_options is missing", () => {
+      const noOptsCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          display_options: null,
+        },
+      };
+      render(
+        <CollectiveCard
+          card={noOptsCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByText(/↓ 32% vs avg/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/↓ 18% vs avg/)).not.toBeInTheDocument();
+    });
+
+    it("shows reduction badges when granularity is 'full'", () => {
+      const fullCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          display_options: { granularity: "full" },
+        },
+      };
+      render(
+        <CollectiveCard
+          card={fullCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByText("↓ 32% vs avg")).toBeInTheDocument();
+      expect(screen.getByText("↓ 18% vs avg")).toBeInTheDocument();
+    });
   });
 
   it("shows material tooltip on hover", () => {

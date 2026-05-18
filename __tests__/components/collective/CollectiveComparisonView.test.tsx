@@ -94,6 +94,7 @@ const mockCards: CollectiveCardData[] = [
       { material: "Organic Cotton", pct: 95 },
       { material: "Elastane", pct: 5 },
     ],
+    display_options: { granularity: "total+reduction" },
   }),
   makeCard("2", "Product B", {
     total_emissions: 5.0,
@@ -103,6 +104,7 @@ const mockCards: CollectiveCardData[] = [
     total_emissions_reduction_pct: null,
     total_water_reduction_pct: 25,
     constituents: [{ material: "Polyester", pct: 100 }],
+    display_options: { granularity: "total+reduction" },
   }),
 ];
 
@@ -225,6 +227,44 @@ describe("CollectiveComparisonView", () => {
     render(<CollectiveComparisonView cards={noReductionCards} />);
     expect(screen.queryByText("Emissions vs avg")).not.toBeInTheDocument();
     expect(screen.queryByText("Water vs avg")).not.toBeInTheDocument();
+  });
+
+  it("hides reduction rows when all DPPs have granularity 'total'", () => {
+    const totalOnly = [
+      makeCard("1", "A", {
+        total_emissions_reduction_pct: 32,
+        total_water_reduction_pct: 18,
+        display_options: { granularity: "total" },
+      }),
+      makeCard("2", "B", {
+        total_emissions_reduction_pct: 25,
+        total_water_reduction_pct: 25,
+        display_options: { granularity: "total" },
+      }),
+    ];
+    render(<CollectiveComparisonView cards={totalOnly} />);
+    expect(screen.queryByText("Emissions vs avg")).not.toBeInTheDocument();
+    expect(screen.queryByText("Water vs avg")).not.toBeInTheDocument();
+  });
+
+  it("only renders reduction values for DPPs whose granularity allows it", () => {
+    const mixed = [
+      makeCard("1", "Permits", {
+        total_emissions_reduction_pct: 32,
+        total_water_reduction_pct: 18,
+        display_options: { granularity: "total+reduction" },
+      }),
+      makeCard("2", "Hides", {
+        total_emissions_reduction_pct: 50,
+        total_water_reduction_pct: 50,
+        display_options: { granularity: "total" },
+      }),
+    ];
+    render(<CollectiveComparisonView cards={mixed} />);
+    expect(screen.getByText("Emissions vs avg")).toBeInTheDocument();
+    expect(screen.getByText(/↓ 32%/)).toBeInTheDocument();
+    // The 'Hides' card must not leak its 50% reduction
+    expect(screen.queryByText(/↓ 50%/)).not.toBeInTheDocument();
   });
 
   it("does not show production journeys when no stages exist", () => {
