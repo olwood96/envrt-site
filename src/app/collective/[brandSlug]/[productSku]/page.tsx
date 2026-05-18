@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
 import { CollectiveDppEmbed } from "@/components/collective/CollectiveDppEmbed";
-import { CollectiveShareModal } from "@/components/collective/CollectiveShareModal";
 import { CollectiveProductJsonLd } from "@/components/collective/CollectiveProductJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
@@ -59,8 +58,6 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
 
   const { dpp, brand, embedUrl } = card;
   const shareUrl = `https://envrt.com/collective/${brandSlug}/${productSku}`;
-  const popupSnippet = `<a href="${shareUrl}" class="envrt-dpp-link" target="_blank" rel="noopener">View Digital Product Passport</a>
-<script src="https://envrt.com/embed.js" async defer></script>`;
 
   return (
     <>
@@ -116,12 +113,6 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
                     </svg>
                   </a>
                 )}
-                <CollectiveShareModal
-                  url={shareUrl}
-                  title={`${dpp.garment_name} by ${brand.name}`}
-                  productName={dpp.garment_name}
-                  popupSnippet={popupSnippet}
-                />
               </div>
             </div>
 
