@@ -284,6 +284,12 @@
       if (!popup) return;
       popup.host.style.display = "none";
       popup.iframe.setAttribute("src", "about:blank");
+      // Clear any inline transform left over from drag-to-dismiss. Without
+      // this, the next open()  applies .visible but the inline transform
+      // overrides the CSS rule and the sheet stays off-screen, leaving the
+      // popup looking unresponsive on every subsequent click.
+      popup.sheet.style.transform = "";
+      popup.sheet.style.transition = "";
       unlockBodyScroll();
     }, ANIMATION_MS);
   }
