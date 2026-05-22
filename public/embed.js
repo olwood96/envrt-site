@@ -88,7 +88,16 @@
 
     var host = document.createElement("div");
     host.setAttribute("data-envrt-popup", "");
-    host.style.cssText = "all: initial;";
+    // `all: initial` shields against host-site CSS that might style our wrapper
+    // (margins, fonts, etc.). Critical positioning properties must come AFTER
+    // so they override the initial values that `all` resets. Without this the
+    // :host { position: fixed; z-index: ... } rule in the shadow tree gets
+    // beaten by the inline `all: initial`, the host ends up position:static
+    // with z-index:auto, no stacking context forms, and any host-page element
+    // with z-index > 0 paints on top of the drawer.
+    host.style.cssText =
+      "all: initial; position: fixed; inset: 0; z-index: 2147483647; " +
+      "pointer-events: none; display: none;";
     var root = host.attachShadow({ mode: "open" });
 
     root.innerHTML =
@@ -191,7 +200,8 @@
     src += (src.indexOf("?") === -1 ? "?" : "&") + "src=embed-popup";
     p.iframe.setAttribute("title", "Digital Product Passport — " + opts.title);
     p.iframe.setAttribute("src", src);
-    p.host.classList.add("loading", "mounted");
+    p.host.style.display = "block";
+    p.host.classList.add("loading");
     document.addEventListener("keydown", onKeyDown);
     window.addEventListener("message", onMessage);
     lockBodyScroll();
@@ -213,7 +223,7 @@
     pendingFallbackUrl = null;
     window.setTimeout(function () {
       if (!popup) return;
-      popup.host.classList.remove("mounted");
+      popup.host.style.display = "none";
       popup.iframe.setAttribute("src", "about:blank");
       unlockBodyScroll();
     }, ANIMATION_MS);
@@ -262,8 +272,8 @@
     "<path d='M6 18 18 6M6 6l12 12'/></svg>";
 
   var STYLES = [
-    ":host { position: fixed; inset: 0; z-index: 2147483647; pointer-events: none; }",
-    ":host(:not(.mounted)) { display: none; }",
+    // Host positioning + z-index are set inline in JS so they win against the
+    // `all: initial` reset. Only child-targeting rules live here.
 
     ".overlay {",
     "  position: fixed; inset: 0; background: rgba(0,0,0,0.5);",
