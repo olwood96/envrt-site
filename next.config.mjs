@@ -63,6 +63,16 @@ const nextConfig = {
         ],
       },
       {
+        // Public embed script loaded by brand sites. Long cache on the CDN
+        // with a shorter browser cache so we can roll out fixes quickly.
+        source: "/embed.js",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=86400" },
+        ],
+      },
+      {
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
