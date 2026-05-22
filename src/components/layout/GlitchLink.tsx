@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!?<>{}[]";
 
@@ -16,29 +16,6 @@ export function GlitchLink({ href, label, className = "", onClick }: GlitchLinkP
   const [display, setDisplay] = useState(label);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const frameRef = useRef(0);
-  const spanRef = useRef<HTMLSpanElement>(null);
-  const [lockedWidth, setLockedWidth] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const measure = () => {
-      if (!spanRef.current) return;
-      // Reset to label text for accurate measurement
-      setDisplay(label);
-      // Use scrollWidth to get full single-line width
-      requestAnimationFrame(() => {
-        if (spanRef.current) {
-          setLockedWidth(Math.ceil(spanRef.current.scrollWidth) + 1);
-        }
-      });
-    };
-
-    measure();
-
-    // Remeasure after fonts load
-    if (document.fonts?.ready) {
-      document.fonts.ready.then(measure);
-    }
-  }, [label]);
 
   const scramble = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -81,11 +58,22 @@ export function GlitchLink({ href, label, className = "", onClick }: GlitchLinkP
       className={`relative text-sm font-medium tracking-wide text-envrt-charcoal transition-colors hover:text-envrt-teal ${className}`}
     >
       <span
-        ref={spanRef}
-        className="inline-block whitespace-nowrap"
-        style={lockedWidth ? { width: lockedWidth, overflow: "visible" } : undefined}
+        data-glitch-wrap
+        className="relative inline-block whitespace-nowrap"
       >
-        {display}
+        <span
+          data-glitch-reserver
+          aria-hidden="true"
+          className="invisible"
+        >
+          {label}
+        </span>
+        <span
+          data-glitch-animated
+          className="absolute inset-0"
+        >
+          {display}
+        </span>
       </span>
     </Link>
   );

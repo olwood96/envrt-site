@@ -144,13 +144,13 @@ export function Navbar() {
                   key={link.href}
                   ref={(el) => { linkRefs.current[i] = el; }}
                   onMouseEnter={() => setHoveredIndex(i)}
-                  className="relative z-10 px-3.5 py-1.5"
+                  className="relative z-10 shrink-0 px-3.5 py-1.5"
                 >
                   <GlitchLink href={link.href} label={link.label} />
                 </div>
               ))}
 
-              <div className="flex items-center gap-2.5 ml-2">
+              <div className="flex shrink-0 items-center gap-2.5 ml-2">
                 <Button href={siteConfig.dashboardUrl} variant="secondary" size="sm" data-cta="nav-dashboard">
                   Dashboard
                 </Button>
