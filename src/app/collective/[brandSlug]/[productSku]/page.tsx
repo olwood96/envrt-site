@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
@@ -6,6 +7,25 @@ import { getFeaturedDpp } from "@/lib/collective/fetch";
 import { CollectiveDppEmbed } from "@/components/collective/CollectiveDppEmbed";
 import { CollectiveProductJsonLd } from "@/components/collective/CollectiveProductJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+
+/** Hostnames that count as "internal" — visits referred from these
+ *  should not be flagged as popup embeds. Anything else (Shopify,
+ *  Webflow, etc.) is treated as a brand-site referral and we append
+ *  ?src=embed-popup to the DPP iframe URL so the view is attributed
+ *  correctly even when the brand site doesn't load embed.js. */
+const INTERNAL_HOSTNAMES = new Set(["envrt.com", "www.envrt.com"]);
+
+function isExternalReferrer(referer: string | null): boolean {
+  if (!referer) return false;
+  try {
+    const host = new URL(referer).hostname.toLowerCase();
+    if (INTERNAL_HOSTNAMES.has(host)) return false;
+    if (host.endsWith(".envrt.com")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const revalidate = 300;
 
@@ -58,6 +78,18 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
 
   const { dpp, brand, embedUrl } = card;
   const shareUrl = `https://envrt.com/collective/${brandSlug}/${productSku}`;
+
+  // Referrer-based attribution fallback: when a brand-site visitor lands
+  // here via a click that didn't go through embed.js (script blocked, no
+  // class on the anchor, cmd-clicked into a new tab, etc.), the Referer
+  // header still points to the brand site. Tag the iframe URL with
+  // ?src=embed-popup so the view is correctly attributed even when the
+  // popup chain breaks. Internal/envrt.com referrers are left alone so
+  // they stay as the default `source = "embed"` for the iframe.
+  const referer = (await headers()).get("referer");
+  const embedIframeUrl = isExternalReferrer(referer)
+    ? `${embedUrl}${embedUrl.includes("?") ? "&" : "?"}src=embed-popup`
+    : embedUrl;
 
   return (
     <>
@@ -153,7 +185,7 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
           {/* Iframe embed */}
           <div className="mt-8">
             <CollectiveDppEmbed
-              embedUrl={embedUrl}
+              embedUrl={embedIframeUrl}
               garmentName={dpp.garment_name}
             />
           </div>
