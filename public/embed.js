@@ -28,6 +28,7 @@
   var DISMISS_DRAG_PX = 100;
   var LINK_SELECTOR = "a.envrt-dpp-link";
   var DASHBOARD_ORIGIN = "https://dpp.envrt.com";
+  var CLICK_ENDPOINT = "https://dpp.envrt.com/api/embed-click";
 
   // ---- State ----
   /** Built lazily on first open. Reused across opens. */
@@ -75,12 +76,70 @@
     if (!iframeUrl) return;
 
     e.preventDefault();
+    trackClick(href);
     open({
       iframeUrl: iframeUrl,
       fallbackUrl: link.href,
       title: link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport"
     });
   }, true);
+
+  // ---- Click tracking ----
+  // Fires a non-blocking beacon BEFORE the iframe opens so we still
+  // capture the click even when the iframe is blocked by CSP, an ad
+  // blocker, or a network failure. Lets analytics compute click → view
+  // conversion. Failures are silently ignored — analytics shouldn't
+  // break the actual UX.
+  function trackClick(href) {
+    try {
+      var u = new URL(href, window.location.href);
+      var parts = u.pathname.split("/").filter(Boolean);
+      if (parts[0] !== "collective" || parts.length < 3) return;
+      var payload = JSON.stringify({
+        brand: parts[1],
+        sku: parts[2],
+        source: "embed-popup",
+        visitorHash: getVisitorHash(),
+        referrer: document.referrer || null
+      });
+      if (typeof navigator.sendBeacon === "function") {
+        // sendBeacon with a string defaults to text/plain — CORS-safelisted,
+        // so the request fires without a preflight even cross-origin.
+        navigator.sendBeacon(CLICK_ENDPOINT, payload);
+      } else {
+        fetch(CLICK_ENDPOINT, {
+          method: "POST",
+          body: payload,
+          keepalive: true,
+          mode: "no-cors"
+        }).catch(function () {});
+      }
+    } catch (_e) {
+      // swallow — tracking failure is never user-facing
+    }
+  }
+
+  // Lightweight per-visitor hash. Non-PII, non-persistent (no cookies
+  // / localStorage). Used to coarsely correlate clicks with views.
+  function getVisitorHash() {
+    try {
+      var fp = [
+        navigator.userAgent || "",
+        navigator.language || "",
+        screen.width + "x" + screen.height,
+        new Date().getTimezoneOffset(),
+        navigator.platform || ""
+      ].join("|");
+      // Tiny non-crypto hash (djb2). Good enough for grouping a session.
+      var h = 5381;
+      for (var i = 0; i < fp.length; i++) {
+        h = ((h << 5) + h + fp.charCodeAt(i)) >>> 0;
+      }
+      return h.toString(36);
+    } catch (_e) {
+      return null;
+    }
+  }
 
   // ---- Popup construction (one-shot, reused) ----
   function ensurePopup() {
