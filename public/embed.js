@@ -29,6 +29,15 @@
   var LINK_SELECTOR = "a.envrt-dpp-link";
   var DASHBOARD_ORIGIN = "https://dpp.envrt.com";
   var CLICK_ENDPOINT = "https://dpp.envrt.com/api/embed-click";
+  var CONFIG_ENDPOINT_BASE = "https://dpp.envrt.com/api/embed-config/";
+
+  var DEFAULT_SETTINGS = {
+    drawerWidth: "40rem",
+    drawerSide: "right",
+    sheetHeight: "92svh",
+    backdropDim: "50",
+    linkText: null
+  };
 
   // ---- State ----
   /** Built lazily on first open. Reused across opens. */
@@ -37,6 +46,10 @@
   var savedScrollY = 0;
   /** Most recent mod-state so the postMessage handler can fall back correctly. */
   var pendingFallbackUrl = null;
+  /** Per-brand settings cache. Key is brand slug, value is a Promise that
+   *  resolves with the settings object. Fetched on first popup open per
+   *  brand, then reused. */
+  var settingsCache = {};
 
   // ---- URL transform ----
   /**
@@ -77,12 +90,70 @@
 
     e.preventDefault();
     trackClick(href);
+    var brand = extractBrandFromHref(href);
+    fetchSettings(brand).then(applySettings);
     open({
       iframeUrl: iframeUrl,
       fallbackUrl: link.href,
       title: link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport"
     });
   }, true);
+
+  // ---- Settings fetch + apply ----
+  function extractBrandFromHref(href) {
+    try {
+      var u = new URL(href, window.location.href);
+      var parts = u.pathname.split("/").filter(Boolean);
+      if (parts[0] !== "collective" || parts.length < 3) return null;
+      return parts[1];
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  function fetchSettings(brand) {
+    if (!brand) return Promise.resolve(DEFAULT_SETTINGS);
+    if (settingsCache[brand]) return settingsCache[brand];
+    settingsCache[brand] = fetch(CONFIG_ENDPOINT_BASE + encodeURIComponent(brand), {
+      method: "GET",
+      credentials: "omit",
+      cache: "default"
+    })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
+        return (data && data.settings) ? data.settings : DEFAULT_SETTINGS;
+      })
+      .catch(function () { return DEFAULT_SETTINGS; });
+    return settingsCache[brand];
+  }
+
+  function applySettings(s) {
+    if (!popup) return;
+    var host = popup.host;
+    var settings = s || DEFAULT_SETTINGS;
+
+    // CSS variables — read by the rules in STYLES via var(--envrt-*).
+    host.style.setProperty("--envrt-drawer-width", settings.drawerWidth || DEFAULT_SETTINGS.drawerWidth);
+    host.style.setProperty("--envrt-sheet-height", settings.sheetHeight || DEFAULT_SETTINGS.sheetHeight);
+
+    var dim = settings.backdropDim || DEFAULT_SETTINGS.backdropDim;
+    if (dim === "blur") {
+      host.style.setProperty("--envrt-backdrop-bg", "rgba(0,0,0,0.15)");
+      host.style.setProperty("--envrt-backdrop-blur", "8px");
+    } else {
+      var alpha = (parseInt(dim, 10) || 50) / 100;
+      host.style.setProperty("--envrt-backdrop-bg", "rgba(0,0,0," + alpha + ")");
+      host.style.setProperty("--envrt-backdrop-blur", "2px");
+    }
+
+    // Drawer side toggles a class so CSS picks the correct base transform
+    // and anchor edge for the slide-in animation.
+    if (settings.drawerSide === "left") {
+      host.classList.add("drawer-left");
+    } else {
+      host.classList.remove("drawer-left");
+    }
+  }
 
   // ---- Click tracking ----
   // Fires a non-blocking beacon BEFORE the iframe opens so we still
@@ -339,10 +410,21 @@
   var STYLES = [
     // Host positioning + z-index are set inline in JS so they win against the
     // `all: initial` reset. Only child-targeting rules live here.
+    //
+    // CSS variables drive the per-brand customisation (applied via JS in
+    // applySettings). Defaults below match DEFAULT_SETTINGS so the popup
+    // renders sensibly during the brief window before settings arrive.
+    ":host {",
+    "  --envrt-drawer-width: 40rem;",
+    "  --envrt-sheet-height: 92svh;",
+    "  --envrt-backdrop-bg: rgba(0,0,0,0.5);",
+    "  --envrt-backdrop-blur: 2px;",
+    "}",
 
     ".overlay {",
-    "  position: fixed; inset: 0; background: rgba(0,0,0,0.5);",
-    "  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);",
+    "  position: fixed; inset: 0; background: var(--envrt-backdrop-bg);",
+    "  backdrop-filter: blur(var(--envrt-backdrop-blur));",
+    "  -webkit-backdrop-filter: blur(var(--envrt-backdrop-blur));",
     "  opacity: 0; transition: opacity 300ms; pointer-events: auto;",
     "}",
     ":host(.visible) .overlay { opacity: 1; }",
@@ -363,8 +445,8 @@
 
     ".sheet {",
     "  position: fixed; left: 0; right: 0; bottom: 0;",
-    "  height: 92svh; height: 92vh;",
-    "  max-height: 92svh; max-height: 92vh;",
+    "  height: var(--envrt-sheet-height); height: 92vh;",
+    "  max-height: var(--envrt-sheet-height); max-height: 92vh;",
     "  background: #ffffff; overflow: hidden;",
     "  border-top-left-radius: 16px; border-top-right-radius: 16px;",
     "  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);",
@@ -376,14 +458,22 @@
     ":host(.visible) .sheet { transform: translateY(0); }",
 
     "@media (min-width: 640px) {",
+    "  /* Default: right-anchored drawer. */",
     "  .sheet {",
-    "    left: auto; bottom: 0; top: 0;",
-    "    width: 100%; max-width: 42rem;",
+    "    left: auto; right: 0; bottom: 0; top: 0;",
+    "    width: 100%; max-width: var(--envrt-drawer-width);",
     "    height: auto; max-height: none;",
     "    border-radius: 0;",
     "    transform: translateX(100%);",
     "  }",
     "  :host(.visible) .sheet { transform: translateX(0); }",
+    "",
+    "  /* Left-anchored drawer (drawerSide === 'left' setting). */",
+    "  :host(.drawer-left) .sheet {",
+    "    left: 0; right: auto;",
+    "    transform: translateX(-100%);",
+    "  }",
+    "  :host(.drawer-left.visible) .sheet { transform: translateX(0); }",
     "}",
 
     ".drag-strip {",
