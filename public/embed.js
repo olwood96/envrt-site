@@ -99,6 +99,39 @@
     });
   }, true);
 
+  // ---- Public API (used by trusted callers, e.g. the dashboard preview) ----
+  // Lets the brand-dashboard's "Test popout" button open the popup with the
+  // current in-form settings, bypassing the fetch+cache so unsaved tweaks
+  // are reflected. Tracking is skipped so internal previews don't pollute
+  // analytics. View tracking on the iframe page is also automatically
+  // suppressed by DppViewBeacon's referrer check (dpp.envrt.com).
+  function buildTestIframeUrl(brand, sku) {
+    if (!brand || !sku) return null;
+    return DASHBOARD_ORIGIN + "/embed/" + encodeURIComponent(brand) + "/" + encodeURIComponent(sku);
+  }
+
+  function openTest(opts) {
+    opts = opts || {};
+    var iframeUrl = buildTestIframeUrl(opts.brand, opts.sku);
+    if (!iframeUrl) return false;
+    ensurePopup();
+    applySettings(opts.settings || DEFAULT_SETTINGS);
+    open({
+      iframeUrl: iframeUrl,
+      fallbackUrl: "https://envrt.com/collective/" +
+        encodeURIComponent(opts.brand) + "/" + encodeURIComponent(opts.sku),
+      title: opts.title || "Digital Product Passport"
+    });
+    return true;
+  }
+
+  window.envrtEmbed = {
+    openTest: openTest,
+    close: function () { close(); },
+    // Exposed for unit tests; not part of the supported API surface.
+    _buildIframeUrl: buildIframeUrl
+  };
+
   // ---- Settings fetch + apply ----
   function extractBrandFromHref(href) {
     try {
