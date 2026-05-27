@@ -12,6 +12,8 @@ interface DppCarouselCardProps {
   totalWater: number | null;
   totalEmissionsReductionPct: number | null;
   totalWaterReductionPct: number | null;
+  /** Mirror the live DPP's granularity: hide reduction badges when the brand's snapshot only permits raw totals. */
+  showReductions: boolean;
 }
 
 /**
@@ -30,6 +32,7 @@ export function DppCarouselCard({
   totalWater,
   totalEmissionsReductionPct,
   totalWaterReductionPct,
+  showReductions,
 }: DppCarouselCardProps) {
   // Trigger wobble on mount (each slide)
   const [wobble, setWobble] = useState(false);
@@ -167,7 +170,7 @@ export function DppCarouselCard({
             <span style={{ fontSize: 5, fontWeight: 500, color: "#9CA3AF" }}>
               kg CO₂-eq
             </span>
-            {totalEmissionsReductionPct != null && totalEmissionsReductionPct !== 0 && (
+            {showReductions && totalEmissionsReductionPct != null && totalEmissionsReductionPct !== 0 && (
               <span
                 style={{
                   display: "inline-block",
@@ -209,7 +212,7 @@ export function DppCarouselCard({
             <span style={{ fontSize: 5, fontWeight: 500, color: "#9CA3AF" }}>
               L AWARE
             </span>
-            {totalWaterReductionPct != null && totalWaterReductionPct !== 0 && (
+            {showReductions && totalWaterReductionPct != null && totalWaterReductionPct !== 0 && (
               <span
                 style={{
                   display: "inline-block",
