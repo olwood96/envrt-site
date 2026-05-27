@@ -419,6 +419,39 @@ export const freeDppFaqItems = [
 /** @deprecated Use freeDppFaqItems */
 export const assessmentFaqItems = freeDppFaqItems;
 
+export const readinessAssessmentFaqItems = [
+  {
+    question: "What is the ENVRT DPP Readiness Assessment?",
+    answer:
+      "A free 10-minute structured assessment that scores your brand across four dimensions of Digital Product Passport readiness: supply chain transparency, product data completeness, regulatory awareness and data infrastructure. It produces a personalised report covering your overall readiness, dimension-specific scores, timeline risk and recommended next steps.",
+  },
+  {
+    question: "Who should take the DPP Readiness Assessment?",
+    answer:
+      "Any apparel, footwear or textile brand selling into the EU, UK or US that needs to understand its exposure to the ESPR, UK DMCCA sustainability provisions or the EU Green Claims Directive. The assessment is calibrated for SME and mid-market fashion brands but works for any brand size.",
+  },
+  {
+    question: "How long does the assessment take to complete?",
+    answer:
+      "Around 10 minutes for 25 questions across five sections. Results are generated immediately and a full report is emailed within minutes.",
+  },
+  {
+    question: "Is the DPP Readiness Assessment free?",
+    answer:
+      "Yes. The assessment is free and does not require an account. An email address is required so the personalised report can be sent.",
+  },
+  {
+    question: "How is the readiness score calculated?",
+    answer:
+      "Each answer carries a weighted score across four dimensions. Supply chain transparency and product data completeness each weight 30 per cent of the overall score. Regulatory awareness and data infrastructure each weight 20 per cent. The overall score is mapped to one of five bands from Critical Exposure to Advanced.",
+  },
+  {
+    question: "What do I receive after completing the assessment?",
+    answer:
+      "An on-screen results page with your overall score, dimension scores, timeline risk note and prioritised recommended actions, plus a full HTML report by email. The report includes a green claims risk flag if your brand markets sustainability claims without verified product-level data.",
+  },
+];
+
 export const teamMembers = [
   {
     name: "Charles Woolwich",

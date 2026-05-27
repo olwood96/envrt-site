@@ -5,7 +5,7 @@ import {
   faqItems,
   pricingFaqItems,
   roiFaqItems,
-  assessmentFaqItems,
+  readinessAssessmentFaqItems,
 } from "@/lib/config";
 
 function getJsonLd(container: HTMLElement) {
@@ -29,7 +29,7 @@ describe("FAQJsonLd", () => {
     const { container } = render(<FAQJsonLd items={pricingFaqItems} />);
     const jsonLd = getJsonLd(container);
 
-    expect(jsonLd.mainEntity).toHaveLength(5);
+    expect(jsonLd.mainEntity).toHaveLength(pricingFaqItems.length);
     expect(jsonLd.mainEntity[0].name).toContain("Digital Product Passport cost");
     expect(jsonLd.mainEntity[0].acceptedAnswer.text).toContain("£149");
   });
@@ -42,12 +42,15 @@ describe("FAQJsonLd", () => {
     expect(jsonLd.mainEntity[0].name).toContain("DPP compliance cost");
   });
 
-  it("renders correct assessment FAQ items", () => {
-    const { container } = render(<FAQJsonLd items={assessmentFaqItems} />);
+  it("renders correct readiness assessment FAQ items", () => {
+    const { container } = render(
+      <FAQJsonLd items={readinessAssessmentFaqItems} />
+    );
     const jsonLd = getJsonLd(container);
 
-    expect(jsonLd.mainEntity).toHaveLength(5);
-    expect(jsonLd.mainEntity[0].name).toContain("assessment take");
+    expect(jsonLd.mainEntity).toHaveLength(readinessAssessmentFaqItems.length);
+    expect(jsonLd.mainEntity[0].name).toMatch(/DPP Readiness Assessment/i);
+    expect(jsonLd.mainEntity.some((q: { name: string }) => /how long/i.test(q.name))).toBe(true);
   });
 
   it("maps each FAQ item to a Question with an Answer", () => {
