@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ImpactStats } from "@/lib/impact-stats";
+import { REFERENCES_PER_LCA } from "@/lib/impact-stats";
 import { useIntersectionOnce } from "@/hooks/useIntersectionOnce";
 import { Container } from "../ui/Container";
 import { FadeUp } from "../ui/Motion";
@@ -23,21 +24,18 @@ function OdometerDigit({
   started: boolean;
   delay: number;
 }) {
-  // The column shows 0-9 stacked vertically. We translate to show the target digit.
-  // translateY(-digit * 10%) scrolls to the right position.
   const targetY = started ? `-${digit * 10}%` : "0%";
 
   return (
     <span
       className="odometer-slot relative mx-[1px] inline-flex h-[1.4em] w-[0.7em] overflow-hidden rounded bg-envrt-charcoal/[0.04]"
     >
-      {/* Centre divider line */}
       <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-px bg-envrt-charcoal/[0.06]" />
 
       <span
         className="odometer-strip flex flex-col items-center"
         style={{
-          height: "1000%", // 10 digits × 100% each
+          height: "1000%",
           transform: `translateY(${targetY})`,
           transitionProperty: "transform",
           transitionDuration: started ? "1.6s" : "0s",
@@ -60,7 +58,15 @@ function OdometerDigit({
 
 /* ── Separator (comma / period) ── */
 
-function OdometerSeparator({ char, started, delay }: { char: string; started: boolean; delay: number }) {
+function OdometerSeparator({
+  char,
+  started,
+  delay,
+}: {
+  char: string;
+  started: boolean;
+  delay: number;
+}) {
   return (
     <span
       className="mx-[1px] inline-flex items-center text-envrt-charcoal/30"
@@ -80,7 +86,6 @@ function OdometerNumber({ value, started }: { value: number; started: boolean })
   const formatted = value.toLocaleString("en-GB");
   const chars = formatted.split("");
 
-  // Count total digit positions for stagger calculation (right-to-left)
   const digitCount = chars.filter((c) => /\d/.test(c)).length;
   let digitIndex = 0;
 
@@ -89,7 +94,6 @@ function OdometerNumber({ value, started }: { value: number; started: boolean })
       {chars.map((char, i) => {
         if (/\d/.test(char)) {
           const posFromRight = digitCount - 1 - digitIndex;
-          // Stagger: rightmost digit has shortest delay, leftmost has longest
           const delay = posFromRight * 0.08;
           digitIndex++;
           return (
@@ -101,48 +105,52 @@ function OdometerNumber({ value, started }: { value: number; started: boolean })
             />
           );
         }
-        // Separator — fades in with the delay of the digit to its left
         const delay = (digitCount - digitIndex) * 0.08;
         return (
-          <OdometerSeparator key={`s-${i}`} char={char} started={started} delay={delay} />
+          <OdometerSeparator
+            key={`s-${i}`}
+            char={char}
+            started={started}
+            delay={delay}
+          />
         );
       })}
     </span>
   );
 }
 
-/* ── Stat column ── */
+/* ── StatBlock — one stat in the strip ── */
 
-function StatColumn({
-  value,
-  unit,
+function StatBlock({
+  liveValue,
+  staticValue,
   label,
   started,
-  showDivider,
 }: {
-  value: number;
-  unit: string;
+  liveValue?: number;
+  staticValue?: string;
   label: string;
   started: boolean;
-  showDivider?: boolean;
 }) {
   return (
-    <>
-      <div className="flex flex-col items-center text-center py-2 sm:py-0">
-        <div className="flex items-baseline gap-1.5">
-          <OdometerNumber value={value} started={started} />
-          <span className="text-sm font-medium text-envrt-muted sm:text-base">
-            {unit}
-          </span>
-        </div>
-        <span className="mt-1.5 text-xs font-medium uppercase tracking-wider text-envrt-muted/70">
-          {label}
+    <div
+      data-stat-block
+      className="flex flex-col items-center text-center px-4 py-6 sm:px-6 sm:py-0"
+    >
+      {liveValue !== undefined ? (
+        <OdometerNumber value={liveValue} started={started} />
+      ) : (
+        <span className="inline-flex items-center text-3xl font-bold tabular-nums text-envrt-charcoal sm:text-4xl lg:text-5xl">
+          {staticValue}
         </span>
-      </div>
-      {showDivider && (
-        <hr className="mx-auto w-12 border-envrt-charcoal/[0.06] sm:hidden" />
       )}
-    </>
+      <span
+        data-stat-label
+        className="mt-3 max-w-[220px] text-xs font-medium uppercase tracking-widest text-envrt-muted"
+      >
+        {label}
+      </span>
+    </div>
   );
 }
 
@@ -156,11 +164,8 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const visible = useIntersectionOnce(sectionRef);
 
-  const [co2, setCo2] = useState(initialStats.co2Kg);
-  const [water, setWater] = useState(initialStats.waterLitres);
   const [scans, setScans] = useState(initialStats.dppScans);
 
-  // Poll for updated stats with backoff on consecutive failures
   useEffect(() => {
     let errorCount = 0;
     const poll = async () => {
@@ -168,10 +173,8 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
         const res = await fetch("/api/impact-stats");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: ImpactStats = await res.json();
-        setCo2(data.co2Kg);
-        setWater(data.waterLitres);
         setScans(data.dppScans);
-        errorCount = 0; // reset on success
+        errorCount = 0;
       } catch {
         errorCount++;
         if (errorCount >= IMPACT_MAX_CONSECUTIVE_ERRORS) {
@@ -184,49 +187,42 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
     return () => clearInterval(interval);
   }, []);
 
-  if (initialStats.co2Kg === 0 && initialStats.waterLitres === 0 && initialStats.dppScans === 0) {
-    return null;
-  }
+  const dataPointsServed = scans * REFERENCES_PER_LCA;
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16">
+    <section
+      ref={sectionRef}
+      aria-labelledby="impact-stats-heading"
+      className="py-12 sm:py-16"
+    >
       <Container>
         <FadeUp>
-          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-envrt-muted/70">
+          <h2
+            id="impact-stats-heading"
+            className="text-center text-xs font-medium uppercase tracking-[0.2em] text-envrt-muted/70"
+          >
             Platform impact
-          </p>
+          </h2>
 
-          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
-            <StatColumn
-              value={co2}
-              unit="kg"
-              label="CO₂e impact explored"
-              started={visible}
-              showDivider
-            />
-            <StatColumn
-              value={water}
-              unit="L"
-              label="Water impact explored"
-              started={visible}
-              showDivider
-            />
-            <StatColumn
-              value={scans}
-              unit=""
-              label="DPP scans worldwide"
+          <div
+            data-impact-stats
+            className="mt-10 grid grid-cols-1 divide-y divide-envrt-charcoal/[0.08] sm:mt-12 sm:grid-cols-3 sm:divide-y-0 sm:divide-x sm:divide-envrt-charcoal/[0.08]"
+          >
+            <StatBlock
+              liveValue={dataPointsServed}
+              label="Data points served via our DPPs"
               started={visible}
             />
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="pointer-events-none absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-envrt-teal" />
-            </span>
-            <span className="text-xs text-envrt-muted/70">
-              Live platform data
-            </span>
+            <StatBlock
+              staticValue="75+"
+              label="Network of apparel brands and partners"
+              started={visible}
+            />
+            <StatBlock
+              staticValue="27"
+              label="EU markets aligned with our methodology"
+              started={visible}
+            />
           </div>
         </FadeUp>
       </Container>

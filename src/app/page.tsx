@@ -4,7 +4,6 @@ import { WhyNowSection } from "@/components/sections/WhyNowSection";
 import { SupplyChainFlowSection } from "@/components/sections/SupplyChainFlowSection";
 import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { ComparisonSection } from "@/components/sections/ComparisonSection";
-import { TrustedBySection } from "@/components/sections/TrustedBySection";
 import { ImpactStatsSection } from "@/components/sections/ImpactStatsSection";
 import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
 import { PricingPreviewSection } from "@/components/sections/PricingPreviewSection";
@@ -40,7 +39,6 @@ export default async function HomePage() {
       <SupplyChainFlowSection />
       <OutcomesSection />
       <ComparisonSection />
-      <TrustedBySection />
       <ImpactStatsSection stats={impactStats} />
       <AlignedWithCarousel />
       <PricingPreviewSection />
