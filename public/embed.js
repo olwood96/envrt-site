@@ -35,8 +35,7 @@
     drawerWidth: "40rem",
     drawerSide: "right",
     sheetHeight: "92svh",
-    backdropDim: "50",
-    linkText: null
+    backdropDim: "50"
   };
 
   // ---- State ----
