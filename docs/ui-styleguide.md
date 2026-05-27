@@ -208,13 +208,21 @@ All custom keyframe animations are disabled under `prefers-reduced-motion: reduc
 
 ## Spacing
 
-### Section-level
+### Section-level vertical padding
 
-| Pattern | Usage |
-|---------|-------|
-| `py-16 sm:py-24` | Standard section padding |
-| `py-20 sm:py-28` | Emphasized section padding |
-| `px-4 sm:px-6` | Responsive horizontal padding |
+Sections fall into one of three tiers based on visual weight and purpose. Match the tier to keep rhythm across the page.
+
+| Tier | Pattern | Use case | Examples |
+|------|---------|----------|----------|
+| Compact | `py-12 sm:py-16` | Trust bands, logo carousels, data tickers, overline-led sections | `TrustedBy`, `ImpactStatsSection`, `AlignedWithCarousel` |
+| Standard | `py-16 sm:py-24` | Content sections with cards, copy, accordions | `WhyNow`, `Outcomes`, `Comparison`, `FAQ`, `PricingPreview` |
+| Emphasized | `py-16 sm:py-20 lg:py-28` | High-priority sections (final CTA, conclusion blocks) | `FinalCTA` |
+
+`HeroSection` uses a one-off pattern (`pt-28 pb-16 sm:pt-32`) due to navbar offset. Do not copy that elsewhere.
+
+### Section-level horizontal padding
+
+Wrap section content in the `<Container>` component (`src/components/ui/Container.tsx`). It already applies `mx-auto w-full max-w-[1280px] px-5 sm:px-8`. Do not re-implement responsive horizontal padding at the section level.
 
 ### Component-level
 
@@ -224,6 +232,54 @@ All custom keyframe animations are disabled under `prefers-reduced-motion: reduc
 | Standard | `p-3`, `gap-2` | Most component internals |
 | Comfortable | `p-6`, `gap-4` | Card content, form groups |
 | Spacious | `p-8`+, `gap-6` | Feature sections, large cards |
+
+---
+
+## Responsive Patterns
+
+### Paragraph text per tier
+
+Paragraphs scale up once at the `sm:` breakpoint (640px). Match the section tier.
+
+| Tier | Mobile | Desktop |
+|------|--------|---------|
+| Compact | `text-sm` | `sm:text-base` |
+| Standard | `text-base` | `sm:text-lg` |
+| Emphasized | `text-base` | `sm:text-lg` |
+
+Avoid three-breakpoint scales (`text-sm sm:text-base md:text-lg`) unless the layout genuinely warrants it.
+
+### Section headings per tier
+
+| Tier | Pattern |
+|------|---------|
+| Compact | Small caps overline `text-[11px] font-medium uppercase tracking-[0.2em] text-envrt-muted/70`, rendered as `<h2>` for semantic hierarchy |
+| Standard | `text-3xl sm:text-4xl font-bold tracking-tight text-envrt-charcoal` |
+| Emphasized | `text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight` |
+
+Always preserve the heading hierarchy: a compact section's small caps label is still an `<h2>`, not a `<p>`.
+
+### Grid breakpoint patterns
+
+Mobile-first cascade. Primary breakpoints are `sm:` (640px), `md:` (768px), `lg:` (1024px).
+
+| Layout | Pattern |
+|--------|---------|
+| 4-up content cards | `grid gap-5 sm:grid-cols-2 lg:grid-cols-4` |
+| 3-up metric grid | `grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8` |
+| 6-up trust band (2/3/6 cascade) | `grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-8 md:gap-x-10 md:gap-y-12 lg:gap-x-6` |
+| 2-col side-by-side | `grid gap-12 lg:gap-16` |
+
+### Animation wrapper
+
+Wrap section content in `<FadeUp>` from `src/components/ui/Motion.tsx` for scroll-triggered entrance. For multi-item grids that should cascade, use `<StaggerChildren>` with `<StaggerItem>` children. Never use raw `motion.div` directly — always go through the `Motion` exports.
+
+### Image / cell heights in trust bands
+
+| Pattern | Use case |
+|---------|----------|
+| `h-10 w-28 sm:h-12 sm:w-32` | TrustedBy logo container (fixed-width logo strip) |
+| `h-12 sm:h-16` | AlignedWithCarousel logo/text-box cell (responsive content width) |
 
 ---
 

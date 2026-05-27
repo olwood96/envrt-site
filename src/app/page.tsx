@@ -6,10 +6,12 @@ import { OutcomesSection } from "@/components/sections/OutcomesSection";
 import { ComparisonSection } from "@/components/sections/ComparisonSection";
 import { TrustedBySection } from "@/components/sections/TrustedBySection";
 import { ImpactStatsSection } from "@/components/sections/ImpactStatsSection";
+import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
 import { PricingPreviewSection } from "@/components/sections/PricingPreviewSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { AlignedWithJsonLd } from "@/components/seo/AlignedWithJsonLd";
 import { StickyNudge } from "@/components/ui/StickyNudge";
 import { faqItems } from "@/lib/config";
 import { fetchImpactStats } from "@/lib/impact-stats";
@@ -32,6 +34,7 @@ export default async function HomePage() {
   return (
     <>
       <FAQJsonLd items={faqItems} />
+      <AlignedWithJsonLd />
       <HeroSection />
       <WhyNowSection />
       <SupplyChainFlowSection />
@@ -39,6 +42,7 @@ export default async function HomePage() {
       <ComparisonSection />
       <TrustedBySection />
       <ImpactStatsSection stats={impactStats} />
+      <AlignedWithCarousel />
       <PricingPreviewSection />
       <FAQSection />
       <FinalCTASection featuredCards={featuredCards} />

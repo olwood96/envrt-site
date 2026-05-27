@@ -40,4 +40,20 @@ describe("OrganizationJsonLd", () => {
     expect(jsonLd.founders[0].name).toBe("Charles Woolwich");
     expect(jsonLd.founders[1].name).toBe("Oliver Woodcock");
   });
+
+  it("includes knowsAbout referencing the aligned-with standards and bodies", () => {
+    const { container } = render(<OrganizationJsonLd />);
+    const jsonLd = getJsonLd(container);
+
+    expect(Array.isArray(jsonLd.knowsAbout)).toBe(true);
+    expect(jsonLd.knowsAbout.length).toBe(12);
+    const names = jsonLd.knowsAbout.map(
+      (k: { name: string }) => k.name,
+    );
+    expect(names).toContain("ISO 14040 Life Cycle Assessment Principles");
+    expect(names).toContain(
+      "European Union Product Environmental Footprint",
+    );
+    expect(names).toContain("AWARE Water Scarcity Model");
+  });
 });

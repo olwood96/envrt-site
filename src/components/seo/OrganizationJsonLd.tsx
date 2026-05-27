@@ -1,3 +1,5 @@
+import { ALIGNED_WITH_ALL } from "@/lib/aligned-with";
+
 export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -31,6 +33,11 @@ export function OrganizationJsonLd() {
         jobTitle: "Founder & CTO",
       },
     ],
+    knowsAbout: ALIGNED_WITH_ALL.map((item) => ({
+      "@type": item.schemaType,
+      name: item.fullName,
+      url: item.url,
+    })),
   };
 
   return (
