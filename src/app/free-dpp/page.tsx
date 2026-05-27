@@ -353,7 +353,7 @@ export default function FreeDppPage() {
                       min={10}
                       max={5000}
                     />
-                    <p className="mt-1.5 text-[11px] text-envrt-muted/70">
+                    <p className="mt-1.5 text-xs text-envrt-muted/70">
                       A t-shirt is ~150g, jeans ~800g, a coat ~1200g
                     </p>
                   </div>
@@ -565,7 +565,7 @@ export default function FreeDppPage() {
                       value={form.product_url}
                       onChange={(e) => update("product_url", e.target.value)}
                     />
-                    <p className="mt-1.5 text-[11px] text-envrt-muted/70">
+                    <p className="mt-1.5 text-xs text-envrt-muted/70">
                       Helps us verify details and add your product image to the DPP
                     </p>
                   </div>

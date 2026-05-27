@@ -192,7 +192,7 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
     <section ref={sectionRef} className="py-12 sm:py-16">
       <Container>
         <FadeUp>
-          <p className="text-center text-[11px] font-medium uppercase tracking-[0.2em] text-envrt-muted/70">
+          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-envrt-muted/70">
             Platform impact
           </p>
 
@@ -224,7 +224,7 @@ export function ImpactStatsSection({ stats: initialStats }: Props) {
               <span className="pointer-events-none absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-40" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-envrt-teal" />
             </span>
-            <span className="text-[11px] text-envrt-muted/70">
+            <span className="text-xs text-envrt-muted/70">
               Live platform data
             </span>
           </div>

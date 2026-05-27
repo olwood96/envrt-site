@@ -14,7 +14,7 @@ export function AlignedWithCarousel() {
           <h2
             data-aligned-heading
             id="aligned-with-heading"
-            className="text-center text-[11px] font-medium uppercase tracking-[0.2em] text-envrt-muted/70"
+            className="text-center text-xs font-medium uppercase tracking-[0.2em] text-envrt-muted/70"
           >
             Aligned with
           </h2>
@@ -41,12 +41,13 @@ export function AlignedWithCarousel() {
                     alt={logo.alt}
                     width={180}
                     height={72}
+                    sizes="(min-width: 1024px) 16vw, (min-width: 768px) 33vw, 50vw"
                     className="max-h-full w-auto object-contain"
                   />
                 </div>
                 <span
                   data-aligned-label
-                  className="mt-4 text-[11px] font-medium uppercase tracking-widest text-envrt-muted"
+                  className="mt-4 text-xs font-medium uppercase tracking-widest text-envrt-muted"
                 >
                   {logo.label}
                 </span>
@@ -73,7 +74,7 @@ export function AlignedWithCarousel() {
                 </div>
                 <span
                   data-aligned-label
-                  className="mt-4 text-[11px] font-medium uppercase tracking-widest text-envrt-muted"
+                  className="mt-4 text-xs font-medium uppercase tracking-widest text-envrt-muted"
                 >
                   {standard.label}
                 </span>

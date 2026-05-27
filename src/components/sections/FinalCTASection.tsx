@@ -10,6 +10,7 @@ import { LaptopFrame } from "../ui/LaptopFrame";
 import { DppWorldMap, type ActiveCountry } from "./DppWorldMap";
 import { DppCarouselCard } from "./DppCarouselCard";
 import type { CollectiveCardData } from "@/lib/collective/types";
+import { showReductionFor } from "@/lib/collective/utils";
 
 function countryFlag(code: string): string {
   if (!code || code.length !== 2) return "\u{1F30D}";
@@ -135,7 +136,7 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
                   </span>
-                  <p className="text-[11px] font-medium tracking-wide text-envrt-muted sm:text-xs">
+                  <p className="text-xs font-medium tracking-wide text-envrt-muted sm:text-xs">
                     {caption}
                   </p>
                 </div>
@@ -243,6 +244,7 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                           totalWater={currentCard.dpp.total_water}
                           totalEmissionsReductionPct={currentCard.dpp.total_emissions_reduction_pct}
                           totalWaterReductionPct={currentCard.dpp.total_water_reduction_pct}
+                          showReductions={showReductionFor(currentCard.dpp)}
                         />
                       </motion.div>
                     </AnimatePresence>

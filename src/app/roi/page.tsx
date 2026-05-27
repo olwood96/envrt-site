@@ -644,7 +644,7 @@ export default function ROICalculatorPage() {
                         </>
                       )}
                     </Button>
-                    <p className="text-center text-[11px] leading-relaxed text-envrt-muted/70">
+                    <p className="text-center text-xs leading-relaxed text-envrt-muted/70">
                       Your results will be emailed to you. See our{" "}
                       <Link
                         href="/privacy"

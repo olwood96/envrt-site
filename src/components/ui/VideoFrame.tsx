@@ -16,7 +16,7 @@ export function VideoFrame({ src, label, className = "" }: VideoFrameProps) {
       {label && (
         <div className="mb-3 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-envrt-teal" />
-          <span className="text-[11px] font-medium tracking-[0.15em] text-envrt-muted uppercase">
+          <span className="text-xs font-medium tracking-[0.15em] text-envrt-muted uppercase">
             {label}
           </span>
         </div>

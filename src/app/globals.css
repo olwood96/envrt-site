@@ -76,6 +76,11 @@ body {
   background-color: var(--envrt-offwhite);
   color: var(--envrt-charcoal);
   min-height: 100vh;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
 }
 
 /* Scene card backgrounds */

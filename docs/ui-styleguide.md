@@ -44,21 +44,30 @@ All colors use CSS custom properties defined in `tailwind.config.ts`. Never use 
 
 | Class | Size | Usage |
 |-------|------|-------|
-| `text-4xl sm:text-5xl` | 36/48px | Page titles (h1) |
+| `text-4xl sm:text-5xl lg:text-[3.5rem]` | 36/48/56px | Page titles (h1) |
 | `text-3xl sm:text-4xl` | 30/36px | Section headings (h2) |
 | `text-2xl sm:text-3xl` | 24/30px | Sub-section headings (h3) |
 | `text-xl` | 20px | Card titles (large) |
 | `text-lg` | 18px | Card titles (standard), emphasis text |
 | `text-base` | 16px | Body paragraphs |
 | `text-sm` | 14px | Secondary body, descriptions, card content |
-| `text-xs` | 12px | Meta text, captions, labels |
-| `text-[11px]` | 11px | Metric badges, data-dense labels |
-| `text-[10px]` | 10px | Tags, pills, fine captions (minimum size) |
+| `text-xs` | 12px | Meta text, captions, labels (minimum size for content text) |
 
 **Rules:**
-- Minimum text size: `text-[10px]` (10px). Never use `text-[9px]` or smaller.
-- Exception: phone/device mockup UI (`text-[8px]`) — document as intentional.
-- Prefer Tailwind scale (`text-xs`, `text-sm`) over custom pixel values where possible.
+- **Minimum body/label text size: `text-xs` (12px)**. Never use arbitrary px values like `text-[11px]` or smaller. The single exception is hardware/device mockup UI (`text-[8px]`) which must be documented as intentional.
+- Always use Tailwind scale (`text-xs`, `text-sm`, etc.) instead of arbitrary `text-[Npx]` values.
+- For tight visual rhythm, prefer 1-step gaps in the scale (e.g. `text-base sm:text-lg`).
+
+### Line height
+
+Set globally in `globals.css`:
+
+| Element | Line-height |
+|---------|-------------|
+| `body` | `1.6` (relaxed for readability) |
+| `h1, h2, h3, h4, h5, h6` | `1.3` (tighter for display) |
+
+Override per-element only when the design genuinely needs it (e.g. very large hero text may need `leading-[1.15]`). Use Tailwind's `leading-relaxed` (1.625) or `leading-tight` (1.25) for utility-side overrides.
 
 ### Font Weights
 
@@ -280,6 +289,39 @@ Wrap section content in `<FadeUp>` from `src/components/ui/Motion.tsx` for scrol
 |---------|----------|
 | `h-10 w-28 sm:h-12 sm:w-32` | TrustedBy logo container (fixed-width logo strip) |
 | `h-12 sm:h-16` | AlignedWithCarousel logo/text-box cell (responsive content width) |
+
+---
+
+## Images
+
+Always use `next/image`. Never use raw `<img>` tags.
+
+### Required attributes
+
+| Attribute | Rule |
+|-----------|------|
+| `src` | Path under `/public` or absolute URL |
+| `alt` | Descriptive, never empty unless image is purely decorative |
+| `width` and `height` | Set explicitly to prevent layout shift |
+| `sizes` | **Required** for responsive grids and content images. Must match the rendered display size at each breakpoint |
+| `priority` | Set only for above-the-fold images |
+
+### Sizes patterns
+
+| Layout | Pattern |
+|--------|---------|
+| 6-up trust band (2/3/6 cascade) | `sizes="(min-width: 1024px) 16vw, (min-width: 768px) 33vw, 50vw"` |
+| 3-up content cards | `sizes="(min-width: 768px) 33vw, 100vw"` |
+| Full-width hero image | `sizes="100vw"` |
+| Above-the-fold square avatar | `sizes="120px"` (fixed size) |
+
+Skipping `sizes` causes Next.js to download a 3840px-wide image regardless of display size. Affects LCP and mobile data use.
+
+### Alt text
+
+- **Decorative images**: `alt=""` is acceptable
+- **Content images**: include the methodology or context (e.g. "EU emblem indicating alignment with EU PEF methodology")
+- **Logo images in trust bands**: name the organisation and what it represents
 
 ---
 

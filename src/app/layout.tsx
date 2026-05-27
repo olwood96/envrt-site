@@ -67,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth" style={{ overflowX: "clip" }}>
+    <html lang="en" className="scroll-smooth">
       <head>
         {/* ── Google Analytics (GA4) ── */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-NN09SER129" />
@@ -107,7 +107,7 @@ export default function RootLayout({
           as="document"
         />
       </head>
-      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased" style={{ overflowX: "clip" }}>
+      <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <Navbar />

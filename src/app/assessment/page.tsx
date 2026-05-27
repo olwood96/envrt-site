@@ -815,7 +815,7 @@ function ProgressBar({
       </div>
       {/* Floating pill indicator */}
       <div className="pointer-events-none flex justify-end px-5 sm:px-8">
-        <span className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium tracking-wide text-envrt-muted shadow-sm ring-1 ring-envrt-charcoal/[0.06] backdrop-blur-md">
+        <span className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium tracking-wide text-envrt-muted shadow-sm ring-1 ring-envrt-charcoal/[0.06] backdrop-blur-md">
           {currentSection + 1}
           <span className="text-envrt-charcoal/20">/</span>
           5
@@ -1305,7 +1305,7 @@ export default function AssessmentPage() {
                   <Button type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
                     {emailSending ? "Sending your report..." : <>View My Report <span className="ml-2">&rarr;</span></>}
                   </Button>
-                  <p className="text-center text-[11px] leading-relaxed text-envrt-muted/70">
+                  <p className="text-center text-xs leading-relaxed text-envrt-muted/70">
                     Your results will be emailed to you. See our{" "}
                     <Link href="/privacy" className="underline hover:text-envrt-teal">
                       privacy policy

@@ -230,7 +230,7 @@ export function CollectiveCard({
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {dpp.total_emissions != null && (
               <div className="flex flex-col">
-                <span className="inline-flex items-center rounded-full bg-envrt-green/5 px-2.5 py-1 text-[11px] font-medium text-envrt-green">
+                <span className="inline-flex items-center rounded-full bg-envrt-green/5 px-2.5 py-1 text-xs font-medium text-envrt-green">
                   {dpp.total_emissions.toFixed(1)} kg CO₂e
                 </span>
                 {showReductionFor(dpp) && dpp.total_emissions_reduction_pct != null && dpp.total_emissions_reduction_pct > 0 && (
@@ -242,7 +242,7 @@ export function CollectiveCard({
             )}
             {dpp.total_water != null && (
               <div className="flex flex-col">
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700">
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
                   {dpp.total_water.toFixed(1)} L H₂O
                 </span>
                 {showReductionFor(dpp) && dpp.total_water_reduction_pct != null && dpp.total_water_reduction_pct > 0 && (
@@ -253,7 +253,7 @@ export function CollectiveCard({
               </div>
             )}
             {dpp.transparency_score != null && (
-              <span className="inline-flex items-center rounded-full bg-envrt-teal/5 px-2.5 py-1 text-[11px] font-medium text-envrt-teal">
+              <span className="inline-flex items-center rounded-full bg-envrt-teal/5 px-2.5 py-1 text-xs font-medium text-envrt-teal">
                 {Math.round(dpp.transparency_score)}% transparency
               </span>
             )}
@@ -397,7 +397,7 @@ export function CollectiveCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1 rounded-full bg-envrt-green/5 px-2.5 py-1 text-[11px] font-medium text-envrt-green transition-colors hover:bg-envrt-green/10"
+                  className="inline-flex items-center gap-1 rounded-full bg-envrt-green/5 px-2.5 py-1 text-xs font-medium text-envrt-green transition-colors hover:bg-envrt-green/10"
                   data-cta="shop-product"
                 >
                   Shop this product

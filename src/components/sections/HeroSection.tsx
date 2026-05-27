@@ -194,12 +194,12 @@ export function HeroSection() {
   const qrHeight = phoneHeight * HERO_QR_HEIGHT_RATIO;
 
   return (
-    <section className="relative mx-auto max-w-[1360px] px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 lg:px-16 lg:pb-24">
+    <section className="relative mx-auto max-w-[1360px] overflow-x-clip px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 lg:px-16 lg:pb-24">
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div className="max-w-xl">
           <FadeUp><Badge>{heroContent.badge}</Badge></FadeUp>
           <FadeUp delay={0.1}>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.2] tracking-tight text-envrt-charcoal sm:text-4xl sm:leading-[1.8] lg:text-[3rem]">
+            <h1 className="mt-6 text-4xl font-bold leading-[1.2] tracking-tight text-envrt-charcoal sm:text-5xl sm:leading-[1.4] lg:text-[3.5rem] lg:leading-[1.15]">
               <em className="italic">Your</em> GARMENTS.<br />
               <em className="italic">Their</em> IMPACT.<br />
               <em className="italic">One</em> PLATFORM.
