@@ -56,34 +56,21 @@ export function AlignedWithCarousel() {
                 </span>
               </div>
             ))}
-
-            {ALIGNED_WITH_STANDARDS.map((standard) => (
-              <div
-                key={standard.slug}
-                data-aligned-cell
-                className="flex flex-col items-center text-center"
-              >
-                <div
-                  data-aligned-text-box
-                  className="flex h-12 w-full items-center justify-center rounded-xl border border-envrt-charcoal/[0.08] px-3 sm:h-16"
-                  aria-label={standard.fullName}
-                >
-                  <span className="text-base font-semibold tracking-tight text-envrt-charcoal/85 sm:text-lg">
-                    {standard.shortName}
-                  </span>
-                </div>
-                <span
-                  data-aligned-label
-                  className="mt-4 text-xs font-medium uppercase tracking-widest text-envrt-muted"
-                >
-                  {standard.label}
-                </span>
-                <span data-aligned-sr-description className="sr-only">
-                  {standard.description}
-                </span>
-              </div>
-            ))}
           </div>
+
+          <p
+            data-aligned-references
+            className="mx-auto mt-10 max-w-3xl text-center text-xs font-medium uppercase leading-relaxed tracking-[0.2em] text-envrt-muted/70 sm:mt-12"
+          >
+            Referencing
+            {ALIGNED_WITH_STANDARDS.map((standard) => (
+              <span key={standard.slug}>
+                <span aria-hidden="true"> · </span>
+                {standard.shortName}
+                <span className="sr-only"> ({standard.description})</span>
+              </span>
+            ))}
+          </p>
         </FadeUp>
       </Container>
     </section>

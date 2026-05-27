@@ -83,46 +83,6 @@ describe("AlignedWithCarousel", () => {
     expect(screen.getByText("UNEP LCI")).toBeInTheDocument();
   });
 
-  it("renders six text standards with their names and descriptive labels", () => {
-    render(<AlignedWithCarousel />);
-
-    const standardNames = [
-      "ISO 14040",
-      "ISO 14044",
-      "ISO 14046",
-      "PEFCR",
-      "ESPR",
-      "EU DPP",
-    ];
-    standardNames.forEach((name) => {
-      expect(screen.getAllByText(name).length).toBeGreaterThan(0);
-    });
-
-    const standardLabels = [
-      "LCA PRINCIPLES",
-      "LCA REQUIREMENTS",
-      "WATER FOOTPRINT",
-      "APPAREL & FOOTWEAR",
-      "EU ECODESIGN",
-      "PASSPORT REGULATION",
-    ];
-    standardLabels.forEach((label) => {
-      expect(screen.getByText(label)).toBeInTheDocument();
-    });
-  });
-
-  it("wraps each text standard in an outlined container that mimics a logo cell", () => {
-    const { container } = render(<AlignedWithCarousel />);
-    const textBoxes = container.querySelectorAll("[data-aligned-text-box]");
-    expect(textBoxes.length).toBe(6);
-    textBoxes.forEach((box) => {
-      expect(box.className).toMatch(/border/);
-      expect(box.className).toMatch(/rounded-xl/);
-      expect(box.className).not.toMatch(/shadow/);
-      expect(box.className).not.toMatch(/bg-white/);
-    });
-  });
-
   it("uses a responsive 2 / 3 / 6 column grid", () => {
     const { container } = render(<AlignedWithCarousel />);
     const grid = container.querySelector("[data-aligned-grid]");
@@ -133,10 +93,10 @@ describe("AlignedWithCarousel", () => {
     expect(grid?.className).toMatch(/lg:grid-cols-6/);
   });
 
-  it("renders 12 total cells (6 logos + 6 text standards) with no card backgrounds", () => {
+  it("renders 6 logo cells with no card backgrounds or shadows", () => {
     const { container } = render(<AlignedWithCarousel />);
     const cells = container.querySelectorAll("[data-aligned-cell]");
-    expect(cells.length).toBe(12);
+    expect(cells.length).toBe(6);
     cells.forEach((cell) => {
       expect(cell.className).not.toMatch(/shadow/);
       expect(cell.className).not.toMatch(/bg-white/);
@@ -163,7 +123,7 @@ describe("AlignedWithCarousel", () => {
     expect(heading?.className).toMatch(/tracking-/);
 
     const labels = container.querySelectorAll("[data-aligned-label]");
-    expect(labels.length).toBe(12);
+    expect(labels.length).toBe(6);
     labels.forEach((label) => {
       expect(label.className).toMatch(/uppercase/);
       expect(label.className).toMatch(/tracking-/);
@@ -195,12 +155,44 @@ describe("AlignedWithCarousel", () => {
     expect(section).toHaveAttribute("aria-labelledby");
   });
 
-  it("includes screen-reader-only long-form descriptions for AEO context", () => {
+  it("renders a typographic reference line listing all six ISO and EU standards", () => {
+    const { container } = render(<AlignedWithCarousel />);
+    const referenceLine = container.querySelector("[data-aligned-references]");
+    expect(referenceLine).not.toBeNull();
+    expect(referenceLine?.textContent).toMatch(/referencing/i);
+    expect(referenceLine?.textContent).toMatch(/ISO 14040/);
+    expect(referenceLine?.textContent).toMatch(/ISO 14044/);
+    expect(referenceLine?.textContent).toMatch(/ISO 14046/);
+    expect(referenceLine?.textContent).toMatch(/PEFCR/);
+    expect(referenceLine?.textContent).toMatch(/ESPR/);
+    expect(referenceLine?.textContent).toMatch(/EU DPP/);
+  });
+
+  it("reference line uses small caps letter-spaced styling and muted colour", () => {
+    const { container } = render(<AlignedWithCarousel />);
+    const referenceLine = container.querySelector("[data-aligned-references]");
+    expect(referenceLine?.className).toMatch(/uppercase/);
+    expect(referenceLine?.className).toMatch(/tracking-/);
+    expect(referenceLine?.className).toMatch(/text-envrt-muted/);
+  });
+
+  it("includes screen-reader-only long descriptions for the standards in the reference line for AEO", () => {
+    const { container } = render(<AlignedWithCarousel />);
+    const srSpans = container.querySelectorAll(
+      "[data-aligned-references] .sr-only",
+    );
+    expect(srSpans.length).toBe(6);
+    srSpans.forEach((span) => {
+      expect(span.textContent?.length ?? 0).toBeGreaterThan(40);
+    });
+  });
+
+  it("includes screen-reader-only long-form descriptions for each logo for AEO context", () => {
     const { container } = render(<AlignedWithCarousel />);
     const descriptions = container.querySelectorAll(
       "[data-aligned-sr-description]",
     );
-    expect(descriptions.length).toBe(12);
+    expect(descriptions.length).toBe(6);
     descriptions.forEach((desc) => {
       expect(desc.className).toMatch(/sr-only/);
       expect(desc.textContent?.length ?? 0).toBeGreaterThan(40);
