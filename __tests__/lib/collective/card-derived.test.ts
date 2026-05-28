@@ -142,6 +142,31 @@ describe("derivePrimaryMaterial", () => {
     });
     expect(derivePrimaryMaterial(dpp)).toBe("50% Cotton · 30% Linen");
   });
+
+  it("merges duplicate material entries before deciding", () => {
+    // Bikini scenario: two ECONYL rows from different suppliers.
+    const dpp = makeDpp({
+      constituents: [
+        { material: "ECONYL", pct: 42.5 },
+        { material: "ECONYL", pct: 39 },
+        { material: "Elastane", pct: 18.5 },
+      ],
+    });
+    // 42.5 + 39 = 81.5, comfortably above the 95 threshold? No, it's 81.5
+    // — so we expect the joined top-two output (combined ECONYL plus Elastane).
+    expect(derivePrimaryMaterial(dpp)).toBe("81.5% ECONYL · 18.5% Elastane");
+  });
+
+  it("treats merged dominant materials (≥95%) as a single composition", () => {
+    const dpp = makeDpp({
+      constituents: [
+        { material: "Cotton", pct: 60 },
+        { material: "Cotton", pct: 36 },
+        { material: "Elastane", pct: 4 },
+      ],
+    });
+    expect(derivePrimaryMaterial(dpp)).toBe("96% Cotton");
+  });
 });
 
 describe("deriveYear", () => {

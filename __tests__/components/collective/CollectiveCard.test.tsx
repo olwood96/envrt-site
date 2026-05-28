@@ -152,21 +152,6 @@ describe("CollectiveCard", () => {
     });
   });
 
-  describe("SKU watermark", () => {
-    it("renders the SKU upper-cased behind the image", () => {
-      render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-        />
-      );
-
-      expect(screen.getByText("TEE-001")).toBeInTheDocument();
-    });
-  });
-
   describe("impact summary", () => {
     it("renders emissions, water and traceability as one prose line", () => {
       render(

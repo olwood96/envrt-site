@@ -6,7 +6,6 @@ import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { DppPopup } from "./DppPopup";
 import { CompositionTag } from "./CompositionTag";
-import { SkuWatermark } from "./SkuWatermark";
 import {
   deriveOrigin,
   derivePrimaryMaterial,
@@ -126,7 +125,6 @@ export function CollectiveCard({
           material={tagMaterial}
           origin={tagOrigin}
           year={tagYear}
-          animateOnMount
         />
 
         {/* Image */}
@@ -137,9 +135,6 @@ export function CollectiveCard({
           className="block"
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-envrt-cream/40">
-            {/* SKU watermark — large faint serial behind the product image */}
-            <SkuWatermark sku={dpp.product_sku} />
-
             {productImageUrl ? (
               <div className="absolute inset-3 z-10">
                 <div className="relative h-full w-full">

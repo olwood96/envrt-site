@@ -1,4 +1,5 @@
 import type { CollectiveDpp } from "./types";
+import { deduplicateConstituents } from "./utils";
 
 /**
  * Capitalises the first letter of each word in a country name without
@@ -35,16 +36,24 @@ export function deriveOrigin(dpp: CollectiveDpp): string | null {
  * Returns a short material composition string for the tag's first line.
  * One material → "100% Cotton". Dominant material (≥95%) → "96% Cotton".
  * Otherwise the top two materials → "60% Cotton · 40% Polyester".
+ *
+ * Reads directly from {@link CollectiveDpp.constituents} (the DPP source
+ * of truth) and merges duplicate material rows via deduplicateConstituents.
+ * Without dedup, a DPP with two ECONYL entries would render as
+ * "42.5% ECONYL · 39% ECONYL" rather than the combined "81.5% ECONYL".
  */
 export function derivePrimaryMaterial(dpp: CollectiveDpp): string {
   const constituents = dpp.constituents;
   if (!constituents || constituents.length === 0) return "Composition pending";
 
-  const sorted = [...constituents].sort((a, b) => b.pct - a.pct);
-  if (sorted.length === 1 || sorted[0].pct >= 95) {
-    return `${sorted[0].pct}% ${sorted[0].material}`;
+  const merged = deduplicateConstituents(constituents);
+  if (merged.length === 0) return "Composition pending";
+
+  const top = merged[0];
+  if (merged.length === 1 || top.pct >= 95) {
+    return `${top.pct}% ${top.material}`;
   }
-  return sorted.slice(0, 2).map((c) => `${c.pct}% ${c.material}`).join(" · ");
+  return merged.slice(0, 2).map((c) => `${c.pct}% ${c.material}`).join(" · ");
 }
 
 /**
