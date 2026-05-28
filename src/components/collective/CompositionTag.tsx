@@ -57,14 +57,12 @@ export function CompositionTag({ material, origin, year }: CompositionTagProps) 
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute left-3 top-2 z-30 origin-top-left"
+      className={`tag-wrap pointer-events-none absolute left-3 top-2 z-30 ${wobbleClass}`}
       aria-label={`Composition: ${material}${origin ? ", " + origin : ""}${year ? ", " + year : ""}`}
     >
-      {/* String anchoring the tag to the card */}
+      {/* String + knot, anchoring the tag to the card */}
       <span aria-hidden="true" className="tag-string" />
-      <div
-        className={`tag-paper ${wobbleClass} group-hover:[transform:rotate(0deg)] group-hover:[max-height:60px]`}
-      >
+      <div className="tag-paper group-hover:[max-height:60px]">
         <p className="tag-line">{material}</p>
         {origin && <p className="tag-line tag-line-secondary">{origin}</p>}
         {year && <p className="tag-line tag-line-secondary">{year}</p>}

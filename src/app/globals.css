@@ -280,6 +280,9 @@ h1, h2, h3, h4, h5, h6 {
   .tag-paper {
     transition: none;
   }
+  .tag-wrap {
+    transition: none;
+  }
 }
 
 /* Glitch text — matrix scramble is handled in JS (GlitchLink component) */
@@ -303,13 +306,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Composition tag (collective card hangtag) ──────────────────── */
+
+/* Wrapper holds the whole tag-and-string assembly. Rotation lives here
+   so the string and paper swing together, pivoting from the string's
+   top anchor like a real hangtag. */
+.tag-wrap {
+  transform: rotate(-5deg);
+  transform-origin: 9px -10px;
+  transition: transform 250ms ease-out;
+}
+.group:hover .tag-wrap {
+  transform: rotate(0deg);
+}
+
 .tag-paper {
   position: relative;
   background-image: url('/textures/kraft.svg');
   background-color: #d8c9a8;
   background-size: 120px;
   padding: 4px 8px;
-  border-radius: 2px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 9px;
   line-height: 1.45;
@@ -317,22 +332,59 @@ h1, h2, h3, h4, h5, h6 {
   color: #2a2418;
   max-height: 18px;
   overflow: hidden;
-  transform: rotate(-5deg);
-  transition: max-height 250ms ease-out, transform 250ms ease-out;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
+  transition: max-height 250ms ease-out;
   white-space: nowrap;
+  /* Layered paper-on-paper shadow */
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  /* Chamfered top-right corner — reads as "tag" silhouette */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% 100%,
+    0 100%
+  );
 }
+
+/* Eyelet — small dark hole on the left side of the top edge, with a
+   thin warm ring around it for the reinforcing grommet */
+.tag-paper::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(20, 16, 8, 0.85);
+  box-shadow: 0 0 0 1px rgba(120, 100, 70, 0.4);
+  z-index: 2;
+}
+
+/* String emerges from the eyelet and runs up to the card edge */
 .tag-string {
   position: absolute;
-  left: 6px;
-  top: -8px;
+  left: 9px;
+  top: -10px;
   width: 1px;
-  height: 10px;
-  background: rgba(30, 30, 30, 0.45);
-  transform-origin: top;
-  transform: rotate(8deg);
+  height: 13px;
+  background: rgba(60, 50, 30, 0.55);
   z-index: 1;
 }
+/* Knot where the string attaches to the card */
+.tag-string::after {
+  content: '';
+  position: absolute;
+  left: -1.5px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(60, 50, 30, 0.55);
+}
+
 .tag-line {
   margin: 0;
   font-weight: 600;
