@@ -64,8 +64,11 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 - Pricing: https://envrt.com/pricing
 - Contact: https://envrt.com/contact
 - Insights (blog): https://envrt.com/insights
+- Glossary: https://envrt.com/glossary
 - Collective (live DPPs): https://envrt.com/collective
 - ROI calculator: https://envrt.com/roi
+- DPP Readiness Assessment (free 10-minute tool): https://envrt.com/assessment
+- Free Eco-Score DPP (no-cost trial DPP): https://envrt.com/free-dpp
 
 ## Published Insights
 
@@ -86,6 +89,9 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 - [Who Can See What: The EU's Tiered Access Model for DPP Data](https://envrt.com/insights/dpp-data-access-tiers)
 - [The DPP Won't Be Static: How Life-Cycle Data Will Follow Your Products](https://envrt.com/insights/dpp-life-cycle-data-updates)
 - [Substances of Concern in Textiles: What the DPP Will Require You to Disclose](https://envrt.com/insights/substances-of-concern-textile-dpp)
+- [A DPP Without Credible Data Is Just a QR Code: Why Methodology Matters More Than the Passport](https://envrt.com/insights/dpp-without-lca-data-quality)
+- [How Long Does DPP Implementation Actually Take? An Honest Timeline for Fashion Brands](https://envrt.com/insights/dpp-implementation-timeline-honest)
+- [Your Suppliers Won't Send Data. Here's What to Do.](https://envrt.com/insights/dpp-supplier-data-collection-when-suppliers-refuse)
 
 ## Full Context
 
