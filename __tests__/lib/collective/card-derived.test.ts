@@ -64,6 +64,42 @@ describe("deriveOrigin", () => {
     });
     expect(deriveOrigin(dpp)).toBe("Made in Turkey");
   });
+
+  it("title-cases lowercase country names", () => {
+    const dpp = makeDpp({
+      production_stages: [
+        { key: "assembly", label: "Assembly", country: "china", regional: null, verification: null },
+      ],
+    });
+    expect(deriveOrigin(dpp)).toBe("Made in China");
+  });
+
+  it("title-cases multi-word country names", () => {
+    const dpp = makeDpp({
+      production_stages: [
+        { key: "assembly", label: "Assembly", country: "united kingdom", regional: null, verification: null },
+      ],
+    });
+    expect(deriveOrigin(dpp)).toBe("Made in United Kingdom");
+  });
+
+  it("title-cases hyphenated country names", () => {
+    const dpp = makeDpp({
+      production_stages: [
+        { key: "assembly", label: "Assembly", country: "guinea-bissau", regional: null, verification: null },
+      ],
+    });
+    expect(deriveOrigin(dpp)).toBe("Made in Guinea-Bissau");
+  });
+
+  it("leaves correctly-cased country names unchanged", () => {
+    const dpp = makeDpp({
+      production_stages: [
+        { key: "assembly", label: "Assembly", country: "Portugal", regional: null, verification: null },
+      ],
+    });
+    expect(deriveOrigin(dpp)).toBe("Made in Portugal");
+  });
 });
 
 describe("derivePrimaryMaterial", () => {

@@ -23,7 +23,14 @@ describe("SkuWatermark", () => {
     render(<SkuWatermark sku="abc-1" />);
     const node = screen.getByTestId("sku-watermark");
     expect(node.className).toMatch(/opacity-0/);
-    expect(node.className).toMatch(/group-hover:opacity-\[0\.10\]/);
+    expect(node.className).toMatch(/group-hover:opacity-\[0\.18\]/);
+  });
+
+  it("sits above the product image with mix-blend-multiply", () => {
+    render(<SkuWatermark sku="abc-1" />);
+    const node = screen.getByTestId("sku-watermark");
+    expect(node.className).toMatch(/z-\[15\]/);
+    expect(node.className).toMatch(/mix-blend-multiply/);
   });
 
   it("prevents wrapping on long SKUs", () => {

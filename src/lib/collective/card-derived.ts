@@ -1,20 +1,34 @@
 import type { CollectiveDpp } from "./types";
 
 /**
+ * Capitalises the first letter of each word in a country name without
+ * disturbing letters that are already correctly cased.
+ *
+ * Handles: "china" → "China", "united kingdom" → "United Kingdom",
+ * "guinea-bissau" → "Guinea-Bissau", "USA" → "USA" (left alone).
+ */
+function capitaliseCountry(country: string): string {
+  return country.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
  * Returns a "Made in {country}" string for the composition tag.
  * Prefers the assembly stage country since that is where the final
  * garment was made. Falls back to the earliest stage with a country
  * if assembly has none, or null when no stage has a country.
+ *
+ * Country names are title-cased so eg "china" reads as "China".
  */
 export function deriveOrigin(dpp: CollectiveDpp): string | null {
   const stages = dpp.production_stages;
   if (!stages || stages.length === 0) return null;
 
   const assembly = stages.find((s) => s.key === "assembly" && s.country);
-  if (assembly?.country) return `Made in ${assembly.country}`;
+  if (assembly?.country) return `Made in ${capitaliseCountry(assembly.country)}`;
 
   const firstWithCountry = stages.find((s) => s.country);
-  return firstWithCountry?.country ? `Made in ${firstWithCountry.country}` : null;
+  if (!firstWithCountry?.country) return null;
+  return `Made in ${capitaliseCountry(firstWithCountry.country)}`;
 }
 
 /**

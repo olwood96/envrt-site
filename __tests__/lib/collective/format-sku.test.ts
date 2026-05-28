@@ -27,18 +27,16 @@ describe("formatSkuForDisplay", () => {
     expect(formatSkuForDisplay("  Tee Oc M 022  ")).toBe("TEE-OC-M-022");
   });
 
-  it("preserves SKUs up to 12 characters unchanged (no ellipsis)", () => {
-    // exactly 12 chars — boundary
-    expect(formatSkuForDisplay("ABCDEFGHIJKL")).toBe("ABCDEFGHIJKL");
-    // 11 chars
-    expect(formatSkuForDisplay("ABCDEFGHIJK")).toBe("ABCDEFGHIJK");
+  it("preserves SKUs up to 14 characters unchanged", () => {
+    expect(formatSkuForDisplay("ABCDEFGHIJKLMN")).toBe("ABCDEFGHIJKLMN"); // 14 chars
+    expect(formatSkuForDisplay("ABCDEFGHIJKLM")).toBe("ABCDEFGHIJKLM");   // 13 chars
   });
 
-  it("truncates SKUs longer than 12 characters with an ellipsis", () => {
-    expect(formatSkuForDisplay("VADA-BOTTOMS-TERRY-CHARCOAL-L")).toBe("VADA-BOTTOM…");
+  it("cleanly cuts SKUs longer than 14 characters (no ellipsis)", () => {
+    expect(formatSkuForDisplay("VADA-BOTTOMS-TERRY-CHARCOAL-L")).toBe("VADA-BOTTOMS-T");
   });
 
   it("truncates after normalising case and whitespace", () => {
-    expect(formatSkuForDisplay("vada bottoms terry charcoal l")).toBe("VADA-BOTTOM…");
+    expect(formatSkuForDisplay("vada bottoms terry charcoal l")).toBe("VADA-BOTTOMS-T");
   });
 });
