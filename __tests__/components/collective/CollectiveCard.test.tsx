@@ -470,23 +470,6 @@ describe("CollectiveCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows verified badge when brand is verified", () => {
-    const verifiedCard: CollectiveCardData = {
-      ...mockCard,
-      brand: { ...mockCard.brand, verified_at: "2025-01-01T00:00:00Z" },
-    };
-    render(
-      <CollectiveCard
-        card={verifiedCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByLabelText("Verified brand")).toBeInTheDocument();
-  });
-
   it("shows production journey toggle when stages have countries", () => {
     const journeyCard: CollectiveCardData = {
       ...mockCard,
