@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FadeUp } from "@/components/ui/Motion";
 import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
+import { RoiResultsReceipt } from "@/components/RoiResultsReceipt";
 
 /* ================================================================
    TYPES
@@ -217,76 +218,6 @@ function OptionTile<T extends string>({
   );
 }
 
-function CostBar({
-  label,
-  amount,
-  maxAmount,
-  color,
-  animated,
-  delay,
-}: {
-  label: string;
-  amount: number;
-  maxAmount: number;
-  color: "teal" | "muted" | "charcoal";
-  animated: boolean;
-  delay: number;
-}) {
-  const [displayAmount, setDisplayAmount] = useState(0);
-  const [barWidth, setBarWidth] = useState(100);
-  const [started, setStarted] = useState(false);
-  const pct = maxAmount > 0 ? Math.max(5, (amount / maxAmount) * 100) : 5;
-
-  const colors = {
-    teal: "bg-envrt-teal",
-    muted: "bg-envrt-muted/40",
-    charcoal: "bg-envrt-charcoal/60",
-  };
-
-  useEffect(() => {
-    if (!animated) return;
-    const timer = setTimeout(() => {
-      setStarted(true);
-      // Animate bar from 100% down to actual percentage
-      setBarWidth(pct);
-      // Count up animation
-      const duration = 1200;
-      const steps = 40;
-      const increment = amount / steps;
-      let current = 0;
-      const interval = setInterval(() => {
-        current += increment;
-        if (current >= amount) {
-          setDisplayAmount(amount);
-          clearInterval(interval);
-        } else {
-          setDisplayAmount(Math.round(current));
-        }
-      }, duration / steps);
-      return () => clearInterval(interval);
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [animated, amount, pct, delay]);
-
-  return (
-    <div className="mb-6 last:mb-0">
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-envrt-charcoal">{label}</span>
-        <span className="text-lg font-bold text-envrt-charcoal">
-          £{displayAmount.toLocaleString()}
-          <span className="text-xs font-normal text-envrt-muted">/yr</span>
-        </span>
-      </div>
-      <div className="h-4 w-full overflow-hidden rounded-full bg-envrt-charcoal/[0.08]">
-        <div
-          className={`h-full rounded-full ${colors[color]} ${started ? "transition-all duration-1000 ease-out" : ""}`}
-          style={{ width: `${barWidth}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
 /* ================================================================
    MAIN PAGE
    ================================================================ */
@@ -294,7 +225,6 @@ function CostBar({
 export default function ROICalculatorPage() {
   const [screen, setScreen] = useState<Screen>("hero");
   const [emailSending, setEmailSending] = useState(false);
-  const [animateResults, setAnimateResults] = useState(false);
   const [assumptionsOpen, setAssumptionsOpen] = useState(false);
 
   // Calculator inputs
@@ -330,17 +260,12 @@ export default function ROICalculatorPage() {
 
   const showResults = useCallback(() => {
     setScreen("results");
-    setAnimateResults(false);
     window.scrollTo(0, 0);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setAnimateResults(true));
-    });
   }, []);
 
   const recalculate = useCallback(() => {
     setScreen("calculator");
     setResults(null);
-    setAnimateResults(false);
     window.scrollTo(0, 0);
   }, []);
 
@@ -667,66 +592,20 @@ export default function ROICalculatorPage() {
       {screen === "results" && results && (
         <div className="pb-20 pt-28 sm:pt-32">
           <Container className="max-w-[720px]">
-            {/* Savings headline */}
+            {/* Till receipt — itemised cost comparison + saving */}
             <FadeUp>
-              <div className="text-center">
-                <p className="text-xs font-bold uppercase tracking-widest text-envrt-teal">
-                  Your estimated annual saving
-                </p>
-                <p className="mt-3 text-5xl font-bold tracking-tight text-envrt-charcoal sm:text-6xl">
-                  <CountUp target={results.maxSaving} animated={animateResults} prefix="£" />
-                </p>
-                <p className="mt-3 text-base text-envrt-muted">
-                  by switching to ENVRT instead of the most expensive alternative
-                </p>
-              </div>
-            </FadeUp>
-
-            {/* Cost comparison bars */}
-            <FadeUp delay={0.15}>
-              <SectionCard className="mt-10">
-                <div className="p-6 sm:p-8">
-                  <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                    Annual Cost Comparison
-                  </h3>
-                  <CostBar
-                    label="ENVRT"
-                    amount={results.envrtCost}
-                    maxAmount={Math.max(
-                      results.envrtCost,
-                      results.consultantCost,
-                      results.inhouseCost
-                    )}
-                    color="teal"
-                    animated={animateResults}
-                    delay={200}
-                  />
-                  <CostBar
-                    label="Consultant"
-                    amount={results.consultantCost}
-                    maxAmount={Math.max(
-                      results.envrtCost,
-                      results.consultantCost,
-                      results.inhouseCost
-                    )}
-                    color="muted"
-                    animated={animateResults}
-                    delay={400}
-                  />
-                  <CostBar
-                    label="In-house hire"
-                    amount={results.inhouseCost}
-                    maxAmount={Math.max(
-                      results.envrtCost,
-                      results.consultantCost,
-                      results.inhouseCost
-                    )}
-                    color="charcoal"
-                    animated={animateResults}
-                    delay={600}
-                  />
-                </div>
-              </SectionCard>
+              <RoiResultsReceipt
+                envrtCost={results.envrtCost}
+                envrtPlan={results.envrtPlan}
+                consultantCost={results.consultantCost}
+                inhouseCost={results.inhouseCost}
+                savingVsConsultant={results.savingVsConsultant}
+                savingVsInhouse={results.savingVsInhouse}
+                maxSaving={results.maxSaving}
+                skuCount={skuCount}
+                market={market}
+                brandName={formDataRef.current?.brandName ?? null}
+              />
             </FadeUp>
 
             {/* Time savings + recommended plan */}
@@ -792,35 +671,6 @@ export default function ROICalculatorPage() {
                   </div>
                 </SectionCard>
               </div>
-            </FadeUp>
-
-            {/* Breakdown */}
-            <FadeUp delay={0.3}>
-              <SectionCard className="mt-6">
-                <div className="p-6 sm:p-8">
-                  <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                    Savings Breakdown
-                  </h3>
-                  <div className="divide-y divide-envrt-charcoal/5">
-                    <div className="flex items-baseline justify-between py-3">
-                      <span className="text-sm text-envrt-charcoal/80">
-                        Saving vs consultant
-                      </span>
-                      <span className="text-sm font-bold text-envrt-charcoal">
-                        £{results.savingVsConsultant.toLocaleString()}/yr
-                      </span>
-                    </div>
-                    <div className="flex items-baseline justify-between py-3">
-                      <span className="text-sm text-envrt-charcoal/80">
-                        Saving vs in-house hire
-                      </span>
-                      <span className="text-sm font-bold text-envrt-charcoal">
-                        £{results.savingVsInhouse.toLocaleString()}/yr
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </SectionCard>
             </FadeUp>
 
             {/* Assumptions */}
@@ -966,46 +816,3 @@ export default function ROICalculatorPage() {
   );
 }
 
-/* ================================================================
-   COUNT-UP COMPONENT
-   ================================================================ */
-
-function CountUp({
-  target,
-  animated,
-  prefix = "",
-}: {
-  target: number;
-  animated: boolean;
-  prefix?: string;
-}) {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (!animated) {
-      setValue(0);
-      return;
-    }
-    const duration = 1500;
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setValue(target);
-        clearInterval(interval);
-      } else {
-        setValue(Math.round(current));
-      }
-    }, duration / steps);
-    return () => clearInterval(interval);
-  }, [animated, target]);
-
-  return (
-    <>
-      {prefix}
-      {value.toLocaleString()}
-    </>
-  );
-}

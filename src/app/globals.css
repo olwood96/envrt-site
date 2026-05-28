@@ -405,6 +405,15 @@ h1, h2, h3, h4, h5, h6 {
   animation: tag-wobble 450ms ease-out;
 }
 
+/* ── ROI till receipt ───────────────────────────────────────────── */
+.receipt-paper {
+  background-color: #faf7ee;
+  /* Layered paper-on-page shadow */
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
