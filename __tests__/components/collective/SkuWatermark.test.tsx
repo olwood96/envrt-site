@@ -11,24 +11,26 @@ describe("SkuWatermark", () => {
 
   it("renders nothing visible when SKU is empty", () => {
     const { container } = render(<SkuWatermark sku="" />);
-    // The span still mounts but is empty — confirm no text content
     expect(container.textContent).toBe("");
   });
 
   it("is hidden from assistive tech (aria-hidden)", () => {
     render(<SkuWatermark sku="abc-1" />);
-    const node = screen.getByText("ABC-1");
-    expect(node.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByTestId("sku-watermark").getAttribute("aria-hidden")).toBe("true");
   });
 
-  it("applies the hover-lift transition class only when hoverLift is true", () => {
-    const { rerender } = render(<SkuWatermark sku="abc-1" hoverLift={false} />);
-    let node = screen.getByText("ABC-1");
-    expect(node.className).not.toMatch(/group-hover:opacity/);
+  it("is invisible at rest (opacity-0) and lifts on group hover", () => {
+    render(<SkuWatermark sku="abc-1" />);
+    const node = screen.getByTestId("sku-watermark");
+    expect(node.className).toMatch(/opacity-0/);
+    expect(node.className).toMatch(/group-hover:opacity-\[0\.10\]/);
+  });
 
-    rerender(<SkuWatermark sku="abc-1" hoverLift />);
-    node = screen.getByText("ABC-1");
-    expect(node.className).toMatch(/group-hover:opacity/);
+  it("prevents wrapping on long SKUs", () => {
+    render(<SkuWatermark sku="vada-bottoms-terry-charcoal-large" />);
+    const node = screen.getByTestId("sku-watermark");
+    expect(node.className).toMatch(/whitespace-nowrap/);
+    expect(node.className).toMatch(/overflow-hidden/);
   });
 
   it("normalises spaces and case in the rendered SKU", () => {
