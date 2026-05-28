@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CollectiveCard } from "@/components/collective/CollectiveCard";
@@ -70,125 +70,8 @@ const mockCard: CollectiveCardData = {
 };
 
 describe("CollectiveCard", () => {
-  it("renders garment name and brand", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("Organic Cotton Tee")).toBeInTheDocument();
-    expect(screen.getByText("EcoBrand")).toBeInTheDocument();
-    expect(screen.getByText("Summer 2025")).toBeInTheDocument();
-  });
-
-  it("renders emission and water metrics", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("3.2 kg CO₂e")).toBeInTheDocument();
-    expect(screen.getByText("45.8 L H₂O")).toBeInTheDocument();
-  });
-
-  it("renders transparency score", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("85% transparency")).toBeInTheDocument();
-  });
-
-  it("renders material tags", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("Organic Cotton 95%")).toBeInTheDocument();
-    expect(screen.getByText("Elastane 5%")).toBeInTheDocument();
-  });
-
-  it("calls onToggleCompare when checkbox clicked", () => {
-    const onToggle = vi.fn();
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={onToggle}
-        compareDisabled={false}
-      />
-    );
-
-    const checkbox = screen.getByRole("checkbox");
-    fireEvent.click(checkbox);
-    expect(onToggle).toHaveBeenCalledWith("dpp-1");
-  });
-
-  it("disables checkbox when compareDisabled is true and not selected", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={true}
-      />
-    );
-
-    const checkbox = screen.getByRole("checkbox");
-    expect(checkbox).toBeDisabled();
-  });
-
-  it("checkbox remains enabled when selected even if compareDisabled", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={true}
-        onToggleCompare={vi.fn()}
-        compareDisabled={true}
-      />
-    );
-
-    const checkbox = screen.getByRole("checkbox");
-    expect(checkbox).not.toBeDisabled();
-  });
-
-  it("links to the detail page (SEO: real href preserved for crawlers and right-click)", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    const links = screen.getAllByRole("link");
-    const detailLinks = links.filter(
-      (l) => l.getAttribute("href") === "/collective/ecobrand/tee-001"
-    );
-    expect(detailLinks.length).toBeGreaterThan(0);
-  });
-
-  describe("DPP popup", () => {
-    it("opens popup when garment image link is clicked", () => {
+  describe("identity", () => {
+    it("renders garment name, brand and collection", () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -198,13 +81,12 @@ describe("CollectiveCard", () => {
         />
       );
 
-      expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument();
-      const imageLink = screen.getByTestId("dpp-link-image");
-      fireEvent.click(imageLink);
-      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+      expect(screen.getByText("Organic Cotton Tee")).toBeInTheDocument();
+      expect(screen.getByText("EcoBrand")).toBeInTheDocument();
+      expect(screen.getByText("Summer 2025")).toBeInTheDocument();
     });
 
-    it("opens popup when garment name link is clicked", () => {
+    it("brand wordmark links to the brand page", () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -214,12 +96,13 @@ describe("CollectiveCard", () => {
         />
       );
 
-      const nameLink = screen.getByTestId("dpp-link-name");
-      fireEvent.click(nameLink);
-      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+      const brandLink = screen.getByText("EcoBrand").closest("a");
+      expect(brandLink).toHaveAttribute("href", "/collective/ecobrand");
     });
+  });
 
-    it("opens popup when 'View DPP' CTA is clicked", () => {
+  describe("composition tag", () => {
+    it("renders the dominant material on the tag", () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -229,12 +112,33 @@ describe("CollectiveCard", () => {
         />
       );
 
-      const ctaLink = screen.getByTestId("dpp-link-cta");
-      fireEvent.click(ctaLink);
-      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+      // 95% Organic Cotton triggers the dominant-material branch
+      expect(screen.getByText("95% Organic Cotton")).toBeInTheDocument();
     });
 
-    it("popup iframe points to the embedUrl from card data", () => {
+    it("renders origin when production stages have countries", () => {
+      const journeyCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          production_stages: [
+            { key: "assembly", label: "Assembly", country: "Portugal", regional: null, verification: null },
+          ],
+        },
+      };
+      render(
+        <CollectiveCard
+          card={journeyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByText("Made in Portugal")).toBeInTheDocument();
+    });
+
+    it("renders the year derived from featured_at", () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -244,14 +148,254 @@ describe("CollectiveCard", () => {
         />
       );
 
-      fireEvent.click(screen.getByTestId("dpp-link-cta"));
-      const iframe = screen.getByTitle(
-        /Digital Product Passport — Organic Cotton Tee/
+      expect(screen.getByText("2025")).toBeInTheDocument();
+    });
+  });
+
+  describe("SKU watermark", () => {
+    it("renders the SKU upper-cased behind the image", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
       );
-      expect(iframe.getAttribute("src")).toContain(mockCard.embedUrl);
+
+      expect(screen.getByText("TEE-001")).toBeInTheDocument();
+    });
+  });
+
+  describe("impact summary", () => {
+    it("renders emissions, water and traceability as one prose line", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      const summary = screen.getByTestId("impact-summary");
+      expect(summary.textContent).toBe("3.2 kg CO₂e · 45.8 L water · 85% traceable");
     });
 
-    it("all three DPP links preserve detail URL as href (SEO)", () => {
+    it("omits null metrics from the summary", () => {
+      const partialCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          total_water: null,
+          transparency_score: null,
+        },
+      };
+      render(
+        <CollectiveCard
+          card={partialCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      const summary = screen.getByTestId("impact-summary");
+      expect(summary.textContent).toBe("3.2 kg CO₂e");
+    });
+
+    it("renders nothing when all impact metrics are null", () => {
+      const emptyCard: CollectiveCardData = {
+        ...mockCard,
+        dpp: {
+          ...mockCard.dpp,
+          total_emissions: null,
+          total_water: null,
+          transparency_score: null,
+        },
+      };
+      render(
+        <CollectiveCard
+          card={emptyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.queryByTestId("impact-summary")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("production journey", () => {
+    const journeyCard: CollectiveCardData = {
+      ...mockCard,
+      dpp: {
+        ...mockCard.dpp,
+        production_stages: [
+          { key: "fibre", label: "Fibre Production", country: "Turkey", regional: "Aydin", verification: "validated" },
+          { key: "assembly", label: "Assembly", country: "Portugal", regional: null, verification: "declared" },
+        ],
+      },
+    };
+
+    it("shows the production journey toggle when stages have countries", () => {
+      render(
+        <CollectiveCard
+          card={journeyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      expect(screen.getByText("Production journey")).toBeInTheDocument();
+    });
+
+    it("defaults the map to open (uncontrolled)", () => {
+      render(
+        <CollectiveCard
+          card={journeyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      // The toggle chevron has a rotate-180 class when open; the map content
+      // (or its Suspense fallback) is mounted.
+      const toggle = screen.getByText("Production journey").closest("button");
+      const chevron = toggle?.querySelector("svg.rotate-180");
+      expect(chevron).toBeInTheDocument();
+    });
+
+    it("respects controlled mapOpen=false even when stages exist", () => {
+      render(
+        <CollectiveCard
+          card={journeyCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          mapOpen={false}
+          onToggleMap={vi.fn()}
+        />
+      );
+
+      const toggle = screen.getByText("Production journey").closest("button");
+      const chevron = toggle?.querySelector("svg.rotate-180");
+      expect(chevron).not.toBeInTheDocument();
+    });
+  });
+
+  describe("compare control", () => {
+    it("calls onToggleCompare when checkbox clicked", () => {
+      const onToggle = vi.fn();
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={onToggle}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByRole("checkbox"));
+      expect(onToggle).toHaveBeenCalledWith("dpp-1");
+    });
+
+    it("disables checkbox when compareDisabled and not selected", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={true}
+        />
+      );
+
+      expect(screen.getByRole("checkbox")).toBeDisabled();
+    });
+
+    it("checkbox remains enabled when selected even if compareDisabled", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={true}
+          onToggleCompare={vi.fn()}
+          compareDisabled={true}
+        />
+      );
+
+      expect(screen.getByRole("checkbox")).not.toBeDisabled();
+    });
+  });
+
+  describe("cross-brand disabled state", () => {
+    it("greys out the card", () => {
+      const { container } = render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={true}
+          crossBrandDisabled={true}
+        />
+      );
+
+      const cardEl = container.querySelector(".opacity-40");
+      expect(cardEl).toBeInTheDocument();
+      expect(cardEl).toHaveClass("grayscale");
+    });
+
+    it("disables the checkbox", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={true}
+        />
+      );
+
+      expect(screen.getByRole("checkbox")).toBeDisabled();
+    });
+
+    it("renders the cross-brand tooltip text", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={true}
+        />
+      );
+
+      expect(
+        screen.getByText(/Cross-brand comparisons aren't available yet/)
+      ).toBeInTheDocument();
+    });
+
+    it("hides the tooltip text when not cross-brand-disabled", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+          crossBrandDisabled={false}
+        />
+      );
+
+      expect(
+        screen.queryByText(/Cross-brand comparisons aren't available yet/)
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("DPP links and popup", () => {
+    it("links image, name and CTA to the detail URL", () => {
       render(
         <CollectiveCard
           card={mockCard}
@@ -275,25 +419,62 @@ describe("CollectiveCard", () => {
       );
     });
 
-    it("brand logo link still navigates to brand page (not popup)", () => {
-      const cardWithLogo: CollectiveCardData = {
-        ...mockCard,
-        brandLogoUrl: "https://example.com/logo.png",
-      };
+    it("opens popup when image link is clicked", () => {
       render(
         <CollectiveCard
-          card={cardWithLogo}
+          card={mockCard}
           isSelected={false}
           onToggleCompare={vi.fn()}
           compareDisabled={false}
         />
       );
 
-      const links = screen.getAllByRole("link");
-      const brandLink = links.find(
-        (l) => l.getAttribute("href") === "/collective/ecobrand"
+      expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId("dpp-link-image"));
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("opens popup when name link is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
       );
-      expect(brandLink).toBeDefined();
+
+      fireEvent.click(screen.getByTestId("dpp-link-name"));
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("opens popup when View DPP CTA is clicked", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("dpp-link-cta"));
+      expect(screen.getByTestId("dpp-popup-overlay")).toBeInTheDocument();
+    });
+
+    it("popup iframe points to the embedUrl from card data", () => {
+      render(
+        <CollectiveCard
+          card={mockCard}
+          isSelected={false}
+          onToggleCompare={vi.fn()}
+          compareDisabled={false}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("dpp-link-cta"));
+      const iframe = screen.getByTitle(/Digital Product Passport — Organic Cotton Tee/);
+      expect(iframe.getAttribute("src")).toContain(mockCard.embedUrl);
     });
 
     it("closes popup when close button is clicked", async () => {
@@ -311,274 +492,42 @@ describe("CollectiveCard", () => {
 
       fireEvent.click(screen.getByLabelText("Close popup"));
       await waitFor(() =>
-        expect(
-          screen.queryByTestId("dpp-popup-overlay")
-        ).not.toBeInTheDocument()
+        expect(screen.queryByTestId("dpp-popup-overlay")).not.toBeInTheDocument()
       );
     });
   });
 
-  describe("New badge", () => {
-    let dateSpy: ReturnType<typeof vi.spyOn>;
-
-    afterEach(() => {
-      dateSpy?.mockRestore();
-    });
-
-    it("shows New badge for recently featured products", () => {
-      // Mock Date.now to be 5 days after featured_at
-      const fiveDaysAfter = new Date("2025-01-06T00:00:00Z").getTime();
-      dateSpy = vi.spyOn(Date, "now").mockReturnValue(fiveDaysAfter);
-
-      render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-        />
-      );
-
-      expect(screen.getByText("New")).toBeInTheDocument();
-    });
-
-    it("does not show New badge for old products", () => {
-      // Mock Date.now to be 30 days after featured_at
-      const thirtyDaysAfter = new Date("2025-01-31T00:00:00Z").getTime();
-      dateSpy = vi.spyOn(Date, "now").mockReturnValue(thirtyDaysAfter);
-
-      render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-        />
-      );
-
-      expect(screen.queryByText("New")).not.toBeInTheDocument();
-    });
-  });
-
-  it("shows emissions reduction percentage", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("↓ 32% vs avg")).toBeInTheDocument();
-  });
-
-  it("shows water reduction percentage", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("↓ 18% vs avg")).toBeInTheDocument();
-  });
-
-  describe("granularity gating for reductions", () => {
-    it("hides reduction badges when granularity is 'total'", () => {
-      const totalOnlyCard: CollectiveCardData = {
+  describe("shop link", () => {
+    it("renders when purchase_url is set", () => {
+      const shopCard: CollectiveCardData = {
         ...mockCard,
-        dpp: {
-          ...mockCard.dpp,
-          display_options: { granularity: "total" },
-        },
+        dpp: { ...mockCard.dpp, purchase_url: "https://shop.example.com" },
       };
       render(
         <CollectiveCard
-          card={totalOnlyCard}
+          card={shopCard}
           isSelected={false}
           onToggleCompare={vi.fn()}
           compareDisabled={false}
         />
       );
 
-      expect(screen.queryByText(/↓ 32% vs avg/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/↓ 18% vs avg/)).not.toBeInTheDocument();
-      // The raw totals must still render
-      expect(screen.getByText("3.2 kg CO₂e")).toBeInTheDocument();
-      expect(screen.getByText("45.8 L H₂O")).toBeInTheDocument();
+      const shopLink = screen.getByText("Shop this product");
+      expect(shopLink).toBeInTheDocument();
+      expect(shopLink.closest("a")).toHaveAttribute("href", "https://shop.example.com");
     });
 
-    it("hides reduction badges when display_options is missing", () => {
-      const noOptsCard: CollectiveCardData = {
-        ...mockCard,
-        dpp: {
-          ...mockCard.dpp,
-          display_options: null,
-        },
-      };
-      render(
-        <CollectiveCard
-          card={noOptsCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-        />
-      );
-
-      expect(screen.queryByText(/↓ 32% vs avg/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/↓ 18% vs avg/)).not.toBeInTheDocument();
-    });
-
-    it("shows reduction badges when granularity is 'full'", () => {
-      const fullCard: CollectiveCardData = {
-        ...mockCard,
-        dpp: {
-          ...mockCard.dpp,
-          display_options: { granularity: "full" },
-        },
-      };
-      render(
-        <CollectiveCard
-          card={fullCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-        />
-      );
-
-      expect(screen.getByText("↓ 32% vs avg")).toBeInTheDocument();
-      expect(screen.getByText("↓ 18% vs avg")).toBeInTheDocument();
-    });
-  });
-
-  it("shows material tooltip on hover", () => {
-    render(
-      <CollectiveCard
-        card={mockCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    // Tooltip text should be in the DOM (hidden until hover)
-    expect(
-      screen.getByText(/Grown without synthetic pesticides/)
-    ).toBeInTheDocument();
-  });
-
-  it("shows production journey toggle when stages have countries", () => {
-    const journeyCard: CollectiveCardData = {
-      ...mockCard,
-      dpp: {
-        ...mockCard.dpp,
-        production_stages: [
-          { key: "fibre", label: "Fibre Production", country: "Turkey", regional: "Aydin", verification: "validated" },
-          { key: "yarn", label: "Yarn Production", country: null, regional: null, verification: null },
-          { key: "assembly", label: "Assembly", country: "Portugal", regional: null, verification: "declared" },
-        ],
-      },
-    };
-    render(
-      <CollectiveCard
-        card={journeyCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    expect(screen.getByText("Production journey")).toBeInTheDocument();
-  });
-
-  it("shows shop link when purchase_url is set", () => {
-    const shopCard: CollectiveCardData = {
-      ...mockCard,
-      dpp: { ...mockCard.dpp, purchase_url: "https://shop.example.com" },
-    };
-    render(
-      <CollectiveCard
-        card={shopCard}
-        isSelected={false}
-        onToggleCompare={vi.fn()}
-        compareDisabled={false}
-      />
-    );
-
-    const shopLink = screen.getByText("Shop this product");
-    expect(shopLink).toBeInTheDocument();
-    expect(shopLink.closest("a")).toHaveAttribute(
-      "href",
-      "https://shop.example.com"
-    );
-  });
-
-  describe("crossBrandDisabled", () => {
-    it("greys out card when crossBrandDisabled is true", () => {
-      const { container } = render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={true}
-          crossBrandDisabled={true}
-        />
-      );
-
-      // The card wrapper should have opacity and grayscale classes
-      const cardEl = container.querySelector(".opacity-40");
-      expect(cardEl).toBeInTheDocument();
-      expect(cardEl).toHaveClass("grayscale");
-    });
-
-    it("disables checkbox when crossBrandDisabled is true", () => {
+    it("is omitted when purchase_url is null", () => {
       render(
         <CollectiveCard
           card={mockCard}
           isSelected={false}
           onToggleCompare={vi.fn()}
           compareDisabled={false}
-          crossBrandDisabled={true}
         />
       );
 
-      const checkbox = screen.getByRole("checkbox");
-      expect(checkbox).toBeDisabled();
-    });
-
-    it("shows cross-brand tooltip when crossBrandDisabled is true", () => {
-      render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-          crossBrandDisabled={true}
-        />
-      );
-
-      expect(
-        screen.getByText(/Cross-brand comparisons aren't available yet/)
-      ).toBeInTheDocument();
-    });
-
-    it("does not show tooltip when crossBrandDisabled is false", () => {
-      render(
-        <CollectiveCard
-          card={mockCard}
-          isSelected={false}
-          onToggleCompare={vi.fn()}
-          compareDisabled={false}
-          crossBrandDisabled={false}
-        />
-      );
-
-      expect(
-        screen.queryByText(/Cross-brand comparisons aren't available yet/)
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Shop this product")).not.toBeInTheDocument();
     });
   });
 
@@ -589,7 +538,6 @@ describe("CollectiveCard", () => {
     };
 
     beforeEach(() => {
-      // Reset body overflow
       document.body.style.overflow = "";
     });
 
@@ -631,8 +579,6 @@ describe("CollectiveCard", () => {
       );
 
       fireEvent.click(screen.getByLabelText("View full image"));
-      expect(screen.getByLabelText("Close lightbox")).toBeInTheDocument();
-
       fireEvent.click(screen.getByLabelText("Close lightbox"));
       expect(screen.queryByLabelText("Close lightbox")).not.toBeInTheDocument();
     });

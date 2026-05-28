@@ -4,9 +4,14 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
-import { getMaterialDescription } from "@/lib/collective/material-info";
-import { deduplicateConstituents, showReductionFor } from "@/lib/collective/utils";
 import { DppPopup } from "./DppPopup";
+import { CompositionTag } from "./CompositionTag";
+import { SkuWatermark } from "./SkuWatermark";
+import {
+  deriveOrigin,
+  derivePrimaryMaterial,
+  deriveYear,
+} from "@/lib/collective/card-derived";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -21,15 +26,30 @@ interface Props {
   compareDisabled: boolean;
   /** True when this card is from a different brand than the first selected compare item */
   crossBrandDisabled?: boolean;
-  /** Controlled production-journey state. If omitted, falls back to internal state. */
+  /** Controlled production-journey state. If omitted, falls back to internal state (default open). */
   mapOpen?: boolean;
   onToggleMap?: () => void;
 }
 
-function isNew(featuredAt: string | null): boolean {
-  if (!featuredAt) return false;
-  const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
-  return Date.now() - new Date(featuredAt).getTime() < fourteenDaysMs;
+function buildImpactSummary(dpp: CollectiveCardData["dpp"]): string {
+  const parts: string[] = [];
+  if (dpp.total_emissions != null) {
+    parts.push(`${dpp.total_emissions.toFixed(1)} kg CO₂e`);
+  }
+  if (dpp.total_water != null) {
+    parts.push(`${dpp.total_water.toFixed(1)} L water`);
+  }
+  if (dpp.transparency_score != null) {
+    parts.push(`${Math.round(dpp.transparency_score)}% traceable`);
+  }
+  return parts.join(" · ");
+}
+
+function brandSlugFor(brand: CollectiveCardData["brand"]): string {
+  return (
+    brand.slug ||
+    brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+  );
 }
 
 export function CollectiveCard({
@@ -41,24 +61,19 @@ export function CollectiveCard({
   mapOpen: controlledMapOpen,
   onToggleMap,
 }: Props) {
-  const { dpp, brand, productImageUrl, brandLogoUrl, detailUrl, embedUrl } = card;
+  const { dpp, brand, productImageUrl, detailUrl, embedUrl } = card;
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
-  // Map state is normally controlled by the parent grid (which syncs all cards
-  // in the same visual row so the row doesn't have empty stretched space when
-  // one card opens). Falls back to internal state if the prop is omitted.
-  const [internalMapOpen, setInternalMapOpen] = useState(false);
+  // Default the production journey OPEN. The map is the unique feature of an
+  // ENVRT card — surfacing it by default beats hiding it behind a toggle.
+  const [internalMapOpen, setInternalMapOpen] = useState(true);
   const mapOpen = controlledMapOpen ?? internalMapOpen;
   const toggleMap = onToggleMap ?? (() => setInternalMapOpen((prev) => !prev));
-  // Tap-to-toggle tooltip state — hover still works on desktop via CSS,
-  // this lets the same tooltips appear on tap for touch devices.
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeTooltip) return;
     const closeTooltip = () => setActiveTooltip(null);
-    // Defer the listener by a tick so the click that opened the tooltip
-    // doesn't immediately close it.
     const t = window.setTimeout(() => {
       document.addEventListener("click", closeTooltip);
     }, 0);
@@ -69,12 +84,12 @@ export function CollectiveCard({
   }, [activeTooltip]);
 
   const openPopup = (e: React.MouseEvent) => {
-    // Allow ctrl/cmd-click and middle-click to open in new tab as normal
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
     e.stopPropagation();
     setPopupOpen(true);
   };
+
   const hasJourney =
     dpp.production_stages &&
     dpp.production_stages.length > 0 &&
@@ -93,34 +108,26 @@ export function CollectiveCard({
     };
   }, [lightboxOpen]);
 
+  const tagMaterial = derivePrimaryMaterial(dpp);
+  const tagOrigin = deriveOrigin(dpp);
+  const tagYear = deriveYear(dpp);
+  const impactSummary = buildImpactSummary(dpp);
+  const brandHref = `/collective/${brandSlugFor(brand)}`;
+
   return (
     <>
-      <div className={`group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white transition-all duration-300 ${crossBrandDisabled ? "opacity-40 grayscale pointer-events-auto" : "sm:hover:-translate-y-1 sm:hover:border-envrt-teal/20 sm:hover:shadow-xl sm:hover:shadow-envrt-teal/8"}`}>
-        {/* New badge */}
-        {isNew(dpp.featured_at) && (
-          <div className="absolute right-3 top-3 z-20 rounded-full bg-envrt-teal px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-sm">
-            New
-          </div>
-        )}
-
-        {/* Brand logo overlay — sibling of the image anchor (NOT nested inside)
-            to avoid invalid nested <a> tags. Nested anchors get normalised
-            unpredictably by browsers and break the parent's click handler on
-            mobile, sending the user to the detail page instead of the popup. */}
-        {brandLogoUrl && (
-          <Link
-            href={`/collective/${brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
-            className="absolute left-3 top-3 z-30 rounded-lg bg-white/90 p-1.5 shadow-sm backdrop-blur transition-transform duration-300 hover:scale-110"
-          >
-            <Image
-              src={brandLogoUrl}
-              alt={brand.name}
-              width={28}
-              height={28}
-              className="h-7 w-7 object-contain"
-            />
-          </Link>
-        )}
+      <div
+        className={`group relative flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white ${
+          crossBrandDisabled ? "opacity-40 grayscale pointer-events-auto" : ""
+        }`}
+      >
+        {/* Composition tag — top-left of the card */}
+        <CompositionTag
+          material={tagMaterial}
+          origin={tagOrigin}
+          year={tagYear}
+          animateOnMount
+        />
 
         {/* Image */}
         <a
@@ -130,32 +137,23 @@ export function CollectiveCard({
           className="block"
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-envrt-cream/40">
+            {/* SKU watermark — large faint serial behind the product image */}
+            <SkuWatermark sku={dpp.product_sku} />
+
             {productImageUrl ? (
-              <>
-                {/* Blurred background fill */}
-                <Image
-                  src={productImageUrl}
-                  alt=""
-                  fill
-                  className="scale-150 object-cover blur-2xl opacity-30"
-                  sizes="128px"
-                  aria-hidden="true"
-                />
-                {/* Main contained image */}
-                <div className="absolute inset-3 z-10">
-                  <div className="relative h-full w-full">
-                    <Image
-                      src={productImageUrl}
-                      alt={dpp.garment_name}
-                      fill
-                      className="object-contain transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
+              <div className="absolute inset-3 z-10">
+                <div className="relative h-full w-full">
+                  <Image
+                    src={productImageUrl}
+                    alt={dpp.garment_name}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="flex h-full items-center justify-center text-envrt-muted/40">
+              <div className="absolute inset-0 z-10 flex items-center justify-center text-envrt-muted/40">
                 <svg
                   className="h-12 w-12"
                   fill="none"
@@ -172,10 +170,7 @@ export function CollectiveCard({
               </div>
             )}
 
-            {/* Gradient blend into content */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-white to-transparent" />
-
-            {/* Expand button for lightbox */}
+            {/* Lightbox expand button — flat, no glass */}
             {productImageUrl && (
               <button
                 onClick={(e) => {
@@ -183,7 +178,7 @@ export function CollectiveCard({
                   e.stopPropagation();
                   setLightboxOpen(true);
                 }}
-                className="absolute bottom-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-envrt-muted shadow-sm backdrop-blur transition-opacity hover:text-envrt-charcoal sm:opacity-0 sm:group-hover:opacity-100"
+                className="absolute bottom-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-md bg-white text-envrt-muted shadow-sm transition-opacity hover:text-envrt-charcoal sm:opacity-0 sm:group-hover:opacity-100"
                 aria-label="View full image"
               >
                 <svg
@@ -206,102 +201,34 @@ export function CollectiveCard({
 
         {/* Content */}
         <div className="flex flex-1 flex-col px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-teal">
-                {brand.name}
-              </p>
-              <a
-                href={detailUrl}
-                data-testid="dpp-link-name"
-                onClick={openPopup}
-              >
-                <h3 className="mt-1 text-[15px] font-semibold leading-snug text-envrt-charcoal group-hover:text-envrt-green">
-                  {dpp.garment_name}
-                </h3>
-              </a>
-              <p className="mt-0.5 text-xs text-envrt-muted">
-                {dpp.collection_name}
-              </p>
-            </div>
-          </div>
+          <Link
+            href={brandHref}
+            onClick={(e) => e.stopPropagation()}
+            className="text-[10px] font-medium uppercase tracking-widest text-envrt-teal hover:underline"
+          >
+            {brand.name}
+          </Link>
+          <a
+            href={detailUrl}
+            data-testid="dpp-link-name"
+            onClick={openPopup}
+          >
+            <h3 className="mt-1 text-[15px] font-semibold leading-snug text-envrt-charcoal group-hover:text-envrt-green">
+              {dpp.garment_name}
+            </h3>
+          </a>
+          <p className="mt-0.5 text-xs text-envrt-muted">
+            {dpp.collection_name}
+          </p>
 
-          {/* Metrics */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {dpp.total_emissions != null && (
-              <div className="flex flex-col">
-                <span className="inline-flex items-center rounded-full bg-envrt-green/5 px-2.5 py-1 text-xs font-medium text-envrt-green">
-                  {dpp.total_emissions.toFixed(1)} kg CO₂e
-                </span>
-                {showReductionFor(dpp) && dpp.total_emissions_reduction_pct != null && dpp.total_emissions_reduction_pct > 0 && (
-                  <span className="mt-0.5 text-center text-[10px] font-medium text-envrt-green">
-                    ↓ {Math.round(dpp.total_emissions_reduction_pct)}% vs avg
-                  </span>
-                )}
-              </div>
-            )}
-            {dpp.total_water != null && (
-              <div className="flex flex-col">
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-                  {dpp.total_water.toFixed(1)} L H₂O
-                </span>
-                {showReductionFor(dpp) && dpp.total_water_reduction_pct != null && dpp.total_water_reduction_pct > 0 && (
-                  <span className="mt-0.5 text-center text-[10px] font-medium text-blue-600">
-                    ↓ {Math.round(dpp.total_water_reduction_pct)}% vs avg
-                  </span>
-                )}
-              </div>
-            )}
-            {dpp.transparency_score != null && (
-              <span className="inline-flex items-center rounded-full bg-envrt-teal/5 px-2.5 py-1 text-xs font-medium text-envrt-teal">
-                {Math.round(dpp.transparency_score)}% transparency
-              </span>
-            )}
-          </div>
+          {/* Impact summary — one quiet line of body text */}
+          {impactSummary && (
+            <p className="mt-3 text-xs text-envrt-muted" data-testid="impact-summary">
+              {impactSummary}
+            </p>
+          )}
 
-          {/* Material tags with tooltips */}
-          {dpp.constituents.length > 0 && (() => {
-            const merged = deduplicateConstituents(dpp.constituents);
-            return (
-            <div className="mt-3 flex flex-wrap gap-1">
-              {merged.slice(0, 3).map((c) => {
-                const desc = getMaterialDescription(c.material);
-                const tooltipKey = `material:${c.material}`;
-                const tooltipActive = activeTooltip === tooltipKey;
-                return (
-                  <span
-                    key={c.material}
-                    onClick={(e) => {
-                      if (!desc) return;
-                      e.stopPropagation();
-                      setActiveTooltip(tooltipActive ? null : tooltipKey);
-                    }}
-                    className={`group/tip relative rounded-full border border-envrt-teal/10 bg-envrt-teal/5 px-2 py-0.5 text-[10px] font-medium text-envrt-teal ${desc ? "cursor-pointer" : "cursor-default"}`}
-                  >
-                    {c.material} {c.pct}%
-                    {desc && (
-                      <span
-                        className={`pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-48 -translate-x-1/2 rounded-lg border border-envrt-charcoal/10 bg-white px-3 py-2 text-[10px] font-normal leading-relaxed text-envrt-charcoal shadow-lg ${
-                          tooltipActive ? "block" : "hidden group-hover/tip:block"
-                        }`}
-                      >
-                        {desc}
-                        <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-white" />
-                      </span>
-                    )}
-                  </span>
-                );
-              })}
-              {merged.length > 3 && (
-                <span className="rounded-full border border-envrt-charcoal/5 bg-envrt-charcoal/5 px-2 py-0.5 text-[10px] font-medium text-envrt-muted">
-                  +{merged.length - 3} more
-                </span>
-              )}
-            </div>
-            );
-          })()}
-
-          {/* Production journey map (collapsible) */}
+          {/* Production journey map — open by default */}
           {hasJourney && (
             <div className="mt-3">
               <button
@@ -352,7 +279,7 @@ export function CollectiveCard({
             </div>
           )}
 
-          {/* Spacer pushes footer to bottom */}
+          {/* Spacer */}
           <div className="flex-1" />
 
           {/* Footer: compare + view CTA */}
@@ -397,7 +324,7 @@ export function CollectiveCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1 rounded-full bg-envrt-green/5 px-2.5 py-1 text-xs font-medium text-envrt-green transition-colors hover:bg-envrt-green/10"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-envrt-green transition-colors hover:underline"
                   data-cta="shop-product"
                 >
                   Shop this product
@@ -423,7 +350,7 @@ export function CollectiveCard({
         </div>
       </div>
 
-      {/* DPP popup — full height, covers the navbar (matches Fairly Made UX). */}
+      {/* DPP popup */}
       <DppPopup
         open={popupOpen}
         onClose={() => setPopupOpen(false)}
@@ -435,7 +362,7 @@ export function CollectiveCard({
       {/* Lightbox */}
       {lightboxOpen && productImageUrl && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70"
           onClick={() => setLightboxOpen(false)}
         >
           <div

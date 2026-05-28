@@ -274,6 +274,12 @@ h1, h2, h3, h4, h5, h6 {
   .animate-nudge {
     animation: none;
   }
+  .animate-tag-wobble {
+    animation: none;
+  }
+  .tag-paper {
+    transition: none;
+  }
 }
 
 /* Glitch text — matrix scramble is handled in JS (GlitchLink component) */
@@ -294,6 +300,57 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Composition tag (collective card hangtag) ──────────────────── */
+.tag-paper {
+  position: relative;
+  background-image: url('/textures/kraft.svg');
+  background-color: #d8c9a8;
+  background-size: 120px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: #2a2418;
+  max-height: 18px;
+  overflow: hidden;
+  transform: rotate(-5deg);
+  transition: max-height 250ms ease-out, transform 250ms ease-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
+  white-space: nowrap;
+}
+.tag-string {
+  position: absolute;
+  left: 6px;
+  top: -8px;
+  width: 1px;
+  height: 10px;
+  background: rgba(30, 30, 30, 0.45);
+  transform-origin: top;
+  transform: rotate(8deg);
+  z-index: 1;
+}
+.tag-line {
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.tag-line-secondary {
+  font-weight: 400;
+  text-transform: none;
+  color: rgba(42, 36, 24, 0.72);
+}
+@keyframes tag-wobble {
+  0%   { transform: rotate(-14deg); }
+  35%  { transform: rotate(-1deg); }
+  65%  { transform: rotate(-7deg); }
+  100% { transform: rotate(-5deg); }
+}
+.animate-tag-wobble {
+  animation: tag-wobble 450ms ease-out;
 }
 
 /* Scrollbar */
