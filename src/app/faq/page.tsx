@@ -84,7 +84,7 @@ const faqSections = [
       {
         question: "How much does ENVRT cost?",
         answer:
-          "ENVRT offers three plans: Starter at \u00a3149/month for up to 50 products, Growth at \u00a3495/month for up to 250 products with full LCA metrics, and Pro at \u00a31,295/month with custom allocation and dedicated support. Annual billing saves 15%.",
+          "ENVRT offers three plans: Starter at \u00a3149/month for up to 50 products, Growth at \u00a3495/month for up to 250 products with full LCA metrics, and Pro on custom pricing for brands needing more than 250 SKUs, advanced PEF-aligned metrics or dedicated support. Annual billing saves 15% on Starter and Growth. Contact sales for a Pro quote.",
       },
       {
         question: "Can I switch plans?",

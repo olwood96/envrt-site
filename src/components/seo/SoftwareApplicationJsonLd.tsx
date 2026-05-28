@@ -35,19 +35,6 @@ export function SoftwareApplicationJsonLd() {
         description:
           "Up to 250 products/SKUs, core LCA metrics, hotspot detection, product comparisons, and priority support.",
       },
-      {
-        "@type": "Offer",
-        name: "Pro",
-        price: "1295",
-        priceCurrency: "GBP",
-        priceValidUntil: new Date(
-          new Date().getFullYear() + 1,
-          0,
-          1
-        ).toISOString().split("T")[0],
-        description:
-          "Custom product/SKU allocation, complete PEF-aligned metrics, advanced modelling, dedicated account specialist.",
-      },
     ],
   };
 

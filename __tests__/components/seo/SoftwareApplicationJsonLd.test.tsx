@@ -19,18 +19,28 @@ describe("SoftwareApplicationJsonLd", () => {
     expect(jsonLd.operatingSystem).toBe("Web");
   });
 
-  it("includes three pricing offers", () => {
+  it("includes only the fixed-price offers (Starter and Growth)", () => {
     const { container } = render(<SoftwareApplicationJsonLd />);
     const jsonLd = getJsonLd(container);
 
-    expect(jsonLd.offers).toHaveLength(3);
+    expect(jsonLd.offers).toHaveLength(2);
     expect(jsonLd.offers[0].name).toBe("Starter");
     expect(jsonLd.offers[0].price).toBe("149");
     expect(jsonLd.offers[0].priceCurrency).toBe("GBP");
     expect(jsonLd.offers[1].name).toBe("Growth");
     expect(jsonLd.offers[1].price).toBe("495");
-    expect(jsonLd.offers[2].name).toBe("Pro");
-    expect(jsonLd.offers[2].price).toBe("1295");
+    expect(jsonLd.offers[1].priceCurrency).toBe("GBP");
+  });
+
+  it("does not include the Pro tier as a priced offer", () => {
+    const { container } = render(<SoftwareApplicationJsonLd />);
+    const jsonLd = getJsonLd(container);
+
+    const names = jsonLd.offers.map((o: { name: string }) => o.name);
+    expect(names).not.toContain("Pro");
+
+    const serialised = JSON.stringify(jsonLd);
+    expect(serialised).not.toContain("1295");
   });
 
   it("each offer has @type Offer", () => {

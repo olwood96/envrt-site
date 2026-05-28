@@ -156,7 +156,9 @@ export interface PricingPlan {
   slug: PlanSlug;
   name: string;
   subheading: string;
-  priceGBP: number;
+  priceGBP?: number;
+  customPricing?: boolean;
+  customSubline?: string;
   description: string;
   features: string[];
   highlighted: boolean;
@@ -209,7 +211,8 @@ export const pricingPlans: PricingPlan[] = [
     slug: "pro",
     name: "Pro",
     subheading: "Your Sustainability Team",
-    priceGBP: 1295,
+    customPricing: true,
+    customSubline: "Tailored to your SKU count, supplier complexity and support needs",
     description:
       "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
@@ -331,7 +334,7 @@ export const pricingFaqItems = [
   {
     question: "How much does a Digital Product Passport cost?",
     answer:
-      "ENVRT offers three plans: Starter at £149/month for up to 50 products/SKUs, Growth at £495/month for up to 250 products/SKUs with LCA metrics, and Pro at £1,295/month with custom allocation and dedicated support.",
+      "ENVRT offers three plans: Starter at £149/month for up to 50 products/SKUs, Growth at £495/month for up to 250 products/SKUs with LCA metrics, and Pro on custom pricing for brands needing more than 250 SKUs, advanced PEF-aligned metrics or dedicated support. Contact sales for a Pro quote.",
   },
   {
     question: "What's included in each ENVRT plan?",

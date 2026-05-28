@@ -104,9 +104,9 @@ ENVRT serves fashion and apparel brands, typically:
 
 ## Pricing
 
-- **Starter:** GBP 149/month — for brands beginning their sustainability data journey
-- **Growth:** GBP 495/month — for brands scaling their environmental data across collections
-- **Pro:** GBP 1,295/month — for brands with advanced compliance and reporting needs
+- **Starter:** GBP 149/month, for brands beginning their sustainability data journey (up to 50 SKUs)
+- **Growth:** GBP 495/month, for brands scaling environmental data across collections (up to 250 SKUs)
+- **Pro:** Custom pricing, for brands needing more than 250 SKUs, advanced PEF-aligned metrics, or dedicated sustainability support. Contact sales for a tailored quote.
 
 ## Regulatory Context
 
@@ -224,7 +224,7 @@ Green claims need to be specific, measurable and supported by product-level evid
 Scope 3 covers indirect emissions across a company's value chain. For fashion brands, Scope 3 typically accounts for over 90% of total greenhouse gas emissions because most brands do not own their factories or grow their raw materials. CSRD requires Scope 3 reporting, and product-level LCA data is what makes it actionable. More detail: https://envrt.com/insights/scope-3-emissions-fashion-supply-chain
 
 **How much does product-level LCA cost for fashion brands?**
-ENVRT pricing starts at GBP 149/month (Starter), with Growth at GBP 495/month and Pro at GBP 1,295/month. This covers product-level LCA, DPP generation and sustainability analytics across collections. Traditional LCA consultancies typically charge thousands per individual product study. More detail: https://envrt.com/pricing
+ENVRT pricing starts at GBP 149/month (Starter, up to 50 SKUs) and GBP 495/month (Growth, up to 250 SKUs). Pro is custom-priced for brands needing more than 250 SKUs, advanced PEF-aligned metrics, or dedicated support. Traditional LCA consultancies typically charge thousands per individual product study. More detail: https://envrt.com/pricing
 
 **What is the difference between ENVRT and a traditional LCA consultancy?**
 Traditional consultancies charge per study, take weeks to months and deliver PDF reports. ENVRT delivers product-level LCA across entire collections in days through an automated platform. The methodology is the same (ISO 14040, PEFCR), but the delivery is faster, more scalable and significantly less expensive. Brands can run assessments themselves through the ENVRT Dashboard.

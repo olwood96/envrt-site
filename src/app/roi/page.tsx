@@ -73,9 +73,9 @@ function calculateROI(inputs: CalcInputs): CalcResults {
     envrtPlan = "Growth";
     envrtPlanPrice = "£495/mo";
   } else {
-    envrtMonthly = 1295;
+    envrtMonthly = 1295; // indicative only, Pro is custom-priced
     envrtPlan = "Pro";
-    envrtPlanPrice = "£1,295/mo";
+    envrtPlanPrice = "Custom";
   }
   const envrtCost = envrtMonthly * 12;
 
@@ -774,12 +774,21 @@ export default function ROICalculatorPage() {
                     <p className="mt-1 text-sm text-envrt-muted">
                       {results.envrtPlanPrice} for {skuCount} products
                     </p>
-                    <Link
-                      href="/pricing"
-                      className="mt-3 inline-block text-xs font-medium text-envrt-teal underline hover:text-envrt-teal/80"
-                    >
-                      View full pricing details
-                    </Link>
+                    {results.envrtPlan === "Pro" ? (
+                      <Link
+                        href="/contact"
+                        className="mt-3 inline-block text-xs font-medium text-envrt-teal underline hover:text-envrt-teal/80"
+                      >
+                        Get a tailored quote
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/pricing"
+                        className="mt-3 inline-block text-xs font-medium text-envrt-teal underline hover:text-envrt-teal/80"
+                      >
+                        View full pricing details
+                      </Link>
+                    )}
                   </div>
                 </SectionCard>
               </div>
@@ -849,7 +858,7 @@ export default function ROICalculatorPage() {
                     <div className="space-y-3 text-xs leading-relaxed text-envrt-muted">
                       <p>
                         <strong className="text-envrt-charcoal">ENVRT pricing:</strong>{" "}
-                        Based on published plan rates. Starter (up to 50 products) at £149/mo, Growth (up to 250) at £495/mo, Pro (250+) at £1,295/mo.
+                        Based on published plan rates. Starter (up to 50 products) at £149/mo, Growth (up to 250) at £495/mo. Pro (250+) is custom-priced and shaped around SKU count, supplier complexity and support needs. The figure above uses an indicative monthly value for illustration. <a href="/contact" className="text-envrt-teal hover:underline">Contact sales</a> for a tailored quote.
                       </p>
                       <p>
                         <strong className="text-envrt-charcoal">Consultant cost:</strong>{" "}

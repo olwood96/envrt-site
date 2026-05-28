@@ -54,9 +54,9 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 
 ## Pricing
 
-- Starter: GBP 149/month
-- Growth: GBP 495/month
-- Pro: GBP 1,295/month
+- Starter: GBP 149/month, up to 50 products/SKUs
+- Growth: GBP 495/month, up to 250 products/SKUs
+- Pro: Custom pricing for brands needing more than 250 SKUs, advanced PEF-aligned metrics, or dedicated sustainability support. Contact sales for a tailored quote.
 
 ## Website
 

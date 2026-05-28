@@ -53,7 +53,9 @@ export function PricingPreviewSection() {
 
           <StaggerChildren className="mt-14 grid gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
-              const price = computePrice(plan.priceGBP, currency, interval);
+              const price = plan.customPricing
+                ? null
+                : computePrice(plan.priceGBP!, currency, interval);
 
               return (
                 <StaggerItem key={plan.name}>
@@ -82,12 +84,27 @@ export function PricingPreviewSection() {
                     </div>
 
                     <div className="mt-5">
-                      <span className="text-3xl font-bold text-envrt-charcoal transition-all duration-300">
-                        {formatPrice(interval === "annual" ? price * 12 : price, currency)}
-                      </span>
-                      <span className="text-sm text-envrt-muted">
-                        {interval === "annual" ? " / year" : " / month"}
-                      </span>
+                      {plan.customPricing ? (
+                        <>
+                          <span className="text-3xl font-bold text-envrt-charcoal">
+                            Custom
+                          </span>
+                          {plan.customSubline && (
+                            <p className="mt-1 text-sm text-envrt-muted">
+                              {plan.customSubline}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-3xl font-bold text-envrt-charcoal transition-all duration-300">
+                            {formatPrice(interval === "annual" ? price! * 12 : price!, currency)}
+                          </span>
+                          <span className="text-sm text-envrt-muted">
+                            {interval === "annual" ? " / year" : " / month"}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     <p className="mt-3 text-sm text-envrt-muted">

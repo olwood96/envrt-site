@@ -117,7 +117,9 @@ export default function PricingPage() {
         {/* Plan cards */}
         <StaggerChildren className="mt-10 grid gap-5 lg:grid-cols-3">
           {pricingPlans.map((plan) => {
-              const price = computePrice(plan.priceGBP, currency, interval);
+              const price = plan.customPricing
+                ? null
+                : computePrice(plan.priceGBP!, currency, interval);
 
               return (
             <StaggerItem key={plan.name}>
@@ -144,12 +146,23 @@ export default function PricingPage() {
                 </div>
 
                 <div className="mt-5">
-                  <span className="text-3xl font-bold text-envrt-charcoal transition-all duration-300">
-                    {formatPrice(interval === "annual" ? price * 12 : price, currency)}
-                  </span>
-                  <span className="text-sm text-envrt-muted">
-                    {interval === "annual" ? " / year" : " / month"}
-                  </span>
+                  {plan.customPricing ? (
+                    <>
+                      <span className="text-3xl font-bold text-envrt-charcoal">Custom</span>
+                      {plan.customSubline && (
+                        <p className="mt-1 text-sm text-envrt-muted">{plan.customSubline}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-bold text-envrt-charcoal transition-all duration-300">
+                        {formatPrice(interval === "annual" ? price! * 12 : price!, currency)}
+                      </span>
+                      <span className="text-sm text-envrt-muted">
+                        {interval === "annual" ? " / year" : " / month"}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <p className="mt-3 text-sm text-envrt-muted">{plan.description}</p>
@@ -167,34 +180,46 @@ export default function PricingPage() {
                 </ul>
 
                 <div className="mt-8 space-y-3">
-                  <button
-                    onClick={() => handleBuyNow(plan.slug)}
-                    disabled={loadingPlan !== null}
-                    className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-base font-medium transition-all duration-300 ${
-                      plan.highlighted
-                        ? "bg-envrt-teal text-white hover:bg-envrt-teal/90"
-                        : "bg-envrt-charcoal text-white hover:bg-envrt-charcoal/90"
-                    } ${loadingPlan !== null ? "cursor-not-allowed opacity-50" : ""}`}
-                  >
-                    {loadingPlan === plan.slug ? (
-                      <>
-                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Loading...
-                      </>
-                    ) : (
-                      "Get started"
-                    )}
-                  </button>
-                  <Button
-                    href="/contact"
-                    variant="secondary"
-                    className="w-full"
-                  >
-                    Get in touch
-                  </Button>
+                  {plan.customPricing ? (
+                    <Button
+                      href="/contact"
+                      variant={plan.highlighted ? "primary" : "secondary"}
+                      className="w-full"
+                    >
+                      Talk to us
+                    </Button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleBuyNow(plan.slug)}
+                        disabled={loadingPlan !== null}
+                        className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-base font-medium transition-all duration-300 ${
+                          plan.highlighted
+                            ? "bg-envrt-teal text-white hover:bg-envrt-teal/90"
+                            : "bg-envrt-charcoal text-white hover:bg-envrt-charcoal/90"
+                        } ${loadingPlan !== null ? "cursor-not-allowed opacity-50" : ""}`}
+                      >
+                        {loadingPlan === plan.slug ? (
+                          <>
+                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            Loading...
+                          </>
+                        ) : (
+                          "Get started"
+                        )}
+                      </button>
+                      <Button
+                        href="/contact"
+                        variant="secondary"
+                        className="w-full"
+                      >
+                        Get in touch
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </StaggerItem>
