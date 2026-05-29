@@ -358,7 +358,15 @@
       "  </div>" +
       "  <button class='close' data-close aria-label='Close popup'>" + X_ICON + "</button>" +
       "  <div class='loading' data-loading>" +
-      "    <div class='spinner'></div>" +
+      "    <div class='qr-frame'>" +
+      "      <span class='vf vf-tl'></span>" +
+      "      <span class='vf vf-tr'></span>" +
+      "      <span class='vf vf-bl'></span>" +
+      "      <span class='vf vf-br'></span>" +
+      "      <img class='qr-img' src='https://envrt.com/qr-code.png' alt='Scanning QR code' />" +
+      "      <div class='qr-line'></div>" +
+      "    </div>" +
+      "    <p class='qr-caption'>Scanning...</p>" +
       "  </div>" +
       "  <iframe data-iframe sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox' title='Digital Product Passport'></iframe>" +
       "</div>";
@@ -615,14 +623,38 @@
     ".close:hover { background: #f0eeea; color: #2aa198; }",
     ".close svg { width: 16px; height: 16px; }",
 
+    // QR-scan loader. Mirrors the React <QRScanLoader/> component used
+    // on envrt-site (hero + collective) so visitors see the same loader
+    // regardless of how they reached a DPP. Hand-rendered here because
+    // embed.js runs in vanilla JS inside a shadow root.
     ".loading {",
     "  position: absolute; inset: 0; background: #f8f7f4;",
-    "  display: flex; align-items: center; justify-content: center; z-index: 1;",
+    "  display: flex; flex-direction: column;",
+    "  align-items: center; justify-content: center; z-index: 1;",
     "  opacity: 0; transition: opacity 200ms; pointer-events: none;",
     "}",
     ":host(.loading) .loading { opacity: 1; pointer-events: auto; }",
-    ".spinner { width: 32px; height: 32px; border-radius: 9999px; border: 2px solid #2aa198; border-top-color: transparent; animation: envrt-spin 1s linear infinite; }",
-    "@keyframes envrt-spin { to { transform: rotate(360deg); } }",
+
+    ".qr-frame { position: relative; width: 120px; height: 120px; }",
+    ".vf { position: absolute; width: 20px; height: 20px; border-color: rgba(30,30,30,0.4); border-style: solid; border-width: 0; }",
+    ".vf-tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 6px; }",
+    ".vf-tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 6px; }",
+    ".vf-bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 6px; }",
+    ".vf-br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 6px; }",
+    ".qr-img { position: absolute; inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); object-fit: contain; }",
+    ".qr-line {",
+    "  position: absolute; left: 0; right: 0; height: 2px;",
+    "  background: linear-gradient(90deg, transparent, rgba(42,161,152,0.6), rgba(42,161,152,0.8), rgba(42,161,152,0.6), transparent);",
+    "  box-shadow: 0 0 8px rgba(42,161,152,0.4);",
+    "  animation: qr-scan 2s ease-in-out infinite;",
+    "}",
+    ".qr-caption {",
+    "  margin: 20px 0 0; font-size: 11px; font-weight: 500;",
+    "  letter-spacing: 0.05em; color: rgba(30,30,30,0.55);",
+    "  animation: qr-pulse 2s ease-in-out infinite;",
+    "}",
+    "@keyframes qr-scan { 0%, 100% { top: 0; } 50% { top: 100%; } }",
+    "@keyframes qr-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }",
 
     "iframe { width: 100%; height: 100%; border: 0; display: block; }"
   ].join("\n");
