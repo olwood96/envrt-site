@@ -59,4 +59,21 @@ describe("public/embed.js — window.envrtEmbed", () => {
       "https://dpp.envrt.com/embed/acme-co/long-sleeve-tee"
     );
   });
+
+  // Regression guard: the mobile bottom-sheet height MUST stay on svh
+  // (small viewport height) units. vh is calculated against the URL-bar-
+  // hidden viewport on iOS Safari/Chrome, so a vh-based height pushes the
+  // close button above the visible area when the URL bar is showing,
+  // making the popup impossible to close. The CSS variable
+  // --envrt-sheet-height defaults to an svh value and is overridden by
+  // brand-chosen svh values. Any literal vh fallback in the .sheet rule
+  // would silently win the cascade and reintroduce the bug.
+  it("does not use vh as a fallback for the mobile sheet height", () => {
+    const src = readFileSync(
+      path.resolve(__dirname, "../../public/embed.js"),
+      "utf8"
+    );
+    expect(src).not.toMatch(/height:\s*92vh/);
+    expect(src).not.toMatch(/max-height:\s*92vh/);
+  });
 });

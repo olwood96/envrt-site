@@ -477,8 +477,8 @@
 
     ".sheet {",
     "  position: fixed; left: 0; right: 0; bottom: 0;",
-    "  height: var(--envrt-sheet-height); height: 92vh;",
-    "  max-height: var(--envrt-sheet-height); max-height: 92vh;",
+    "  height: var(--envrt-sheet-height);",
+    "  max-height: var(--envrt-sheet-height);",
     "  background: #ffffff; overflow: hidden;",
     "  border-top-left-radius: 16px; border-top-right-radius: 16px;",
     "  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);",
