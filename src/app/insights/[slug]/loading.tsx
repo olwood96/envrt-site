@@ -1,11 +1,12 @@
 import { Container } from "@/components/ui/Container";
+import { StitchingLoader } from "@/components/ui/StitchingLoader";
 
 export default function InsightLoading() {
   return (
     <section className="py-20 sm:py-28">
       <Container>
-        <div className="mx-auto max-w-3xl animate-pulse">
-          {/* Title */}
+        <div className="mx-auto max-w-3xl">
+          {/* Title placeholders (static, no pulse) */}
           <div className="h-10 w-3/4 rounded-lg bg-envrt-cream" />
           <div className="mt-4 h-5 w-1/2 rounded bg-envrt-cream" />
 
@@ -15,8 +16,11 @@ export default function InsightLoading() {
             <div className="h-4 w-20 rounded bg-envrt-cream" />
           </div>
 
-          {/* Content lines */}
-          <div className="mt-12 space-y-4">
+          {/* Single calm loading cue */}
+          <StitchingLoader label="Loading insight" className="py-8" />
+
+          {/* Content placeholders */}
+          <div className="space-y-4">
             <div className="h-4 w-full rounded bg-envrt-cream" />
             <div className="h-4 w-5/6 rounded bg-envrt-cream" />
             <div className="h-4 w-full rounded bg-envrt-cream" />

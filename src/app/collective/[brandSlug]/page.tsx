@@ -80,15 +80,13 @@ export default async function BrandProfilePage({ params }: PageProps) {
         {/* Brand header */}
         <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
           {brandLogoUrl && (
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-envrt-charcoal/5 bg-white p-2">
-              <Image
-                src={brandLogoUrl}
-                alt={brand.name}
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain"
-              />
-            </div>
+            <Image
+              src={brandLogoUrl}
+              alt={brand.name}
+              width={80}
+              height={80}
+              className="h-16 w-auto max-w-[120px] shrink-0 object-contain sm:h-20 sm:max-w-[160px]"
+            />
           )}
           <div className="min-w-0">
             <div className="flex items-center gap-2">

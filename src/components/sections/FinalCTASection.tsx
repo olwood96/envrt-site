@@ -131,14 +131,11 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
 
             {caption && (
               <FadeUp delay={0.1}>
-                <div className="mt-5 flex w-fit items-center gap-2.5 rounded-full border border-envrt-charcoal/8 bg-envrt-charcoal/[0.03] px-4 py-1.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
-                  </span>
-                  <p className="text-xs font-medium tracking-wide text-envrt-muted sm:text-xs">
+                <div className="mt-5">
+                  <p className="text-xs font-medium italic tracking-wide text-envrt-muted">
                     {caption}
                   </p>
+                  <div className="mt-1.5 h-px w-10 bg-envrt-charcoal/25" aria-hidden="true" />
                 </div>
               </FadeUp>
             )}
@@ -205,15 +202,9 @@ export function FinalCTASection({ featuredCards }: FinalCTASectionProps) {
                         </div>
                       </div>
                     ) : caption ? (
-                      <div className="flex items-center gap-2">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-envrt-teal opacity-50" />
-                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-envrt-teal" />
-                        </span>
-                        <p className="text-[10px] font-medium text-envrt-muted">
-                          {caption}
-                        </p>
-                      </div>
+                      <p className="text-[10px] font-medium italic text-envrt-muted">
+                        {caption}
+                      </p>
                     ) : null}
                   </motion.div>
                 </AnimatePresence>

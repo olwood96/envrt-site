@@ -23,11 +23,14 @@ export default function TermsPage() {
     <div className="pt-28 pb-16">
       <Container>
         <div className="mx-auto max-w-2xl">
-          <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-envrt-muted">
+            ENVRT Legal
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-envrt-charcoal">
             Terms of service
           </h1>
-          <p className="mt-4 text-sm text-envrt-muted">
-            Last updated: March 2026
+          <p className="mt-1 text-xs text-envrt-muted">
+            Last updated 1 March 2026
           </p>
 
           <div className="mt-8 space-y-8 text-sm leading-relaxed text-envrt-charcoal/70">

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { StitchingLoader } from "@/components/ui/StitchingLoader";
 
 interface Props {
   open: boolean;
@@ -286,7 +287,7 @@ export function DppPopup({
 
         {isLoading && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8f7f4]">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-envrt-teal border-t-transparent" />
+            <StitchingLoader label="Loading passport" />
           </div>
         )}
       </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toPng } from "html-to-image";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { deduplicateConstituents, showReductionFor } from "@/lib/collective/utils";
+import { StitchingLoader } from "@/components/ui/StitchingLoader";
 
 const CollectiveProductionMap = lazy(() =>
   import("./CollectiveProductionMap").then((m) => ({
@@ -523,7 +524,7 @@ export function CollectiveComparisonView({ cards }: Props) {
                     <Suspense
                       fallback={
                         <div className="flex h-[140px] items-center justify-center rounded-lg bg-envrt-cream/40">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-envrt-teal border-t-transparent" />
+                          <StitchingLoader label="Loading journey" className="py-0" />
                         </div>
                       }
                     >

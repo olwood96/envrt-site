@@ -6,6 +6,7 @@ import { SectionCard } from "@/components/ui/SectionCard";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
+import { ContactSuccessConfirmation } from "@/components/ContactSuccessConfirmation";
 
 /* ── Custom Dropdown ──────────────────────────────────────────────────── */
 
@@ -106,7 +107,10 @@ function InterestDropdown({
 /* ── Page ──────────────────────────────────────────────────────────────── */
 
 export default function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<{
+    firstName: string;
+    email: string;
+  } | null>(null);
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -119,15 +123,17 @@ export default function ContactPage() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const firstName = String(formData.get("first-name") || "");
+    const email = String(formData.get("email") || "");
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: formData.get("first-name") || "",
+          firstName,
           lastName: formData.get("last-name") || "",
-          email: formData.get("email") || "",
+          email,
           company: formData.get("company") || "",
           interest: formData.get("interest") || "",
           message: formData.get("message") || "",
@@ -136,7 +142,7 @@ export default function ContactPage() {
         }),
       });
       if (res.ok) {
-        setSubmitted(true);
+        setSubmitted({ firstName, email });
       } else {
         setError(true);
       }
@@ -166,19 +172,10 @@ export default function ContactPage() {
           <SectionCard className="mx-auto mt-12 max-w-xl">
             <div className="p-8 sm:p-10">
               {submitted ? (
-                <div className="text-center py-12">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-envrt-teal/10">
-                    <svg className="h-8 w-8 text-envrt-teal" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="mt-4 text-xl font-semibold text-envrt-charcoal">
-                    Thank you!
-                  </h3>
-                  <p className="mt-2 text-sm text-envrt-muted">
-                    We&apos;ll be in touch shortly to schedule your demo.
-                  </p>
-                </div>
+                <ContactSuccessConfirmation
+                  firstName={submitted.firstName}
+                  email={submitted.email}
+                />
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <p className="hidden">

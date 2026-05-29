@@ -283,6 +283,9 @@ h1, h2, h3, h4, h5, h6 {
   .tag-wrap {
     transition: none;
   }
+  .stitch-line {
+    animation: none;
+  }
 }
 
 /* Glitch text — matrix scramble is handled in JS (GlitchLink component) */
@@ -412,6 +415,26 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow:
     0 1px 1px rgba(0, 0, 0, 0.04),
     0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Stitching loader ───────────────────────────────────────────── */
+/* Horizontal hairline that "stitches" left-to-right, like the visible
+   thread of a sewing machine. Used by <StitchingLoader />. */
+.stitch-line {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(60, 50, 30, 0.45) 0,
+    rgba(60, 50, 30, 0.45) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  background-size: 8px 1px;
+  animation: stitch-march 0.6s linear infinite;
+}
+@keyframes stitch-march {
+  from { background-position: 0 0; }
+  to   { background-position: -8px 0; }
 }
 
 /* Scrollbar */
