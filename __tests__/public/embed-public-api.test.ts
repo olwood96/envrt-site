@@ -3,23 +3,24 @@
 // Smoke tests for the public window.envrtEmbed API exposed by
 // public/embed.js. The dashboard's "Test popout" button calls this to
 // preview brand-level customisation without saving.
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { readFileSync } from "fs";
 import path from "path";
 
+function loadEmbedScript() {
+  delete (window as unknown as Record<string, unknown>).__envrtDppEmbedLoaded;
+  delete (window as unknown as Record<string, unknown>).envrtEmbed;
+  const src = readFileSync(
+    path.resolve(__dirname, "../../public/embed.js"),
+    "utf8"
+  );
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  new Function(src)();
+}
+
 describe("public/embed.js — window.envrtEmbed", () => {
   beforeAll(() => {
-    // Reset the load guard between test runs and evaluate the script in
-    // the jsdom global scope. The script's IIFE assigns the public API
-    // to window.envrtEmbed on first run.
-    delete (window as unknown as Record<string, unknown>).__envrtDppEmbedLoaded;
-    delete (window as unknown as Record<string, unknown>).envrtEmbed;
-    const src = readFileSync(
-      path.resolve(__dirname, "../../public/embed.js"),
-      "utf8"
-    );
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    new Function(src)();
+    loadEmbedScript();
   });
 
   it("exposes openTest, close, and the _buildIframeUrl test helper", () => {
@@ -77,3 +78,67 @@ describe("public/embed.js — window.envrtEmbed", () => {
     expect(src).not.toMatch(/max-height:\s*92vh/);
   });
 });
+
+describe("public/embed.js — attribution injection", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("injects 'Powered by ENVRT' into a bare .envrt-dpp-link anchor", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    loadEmbedScript();
+
+    const attribution = link.querySelector("[data-envrt-attribution]");
+    expect(attribution).not.toBeNull();
+    expect(attribution!.textContent).toContain("Powered by");
+    expect(link.querySelector('img[src*="envrt-logo"]')).not.toBeNull();
+    expect(link.getAttribute("data-envrt-attributed")).toBe("1");
+  });
+
+  it("does not double-inject when an older snippet already includes the attribution inline", () => {
+    // Mimic the previous snippet format: text "Powered by" + the wordmark image.
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.innerHTML =
+      'View DPP<br><span>Powered by <img src="https://envrt.com/brand/envrt-logo.png" alt="ENVRT"></span>';
+    document.body.appendChild(link);
+
+    loadEmbedScript();
+
+    // Should not add a second attribution span.
+    expect(link.querySelectorAll("[data-envrt-attribution]").length).toBe(0);
+    expect(link.querySelectorAll('img[src*="envrt-logo"]').length).toBe(1);
+    // Still stamped so future passes skip it.
+    expect(link.getAttribute("data-envrt-attributed")).toBe("1");
+  });
+
+  it("is idempotent across repeated runs on the same anchor", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    loadEmbedScript();
+    // Manually trigger the injection again via the public API surface
+    // (we don't expose injectAttributionEverywhere directly, so we rely
+    // on the data-envrt-attributed stamp guarding against double work).
+    const span = link.querySelector("[data-envrt-attribution]");
+    expect(span).not.toBeNull();
+
+    // Re-running the script body is the closest analogue to "the
+    // observer fires twice for the same anchor" in a JSDOM smoke test.
+    loadEmbedScript();
+    expect(link.querySelectorAll("[data-envrt-attribution]").length).toBe(1);
+  });
+});
+

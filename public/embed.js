@@ -72,6 +72,92 @@
     }
   }
 
+  // ---- Attribution injection ----
+  // The "Powered by ENVRT" attribution is injected at runtime rather than
+  // baked into the pasted snippet, so brands can't strip it from their
+  // page source. Runs on script init for any anchor already in the DOM,
+  // and via MutationObserver for anchors added later (SPAs, dynamic
+  // product pages, etc.).
+  //
+  // Idempotency: each anchor is stamped with data-envrt-attributed once
+  // injected. We also detect older snippets that included the attribution
+  // inline (text "Powered by" or an img with envrt-logo in the src) and
+  // skip those so we don't double-stamp brands who pasted the previous
+  // snippet format.
+  function buildAttributionSpan() {
+    var span = document.createElement("span");
+    span.setAttribute("data-envrt-attribution", "");
+    // display:inline-block creates a new text-decoration scope so the
+    // host site's anchor underline doesn't draw through this span. The
+    // explicit text-decoration:none is belt-and-braces for hosts that
+    // re-apply underlines via descendant selectors.
+    span.style.cssText =
+      "display:inline-block;text-decoration:none;font-size:0.85em;opacity:0.75;margin-top:2px;";
+    span.innerHTML =
+      'Powered by <img src="https://envrt.com/brand/envrt-logo.png" ' +
+      'alt="ENVRT" ' +
+      'style="height:0.9em;width:auto;vertical-align:-0.1em;display:inline-block;margin:0 0 0 3px;" />';
+    return span;
+  }
+
+  function hasExistingAttribution(link) {
+    if (link.querySelector("[data-envrt-attribution]")) return true;
+    if (link.querySelector('img[src*="envrt-logo"]')) return true;
+    // textContent walk catches plain-text "Powered by" from older snippet
+    // formats even when the wordmark image failed to load.
+    if ((link.textContent || "").indexOf("Powered by") !== -1) return true;
+    return false;
+  }
+
+  function injectAttributionInto(link) {
+    if (link.getAttribute("data-envrt-attributed") === "1") return;
+    if (hasExistingAttribution(link)) {
+      link.setAttribute("data-envrt-attributed", "1");
+      return;
+    }
+    link.appendChild(document.createElement("br"));
+    link.appendChild(buildAttributionSpan());
+    link.setAttribute("data-envrt-attributed", "1");
+  }
+
+  function injectAttributionEverywhere() {
+    var links = document.querySelectorAll(LINK_SELECTOR);
+    for (var i = 0; i < links.length; i++) injectAttributionInto(links[i]);
+  }
+
+  function startAttributionObserver() {
+    if (typeof MutationObserver !== "function") return;
+    var obs = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        var added = mutations[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var node = added[j];
+          if (node.nodeType !== 1) continue; // element only
+          if (node.matches && node.matches(LINK_SELECTOR)) {
+            injectAttributionInto(node);
+          }
+          if (node.querySelectorAll) {
+            var nested = node.querySelectorAll(LINK_SELECTOR);
+            for (var k = 0; k < nested.length; k++) injectAttributionInto(nested[k]);
+          }
+        }
+      }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // Run once the DOM is ready (script is loaded async/defer so this may
+  // be immediate or queued depending on parser state).
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      injectAttributionEverywhere();
+      startAttributionObserver();
+    });
+  } else {
+    injectAttributionEverywhere();
+    startAttributionObserver();
+  }
+
   // ---- Click interception ----
   document.addEventListener("click", function (e) {
     if (e.defaultPrevented) return;
