@@ -173,6 +173,7 @@ export const pricingPlans: PricingPlan[] = [
     description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
       "Up to 50 products/SKUs",
+      "1 team seat",
       "QR-ready passport pages",
       "Transparency score per product",
       "Evidence uploads and product documentation",
@@ -180,7 +181,7 @@ export const pricingPlans: PricingPlan[] = [
       "CO\u2082e and AWARE water scarcity indicators",
       "French Eco-Score rating",
       "Fibre-to-assembly supply chain reconstruction",
-      "DPP scan and engagement analytics",
+      "Regulatory compliance exports",
       "Email support with onboarding call",
     ],
     highlighted: false,
@@ -193,6 +194,8 @@ export const pricingPlans: PricingPlan[] = [
     description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
       "Up to 250 products/SKUs",
+      "5 team seats",
+      "Everything in Starter, plus:",
       "Expanded product data in DPP",
       "Core LCA metrics beyond indicators",
       "Process-level supply chain reconstruction",
@@ -202,7 +205,8 @@ export const pricingPlans: PricingPlan[] = [
       "Entry-level decarbonisation guidance",
       "Stage-linked evidence library",
       "Hotspot insights with reduction opportunities",
-      "Exportable sustainability reports and collection analytics",
+      "DPP scan and engagement analytics",
+      "Metrics and analytics report exports",
       "Priority support",
     ],
     highlighted: true,
@@ -217,6 +221,8 @@ export const pricingPlans: PricingPlan[] = [
       "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
     features: [
       "Custom product/SKU allocation",
+      "Unlimited team seats",
+      "Everything in Growth, plus:",
       "Complete PEF-aligned metrics",
       "Advanced modelling and optimisation frameworks",
       "Seasonal product-line impact reports",
@@ -231,6 +237,12 @@ export const pricingPlans: PricingPlan[] = [
 
 export const pricingComparison = {
   categories: [
+    {
+      name: "Team and Access",
+      features: [
+        { name: "Team seats", starter: "1", growth: "5", pro: "Unlimited" },
+      ],
+    },
     {
       name: "DPP Creation",
       features: [
@@ -272,12 +284,18 @@ export const pricingComparison = {
     {
       name: "Dashboard and Insights",
       features: [
-        { name: "DPP scan and engagement analytics", starter: true, growth: true, pro: true },
+        { name: "DPP scan and engagement analytics", starter: false, growth: true, pro: true },
         { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
         { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
         { name: "Product comparisons", starter: false, growth: true, pro: true },
-        { name: "Exportable sustainability reports and collection analytics", starter: false, growth: true, pro: true },
         { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true },
+      ],
+    },
+    {
+      name: "Exports and Reporting",
+      features: [
+        { name: "Regulatory compliance exports", starter: true, growth: true, pro: true },
+        { name: "Metrics and analytics exports", starter: false, growth: true, pro: true },
       ],
     },
     {
@@ -339,7 +357,7 @@ export const pricingFaqItems = [
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes DPP creation, QR-ready passport pages, transparency scores, CO\u2082e indicators, French Eco-Score ratings and DPP scan analytics. Growth adds expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
+      "Starter includes 1 team seat, DPP creation, QR-ready passport pages, transparency scores, CO\u2082e and AWARE water indicators, French Eco-Score ratings and regulatory compliance exports. Growth adds 5 team seats, expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, product comparisons, DPP scan and engagement analytics, and metrics and analytics exports. Pro includes unlimited team seats, complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",

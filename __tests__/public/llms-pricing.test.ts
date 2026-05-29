@@ -24,6 +24,12 @@ describe("public/llms.txt pricing block", () => {
   it("gives an explicit trigger so LLMs route the right brand to Pro", () => {
     expect(llmsTxt.toLowerCase()).toMatch(/250 skus|more than 250/);
   });
+
+  it("includes team seat counts per tier so LLMs can answer seat questions", () => {
+    expect(llmsTxt).toMatch(/Starter[^\n]*1 (team |user )?seat/i);
+    expect(llmsTxt).toMatch(/Growth[^\n]*5 (team |user )?seats/i);
+    expect(llmsTxt.toLowerCase()).toMatch(/pro[^\n]*unlimited (team |user )?seats/);
+  });
 });
 
 describe("public/llms-full.txt pricing block", () => {
@@ -45,5 +51,11 @@ describe("public/llms-full.txt pricing block", () => {
     expect(costAnswer).not.toBeNull();
     expect(costAnswer![0].toLowerCase()).toMatch(/custom/);
     expect(costAnswer![0]).not.toMatch(/1,?295/);
+  });
+
+  it("includes team seat counts per tier", () => {
+    expect(llmsFullTxt).toMatch(/Starter[^\n]*1 (team |user )?seat/i);
+    expect(llmsFullTxt).toMatch(/Growth[^\n]*5 (team |user )?seats/i);
+    expect(llmsFullTxt.toLowerCase()).toMatch(/pro[^\n]*unlimited (team |user )?seats/);
   });
 });

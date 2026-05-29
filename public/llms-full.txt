@@ -104,9 +104,9 @@ ENVRT serves fashion and apparel brands, typically:
 
 ## Pricing
 
-- **Starter:** GBP 149/month, for brands beginning their sustainability data journey (up to 50 SKUs)
-- **Growth:** GBP 495/month, for brands scaling environmental data across collections (up to 250 SKUs)
-- **Pro:** Custom pricing, for brands needing more than 250 SKUs, advanced PEF-aligned metrics, or dedicated sustainability support. Contact sales for a tailored quote.
+- **Starter:** GBP 149/month, for brands beginning their sustainability data journey (up to 50 SKUs, 1 team seat)
+- **Growth:** GBP 495/month, for brands scaling environmental data across collections (up to 250 SKUs, 5 team seats)
+- **Pro:** Custom pricing, unlimited team seats, for brands needing more than 250 SKUs, advanced PEF-aligned metrics, or dedicated sustainability support. Contact sales for a tailored quote.
 
 ## Regulatory Context
 

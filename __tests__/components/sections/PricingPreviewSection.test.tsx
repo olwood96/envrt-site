@@ -26,4 +26,12 @@ describe("PricingPreviewSection", () => {
     expect(container.textContent).not.toMatch(/1,?295/);
     expect(screen.getAllByText(/Custom/i).length).toBeGreaterThan(0);
   });
+
+  it("surfaces team seat counts on every plan card", () => {
+    const { container } = render(<PricingPreviewSection />);
+    const text = container.textContent || "";
+    expect(text).toMatch(/1 team seat/i);
+    expect(text).toMatch(/5 team seats/i);
+    expect(text).toMatch(/unlimited (team )?seats/i);
+  });
 });
