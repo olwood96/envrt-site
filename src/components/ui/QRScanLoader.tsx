@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 interface QRScanLoaderProps {
   /** Controls visibility + fade-out. Default true. Pass false to fade
@@ -69,11 +68,16 @@ export function QRScanLoader({
         <ViewfinderCorner position="br" />
 
         <div className="absolute inset-3 flex items-center justify-center">
-          <Image
+          {/* Plain <img> by design. This is a LOADING screen, so we
+              cannot afford the extra fetch round-trip that next/image
+              imposes via /_next/image?url=... — if that request stalls
+              or fails, the loader shows a broken image icon at the
+              exact moment we need a clean visual. Loading the static
+              asset directly is faster and more reliable. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/qr-code.png"
             alt="Scanning QR code"
-            width={200}
-            height={200}
             className="h-full w-full object-contain"
           />
         </div>
