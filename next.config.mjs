@@ -73,6 +73,28 @@ const nextConfig = {
         ],
       },
       {
+        // N27 font files loaded cross-origin by embed.js into the popup
+        // shadow DOM via @font-face. Browsers require CORS on font
+        // resources, without these headers the font request succeeds
+        // but the browser refuses to use the font and falls back to the
+        // system default. Long cache because font files don't change.
+        source: "/fonts/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // QR code PNG used by the embed.js popup loading state. Loaded
+        // cross-origin from brand sites. Long cache for the same reason
+        // as fonts above.
+        source: "/qr-code.png",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=86400, s-maxage=2592000" },
+        ],
+      },
+      {
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },

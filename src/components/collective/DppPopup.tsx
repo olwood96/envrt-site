@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { StitchingLoader } from "@/components/ui/StitchingLoader";
+import { QRScanLoader } from "@/components/ui/QRScanLoader";
 
 interface Props {
   open: boolean;
@@ -285,11 +285,7 @@ export function DppPopup({
           </svg>
         </button>
 
-        {isLoading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8f7f4]">
-            <StitchingLoader label="Loading passport" />
-          </div>
-        )}
+        <QRScanLoader visible={isLoading} />
       </div>
     </>,
     document.body

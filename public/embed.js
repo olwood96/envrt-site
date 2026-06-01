@@ -627,6 +627,21 @@
     // on envrt-site (hero + collective) so visitors see the same loader
     // regardless of how they reached a DPP. Hand-rendered here because
     // embed.js runs in vanilla JS inside a shadow root.
+    //
+    // N27 is the ENVRT brand font, loaded cross-origin from envrt.com
+    // into the shadow root via @font-face. Without this rule the host
+    // page's fonts wouldn't reach the caption (shadow DOM doesn't
+    // inherit fonts) and the visitor would see a generic sans-serif
+    // for "Scanning...". envrt.com serves /fonts/ with CORS headers so
+    // the font request doesn't fail silently.
+    "@font-face {",
+    "  font-family: 'envrt-n27';",
+    "  src: url('https://envrt.com/fonts/n27/n27-medium-webfont.woff2') format('woff2');",
+    "  font-weight: 500;",
+    "  font-style: normal;",
+    "  font-display: swap;",
+    "}",
+
     ".loading {",
     "  position: absolute; inset: 0; background: #f8f7f4;",
     "  display: flex; flex-direction: column;",
@@ -651,6 +666,7 @@
     ".qr-caption {",
     "  margin: 20px 0 0; font-size: 11px; font-weight: 500;",
     "  letter-spacing: 0.05em; color: rgba(30,30,30,0.55);",
+    "  font-family: 'envrt-n27', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;",
     "  animation: qr-pulse 2s ease-in-out infinite;",
     "}",
     "@keyframes qr-scan { 0%, 100% { top: 0; } 50% { top: 100%; } }",
