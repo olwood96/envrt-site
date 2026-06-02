@@ -1,125 +1,72 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "../../ui/Button";
 import { Badge } from "../../ui/Badge";
 import { FadeUp } from "../../ui/Motion";
-import { QRScanLoader } from "../../ui/QRScanLoader";
-import { siteConfig } from "@/lib/config";
-import {
-  HERO_JACKET_HEIGHT_RATIO,
-  HERO_QR_HEIGHT_RATIO,
-  PHONE_VIEWPORT_WIDTH,
-  PHONE_VIEWPORT_HEIGHT,
-} from "@/lib/constants";
 
-function PhoneMockup({ src }: { src: string }) {
-  const screenRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
+// Each annotation thumbnail shows a cropped region of a single full DPP
+// screenshot (public/screenshots/dpp/hoodie-full.png). Crop is controlled
+// via background-position + background-size, so all four panels share one
+// asset. Tune the coordinates by eye once the screenshot is in place.
+type Annotation = {
+  id: number;
+  label: string;
+  // CSS background-position-y as a percentage of the source image height.
+  // Pick the region of the DPP that corresponds to this annotation.
+  cropY: string;
+  // Where this panel sits on the desktop composition.
+  desktopAnchor: { top: string; left?: string; right?: string };
+};
 
-  useEffect(() => {
-    const update = () => {
-      if (screenRef.current) {
-        setScale(screenRef.current.offsetWidth / PHONE_VIEWPORT_WIDTH);
-      }
-    };
-    update();
-    const observer = new ResizeObserver(update);
-    if (screenRef.current) observer.observe(screenRef.current);
-    return () => observer.disconnect();
-  }, []);
+const annotations: Annotation[] = [
+  {
+    id: 1,
+    label: "Headline impact",
+    cropY: "7%",
+    desktopAnchor: { top: "6%", left: "-4%" },
+  },
+  {
+    id: 2,
+    label: "Materials breakdown",
+    cropY: "17%",
+    desktopAnchor: { top: "6%", right: "-4%" },
+  },
+  {
+    id: 3,
+    label: "Supply chain map",
+    cropY: "26%",
+    desktopAnchor: { top: "62%", left: "-4%" },
+  },
+  {
+    id: 4,
+    label: "Verified standards",
+    cropY: "72%",
+    desktopAnchor: { top: "62%", right: "-4%" },
+  },
+];
 
-  return (
-    <div className="relative mx-auto w-full max-w-[280px] lg:max-w-[300px]">
-      <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5" style={{ height: 22 }}>
-          <span className="text-[10px] font-semibold leading-none text-envrt-charcoal">21:37</span>
-          <div className="w-[72px]" />
-          <div className="flex items-center gap-[4px]">
-            <svg width="12" height="9" viewBox="0 0 14 10" fill="none" className="text-envrt-charcoal">
-              <rect x="0" y="7" width="2.5" height="3" rx="0.5" fill="currentColor" />
-              <rect x="3.5" y="5" width="2.5" height="5" rx="0.5" fill="currentColor" />
-              <rect x="7" y="2.5" width="2.5" height="7.5" rx="0.5" fill="currentColor" />
-              <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" />
-            </svg>
-            <svg width="11" height="9" viewBox="0 0 13 10" fill="none" className="text-envrt-charcoal">
-              <path d="M6.5 8.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" fill="currentColor" />
-              <path d="M4 7.2a3.5 3.5 0 0 1 5 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              <path d="M1.8 4.8a6.5 6.5 0 0 1 9.4 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <span className="text-[8px] font-medium leading-none text-envrt-charcoal">69</span>
-            <div className="flex items-center gap-[1px]">
-              <div className="relative h-[8px] w-[17px] rounded-[2px] border border-envrt-charcoal/80">
-                <div className="absolute inset-[1px] rounded-[1px] bg-envrt-charcoal" style={{ width: "69%" }} />
-              </div>
-              <div className="h-[3px] w-[1px] rounded-r-full bg-envrt-charcoal/80" />
-            </div>
-          </div>
-        </div>
-        <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
+// Where each panel's connector line lands on the central composition,
+// expressed as percentages of the right column. The QR sits roughly at
+// (60%, 60%) of the column, which is the natural focal point.
+const FOCAL_POINT = { x: 58, y: 62 };
 
-        <div ref={screenRef} className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ aspectRatio: "9 / 19" }}>
-          <div className="absolute inset-0 overflow-hidden">
-            <iframe
-              src={src}
-              title="Digital Product Passport"
-              loading="eager"
-              className="absolute border-0"
-              style={{
-                top: 0,
-                left: 0,
-                width: `${PHONE_VIEWPORT_WIDTH}px`,
-                height: `${PHONE_VIEWPORT_HEIGHT}px`,
-                transform: `scale(${scale})`,
-                transformOrigin: "top left",
-                overflow: "auto",
-                WebkitOverflowScrolling: "touch",
-                paddingTop: "22px",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-              onLoad={() => setIframeLoaded(true)}
-            />
-          </div>
-          <QRScanLoader
-            visible={!iframeLoaded}
-            containerRadiusClassName="rounded-[2.3rem]"
-            qrSizeClassName="w-[55%]"
-          />
-        </div>
-      </div>
+// Panel anchor points (where the connector line starts), expressed as a
+// percentage of the right column. Computed from desktopAnchor + panel size.
+const PANEL_ANCHORS: Record<number, { x: number; y: number }> = {
+  1: { x: 12, y: 22 },
+  2: { x: 88, y: 22 },
+  3: { x: 12, y: 78 },
+  4: { x: 88, y: 78 },
+};
 
-      <p className="mt-3 text-center text-xs text-envrt-muted/60">
-        ↕ Scroll to explore the live DPP
-      </p>
-    </div>
-  );
-}
+const SCREENSHOT_SRC = "/screenshots/dpp/hoodie-full.png";
 
 export function HeroV2() {
-  const phoneRef = useRef<HTMLDivElement>(null);
-  const [phoneHeight, setPhoneHeight] = useState(0);
-
-  const updateHeight = useCallback(() => {
-    if (phoneRef.current) {
-      setPhoneHeight(phoneRef.current.offsetHeight);
-    }
-  }, []);
-
-  useEffect(() => {
-    updateHeight();
-    const observer = new ResizeObserver(updateHeight);
-    if (phoneRef.current) observer.observe(phoneRef.current);
-    return () => observer.disconnect();
-  }, [updateHeight]);
-
-  const jacketHeight = phoneHeight * HERO_JACKET_HEIGHT_RATIO;
-  const qrHeight = phoneHeight * HERO_QR_HEIGHT_RATIO;
-
   return (
     <section className="relative mx-auto max-w-[1360px] overflow-x-clip px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 lg:px-16 lg:pb-24">
-      <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+        {/* Left: text content */}
         <div className="max-w-xl">
           <FadeUp><Badge>Ready for the EU ESPR mandate.</Badge></FadeUp>
           <FadeUp delay={0.1}>
@@ -156,51 +103,153 @@ export function HeroV2() {
           </FadeUp>
         </div>
 
+        {/* Right: hoodie + QR composition with annotated thumbnails */}
         <FadeUp delay={0.2}>
-          <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-[100vw] px-6 pb-12 sm:px-10 sm:pb-14 lg:static lg:ml-0 lg:mr-0 lg:w-auto lg:px-0 lg:pb-0 lg:pl-4">
-            <div ref={phoneRef} className="relative mx-auto max-w-md lg:max-w-none">
-              {phoneHeight > 0 && (
+          <div className="relative mx-auto w-full max-w-[640px]">
+            {/* Desktop composition with annotations around the artefact */}
+            <div className="relative hidden aspect-square lg:block">
+              {/* Connector overlay */}
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                {annotations.map((a) => {
+                  const anchor = PANEL_ANCHORS[a.id];
+                  return (
+                    <g key={a.id}>
+                      <line
+                        x1={anchor.x}
+                        y1={anchor.y}
+                        x2={FOCAL_POINT.x}
+                        y2={FOCAL_POINT.y}
+                        stroke="rgba(42, 161, 152, 0.45)"
+                        strokeWidth={0.15}
+                        strokeDasharray="0.5 0.5"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                      <circle
+                        cx={anchor.x}
+                        cy={anchor.y}
+                        r={0.35}
+                        fill="rgb(42, 161, 152)"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </g>
+                  );
+                })}
+                <circle
+                  cx={FOCAL_POINT.x}
+                  cy={FOCAL_POINT.y}
+                  r={0.55}
+                  fill="rgb(42, 161, 152)"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+
+              {/* Hoodie */}
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 w-[58%] -translate-x-1/2 -translate-y-1/2"
+                style={{ transform: "translate(-50%, -50%) rotate(-6deg)" }}
+              >
+                <Image
+                  src="/jacket.png"
+                  alt="Sustainable hoodie"
+                  width={480}
+                  height={560}
+                  className="h-auto w-full object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.25)]"
+                  priority
+                />
+              </div>
+
+              {/* QR overlay near the natural tag area */}
+              <div
+                className="pointer-events-none absolute"
+                style={{ left: `${FOCAL_POINT.x - 7}%`, top: `${FOCAL_POINT.y - 7}%`, width: "14%" }}
+              >
+                <Image
+                  src="/qr-code.png"
+                  alt="Digital Product Passport QR code"
+                  width={320}
+                  height={320}
+                  className="h-auto w-full object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+                />
+              </div>
+
+              {/* Annotation panels */}
+              {annotations.map((a) => (
                 <div
-                  className="pointer-events-none absolute z-0 -rotate-[18deg]"
-                  style={{ height: jacketHeight, top: "-25%", left: "-28%" }}
+                  key={a.id}
+                  className="absolute w-[22%]"
+                  style={{
+                    top: a.desktopAnchor.top,
+                    left: a.desktopAnchor.left,
+                    right: a.desktopAnchor.right,
+                  }}
                 >
+                  <AnnotationPanel annotation={a} />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile composition: hoodie + QR then 2x2 thumbnail grid */}
+            <div className="lg:hidden">
+              <div className="relative mx-auto aspect-[4/5] w-full max-w-[360px]">
+                <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-full w-[80%]">
                   <Image
                     src="/jacket.png"
-                    alt="Sustainable jacket"
+                    alt="Sustainable hoodie"
                     width={480}
                     height={560}
-                    className="h-full w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                    className="h-full w-full object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.22)]"
                     priority
                   />
                 </div>
-              )}
-              {phoneHeight > 0 && (
-                <div
-                  className="pointer-events-none absolute z-0"
-                  style={{
-                    width: qrHeight,
-                    height: qrHeight,
-                    bottom: "2%",
-                    right: "-8%",
-                    transform: "rotate(12deg)",
-                  }}
-                >
+                <div className="pointer-events-none absolute right-[18%] top-[42%] w-[20%]">
                   <Image
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     width={320}
                     height={320}
-                    className="h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.25)]"
+                    className="h-auto w-full object-contain drop-shadow-[0_10px_24px_rgba(0,0,0,0.2)]"
                   />
                 </div>
-              )}
-              <div className="relative z-10">
-                <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                {annotations.map((a) => (
+                  <AnnotationPanel key={a.id} annotation={a} />
+                ))}
               </div>
             </div>
           </div>
         </FadeUp>
       </div>
     </section>
+  );
+}
+
+function AnnotationPanel({ annotation }: { annotation: Annotation }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-envrt-charcoal/10 bg-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)]">
+      {/* Cropped DPP region */}
+      <div
+        className="relative aspect-[5/3] w-full bg-envrt-cream"
+        style={{
+          backgroundImage: `url(${SCREENSHOT_SRC})`,
+          backgroundSize: "100% auto",
+          backgroundPosition: `center ${annotation.cropY}`,
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      <div className="border-t border-envrt-charcoal/5 px-3 py-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold leading-none text-envrt-teal">
+            {String(annotation.id).padStart(2, "0")}
+          </span>
+          <p className="text-xs font-semibold text-envrt-charcoal">{annotation.label}</p>
+        </div>
+      </div>
+    </div>
   );
 }
