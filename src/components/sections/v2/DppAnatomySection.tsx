@@ -46,11 +46,11 @@ const callouts: Callout[] = [
   },
   {
     id: 2,
-    label: "Materials breakdown",
-    body: "Every fibre, every blend, with percentage breakdown and source country traced.",
-    revealAt: 0.15,
+    label: "Eco-Score",
+    body: "French Affichage Environnemental score in points, calculated using the official Ecobalyse methodology.",
+    revealAt: 0.06,
     desktopPosition: { top: "12%", side: "right" },
-    visualAnchorY: 26,
+    visualAnchorY: 10,
   },
   {
     id: 3,
