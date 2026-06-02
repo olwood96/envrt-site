@@ -9,13 +9,14 @@ module.exports = {
     "/404",
     "/payment/**",
     "/api/**",
+    "/preview/**",
   ],
   robotsTxtOptions: {
     policies: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/payment/"],
+        disallow: ["/api/", "/payment/", "/preview/"],
       },
     ],
     additionalSitemaps: [],
