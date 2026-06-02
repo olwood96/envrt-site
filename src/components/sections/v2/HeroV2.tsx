@@ -178,7 +178,7 @@ function SupplyChainMapTile() {
           fill="none"
           strokeDasharray="2 1.5"
         />
-        {stages.map((s, i) => (
+        {stages.map((s) => (
           <g key={s.label}>
             <circle cx={s.x} cy={s.y} r="2.5" fill="#1a3a2a" />
             <text
