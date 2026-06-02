@@ -8,11 +8,11 @@ type Callout = {
   id: number;
   label: string;
   body: string;
-  // Position of the dot on the visual (percentages relative to frame).
-  // Used on lg+ where callouts are pinned around the visual.
-  desktopAnchor: { top: string; left: string };
-  // Which side the label sits on (left/right of frame) for desktop layout.
   side: "left" | "right";
+  // Vertical position of the callout block within the 640px stage (0–100).
+  calloutY: number;
+  // Vertical position of the connector anchor on the visual (0–100 of stage).
+  visualY: number;
 };
 
 const callouts: Callout[] = [
@@ -20,31 +20,42 @@ const callouts: Callout[] = [
     id: 1,
     label: "Scanned from the tag",
     body: "What a customer sees when they scan the QR on the garment label.",
-    desktopAnchor: { top: "8%", left: "50%" },
     side: "left",
+    calloutY: 8,
+    visualY: 6,
   },
   {
     id: 2,
     label: "Headline impact",
     body: "CO₂e and water scarcity per garment, calculated using peer-reviewed methods.",
-    desktopAnchor: { top: "32%", left: "50%" },
     side: "right",
+    calloutY: 30,
+    visualY: 26,
   },
   {
     id: 3,
     label: "Full supply chain",
     body: "Every stage from fibre to finished garment, mapped and traceable.",
-    desktopAnchor: { top: "60%", left: "50%" },
     side: "left",
+    calloutY: 55,
+    visualY: 50,
   },
   {
     id: 4,
     label: "French Eco-Score",
     body: "Regulation-recognised environmental class, calculated to the published methodology.",
-    desktopAnchor: { top: "84%", left: "50%" },
     side: "right",
+    calloutY: 82,
+    visualY: 75,
   },
 ];
+
+// Stage geometry (desktop). The DPP visual sits centred with these edges
+// expressed as percentages of stage width — used to anchor connector lines.
+const VISUAL_LEFT_EDGE_PCT = 38;
+const VISUAL_RIGHT_EDGE_PCT = 62;
+const CALLOUT_DOT_X_LEFT = 32;
+const CALLOUT_DOT_X_RIGHT = 68;
 
 export function DppAnatomySection() {
   return (
@@ -64,49 +75,98 @@ export function DppAnatomySection() {
           </div>
         </FadeUp>
 
-        {/* Desktop: pinned callouts around the visual. Mobile: visual + numbered list below. */}
+        {/* Desktop: annotated stage with connector lines */}
         <FadeUp delay={0.1}>
-          <div className="relative mt-12 sm:mt-16">
-            <div className="relative mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
-              {/* Left column: callouts 1 + 3 on desktop */}
-              <div className="hidden lg:flex lg:flex-col lg:gap-12 lg:pt-12">
-                {callouts.filter((c) => c.side === "left").map((c) => (
-                  <DesktopCallout key={c.id} callout={c} align="right" />
-                ))}
-              </div>
+          <div className="relative mx-auto mt-16 hidden h-[640px] w-full max-w-[1100px] lg:block">
+            {/* Connector overlay (drawn behind callouts so dots and text sit on top) */}
+            <svg
+              className="absolute inset-0 h-full w-full"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              {callouts.map((c) => {
+                const startX = c.side === "left" ? CALLOUT_DOT_X_LEFT : CALLOUT_DOT_X_RIGHT;
+                const endX = c.side === "left" ? VISUAL_LEFT_EDGE_PCT : VISUAL_RIGHT_EDGE_PCT;
+                return (
+                  <g key={c.id}>
+                    <line
+                      x1={startX}
+                      y1={c.calloutY}
+                      x2={endX}
+                      y2={c.visualY}
+                      stroke="rgba(42, 161, 152, 0.45)"
+                      strokeWidth={0.15}
+                      strokeDasharray="0.5 0.5"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <circle
+                      cx={endX}
+                      cy={c.visualY}
+                      r={0.4}
+                      fill="rgb(42, 161, 152)"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <circle
+                      cx={startX}
+                      cy={c.calloutY}
+                      r={0.4}
+                      fill="rgb(42, 161, 152)"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </g>
+                );
+              })}
+            </svg>
 
-              {/* Visual */}
+            {/* Callouts positioned absolutely */}
+            {callouts.map((c) => (
+              <div
+                key={c.id}
+                className={`absolute w-[26%] ${c.side === "left" ? "text-right" : "text-left"}`}
+                style={{
+                  top: `${c.calloutY}%`,
+                  [c.side === "left" ? "left" : "right"]: "3%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <CalloutBlock callout={c} />
+              </div>
+            ))}
+
+            {/* DPP visual, centred */}
+            <div className="absolute left-1/2 top-0 w-[300px] -translate-x-1/2">
               <DppVisualFrame src={siteConfig.dppDemoEmbedUrl} />
-
-              {/* Right column: callouts 2 + 4 on desktop */}
-              <div className="hidden lg:flex lg:flex-col lg:gap-12 lg:pt-24">
-                {callouts.filter((c) => c.side === "right").map((c) => (
-                  <DesktopCallout key={c.id} callout={c} align="left" />
-                ))}
-              </div>
             </div>
-
-            {/* Mobile callouts: numbered list below visual */}
-            <ol className="mx-auto mt-10 grid max-w-md gap-5 lg:hidden">
-              {callouts.map((c, i) => (
-                <FadeUp key={c.id} delay={0.05 * (i + 1)}>
-                  <li className="flex gap-4">
-                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-envrt-teal/[0.12] text-xs font-semibold text-envrt-teal">
-                      {c.id}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-envrt-charcoal">{c.label}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-envrt-muted">{c.body}</p>
-                    </div>
-                  </li>
-                </FadeUp>
-              ))}
-            </ol>
           </div>
         </FadeUp>
 
+        {/* Mobile: visual then numbered list */}
+        <div className="lg:hidden">
+          <FadeUp delay={0.1}>
+            <div className="mx-auto mt-12 w-full max-w-[300px]">
+              <DppVisualFrame src={siteConfig.dppDemoEmbedUrl} />
+            </div>
+          </FadeUp>
+          <ol className="mx-auto mt-12 grid max-w-md gap-7">
+            {callouts.map((c, i) => (
+              <FadeUp key={c.id} delay={0.05 * (i + 1)}>
+                <li className="flex gap-5">
+                  <span className="text-2xl font-bold leading-none text-envrt-teal">
+                    {String(c.id).padStart(2, "0")}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-envrt-charcoal">{c.label}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-envrt-muted">{c.body}</p>
+                  </div>
+                </li>
+              </FadeUp>
+            ))}
+          </ol>
+        </div>
+
         <FadeUp delay={0.2}>
-          <div className="mt-12 text-center sm:mt-14">
+          <div className="mt-14 text-center sm:mt-16">
             <a
               href={siteConfig.dppDemoUrl}
               target="_blank"
@@ -125,40 +185,32 @@ export function DppAnatomySection() {
   );
 }
 
-function DesktopCallout({ callout, align }: { callout: Callout; align: "left" | "right" }) {
+function CalloutBlock({ callout }: { callout: Callout }) {
   return (
-    <FadeUp delay={0.1 * callout.id}>
-      <div className={`flex items-start gap-3 ${align === "right" ? "flex-row-reverse text-right" : "text-left"}`}>
-        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-envrt-teal/[0.12] text-xs font-semibold text-envrt-teal">
-          {callout.id}
-        </span>
-        <div>
-          <p className="text-sm font-semibold text-envrt-charcoal">{callout.label}</p>
-          <p className="mt-1 text-sm leading-relaxed text-envrt-muted">{callout.body}</p>
-        </div>
-      </div>
-    </FadeUp>
+    <div>
+      <p className="text-3xl font-bold leading-none tracking-tight text-envrt-teal sm:text-4xl">
+        {String(callout.id).padStart(2, "0")}
+      </p>
+      <p className="mt-3 text-sm font-semibold text-envrt-charcoal">{callout.label}</p>
+      <p className="mt-1 text-sm leading-relaxed text-envrt-muted">{callout.body}</p>
+    </div>
   );
 }
 
 function DppVisualFrame({ src }: { src: string }) {
-  // v1 visual: live DPP rendered in a tall frame, interaction disabled so it
-  // acts as a static preview. Swap to a captured screenshot once Playwright
-  // is wired (`public/screenshots/dpp/hoodie-passport.png`).
+  // v1 visual: live DPP rendered with pointer-events off so it acts as a
+  // static preview. Swap to a captured screenshot when Playwright is wired.
   return (
-    <div className="relative mx-auto w-full max-w-[320px] lg:max-w-[360px]">
-      <div className="relative overflow-hidden rounded-[2rem] border border-envrt-charcoal/10 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)]">
-        <div className="relative w-full overflow-hidden" style={{ aspectRatio: "9 / 16" }}>
-          <iframe
-            src={src}
-            title="What's in a Digital Product Passport"
-            loading="lazy"
-            className="pointer-events-none absolute inset-0 h-full w-full border-0"
-            sandbox="allow-scripts allow-same-origin"
-          />
-          {/* Soft fade at the bottom suggesting more content below the fold */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/60 to-transparent" />
-        </div>
+    <div className="relative overflow-hidden rounded-[2rem] border border-envrt-charcoal/10 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)]">
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "9 / 16" }}>
+        <iframe
+          src={src}
+          title="What's in a Digital Product Passport"
+          loading="lazy"
+          className="pointer-events-none absolute inset-0 h-full w-full border-0"
+          sandbox="allow-scripts allow-same-origin"
+        />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white via-white/70 to-transparent" />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { Container } from "../../ui/Container";
 import { FadeUp, StaggerChildren, StaggerItem } from "../../ui/Motion";
 
 type Deliverable = {
+  id: number;
   title: string;
   body: string;
   Icon: React.ComponentType<{ className?: string }>;
@@ -11,7 +12,7 @@ type Deliverable = {
 
 function PassportIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <rect x="6" y="3" width="12" height="18" rx="2" />
       <path d="M9 7h6" />
       <circle cx="12" cy="13" r="2.5" />
@@ -22,7 +23,7 @@ function PassportIcon({ className }: { className?: string }) {
 
 function QrIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="7" height="7" rx="1" />
       <rect x="14" y="3" width="7" height="7" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -33,7 +34,7 @@ function QrIcon({ className }: { className?: string }) {
 
 function MetricsIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 20V10" />
       <path d="M10 20V6" />
       <path d="M16 20v-8" />
@@ -44,32 +45,35 @@ function MetricsIcon({ className }: { className?: string }) {
 
 function DocumentIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
       <path d="M14 3v6h6" />
-      <circle cx="12" cy="15" r="2.5" />
-      <path d="M9.5 15h-1M14.5 15h1M12 12.5v-1M12 17.5v1" />
+      <path d="M8 13h8M8 17h6" />
     </svg>
   );
 }
 
 const deliverables: Deliverable[] = [
   {
+    id: 1,
     title: "Digital Product Passport per garment",
     body: "A live, scannable page for every SKU in your collection.",
     Icon: PassportIcon,
   },
   {
+    id: 2,
     title: "QR codes for tags and packaging",
     body: "Print-ready codes that link straight to each passport.",
     Icon: QrIcon,
   },
   {
+    id: 3,
     title: "Full impact data",
     body: "Stage-by-stage emissions, water scarcity and Eco-Score for every product.",
     Icon: MetricsIcon,
   },
   {
+    id: 4,
     title: "EU-aligned methodology",
     body: "PEF, ISO 14040 and AWARE referenced throughout, so your numbers hold up.",
     Icon: DocumentIcon,
@@ -94,17 +98,30 @@ export function WhatYouGetSection() {
           </div>
         </FadeUp>
 
-        <StaggerChildren className="mt-14 grid gap-5 sm:grid-cols-2">
-          {deliverables.map((d) => (
-            <StaggerItem key={d.title}>
-              <div className="group flex h-full gap-5 rounded-2xl border border-envrt-charcoal/5 bg-white p-6 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg hover:shadow-envrt-teal/5 sm:p-8">
-                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-envrt-teal/[0.07] transition-colors group-hover:bg-envrt-teal/[0.12]">
-                  <d.Icon className="h-6 w-6 text-envrt-teal" />
-                </span>
-                <div>
-                  <h3 className="text-base font-semibold text-envrt-charcoal">{d.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-envrt-muted">{d.body}</p>
+        {/* Strip layout: no cards, no borders. Hairline dividers separate items. */}
+        <StaggerChildren className="mt-14 grid divide-y divide-envrt-charcoal/10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+          {deliverables.map((d, i) => (
+            <StaggerItem
+              key={d.id}
+              className={[
+                "py-8 sm:py-0 sm:px-6 lg:px-8",
+                // Vertical dividers between columns on sm+ (skip first)
+                i > 0 ? "sm:border-l sm:border-envrt-charcoal/10" : "",
+                // Reset the left border at the second row break on sm (2-col)
+                "sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(2n+1)]:border-l",
+                // On lg (4-col) the first column has no left border
+                "lg:[&:first-child]:border-l-0",
+              ].join(" ")}
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold leading-none tracking-tight text-envrt-teal">
+                    {String(d.id).padStart(2, "0")}
+                  </span>
+                  <d.Icon className="h-5 w-5 text-envrt-charcoal/40" />
                 </div>
+                <h3 className="mt-5 text-base font-semibold text-envrt-charcoal">{d.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-envrt-muted">{d.body}</p>
               </div>
             </StaggerItem>
           ))}
