@@ -6,45 +6,32 @@ import { Badge } from "../../ui/Badge";
 import { FadeUp } from "../../ui/Motion";
 
 // ─── Annotation tiles ─────────────────────────────────────────────────────
-// Three tiles use real captured DPP element screenshots (eco-score badge,
-// headline metrics, production journey). The fourth (verified standards)
-// is a brand-consistent recreation since the user is happy with that one.
+// Flat white cards that float beside / over the hoodie. The annotated DPP
+// content sits directly on the card — no nested frame around it. Three of
+// the four use real captured DPP element screenshots. Verified standards
+// uses a brand-consistent recreation, which the user has approved.
 
-function ScreenshotTile({
-  src,
-  alt,
-  objectPosition = "center",
-}: {
-  src: string;
-  alt: string;
-  objectPosition?: string;
-}) {
+function TileHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative aspect-[5/3] w-full overflow-hidden rounded-md border border-envrt-charcoal/10 bg-envrt-offwhite">
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="220px"
-        style={{ objectFit: "cover", objectPosition }}
-      />
-    </div>
+    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-charcoal/55">
+      {children}
+    </p>
   );
 }
 
 function EcoScoreTile() {
   return (
-    <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-3 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
-          Eco-Score
-        </p>
-        <span className="rounded-sm bg-envrt-offwhite px-1 py-0.5 text-[8px] font-bold text-envrt-charcoal">
-          FR
-        </span>
-      </div>
-      <div className="mt-2">
-        <ScreenshotTile src="/screenshots/dpp/sections/eco-score.png" alt="Ecobalyse Coût Environnemental label" />
+    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+      <TileHeader>Eco-Score (FR)</TileHeader>
+      <div className="mt-2.5 flex justify-center">
+        <Image
+          src="/screenshots/dpp/sections/eco-score.png"
+          alt="Ecobalyse Coût Environnemental label showing 1,573 points"
+          width={460}
+          height={272}
+          sizes="320px"
+          className="h-auto w-full max-w-[280px]"
+        />
       </div>
     </div>
   );
@@ -52,15 +39,16 @@ function EcoScoreTile() {
 
 function HeadlineImpactTile() {
   return (
-    <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-3 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
-        Headline impact
-      </p>
-      <div className="mt-2">
-        <ScreenshotTile
+    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+      <TileHeader>Headline impact</TileHeader>
+      <div className="mt-2.5">
+        <Image
           src="/screenshots/dpp/sections/headline-metrics.png"
-          alt="Emissions and water scarcity metric cards"
-          objectPosition="center top"
+          alt="CO2e, water scarcity, garment mass and transparency metric cards"
+          width={760}
+          height={500}
+          sizes="320px"
+          className="h-auto w-full"
         />
       </div>
     </div>
@@ -68,16 +56,18 @@ function HeadlineImpactTile() {
 }
 
 function SupplyChainMapTile() {
+  // The production-journey capture is tall (map + stage list). Show the
+  // map only by cropping to a wide aspect ratio with the map at centre.
   return (
-    <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-3 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
-        Production journey
-      </p>
-      <div className="mt-2">
-        <ScreenshotTile
+    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+      <TileHeader>Production journey</TileHeader>
+      <div className="relative mt-2.5 aspect-[5/3] w-full overflow-hidden rounded-md">
+        <Image
           src="/screenshots/dpp/sections/production-journey.png"
-          alt="World supply chain map with production countries"
-          objectPosition="center 18%"
+          alt="World supply chain map with country dots and connections"
+          fill
+          sizes="320px"
+          style={{ objectFit: "cover", objectPosition: "center 22%" }}
         />
       </div>
     </div>
@@ -85,94 +75,63 @@ function SupplyChainMapTile() {
 }
 
 function VerifiedStandardsTile() {
-  // Recreation kept — the user said this one is fine as-is.
-  const standards = [
-    { label: "EU PEF" },
-    { label: "ISO 14040" },
-    { label: "AWARE" },
-  ];
+  const standards = ["EU PEF", "ISO 14040", "AWARE"];
   return (
-    <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-4 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
-        Verified standards
-      </p>
+    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+      <TileHeader>Verified standards</TileHeader>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         {standards.map((s) => (
           <span
-            key={s.label}
-            className="inline-flex items-center gap-1 rounded-md border border-envrt-charcoal/10 bg-envrt-offwhite px-2 py-1 text-[10px] font-semibold text-envrt-charcoal"
+            key={s}
+            className="inline-flex items-center gap-1 rounded-md border border-envrt-charcoal/10 bg-envrt-offwhite px-2.5 py-1.5 text-[11px] font-semibold text-envrt-charcoal"
           >
-            <svg className="h-2.5 w-2.5 text-envrt-teal" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="h-3 w-3 text-envrt-teal" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 4L6 12L2 8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            {s.label}
+            {s}
           </span>
         ))}
       </div>
-      <p className="mt-2 text-[10px] leading-snug text-envrt-muted">
+      <p className="mt-2.5 text-xs leading-snug text-envrt-muted">
         Aligned with EU and ISO methodologies.
       </p>
     </div>
   );
 }
 
-// ─── Annotation layout config ─────────────────────────────────────────────
-type AnnotationSlot = {
+// ─── Cascade layout config ────────────────────────────────────────────────
+// Tiles cascade down the left side of the right column, with each one
+// offset slightly so they overlap each other and the hoodie behind them.
+
+type Slot = {
   id: number;
-  label: string;
   Tile: React.ComponentType;
-  desktop: { top: string; side: "left" | "right" };
-  // Anchors used to draw the connector bezier. Coordinates are percentages
-  // of the right column (0–100).
-  hoodieAnchor: { x: number; y: number };
-  tileAnchor: { x: number; y: number };
+  // Desktop position as percentages of the right column.
+  desktop: { top: string; left: string; width: string; rotate?: string };
 };
 
-const annotations: AnnotationSlot[] = [
+const slots: Slot[] = [
   {
     id: 1,
-    label: "Eco-Score",
     Tile: EcoScoreTile,
-    desktop: { top: "1%", side: "left" },
-    hoodieAnchor: { x: 42, y: 22 },
-    tileAnchor: { x: 26, y: 12 },
+    desktop: { top: "1%",  left: "0%",  width: "52%", rotate: "-1.5deg" },
   },
   {
     id: 2,
-    label: "Headline impact",
     Tile: HeadlineImpactTile,
-    desktop: { top: "1%", side: "right" },
-    hoodieAnchor: { x: 58, y: 22 },
-    tileAnchor: { x: 74, y: 12 },
+    desktop: { top: "28%", left: "6%",  width: "55%", rotate: "1deg" },
   },
   {
     id: 3,
-    label: "Production journey",
     Tile: SupplyChainMapTile,
-    desktop: { top: "60%", side: "left" },
-    hoodieAnchor: { x: 42, y: 78 },
-    tileAnchor: { x: 26, y: 82 },
+    desktop: { top: "55%", left: "1%",  width: "52%", rotate: "-1deg" },
   },
   {
     id: 4,
-    label: "Verified standards",
     Tile: VerifiedStandardsTile,
-    desktop: { top: "60%", side: "right" },
-    hoodieAnchor: { x: 58, y: 78 },
-    tileAnchor: { x: 74, y: 82 },
+    desktop: { top: "80%", left: "9%",  width: "48%", rotate: "1.5deg" },
   },
 ];
-
-function buildConnectorPath(
-  start: { x: number; y: number },
-  end: { x: number; y: number },
-  side: "left" | "right",
-): string {
-  const midX = (start.x + end.x) / 2;
-  const midY = (start.y + end.y) / 2;
-  const offset = side === "left" ? -4 : 4;
-  return `M ${start.x} ${start.y} Q ${midX + offset} ${midY} ${end.x} ${end.y}`;
-}
 
 export function HeroV2() {
   return (
@@ -215,99 +174,78 @@ export function HeroV2() {
           </FadeUp>
         </div>
 
-        {/* Right: hoodie + QR + tiles. No iframe — that lives in the section below. */}
+        {/* Right: hoodie + cascading annotation tiles */}
         <FadeUp delay={0.2}>
           <div className="relative mx-auto w-full max-w-[640px]">
             {/* Desktop composition */}
-            <div className="relative hidden h-[600px] lg:block">
-              {/* Connector overlay */}
-              <svg
-                className="pointer-events-none absolute inset-0 h-full w-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-              >
-                {annotations.map((a) => (
-                  <path
-                    key={a.id}
-                    d={buildConnectorPath(a.tileAnchor, a.hoodieAnchor, a.desktop.side)}
-                    stroke="rgba(30, 30, 30, 0.22)"
-                    strokeWidth={0.2}
-                    fill="none"
-                    vectorEffect="non-scaling-stroke"
-                    strokeLinecap="round"
-                  />
-                ))}
-              </svg>
-
-              {/* Annotation tiles at the corners */}
-              {annotations.map((a) => (
-                <div
-                  key={a.id}
-                  className="absolute z-20 w-[24%]"
-                  style={{
-                    top: a.desktop.top,
-                    [a.desktop.side === "left" ? "left" : "right"]: "0%",
-                  }}
-                >
-                  <a.Tile />
-                </div>
-              ))}
-
-              {/* Hoodie + QR central group */}
-              <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-                <div className="relative" style={{ width: 360, height: 420 }}>
-                  <Image
-                    src="/jacket.png"
-                    alt="Sustainable hoodie"
-                    fill
-                    sizes="360px"
-                    className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
-                    priority
-                  />
-                  <div
-                    className="absolute"
-                    style={{ width: 110, height: 110, bottom: "10%", right: "8%", transform: "rotate(8deg)" }}
-                  >
-                    <Image
-                      src="/qr-code.png"
-                      alt="Digital Product Passport QR code"
-                      fill
-                      sizes="110px"
-                      className="object-contain drop-shadow-[0_14px_28px_rgba(0,0,0,0.22)]"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile composition: hoodie + QR, tiles in 2x2 below */}
-            <div className="lg:hidden">
-              <div className="relative mx-auto h-[360px] w-full max-w-[320px]">
+            <div className="relative hidden h-[680px] lg:block">
+              {/* Hoodie pushed right, tiles will overlap its left edge */}
+              <div className="absolute right-[-2%] top-1/2 z-0 h-[110%] w-[60%] -translate-y-1/2">
                 <Image
                   src="/jacket.png"
                   alt="Sustainable hoodie"
                   fill
-                  sizes="320px"
+                  sizes="380px"
+                  className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
+                  priority
+                />
+                {/* QR small overlay near tag area */}
+                <div className="absolute" style={{ width: 92, height: 92, bottom: "16%", right: "18%", transform: "rotate(8deg)" }}>
+                  <Image
+                    src="/qr-code.png"
+                    alt="Digital Product Passport QR code"
+                    fill
+                    sizes="92px"
+                    className="object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
+                  />
+                </div>
+              </div>
+
+              {/* Cascading tiles */}
+              {slots.map((slot, i) => (
+                <div
+                  key={slot.id}
+                  className="absolute z-10"
+                  style={{
+                    top: slot.desktop.top,
+                    left: slot.desktop.left,
+                    width: slot.desktop.width,
+                    transform: slot.desktop.rotate ? `rotate(${slot.desktop.rotate})` : undefined,
+                    zIndex: 10 + i,
+                  }}
+                >
+                  <slot.Tile />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile: hoodie at top, tiles stacked below */}
+            <div className="lg:hidden">
+              <div className="relative mx-auto h-[360px] w-full max-w-[340px]">
+                <Image
+                  src="/jacket.png"
+                  alt="Sustainable hoodie"
+                  fill
+                  sizes="340px"
                   className="object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.18)]"
                   priority
                 />
                 <div
                   className="absolute"
-                  style={{ width: 90, height: 90, bottom: "12%", right: "8%", transform: "rotate(8deg)" }}
+                  style={{ width: 80, height: 80, bottom: "14%", right: "14%", transform: "rotate(8deg)" }}
                 >
                   <Image
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     fill
-                    sizes="90px"
+                    sizes="80px"
                     className="object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
                   />
                 </div>
               </div>
-              <div className="mt-8 grid grid-cols-2 gap-3">
-                {annotations.map((a) => (
-                  <a.Tile key={a.id} />
+              <div className="mt-6 space-y-3">
+                {slots.map((slot) => (
+                  <slot.Tile key={slot.id} />
                 ))}
               </div>
             </div>
