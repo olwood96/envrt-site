@@ -1,15 +1,23 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react"; // useRef/useState used by PhoneMockup
+import Image from "next/image";
 import { Button } from "../../ui/Button";
 import { Badge } from "../../ui/Badge";
 import { FadeUp } from "../../ui/Motion";
 import { QRScanLoader } from "../../ui/QRScanLoader";
 import { siteConfig } from "@/lib/config";
 import {
+  HERO_JACKET_HEIGHT_RATIO,
+  HERO_QR_HEIGHT_RATIO,
   PHONE_VIEWPORT_WIDTH,
   PHONE_VIEWPORT_HEIGHT,
 } from "@/lib/constants";
+
+// 280px wide phone with 9:19 screen + 5px border each side = ~601px tall.
+const PHONE_HEIGHT = 601;
+const JACKET_HEIGHT = PHONE_HEIGHT * HERO_JACKET_HEIGHT_RATIO;
+const QR_HEIGHT = PHONE_HEIGHT * HERO_QR_HEIGHT_RATIO;
 
 // ─── Phone with live DPP iframe ───────────────────────────────────────────
 function PhoneMockup({ src }: { src: string }) {
@@ -30,7 +38,7 @@ function PhoneMockup({ src }: { src: string }) {
   }, []);
 
   return (
-    <div className="relative w-full max-w-[280px]">
+    <div className="relative w-[280px]">
       <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5" style={{ height: 22 }}>
           <span className="text-[10px] font-semibold leading-none text-envrt-charcoal">21:37</span>
@@ -92,9 +100,9 @@ function PhoneMockup({ src }: { src: string }) {
 }
 
 // ─── Annotation recreations ───────────────────────────────────────────────
-// Small, brand-consistent stylings of each annotated DPP section. Not
-// screenshots. Designed to look like the real DPP at a glance but render
-// crisp at any size and stay in our control.
+// Brand-consistent recreations of each annotated DPP section. Designed to
+// look like the real DPP at a glance, render crisp at any size, and stay
+// in our control without screenshots.
 
 function HeadlineImpactTile() {
   return (
@@ -120,18 +128,20 @@ function HeadlineImpactTile() {
 
 function EcoScoreTile() {
   // Recreation of the Ecobalyse "coût environnemental" badge embedded on
-  // the live DPP. The score is in points (lower is better); the colour
-  // scale runs from a low-impact green through to a high-impact red.
+  // the live DPP. White card, big point score, gradient scale with marker.
   const points = 1573;
-  // The scale used by Affichage Environnemental tops out around 2400 for
-  // textiles; map our position approximately.
   const scalePosition = Math.min(95, Math.max(5, (points / 2400) * 100));
 
   return (
     <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-4 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
-        Eco-Score (FR)
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
+          Coût environnemental
+        </p>
+        <span className="rounded-sm bg-envrt-offwhite px-1 py-0.5 text-[8px] font-bold text-envrt-charcoal">
+          FR
+        </span>
+      </div>
       <div className="mt-1.5 flex items-baseline gap-1">
         <span className="text-2xl font-bold leading-none tracking-tight text-envrt-charcoal">
           {points.toLocaleString()}
@@ -140,78 +150,81 @@ function EcoScoreTile() {
       </div>
       <div className="relative mt-2.5">
         <div
-          className="h-1 w-full rounded-full"
+          className="h-1.5 w-full rounded-full"
           style={{
             background:
               "linear-gradient(to right, #1a7d3a 0%, #7bb84a 28%, #e8c83a 52%, #e0833a 76%, #c43a2a 100%)",
           }}
         />
         <div
-          className="absolute top-1/2 h-3 w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-charcoal"
+          className="absolute top-1/2 h-3.5 w-[2.5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-charcoal shadow-[0_0_0_2px_white]"
           style={{ left: `${scalePosition}%` }}
         />
       </div>
-      <p className="mt-1.5 text-[10px] text-envrt-muted">Lower is better</p>
+      <p className="mt-1.5 text-[10px] text-envrt-muted">Ecobalyse • lower is better</p>
     </div>
   );
 }
 
 function SupplyChainMapTile() {
-  // Schematic of a production journey: 4 stages with locations, connected.
+  // Stylised world view with dots on production countries, lines linking
+  // the journey. Not photographic but recognisably a map, matching the
+  // "production journey" section in the live DPP.
   const stages = [
-    { x: 12, y: 60, label: "Fibre", country: "TR" },
-    { x: 40, y: 35, label: "Yarn", country: "PT" },
-    { x: 65, y: 55, label: "Fabric", country: "IT" },
-    { x: 90, y: 30, label: "Assembly", country: "PT" },
+    { x: 50, y: 47, code: "TR", label: "Fibre" },
+    { x: 45, y: 35, code: "PT", label: "Yarn" },
+    { x: 48, y: 36, code: "IT", label: "Fabric" },
+    { x: 45, y: 35, code: "PT", label: "Assembly" },
   ];
+
   return (
     <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-4 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-muted">
         Production journey
       </p>
-      <svg viewBox="0 0 100 80" className="mt-2 h-16 w-full">
-        {/* Connector path */}
-        <path
-          d={`M ${stages[0].x},${stages[0].y} L ${stages[1].x},${stages[1].y} L ${stages[2].x},${stages[2].y} L ${stages[3].x},${stages[3].y}`}
-          stroke="rgba(42, 161, 152, 0.5)"
-          strokeWidth="0.6"
-          fill="none"
-          strokeDasharray="2 1.5"
-        />
-        {stages.map((s) => (
-          <g key={s.label}>
-            <circle cx={s.x} cy={s.y} r="2.5" fill="#1a3a2a" />
-            <text
-              x={s.x}
-              y={s.y - 5}
-              textAnchor="middle"
-              fontSize="4"
-              fill="#1e1e1e"
-              fontWeight="600"
-            >
-              {s.country}
-            </text>
-            <text
-              x={s.x}
-              y={s.y + 9}
-              textAnchor="middle"
-              fontSize="3.5"
-              fill="#9ca3a0"
-            >
-              {s.label}
-            </text>
+      <div className="relative mt-2 h-16 w-full overflow-hidden rounded-md bg-envrt-offwhite">
+        <svg viewBox="0 0 100 60" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid meet">
+          {/* Stylised continent shapes */}
+          <g fill="rgba(30, 30, 30, 0.08)" stroke="rgba(30, 30, 30, 0.12)" strokeWidth="0.3">
+            {/* North America */}
+            <path d="M5 20 Q12 16 18 18 Q22 22 24 28 Q22 34 16 36 Q10 34 8 28 Z" />
+            {/* South America */}
+            <path d="M22 38 Q26 38 27 44 Q26 52 22 54 Q18 50 19 44 Z" />
+            {/* Europe + Africa */}
+            <path d="M44 18 Q50 16 54 20 Q56 24 53 28 L52 32 Q54 40 52 48 Q48 52 44 50 Q42 44 44 36 Q42 30 44 24 Z" />
+            {/* Asia */}
+            <path d="M58 18 Q72 16 82 22 Q86 28 84 34 Q78 38 70 36 Q62 34 58 28 Z" />
+            {/* Oceania */}
+            <path d="M78 44 Q86 44 88 48 Q86 52 80 51 Q76 49 78 46 Z" />
           </g>
-        ))}
-      </svg>
+          {/* Connecting line between stages */}
+          <path
+            d={`M ${stages[0].x},${stages[0].y} Q 47,40 ${stages[1].x},${stages[1].y}`}
+            stroke="rgba(42, 161, 152, 0.7)"
+            strokeWidth="0.6"
+            fill="none"
+            strokeDasharray="1.5 1"
+          />
+          {/* Country markers */}
+          {stages.slice(0, 2).map((s, i) => (
+            <g key={i}>
+              <circle cx={s.x} cy={s.y} r="2" fill="#1a3a2a" stroke="white" strokeWidth="0.6" />
+            </g>
+          ))}
+        </svg>
+      </div>
+      <p className="mt-2 text-[10px] leading-snug text-envrt-muted">
+        Fibre → Yarn → Fabric → Assembly, traced to country.
+      </p>
     </div>
   );
 }
 
 function VerifiedStandardsTile() {
   const standards = [
-    { label: "EU PEF", code: "PEF" },
-    { label: "ISO 14040", code: "ISO" },
-    { label: "AWARE", code: "AW" },
+    { label: "EU PEF" },
+    { label: "ISO 14040" },
+    { label: "AWARE" },
   ];
   return (
     <div className="rounded-xl border border-envrt-charcoal/10 bg-white p-4 shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]">
@@ -221,7 +234,7 @@ function VerifiedStandardsTile() {
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         {standards.map((s) => (
           <span
-            key={s.code}
+            key={s.label}
             className="inline-flex items-center gap-1 rounded-md border border-envrt-charcoal/10 bg-envrt-offwhite px-2 py-1 text-[10px] font-semibold text-envrt-charcoal"
           >
             <svg className="h-2.5 w-2.5 text-envrt-teal" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
@@ -243,16 +256,8 @@ type AnnotationSlot = {
   id: number;
   label: string;
   Tile: React.ComponentType;
-  // Position of the tile on the desktop composition (% of right column).
-  desktop: {
-    top: string;
-    side: "left" | "right";
-  };
-  // Anchor point on the phone (in the right column's % space) where the
-  // connector line ends. Tuned by eye to land on the relevant DPP section.
+  desktop: { top: string; side: "left" | "right" };
   phoneAnchor: { x: number; y: number };
-  // Anchor point on the tile (in the right column's % space) where the line
-  // starts. Drawn at the inner edge of the tile facing the phone.
   tileAnchor: { x: number; y: number };
 };
 
@@ -262,37 +267,35 @@ const annotations: AnnotationSlot[] = [
     label: "Headline impact",
     Tile: HeadlineImpactTile,
     desktop: { top: "2%", side: "left" },
-    phoneAnchor: { x: 50, y: 18 },
-    tileAnchor: { x: 31, y: 14 },
+    phoneAnchor: { x: 42, y: 22 },
+    tileAnchor: { x: 23, y: 14 },
   },
   {
     id: 2,
     label: "Eco-Score",
     Tile: EcoScoreTile,
     desktop: { top: "2%", side: "right" },
-    phoneAnchor: { x: 50, y: 32 },
-    tileAnchor: { x: 69, y: 14 },
+    phoneAnchor: { x: 58, y: 22 },
+    tileAnchor: { x: 77, y: 14 },
   },
   {
     id: 3,
     label: "Supply chain map",
     Tile: SupplyChainMapTile,
     desktop: { top: "62%", side: "left" },
-    phoneAnchor: { x: 50, y: 64 },
-    tileAnchor: { x: 31, y: 74 },
+    phoneAnchor: { x: 42, y: 70 },
+    tileAnchor: { x: 23, y: 78 },
   },
   {
     id: 4,
     label: "Verified standards",
     Tile: VerifiedStandardsTile,
     desktop: { top: "62%", side: "right" },
-    phoneAnchor: { x: 50, y: 82 },
-    tileAnchor: { x: 69, y: 74 },
+    phoneAnchor: { x: 58, y: 78 },
+    tileAnchor: { x: 77, y: 78 },
   },
 ];
 
-// Build a smooth quadratic bezier path between two points with a control
-// point offset outward (away from the phone) for a gentle curve.
 function buildConnectorPath(
   start: { x: number; y: number },
   end: { x: number; y: number },
@@ -300,8 +303,7 @@ function buildConnectorPath(
 ): string {
   const midX = (start.x + end.x) / 2;
   const midY = (start.y + end.y) / 2;
-  // Pull the curve toward the outside of the composition.
-  const offset = side === "left" ? -5 : 5;
+  const offset = side === "left" ? -4 : 4;
   const cx = midX + offset;
   const cy = midY;
   return `M ${start.x} ${start.y} Q ${cx} ${cy} ${end.x} ${end.y}`;
@@ -348,11 +350,11 @@ export function HeroV2() {
           </FadeUp>
         </div>
 
-        {/* Right: phone + iframe with annotation tiles around it */}
+        {/* Right: phone + hoodie + QR + annotation tiles */}
         <FadeUp delay={0.2}>
           <div className="relative mx-auto w-full max-w-[640px]">
             {/* Desktop composition */}
-            <div className="relative hidden h-[600px] lg:block">
+            <div className="relative hidden h-[640px] lg:block">
               {/* Connector overlay */}
               <svg
                 className="pointer-events-none absolute inset-0 h-full w-full"
@@ -376,7 +378,7 @@ export function HeroV2() {
               {annotations.map((a) => (
                 <div
                   key={a.id}
-                  className="absolute w-[26%]"
+                  className="absolute z-20 w-[26%]"
                   style={{
                     top: a.desktop.top,
                     [a.desktop.side === "left" ? "left" : "right"]: "0%",
@@ -386,18 +388,86 @@ export function HeroV2() {
                 </div>
               ))}
 
-              {/* Phone centred */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
+              {/* Central hoodie + QR + phone group */}
+              <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+                <div className="relative">
+                  <div
+                    className="pointer-events-none absolute -z-10 -rotate-[14deg]"
+                    style={{ height: JACKET_HEIGHT, top: "-15%", left: "-58%" }}
+                  >
+                    <Image
+                      src="/jacket.png"
+                      alt="Sustainable hoodie"
+                      width={480}
+                      height={560}
+                      className="h-full w-auto object-contain opacity-90 drop-shadow-[0_20px_40px_rgba(0,0,0,0.25)]"
+                      priority
+                    />
+                  </div>
+                  <div
+                    className="pointer-events-none absolute z-20"
+                    style={{
+                      width: QR_HEIGHT,
+                      height: QR_HEIGHT,
+                      bottom: "2%",
+                      right: "-22%",
+                      transform: "rotate(10deg)",
+                    }}
+                  >
+                    <Image
+                      src="/qr-code.png"
+                      alt="Digital Product Passport QR code"
+                      width={320}
+                      height={320}
+                      className="h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.25)]"
+                    />
+                  </div>
+                  <div className="relative z-10">
+                    <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Mobile composition: phone + 2x2 tile grid */}
+            {/* Mobile composition: phone + hoodie + QR, tiles in 2x2 below */}
             <div className="lg:hidden">
-              <div className="mx-auto flex justify-center">
-                <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
+              <div className="relative mx-auto flex justify-center">
+                <div className="relative">
+                  <div
+                    className="pointer-events-none absolute -z-10 -rotate-[16deg]"
+                    style={{ height: JACKET_HEIGHT, top: "-15%", left: "-50%" }}
+                  >
+                    <Image
+                      src="/jacket.png"
+                      alt="Sustainable hoodie"
+                      width={480}
+                      height={560}
+                      className="h-full w-auto object-contain opacity-90"
+                      priority
+                    />
+                  </div>
+                  <div
+                    className="pointer-events-none absolute z-20"
+                    style={{
+                      width: QR_HEIGHT,
+                      height: QR_HEIGHT,
+                      bottom: "2%",
+                      right: "-18%",
+                      transform: "rotate(10deg)",
+                    }}
+                  >
+                    <Image
+                      src="/qr-code.png"
+                      alt="Digital Product Passport QR code"
+                      width={320}
+                      height={320}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                  <PhoneMockup src={siteConfig.dppDemoEmbedUrl} />
+                </div>
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="mt-8 grid grid-cols-2 gap-3">
                 {annotations.map((a) => (
                   <a.Tile key={a.id} />
                 ))}
