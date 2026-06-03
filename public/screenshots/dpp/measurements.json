@@ -1,0 +1,50 @@
+{
+  "totalHeight": 5353,
+  "sections": [
+    {
+      "name": "hero",
+      "top": 80,
+      "height": 372
+    },
+    {
+      "name": "headline-metrics",
+      "top": 468,
+      "height": 367
+    },
+    {
+      "name": "materials",
+      "top": 851,
+      "height": 424
+    },
+    {
+      "name": "production-journey",
+      "top": 1290,
+      "height": 1275
+    },
+    {
+      "name": "environmental-impact",
+      "top": 2581,
+      "height": 458
+    },
+    {
+      "name": "certifications",
+      "top": 3055,
+      "height": 793
+    },
+    {
+      "name": "care-end-of-life",
+      "top": 3864,
+      "height": 793
+    },
+    {
+      "name": "actions",
+      "top": 4673,
+      "height": 32
+    },
+    {
+      "name": "feedback",
+      "top": 4729,
+      "height": 347
+    }
+  ]
+}

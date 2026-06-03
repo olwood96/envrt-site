@@ -7,12 +7,13 @@ import { FadeUp } from "../../ui/Motion";
 import { siteConfig } from "@/lib/config";
 
 // ─── Geometry ─────────────────────────────────────────────────────────────
-// Desktop phone screen height (from a 280px-wide phone with 9:19 ratio).
-const DESKTOP_SCREEN_HEIGHT = 591;
-const MOBILE_SCREEN_HEIGHT = 506; // 240px-wide phone at 9:19
-// Natural iframe height — tall enough to include every annotated section.
-const IFRAME_NATURAL_HEIGHT = 7200;
-// Outer stage scroll runway in viewport heights.
+// Measured live at 280px viewport (see scripts/capture-dpp-screenshot.mjs).
+// Updating these constants is a single source of truth for both the iframe
+// pan range and the per-section reveal thresholds.
+const IFRAME_NATURAL_HEIGHT = 5400; // total DPP page height at phone width
+const DESKTOP_SCREEN_HEIGHT = 591;  // 280px-wide phone, 9:19 ratio
+const MOBILE_SCREEN_HEIGHT = 506;   // 240px-wide phone, 9:19 ratio
+// Stage scroll runway in viewport heights. Longer = slower pan.
 const STAGE_HEIGHT_VH = 480;
 
 type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
@@ -21,46 +22,45 @@ type Callout = {
   id: number;
   label: string;
   body: string;
-  // Approximate DPP page Y of the section's top (for line endpoint tracking).
+  // Approximate DPP Y of the section's top, in pixels. Used to compute
+  // both the reveal threshold and the live line endpoint position.
   sectionY: number;
-  // Scroll progress range over which this annotation is visible.
-  range: [number, number];
-  // Desktop corner placement.
+  // Approximate height of the section so we can detect when it exits.
+  sectionHeight: number;
   corner: Corner;
 };
 
-// Annotations in DPP top-to-bottom order. Corners alternate.
 const callouts: Callout[] = [
   {
     id: 1,
     label: "Eco-Score",
     body: "French Affichage Environnemental score, calculated using the official Ecobalyse methodology.",
-    sectionY: 320,
-    range: [0.0, 0.18],
+    sectionY: 350,         // inside the hero section, badge sits over the product image
+    sectionHeight: 100,
     corner: "top-left",
   },
   {
     id: 2,
     label: "Headline impact",
-    body: "CO₂e and water scarcity per garment, calculated against industry benchmarks using peer-reviewed methods.",
-    sectionY: 520,
-    range: [0.18, 0.36],
+    body: "CO₂e and water scarcity per garment, with industry-average comparison baked in.",
+    sectionY: 468,
+    sectionHeight: 367,
     corner: "top-right",
   },
   {
     id: 3,
-    label: "Supply chain map",
-    body: "Every stage from fibre to finished garment, mapped to the country and verified.",
-    sectionY: 2300,
-    range: [0.36, 0.72],
+    label: "Production journey",
+    body: "World map of fibre-to-garment stages, with each country traced and verified.",
+    sectionY: 1290,
+    sectionHeight: 1275,
     corner: "bottom-left",
   },
   {
     id: 4,
     label: "Verified standards",
-    body: "Aligned with EU PEF, ISO 14040 and AWARE methodologies, so the numbers hold up.",
-    sectionY: 6200,
-    range: [0.72, 1.0],
+    body: "Real certifications and third-party claims, attached to the product page.",
+    sectionY: 3055,
+    sectionHeight: 793,
     corner: "bottom-right",
   },
 ];
@@ -77,7 +77,6 @@ function ScrollablePhone({
   return (
     <div className="relative" style={{ width }}>
       <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-envrt-charcoal/90 bg-envrt-charcoal shadow-[0_25px_60px_-10px_rgba(0,0,0,0.4)]">
-        {/* Status bar */}
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[2.3rem] bg-white px-5"
           style={{ height: 22 }}
@@ -99,14 +98,8 @@ function ScrollablePhone({
             </div>
           </div>
         </div>
-        {/* Dynamic island */}
         <div className="absolute left-1/2 top-[4px] z-30 h-[16px] w-[72px] -translate-x-1/2 rounded-full bg-envrt-charcoal" />
-
-        {/* Screen */}
-        <div
-          className="relative w-full overflow-hidden rounded-[2.3rem] bg-white"
-          style={{ height: screenHeight }}
-        >
+        <div className="relative w-full overflow-hidden rounded-[2.3rem] bg-white" style={{ height: screenHeight }}>
           <motion.iframe
             src={siteConfig.dppDemoEmbedUrl}
             title="What's in a Digital Product Passport"
@@ -122,6 +115,15 @@ function ScrollablePhone({
 }
 
 // ─── Section ──────────────────────────────────────────────────────────────
+const DESKTOP_PAN_RANGE = IFRAME_NATURAL_HEIGHT - DESKTOP_SCREEN_HEIGHT;
+const MOBILE_PAN_RANGE = IFRAME_NATURAL_HEIGHT - MOBILE_SCREEN_HEIGHT;
+
+// Reveal threshold for a callout: progress at which the section's top
+// reaches the top of the visible window. Clamped to [0, 1].
+function revealThreshold(c: Callout) {
+  return Math.max(0, Math.min(1, c.sectionY / DESKTOP_PAN_RANGE));
+}
+
 export function DppAnatomySection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -134,23 +136,23 @@ export function DppAnatomySection() {
     restDelta: 0.001,
   });
 
-  // Iframe pan distance for each layout.
-  const desktopRange = IFRAME_NATURAL_HEIGHT - DESKTOP_SCREEN_HEIGHT;
-  const mobileRange = IFRAME_NATURAL_HEIGHT - MOBILE_SCREEN_HEIGHT;
-  const desktopIframeY = useTransform(smoothProgress, [0, 1], [0, -desktopRange]);
-  const mobileIframeY = useTransform(smoothProgress, [0, 1], [0, -mobileRange]);
+  const desktopIframeY = useTransform(smoothProgress, [0, 1], [0, -DESKTOP_PAN_RANGE]);
+  const mobileIframeY = useTransform(smoothProgress, [0, 1], [0, -MOBILE_PAN_RANGE]);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Accumulating reveal: once a callout reveals, it stays visible.
+  const [revealedSet, setRevealedSet] = useState<Set<number>>(new Set([1]));
   useMotionValueEvent(smoothProgress, "change", (latest) => {
-    let next = 0;
-    for (let i = 0; i < callouts.length; i++) {
-      if (latest >= callouts[i].range[0] && latest < callouts[i].range[1]) {
-        next = i;
-        break;
+    setRevealedSet((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const c of callouts) {
+        if (!next.has(c.id) && latest >= revealThreshold(c)) {
+          next.add(c.id);
+          changed = true;
+        }
       }
-      if (latest >= callouts[i].range[1]) next = i;
-    }
-    setActiveIndex(next);
+      return changed ? next : prev;
+    });
   });
 
   return (
@@ -165,7 +167,7 @@ export function DppAnatomySection() {
               What&apos;s in a Digital Product Passport.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-envrt-muted sm:text-lg">
-              Scroll through a live passport. Each label highlights its section as it comes into view.
+              Scroll through a live passport. Each label stays once it appears, so you can read them together at the end as a summary.
             </p>
           </div>
         </FadeUp>
@@ -176,19 +178,37 @@ export function DppAnatomySection() {
           style={{ height: `${STAGE_HEIGHT_VH}vh` }}
         >
           {/* ── Mobile stage ────────────────────────────────────────────── */}
-          <div className="sticky top-0 flex h-screen flex-col items-center justify-between gap-6 py-10 lg:hidden">
+          <div className="sticky top-0 flex h-screen flex-col items-center justify-start gap-5 py-10 lg:hidden">
             <ScrollablePhone iframeY={mobileIframeY} screenHeight={MOBILE_SCREEN_HEIGHT} />
-            <MobileCalloutCarousel
-              callouts={callouts}
-              activeIndex={activeIndex}
-            />
+            <div className="w-full max-w-md flex-1 space-y-3">
+              {callouts.map((c) => {
+                const isRevealed = revealedSet.has(c.id);
+                return (
+                  <motion.div
+                    key={c.id}
+                    initial={false}
+                    animate={{ opacity: isRevealed ? 1 : 0, y: isRevealed ? 0 : 8 }}
+                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="flex gap-3"
+                  >
+                    <span className="text-xl font-bold leading-none tracking-tight text-envrt-teal">
+                      {String(c.id).padStart(2, "0")}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-envrt-charcoal">{c.label}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-envrt-muted">{c.body}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
 
           {/* ── Desktop stage ───────────────────────────────────────────── */}
           <div className="sticky top-0 hidden h-screen items-center justify-center lg:flex">
             <DesktopStage
               callouts={callouts}
-              activeIndex={activeIndex}
+              revealedSet={revealedSet}
               progress={smoothProgress}
               iframeY={desktopIframeY}
             />
@@ -199,124 +219,59 @@ export function DppAnatomySection() {
   );
 }
 
-// ─── Mobile carousel ──────────────────────────────────────────────────────
-function MobileCalloutCarousel({
-  callouts,
-  activeIndex,
-}: {
-  callouts: Callout[];
-  activeIndex: number;
-}) {
-  return (
-    <div className="w-full max-w-md">
-      {/* Progress dots */}
-      <div className="mb-4 flex justify-center gap-2">
-        {callouts.map((c, i) => (
-          <span
-            key={c.id}
-            aria-hidden="true"
-            className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
-              i === activeIndex ? "bg-envrt-teal" : "bg-envrt-charcoal/15"
-            }`}
-          />
-        ))}
-      </div>
-      {/* Cross-fading callouts */}
-      <div className="relative h-32">
-        {callouts.map((c, i) => (
-          <motion.div
-            key={c.id}
-            initial={false}
-            animate={{ opacity: i === activeIndex ? 1 : 0, y: i === activeIndex ? 0 : 8 }}
-            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute inset-0 flex gap-4"
-          >
-            <span className="text-3xl font-bold leading-none tracking-tight text-envrt-teal">
-              {String(c.id).padStart(2, "0")}
-            </span>
-            <div className="flex-1">
-              <p className="text-base font-semibold text-envrt-charcoal">{c.label}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-envrt-muted">{c.body}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ─── Desktop stage ────────────────────────────────────────────────────────
-// Stage layout (percentages of stage box):
-//   Phone:          centred at x=50, occupies a vertical band ~middle.
-//   Corner tiles:   placed at the 4 corners, each tile ~24% wide.
-//   Connector line: from tile inner edge to a tracked Y on phone outer edge.
-//
-// Stage is 100vh tall. Phone is fixed pixel height. We position everything
-// in a 1100×600 viewBox-ish coordinate space using percentages so the SVG
-// connector overlay tracks alongside the DOM tiles.
-
 const STAGE_WIDTH_PX = 1100;
-const STAGE_HEIGHT_PX = 600;
-const PHONE_LEFT_EDGE_PCT = 41.5; // visual left edge of phone in stage
-const PHONE_RIGHT_EDGE_PCT = 58.5;
-const PHONE_TOP_PCT = 8;
-const PHONE_BOTTOM_PCT = 92;
+const STAGE_HEIGHT_PX = 620;
+const PHONE_LEFT_EDGE_PCT = 41;
+const PHONE_RIGHT_EDGE_PCT = 59;
+const PHONE_TOP_PCT = 6;
+const PHONE_BOTTOM_PCT = 94;
 
 const CORNER_LAYOUT: Record<Corner, {
   tileTop: string;
   tileSide: "left" | "right";
   tileSidePct: number;
-  // Anchor point on the tile's inner edge.
   tileAnchor: { xPct: number; yPct: number };
 }> = {
-  "top-left":     { tileTop: "8%",  tileSide: "left",  tileSidePct: 2,  tileAnchor: { xPct: 28, yPct: 12 } },
-  "top-right":    { tileTop: "8%",  tileSide: "right", tileSidePct: 2,  tileAnchor: { xPct: 72, yPct: 12 } },
-  "bottom-left":  { tileTop: "70%", tileSide: "left",  tileSidePct: 2,  tileAnchor: { xPct: 28, yPct: 78 } },
-  "bottom-right": { tileTop: "70%", tileSide: "right", tileSidePct: 2,  tileAnchor: { xPct: 72, yPct: 78 } },
+  "top-left":     { tileTop: "6%",  tileSide: "left",  tileSidePct: 2, tileAnchor: { xPct: 27, yPct: 10 } },
+  "top-right":    { tileTop: "6%",  tileSide: "right", tileSidePct: 2, tileAnchor: { xPct: 73, yPct: 10 } },
+  "bottom-left":  { tileTop: "62%", tileSide: "left",  tileSidePct: 2, tileAnchor: { xPct: 27, yPct: 80 } },
+  "bottom-right": { tileTop: "62%", tileSide: "right", tileSidePct: 2, tileAnchor: { xPct: 73, yPct: 80 } },
 };
 
 function DesktopStage({
   callouts,
-  activeIndex,
+  revealedSet,
   progress,
   iframeY,
 }: {
   callouts: Callout[];
-  activeIndex: number;
+  revealedSet: Set<number>;
   progress: import("framer-motion").MotionValue<number>;
   iframeY: import("framer-motion").MotionValue<number>;
 }) {
   return (
-    <div
-      className="relative"
-      style={{ width: STAGE_WIDTH_PX, height: STAGE_HEIGHT_PX, maxWidth: "100%" }}
-    >
-      {/* SVG connector overlay — draws the active annotation's line */}
+    <div className="relative" style={{ width: STAGE_WIDTH_PX, height: STAGE_HEIGHT_PX, maxWidth: "100%" }}>
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        {callouts.map((c, i) => (
-          <ConnectorLine
-            key={c.id}
-            callout={c}
-            isActive={i === activeIndex}
-            progress={progress}
-          />
+        {callouts.map((c) => (
+          <ConnectorLine key={c.id} callout={c} isRevealed={revealedSet.has(c.id)} progress={progress} />
         ))}
       </svg>
 
-      {/* Annotation tiles, only the active one is visible (cross-fade) */}
-      {callouts.map((c, i) => {
+      {callouts.map((c) => {
         const layout = CORNER_LAYOUT[c.corner];
+        const isRevealed = revealedSet.has(c.id);
         return (
           <motion.div
             key={c.id}
             initial={false}
-            animate={{ opacity: i === activeIndex ? 1 : 0, y: i === activeIndex ? 0 : 6 }}
-            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            animate={{ opacity: isRevealed ? 1 : 0, y: isRevealed ? 0 : 6 }}
+            transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
             className={`absolute z-20 w-[24%] ${layout.tileSide === "left" ? "text-left" : "text-right"}`}
             style={{
               top: layout.tileTop,
@@ -332,7 +287,6 @@ function DesktopStage({
         );
       })}
 
-      {/* Phone centred */}
       <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
         <ScrollablePhone iframeY={iframeY} screenHeight={DESKTOP_SCREEN_HEIGHT} />
       </div>
@@ -340,34 +294,28 @@ function DesktopStage({
   );
 }
 
-// ─── Connector line ───────────────────────────────────────────────────────
-// The line endpoint on the phone tracks the active section as it moves
-// through the visible frame. Endpoint Y is derived from scroll progress
-// using each section's known DPP Y position.
+// Connector line for a single callout. While its section is in the visible
+// frame, the line endpoint Y tracks the section's top. After the section
+// exits the top of the frame, the endpoint clamps to the top of the phone.
 function ConnectorLine({
   callout,
-  isActive,
+  isRevealed,
   progress,
 }: {
   callout: Callout;
-  isActive: boolean;
+  isRevealed: boolean;
   progress: import("framer-motion").MotionValue<number>;
 }) {
   const layout = CORNER_LAYOUT[callout.corner];
-  const desktopRange = IFRAME_NATURAL_HEIGHT - DESKTOP_SCREEN_HEIGHT;
   const phoneEdgeXPct = layout.tileSide === "left" ? PHONE_LEFT_EDGE_PCT : PHONE_RIGHT_EDGE_PCT;
 
-  // Convert section Y on the phone screen into a percentage of stage height.
-  // Section Y on screen = sectionY - panPosition. panPosition = desktopRange * p.
-  // Fraction of screen = (sectionY - desktopRange*p) / DESKTOP_SCREEN_HEIGHT.
-  // Phone screen occupies stage Y from PHONE_TOP_PCT to PHONE_BOTTOM_PCT.
   const phoneEdgeY = useTransform(progress, (p) => {
-    const sectionOnScreen = callout.sectionY - desktopRange * p;
-    const screenFraction = Math.max(0, Math.min(1, sectionOnScreen / DESKTOP_SCREEN_HEIGHT));
-    return PHONE_TOP_PCT + screenFraction * (PHONE_BOTTOM_PCT - PHONE_TOP_PCT);
+    const panPos = DESKTOP_PAN_RANGE * p;
+    const sectionOnScreen = callout.sectionY - panPos;
+    const fraction = Math.max(0, Math.min(1, sectionOnScreen / DESKTOP_SCREEN_HEIGHT));
+    return PHONE_TOP_PCT + fraction * (PHONE_BOTTOM_PCT - PHONE_TOP_PCT);
   });
 
-  // Build the SVG path as a curved bezier from tile anchor to phone edge.
   const pathD = useTransform(phoneEdgeY, (yPct) => {
     const start = layout.tileAnchor;
     const end = { x: phoneEdgeXPct, y: yPct };
@@ -386,8 +334,8 @@ function ConnectorLine({
       vectorEffect="non-scaling-stroke"
       strokeLinecap="round"
       initial={false}
-      animate={{ opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      animate={{ opacity: isRevealed ? 1 : 0 }}
+      transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
     />
   );
 }
