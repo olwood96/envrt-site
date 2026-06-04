@@ -273,38 +273,43 @@ export function HeroV2() {
         <div className="relative mx-auto w-full max-w-[640px]">
           {/* Desktop composition */}
           <div className="relative hidden h-[680px] lg:block">
-            {/* Hoodie centered, sized to leave breathing room around the callouts */}
-            <FadeUp delay={0.1}>
-              <div className="animate-float absolute left-1/2 top-1/2 z-0 h-[78%] w-[42%] -translate-x-1/2 -translate-y-1/2">
-                <Image
-                  src="/jacket.png"
-                  alt="Sustainable hoodie"
-                  fill
-                  sizes="280px"
-                  className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
-                  priority
-                />
-                {/* QR sits on the hoodie chest like a sewn-in tag, with a pulse halo */}
-                <div
-                  className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2"
-                  style={{ width: 88, height: 88 }}
-                >
-                  <span
-                    aria-hidden
-                    className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
+            {/* Hoodie centered, sized to leave breathing room around the callouts.
+                Outer div owns the centring transform; inner div owns the float
+                keyframe. Keeping them on separate elements stops one transform
+                from overriding the other. */}
+            <div className="absolute left-1/2 top-1/2 z-0 h-[78%] w-[42%] -translate-x-1/2 -translate-y-1/2">
+              <FadeUp delay={0.1} className="h-full w-full">
+                <div className="animate-float relative h-full w-full">
+                  <Image
+                    src="/jacket.png"
+                    alt="Sustainable hoodie"
+                    fill
+                    sizes="280px"
+                    className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
+                    priority
                   />
-                  <div className="relative h-full w-full rounded-xl bg-white p-1.5 shadow-[0_12px_24px_rgba(0,0,0,0.18)] ring-1 ring-envrt-charcoal/5">
-                    <Image
-                      src="/qr-code.png"
-                      alt="Digital Product Passport QR code"
-                      fill
-                      sizes="88px"
-                      className="object-contain p-1"
+                  {/* QR sits on the hoodie chest like a sewn-in tag, with a pulse halo */}
+                  <div
+                    className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2"
+                    style={{ width: 88, height: 88 }}
+                  >
+                    <span
+                      aria-hidden
+                      className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
                     />
+                    <div className="relative h-full w-full rounded-xl bg-white p-1.5 shadow-[0_12px_24px_rgba(0,0,0,0.18)] ring-1 ring-envrt-charcoal/5">
+                      <Image
+                        src="/qr-code.png"
+                        alt="Digital Product Passport QR code"
+                        fill
+                        sizes="88px"
+                        className="object-contain p-1"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </FadeUp>
+              </FadeUp>
+            </div>
 
             {/* Corner callouts */}
             {callouts.map((c, i) => (
