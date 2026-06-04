@@ -293,6 +293,58 @@ h1, h2, h3, h4, h5, h6 {
   color: transparent;
 }
 
+/* Card shimmer (subtle teal sheen sweeps across the card) */
+@keyframes card-shimmer {
+  0% { background-position: -200% 0; }
+  50% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.animate-card-shimmer {
+  background-image: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(42, 161, 152, 0.06) 48%,
+    rgba(42, 161, 152, 0.14) 50%,
+    rgba(42, 161, 152, 0.06) 52%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: card-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* DPP-scroll (auto-pan a tall screenshot inside a fixed-height frame) */
+@keyframes dpp-scroll {
+  0%, 10% { transform: translateY(0); }
+  45%, 55% { transform: translateY(-50%); }
+  90%, 100% { transform: translateY(0); }
+}
+.animate-dpp-scroll {
+  animation: dpp-scroll 14s ease-in-out infinite;
+}
+.dpp-scroll-frame:hover .animate-dpp-scroll {
+  animation-play-state: paused;
+}
+
+/* Orbit (rotate + translate + counter-rotate keeps child upright while it circles) */
+@keyframes orbit-cw {
+  0%   { transform: rotate(0deg)   translateX(var(--orbit-r, 80px)) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(var(--orbit-r, 80px)) rotate(-360deg); }
+}
+@keyframes orbit-ccw {
+  0%   { transform: rotate(0deg)   translateX(var(--orbit-r, 80px)) rotate(0deg); }
+  100% { transform: rotate(-360deg) translateX(var(--orbit-r, 80px)) rotate(360deg); }
+}
+.animate-orbit-cw  { animation: orbit-cw  18s linear infinite; }
+.animate-orbit-ccw { animation: orbit-ccw 22s linear infinite; }
+
+/* Morph (slow blob shape change for decorative backgrounds) */
+@keyframes morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%      { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+.animate-morph { animation: morph 14s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .glass-nav {
     animation: none;
@@ -322,6 +374,21 @@ h1, h2, h3, h4, h5, h6 {
     animation: none;
   }
   .animate-pulse-ring {
+    animation: none;
+  }
+  .animate-card-shimmer {
+    animation: none;
+  }
+  .animate-dpp-scroll {
+    animation: none;
+  }
+  .animate-orbit-cw {
+    animation: none;
+  }
+  .animate-orbit-ccw {
+    animation: none;
+  }
+  .animate-morph {
     animation: none;
   }
 }

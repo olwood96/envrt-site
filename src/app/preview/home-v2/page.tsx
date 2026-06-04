@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HeroV2 } from "@/components/sections/v2/HeroV2";
+import { FxLabSection } from "@/components/sections/v2/FxLabSection";
 import { DppAnatomySection } from "@/components/sections/v2/DppAnatomySection";
 import { HowItWorksV2 } from "@/components/sections/v2/HowItWorksV2";
 import { WhatYouGetSection } from "@/components/sections/v2/WhatYouGetSection";
@@ -43,6 +44,7 @@ export default async function HomeV2PreviewPage() {
   return (
     <>
       <HeroV2 />
+      <FxLabSection />
       <DppAnatomySection />
       <HowItWorksV2 />
       <WhatYouGetSection />
