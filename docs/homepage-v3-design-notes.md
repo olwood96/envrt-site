@@ -1,67 +1,73 @@
 # Homepage v3 — design notes
 
-> Internal rulebook for the editorial redesign at `/preview/home-v3`. Not yet
-> promoted. If we keep it, fold these rules into `docs/ui-styleguide.md` and
-> retire the v2 docs.
+> Internal rulebook for the homepage at `/preview/home-v3`. Not yet promoted.
+> If we keep it, fold these rules into `docs/ui-styleguide.md`.
 
 ---
 
 ## The angle
 
-Competitor sites cluster in three places:
+Competitor landing pages cluster in four places:
 
 | Cluster | Examples | Feels like |
 |---|---|---|
 | Glassmorphic AI-tech | merloop, Carbonfact | Tech demo, dark, fast |
 | Lifestyle / busy | Renoon, tex.tracer | Editorial-adjacent but cluttered |
 | Corporate B2B SaaS | TrusTrace, Retraced, Fairly Made | Clean but generic |
+| Apple-clean precision | Apple, Stripe, Linear | Calm, confident, modern |
 
-v3 takes a fourth lane: **editorial precision**. Quietly confident. Audit-grade
-under the hood, fashion-credible on the surface. Closer in temperament to
-Cuyana, Aesop, Tibi than to a typical SaaS landing page.
+v3 sits in the fourth lane: Apple-clean precision. Confident sans-serif type,
+generous whitespace, dark + light section heartbeat, one calibrated motion
+moment per section. Trust earned through restraint.
 
-The page should answer two questions on first scroll:
+Two questions the page must answer on first scroll:
 
-1. Is this fashion-credible enough that I'd put a QR from them on my hangtag?
-2. Will the numbers underneath survive my compliance team's review?
-
-Everything else is decoration.
+1. Is this serious enough that my compliance team will sign off?
+2. Is this calm enough that I'm not about to scroll into another SaaS landing
+   page with 14 gradient blobs?
 
 ---
 
 ## Type system
 
 ### Pairing
-- **N27** — primary. UI, headings, captions, buttons. Unchanged from v2.
-- **Fraunces** — editorial serif, italic only. Loaded via `next/font/google`
-  on the v3 route. Used for:
-  - Hero lead line
-  - Section headings (h2)
-  - Pull-quote moments in body copy
-  - Big stat numerals
-  - Step numbers in How It Works
-  - Foot quote-marks (italic captions like "Built for fashion brands…")
+- **N27** — brand voice. Reserved for the wordmark, eyebrows, the
+  occasional brand-marked label. Loaded globally for the whole site.
+- **System (SF Pro on Apple, Segoe UI on Windows, Roboto on Android)** —
+  primary display + body across v3. The exact font Apple uses on
+  apple.com. No webfont download.
 
-### Rule of thumb
-- Fraunces italic is the **voice**.
-- N27 bold/semibold is the **product**.
-- Anything that's a number you want to feel like a statement → Fraunces italic.
-  Anything that's instructional → N27.
+Tailwind:
+```ts
+font-system → ["-apple-system", "BlinkMacSystemFont", '"SF Pro Display"',
+              '"SF Pro Text"', '"Segoe UI"', "Roboto",
+              '"Helvetica Neue"', "Arial", "sans-serif"]
+```
 
-### Sizes (display)
+Applied at the v3 page wrapper. Cascades to every descendant unless a
+component opts back into `font-n27` for a brand moment.
+
+### Weight rule
+- **font-semibold (600)** for h1, h2, h3 — Apple's display weight
+- **font-medium (500)** for buttons, labels, small caps
+- **font-normal (400)** for body
+- Avoid font-bold (700) on display — too heavy for SF Pro Display
+
+### Tracking rule
+- Display headings: `tracking-[-0.02em]` to `tracking-[-0.04em]` for big
+  numerals. SF Pro is designed to be tightened at display sizes.
+- Body and UI: default tracking, no override.
+- Small-caps eyebrows: `tracking-[0.22em]`.
+
+### Display sizes
 
 | Element | Class |
 |---|---|
-| Hero serif lead | `font-fraunces italic text-[1.7rem] sm:text-[2.1rem] lg:text-[2.4rem]` |
-| Section h2 (serif) | `font-fraunces italic text-3xl sm:text-4xl lg:text-[2.6rem]` |
-| Manifesto strip | `font-fraunces italic text-3xl sm:text-4xl lg:text-[3.2rem]` |
-| Big numeral | `font-fraunces italic text-[5rem] sm:text-[6rem] lg:text-[7rem]` |
-| Pull-quote in tile | `font-fraunces italic text-xl` |
-
-### Weight rule
-- Fraunces: `font-normal` (400) for all display. Italic does the emphasis work;
-  weight stacking would over-stress it.
-- N27: same scale as v2 (bold for h1, semibold for h3, medium for labels).
+| Hero h1 | `text-[2.5rem] sm:text-5xl lg:text-[3.75rem] font-semibold tracking-[-0.02em]` |
+| Section h2 | `text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold tracking-[-0.02em]` |
+| Manifesto strip | `text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold` |
+| Big numeral (NumbersSection) | `text-[4.5rem] sm:text-[5.5rem] lg:text-[6.5rem] font-semibold tracking-[-0.04em]` |
+| Bento tile main | `text-xl font-semibold tracking-[-0.01em]` |
 
 ---
 
@@ -69,118 +75,137 @@ Everything else is decoration.
 
 ### Palette extensions
 
-Two additions, both as CSS vars in `globals.css`:
+Two additions as CSS vars in `globals.css`:
 
 | Token | Hex | Use |
 |---|---|---|
-| `envrt-ink` | `#0e0e0e` | High-emphasis editorial type, dark section grounds |
-| `envrt-stone` | `#ece8e1` | Warmer paper tone for layered backgrounds, plate-behind-photo |
+| `envrt-ink` | `#0e0e0e` | High-emphasis editorial type, dark section grounds, final CTA |
+| `envrt-stone` | `#ece8e1` | Warmer paper tone for layered backgrounds, scene-plates behind photos |
 
-`envrt-charcoal` is now reserved for **mid-weight** type (body text, captions).
-Use `envrt-ink` for hero h1, section h2, and anywhere you want the weight of
-ink on cotton paper.
+`envrt-charcoal` is now reserved for mid-weight body text. Use `envrt-ink`
+for hero h1, section h2, dark inverted sections.
 
-### When to use stone vs cream vs offwhite
+### Section ground rhythm
 
-| Ground | Use |
-|---|---|
-| `envrt-offwhite` | Default page background |
-| `envrt-stone` | Layered surfaces (scene plates behind photos, final CTA section) |
-| `envrt-cream` | Skeleton loaders only (unchanged from v2) |
-| `envrt-ink` | Dark inversion (manifesto strip, hero bento dark tile) |
+The scroll alternates ground tones to give a heartbeat:
 
-### Accent discipline
+```
+offwhite (hero) → ink (manifesto) → ink (scroll tour) → offwhite (bento)
+  → white (numbers) → offwhite (how it works) → ink (final CTA)
+```
+
+Two adjacent dark sections (manifesto → scroll tour) read as a single
+"trust strip" — calm tech statement, then the live tour as the proof.
+
+### Accent
 - `envrt-green` — primary brand, hero buttons, dark tile backgrounds
-- `envrt-teal` — small-caps labels, accent highlights, hover states
-- `envrt-teal-light` — accent labels on dark grounds
-- No new accent colour. The warmth comes from `envrt-stone`, not new hues.
+- `envrt-teal` — small-caps labels, accent highlights, active states
+- `envrt-teal-light` — labels on dark grounds
+- No new hues. Warmth comes from `envrt-stone`, depth from `envrt-ink`.
 
 ---
 
 ## Layout
 
-### Page rhythm
-Alternate ground tones to give the scroll a heartbeat:
-
-```
-offwhite → ink (manifesto) → offwhite → offwhite → white → … → stone (CTA)
-```
-
-Don't run two same-coloured sections in a row.
-
 ### Container
-- Max width: `1320px` (was `1280px` in v2). Slightly wider gives the bento
-  more room without feeling crowded.
-- Side padding: `px-6 sm:px-10 lg:px-16`
+- Max width: `1280px–1320px` (was `1280px` in v2). Slightly wider so the
+  scroll-tour columns breathe.
+- Side padding: `px-6 sm:px-10 lg:px-12` or `lg:px-16`
 
 ### Section vertical padding
 
 | Tier | Pattern |
 |---|---|
-| Editorial standard | `py-20 sm:py-24 lg:py-32` |
-| Editorial spacious | `py-24 sm:py-32 lg:py-40` (manifesto, final CTA) |
-
-Always more than v2. Generous whitespace is non-negotiable.
+| Standard | `py-20 sm:py-24 lg:py-32` |
+| Spacious | `py-24 sm:py-32 lg:py-40` (manifesto, final CTA) |
+| Pinned scroll | `h-[400vh]` (scroll tour) |
 
 ### Bento rules
-- Use 12-column grid on `lg`, 6-column on `sm`, single on mobile
-- No tile rotates. No tile floats. No shimmer keyframes on bento tiles.
-- Alternate `bg-envrt-ink`, `bg-envrt-stone`, `bg-white ring-1 ring-envrt-ink/5`
-  across the grid to vary surface
-- Each tile has a small-caps label (top), main content (middle), short
-  caption sentence (bottom-anchored)
+- 12-column on `lg`, 6-column on `sm`, single on mobile
+- No tile rotates. No infinite-loop ambient animation on tiles.
+- Hover-lift: `hover:-translate-y-1 hover:shadow-[0_24px_50px_-20px_rgba(14,14,14,0.18)]`
+- Alternate `bg-envrt-ink`, `bg-envrt-stone`, `bg-white ring-1 ring-envrt-ink/5` to vary surface
+- Each tile: small-caps label (top) · main content (middle) · short caption (bottom-anchored)
 
 ---
 
 ## Motion
 
-### Removed from v2
-- Glow blobs behind the hero — too tech-y for editorial register
-- Auto-pulse ring on QR — distracts from a calm product shot
-- Hoodie float bob — calm photography doesn't bob
-- Cascading rotated callouts — replaced with bento
+### Headline pattern: scroll-pinned DPP tour
+The set-piece of v3. See `ScrollTourSection.tsx`.
 
-### Kept
-- `FadeUp` on every section entrance, staggered 60–80ms between siblings
-- No infinite-loop ambient animations on the v3 page (apart from
-  `prefers-reduced-motion`-respecting custom keyframes that the site already
-  ships globally; the v3 page just doesn't use them)
+- Section is 4 viewport heights (`h-[400vh]`)
+- Inner container uses `position: sticky; top: 0`
+- A tall DPP screenshot pans inside a phone frame via `useScroll` +
+  `useTransform` (`y: ["0%", "-72%"]`)
+- 4 narrative stops on the left rail, each tied to a scroll progress range
+  `[0, 0.27]`, `[0.27, 0.5]`, etc.
+- Each stop's opacity, number colour and left-edge indicator are derived
+  from the same `scrollYProgress` motion value
+- Background teal halo also reacts to scroll progress
+
+### Smaller motion moments
+- **CountUp** on big stats (NumbersSection). Cubic ease, 1.4s, fires once
+  when in view. Swaps to formatted display string on completion.
+- **Soft scale-in** on the hero QR card (motion.div with
+  `initial={{ opacity: 0, scale: 0.92 }}`)
+- **Hover lift** on bento tiles and how-it-works rows
+- **Section entrance** via `FadeUp` everywhere
+
+### Removed from v2
+- Glow blobs behind every section — too tech-y at scale
+- Auto-pulse ring on QR — distracts from a calm product shot
+- Hoodie float bob — calm product photos don't bob
+- Cascading rotated callouts — replaced with bento
+- All Fraunces italic display — switched to N27 / system bold
 
 ### Rule
-- The page should feel quiet on first paint. Motion is for arrival, not
-  ambience.
+- Quiet on first paint. One choreographed motion moment per section. Scroll
+  tour is the moment of "show me how this works".
 
 ---
 
 ## Photography
 
 ### Hero
-- One garment, centered, fill-frame inside a `5:6` plate
-- Stone-tinted plate behind it (subtle frame)
-- One QR + tag combination, placed where a care label would naturally sit
-- Drop-shadow: `drop-shadow-[0_30px_60px_rgba(14,14,14,0.18)]`
+- One garment, fill-frame inside a 4:5 aspect ratio
+- Stone-tinted scene plate behind (subtle frame)
+- One QR + tag overlay where a real care label would sit
+- Drop-shadow: `drop-shadow-[0_30px_60px_rgba(14,14,14,0.16)]`
 
-### Bento
-- Photos at max two per grid (Eco-Score label, QR). Don't crowd.
-- Diagrams (provenance map, supply chain) use SVG, not raster screenshots.
+### Scroll tour
+- Phone shell with ~600px-tall screen
+- Tall DPP PNG inside, panned via `translateY`
+- Gradient fade masks at top and bottom of the screen frame
+- Caption strip under the phone: `dpp.envrt.com · live example`
 
 ---
 
 ## Copy register
 
-### Lead lines (serif italic)
-- Build with **specifics**, not adjectives. "Numbers that pass an audit"
-  beats "Trusted compliance".
-- Use two short sentences for the lead, not one long one.
-- Period at the end of every line. Closure matters.
+### Lead lines
+- Build with **specifics**, not adjectives
+- Active voice, short sentences
+- Period at the end of every line
 
-### Body
-- Active voice, short sentences. Per universal style rules.
-- No oxford commas. No em dashes.
-- Numbers as digits in stats and stat-adjacent prose.
+### Numbers
+- **Source from real site data**, never invent. See cross-references:
+
+| Claim | Source |
+|---|---|
+| ~30 minutes onboarding | `src/app/faq/page.tsx:17` |
+| 68,431 reference cells per LCA | `src/lib/impact-stats.ts:9` |
+| £149/mo Starter | `src/app/pricing/layout.tsx`, `src/app/roi/page.tsx:71` |
+| 6.3 kg CO₂e (hoodie) | `src/components/sections/SupplyChainFlowSection.tsx:7` |
+| 12,450 L water (hoodie) | `src/components/sections/SupplyChainFlowSection.tsx:8` |
+| 69% data depth | `src/components/sections/SupplyChainFlowSection.tsx` |
+| EU PEF · ISO 14040 · AWARE | `src/lib/aligned-with.ts` |
+
+If a stat isn't anchored to one of these, don't put a number on it.
 
 ### Labels (small-caps overlines)
-- `text-[11px] font-medium uppercase tracking-[0.22em] text-envrt-charcoal/55`
+- `text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal`
+- Coloured teal on light grounds, teal-light on dark grounds
 - One per section. Never two stacked.
 
 ---
@@ -189,37 +214,37 @@ Always more than v2. Generous whitespace is non-negotiable.
 
 | File | Purpose |
 |---|---|
-| `src/components/sections/v3/HeroV3.tsx` | Editorial hero + one product photo + stat strip caption |
-| `src/components/sections/v3/ManifestoSection.tsx` | Dark exhale strip, single serif statement |
-| `src/components/sections/v3/WhatsInDppV3.tsx` | Six-tile bento describing the passport |
-| `src/components/sections/v3/NumbersSection.tsx` | Three big serif numerals |
-| `src/components/sections/v3/HowItWorksV3.tsx` | Three editorial rows with serif step numbers |
-| `src/components/sections/v3/FinalCtaV3.tsx` | Stone-ground final CTA, single italic line |
+| `src/components/sections/v3/HeroV3.tsx` | Apple-clean hero, single product photo, two CTAs |
+| `src/components/sections/v3/ManifestoSection.tsx` | Dark exhale strip, single bold statement |
+| `src/components/sections/v3/ScrollTourSection.tsx` | Scroll-pinned phone with panning DPP and a 4-stop narrative rail |
+| `src/components/sections/v3/WhatsInDppV3.tsx` | Six-tile bento with hover-lift |
+| `src/components/sections/v3/NumbersSection.tsx` | Three big numerals with `CountUp` animation |
+| `src/components/sections/v3/HowItWorksV3.tsx` | Three rows with hover-state on `01 02 03` step numbers |
+| `src/components/sections/v3/FinalCtaV3.tsx` | Dark closing block with teal halo |
 
-Existing sections reused as-is: `ComparisonSection`, `AlignedWithCarousel`,
-`FAQSection`. These don't yet match the v3 type system. If v3 is promoted,
-they need a Fraunces pass on their section headings.
+Existing sections reused as-is on v3 (mid-page support):
+`ComparisonSection`, `AlignedWithCarousel`, `FAQSection`. These don't yet
+match the v3 weight rules. If v3 is promoted, sweep them for `font-bold`
+→ `font-semibold` and Apple-style tracking on h2.
 
 ---
 
 ## What's deliberately not on v3 (vs v2)
 
 - ImpactStatsSection — replaced by `NumbersSection`
-- PricingPreviewSection — out of the editorial run; should be promoted to its
-  own page or shortened to a single price moment in v3
-- StickyNudge — kills the editorial mood
-- DppAnatomySection (the iframe-pan version) — bento covers the same ground
+- PricingPreviewSection — out of the page run; tease it from final CTA only
+- StickyNudge — kills the calm
+- DppAnatomySection — superseded by `ScrollTourSection`
 - FxLabSection — was only ever a sandbox
 
 ---
 
 ## Open questions for review
 
-1. Is `Fraunces` the right serif or should we test `Cormorant Garamond`
-   (higher-fashion, more luxe) or `Source Serif` (more neutral)?
-2. Does the manifesto strip earn its dark-section moment, or should it be a
-   lighter pull-quote?
-3. Should the final CTA stay stone-ground, or invert to ink for a stronger
-   close?
-4. Does the bento need a sixth tile or do five (3+2) read calmer?
-5. Promote v3 in place at `/`, or keep it as a campaign landing page only?
+1. Does the scroll-tour earn its 4 viewport heights, or is it too long?
+2. The CountUp on NumbersSection — does it land as confident, or does it
+   look like a performance gimmick?
+3. Manifesto + scroll tour are both dark and adjacent. Read as one trust
+   strip, or do we need a visual break between them?
+4. Should the v3 hero invert to dark too, for a Carbonfact-style entrance?
+5. Promote v3 in place at `/`, or keep as a campaign landing page?

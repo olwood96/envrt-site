@@ -3,15 +3,30 @@
 import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
 
-// Editorial bento. Each tile reads as its own magazine module.
-// Tiles use Tailwind's `font-fraunces` for serif accents and sit on
-// envrt-stone or pure white grounds to vary texture across the grid.
+// Apple-style bento: each tile a clean, confident module. System font
+// throughout. Slight hover-lift on each card for tactility.
 
 function TileLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-envrt-charcoal/55">
+    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-envrt-charcoal/55">
       {children}
     </p>
+  );
+}
+
+function TileBase({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex h-full flex-col rounded-3xl p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_50px_-20px_rgba(14,14,14,0.18)] sm:p-9 ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -22,10 +37,10 @@ export function WhatsInDppV3() {
         {/* Section header */}
         <div className="mb-12 grid gap-8 sm:mb-16 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <FadeUp>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-envrt-charcoal/55">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
               The passport
             </p>
-            <h2 className="mt-5 font-fraunces text-3xl font-normal italic leading-[1.15] tracking-tight text-envrt-ink sm:text-4xl lg:text-[2.6rem]">
+            <h2 className="mt-5 text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
               What lives on a DPP.
             </h2>
           </FadeUp>
@@ -38,62 +53,62 @@ export function WhatsInDppV3() {
           </FadeUp>
         </div>
 
-        {/* Bento grid: 12 cols on desktop, asymmetric arrangements */}
+        {/* Bento grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:gap-5 lg:grid-cols-12 lg:gap-6">
           {/* 1. Headline impact — wide hero tile */}
           <FadeUp className="sm:col-span-6 lg:col-span-7">
-            <div className="flex h-full flex-col justify-between rounded-3xl bg-envrt-ink p-8 text-envrt-offwhite sm:p-10">
+            <TileBase className="justify-between bg-envrt-ink text-envrt-offwhite">
               <TileLabel>
                 <span className="text-envrt-teal-light">Headline impact</span>
               </TileLabel>
-              <div className="mt-10 grid grid-cols-3 gap-6">
+              <div className="mt-8 grid grid-cols-3 gap-6">
                 <div>
-                  <p className="font-fraunces text-4xl font-normal italic leading-none sm:text-5xl">
+                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
                     6.3
-                    <span className="ml-1 text-base not-italic text-envrt-offwhite/60">
+                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
                       kg
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
                     CO₂e
                   </p>
                 </div>
                 <div>
-                  <p className="font-fraunces text-4xl font-normal italic leading-none sm:text-5xl">
+                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
                     12.4k
-                    <span className="ml-1 text-base not-italic text-envrt-offwhite/60">
+                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
                       L
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
                     Water scarcity
                   </p>
                 </div>
                 <div>
-                  <p className="font-fraunces text-4xl font-normal italic leading-none sm:text-5xl">
+                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
                     69
-                    <span className="ml-1 text-base not-italic text-envrt-offwhite/60">
+                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
                       %
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
                     Data depth
                   </p>
                 </div>
               </div>
-              <p className="mt-10 max-w-md text-sm leading-relaxed text-envrt-offwhite/65">
+              <p className="mt-8 max-w-md text-sm leading-relaxed text-envrt-offwhite/65">
                 Numbers calculated per garment, peer-reviewed methods, ready
                 to drop into an audit pack.
               </p>
-            </div>
+            </TileBase>
           </FadeUp>
 
-          {/* 2. Eco-Score — tall narrow tile */}
+          {/* 2. Eco-Score — narrow tile */}
           <FadeUp delay={0.06} className="sm:col-span-3 lg:col-span-5">
-            <div className="flex h-full flex-col justify-between rounded-3xl bg-envrt-stone p-8 sm:p-10">
+            <TileBase className="justify-between bg-envrt-stone">
               <TileLabel>French Eco-Score</TileLabel>
-              <div className="mt-8 flex items-center justify-center">
-                <div className="relative h-32 w-full max-w-[220px]">
+              <div className="mt-6 flex items-center justify-center">
+                <div className="relative h-28 w-full max-w-[220px]">
                   <Image
                     src="/screenshots/dpp/sections/eco-score.png"
                     alt="Coût Environnemental label, 1573 points"
@@ -103,21 +118,21 @@ export function WhatsInDppV3() {
                   />
                 </div>
               </div>
-              <p className="mt-8 text-sm leading-relaxed text-envrt-charcoal/75">
-                Government-recognised in France. Same calc methodology
-                envrt runs by default.
+              <p className="mt-6 text-sm leading-relaxed text-envrt-charcoal/75">
+                Government-recognised in France. Same methodology ENVRT runs
+                by default.
               </p>
-            </div>
+            </TileBase>
           </FadeUp>
 
-          {/* 3. Provenance map — medium tile */}
+          {/* 3. Provenance map */}
           <FadeUp delay={0.12} className="sm:col-span-3 lg:col-span-5">
-            <div className="flex h-full flex-col rounded-3xl bg-white p-8 ring-1 ring-envrt-ink/5 sm:p-10">
+            <TileBase className="bg-white ring-1 ring-envrt-ink/5">
               <TileLabel>Provenance</TileLabel>
-              <p className="mt-4 font-fraunces text-lg italic leading-snug text-envrt-ink sm:text-xl">
+              <p className="mt-3 text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
                 Fibre to finished garment.
               </p>
-              <div className="relative mt-6 aspect-[5/3] w-full overflow-hidden rounded-2xl bg-envrt-stone/60">
+              <div className="relative mt-5 aspect-[5/3] w-full overflow-hidden rounded-2xl bg-envrt-stone/60">
                 <div
                   aria-hidden
                   className="absolute inset-0 opacity-50"
@@ -152,18 +167,18 @@ export function WhatsInDppV3() {
                     </g>
                   ))}
                 </svg>
-                <div className="absolute inset-x-0 bottom-2 flex items-end justify-between px-4 text-[10px] font-medium uppercase tracking-[0.15em] text-envrt-ink/70">
+                <div className="absolute inset-x-0 bottom-2 flex items-end justify-between px-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-envrt-ink/70">
                   <span>IN · Cotton</span>
                   <span>TR · Fabric</span>
                   <span>PT · Assembly</span>
                 </div>
               </div>
-            </div>
+            </TileBase>
           </FadeUp>
 
-          {/* 4. Verified standards — small tile */}
+          {/* 4. Verified standards */}
           <FadeUp delay={0.18} className="sm:col-span-3 lg:col-span-4">
-            <div className="flex h-full flex-col rounded-3xl bg-envrt-green p-8 text-envrt-offwhite sm:p-10">
+            <TileBase className="bg-envrt-green text-envrt-offwhite">
               <TileLabel>
                 <span className="text-envrt-teal-light">Verified against</span>
               </TileLabel>
@@ -172,7 +187,7 @@ export function WhatsInDppV3() {
                   (label) => (
                     <li
                       key={label}
-                      className="flex items-center gap-3 font-fraunces text-base italic"
+                      className="flex items-center gap-3 text-base font-medium"
                     >
                       <svg
                         className="h-3 w-3 flex-shrink-0 text-envrt-teal-light"
@@ -191,28 +206,28 @@ export function WhatsInDppV3() {
               <p className="mt-auto pt-8 text-sm leading-relaxed text-envrt-offwhite/70">
                 Methodology that survives a regulator&apos;s PDF.
               </p>
-            </div>
+            </TileBase>
           </FadeUp>
 
-          {/* 5. Brand story — small tile */}
+          {/* 5. Brand story */}
           <FadeUp delay={0.24} className="sm:col-span-3 lg:col-span-4">
-            <div className="flex h-full flex-col rounded-3xl bg-envrt-stone p-8 sm:p-10">
+            <TileBase className="bg-envrt-stone">
               <TileLabel>Your story</TileLabel>
-              <p className="mt-6 font-fraunces text-xl italic leading-snug text-envrt-ink">
+              <p className="mt-6 text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
                 Photography, provenance, repair guidance — your editorial
                 voice, your assets, your control.
               </p>
               <p className="mt-auto pt-8 text-sm leading-relaxed text-envrt-charcoal/65">
                 The numbers earn the trust. The story earns the loyalty.
               </p>
-            </div>
+            </TileBase>
           </FadeUp>
 
-          {/* 6. Scan-ready — small tile */}
+          {/* 6. Scan-ready */}
           <FadeUp delay={0.3} className="sm:col-span-6 lg:col-span-4">
-            <div className="flex h-full flex-col justify-between rounded-3xl bg-white p-8 ring-1 ring-envrt-ink/5 sm:p-10">
+            <TileBase className="justify-between bg-white ring-1 ring-envrt-ink/5">
               <TileLabel>Scan-ready</TileLabel>
-              <div className="my-6 flex items-center gap-5">
+              <div className="my-5 flex items-center gap-5">
                 <div className="relative h-16 w-16 flex-shrink-0">
                   <Image
                     src="/qr-code.png"
@@ -222,7 +237,7 @@ export function WhatsInDppV3() {
                     className="object-contain"
                   />
                 </div>
-                <p className="font-fraunces text-lg italic leading-snug text-envrt-ink">
+                <p className="text-lg font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
                   One QR. One scan. The full passport.
                 </p>
               </div>
@@ -230,7 +245,7 @@ export function WhatsInDppV3() {
                 Sized for care labels, hangtags, packaging. Resolves to a
                 hosted page or your own domain.
               </p>
-            </div>
+            </TileBase>
           </FadeUp>
         </div>
       </div>

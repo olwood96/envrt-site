@@ -32,33 +32,33 @@ const steps: Step[] = [
 
 export function HowItWorksV3() {
   return (
-    <section className="bg-white py-20 sm:py-24 lg:py-32">
+    <section className="bg-envrt-offwhite py-20 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-envrt-charcoal/55">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
             How it works
           </p>
-          <h2 className="mt-5 max-w-3xl font-fraunces text-3xl font-normal italic leading-[1.15] tracking-tight text-envrt-ink sm:text-4xl lg:text-[2.6rem]">
+          <h2 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
             Three steps. Half a day. One passport per garment.
           </h2>
         </FadeUp>
 
-        <div className="mt-14 space-y-0 border-t border-envrt-ink/8">
+        <div className="mt-14 border-t border-envrt-ink/8">
           {steps.map((step, i) => (
             <FadeUp key={step.index} delay={0.08 + i * 0.08}>
-              <div className="grid grid-cols-1 gap-6 border-b border-envrt-ink/8 py-10 sm:grid-cols-[120px_1fr_240px] sm:items-baseline sm:gap-12 sm:py-14">
-                <p className="font-fraunces text-5xl font-normal italic leading-none text-envrt-ink/15 sm:text-6xl">
+              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-ink/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[120px_1fr_240px] sm:items-baseline sm:gap-12 sm:px-2 sm:py-14">
+                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-ink/15 transition-colors duration-300 group-hover:text-envrt-teal sm:text-6xl">
                   {step.index}
                 </p>
                 <div>
-                  <h3 className="font-fraunces text-2xl font-normal italic leading-snug text-envrt-ink sm:text-3xl">
+                  <h3 className="text-2xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink sm:text-[1.75rem]">
                     {step.title}
                   </h3>
                   <p className="mt-4 max-w-xl text-base leading-relaxed text-envrt-charcoal/70">
                     {step.body}
                   </p>
                 </div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-envrt-teal sm:text-right">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-teal sm:text-right">
                   {step.caption}
                 </p>
               </div>

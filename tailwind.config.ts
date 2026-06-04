@@ -27,9 +27,20 @@ const config: Config = {
       fontFamily: {
         n27: ["N27", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         body: ["N27", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
-        // v3: editorial serif paired with N27. Loaded via next/font on the
-        // home-v3 route only (see src/app/preview/home-v3/page.tsx).
-        fraunces: ["var(--font-fraunces)", "Fraunces", "Georgia", "serif"],
+        // v3: Apple-style system stack. Resolves to SF Pro on Apple devices,
+        // Segoe UI on Windows, Roboto on Android. No webfont download — the
+        // exact font Apple uses on apple.com.
+        system: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"SF Pro Display"',
+          '"SF Pro Text"',
+          '"Segoe UI"',
+          "Roboto",
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
       },
       borderRadius: {
         scene: "1.5rem",

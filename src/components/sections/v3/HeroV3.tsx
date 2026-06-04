@@ -1,146 +1,128 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
+
+// Apple-style hero: a single confident headline, one short sub, two CTAs,
+// one big considered product photo. No editorial italic, no rotated tiles,
+// no foot quote. The hero earns the scroll by being calm.
 
 export function HeroV3() {
   return (
     <section className="relative overflow-hidden bg-envrt-offwhite">
-      {/* Editorial baseline: wide left text column, calm right image column.
-          No ambient glow blobs, no callouts cluttering the photo. */}
-      <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-12 px-6 pb-20 pt-28 sm:px-10 sm:pt-32 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:px-16 lg:pb-28">
-        {/* Left: editorial copy */}
-        <div className="max-w-2xl">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-12 px-6 pt-28 pb-20 sm:px-10 sm:pt-32 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:pt-36 lg:pb-28">
+        {/* Left: confident headline + sub + CTAs */}
+        <div className="max-w-xl">
           <FadeUp>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-envrt-charcoal/55">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
               EU ESPR · Ready
             </p>
           </FadeUp>
 
           <FadeUp delay={0.08}>
-            {/* Serif lead — Fraunces italic. The emotional hook. */}
-            <p className="mt-7 font-fraunces text-[1.7rem] font-normal italic leading-[1.2] tracking-tight text-envrt-ink sm:text-[2.1rem] lg:text-[2.4rem]">
-              Numbers that pass an audit. Stories that earn a scan.
-            </p>
-          </FadeUp>
-
-          <FadeUp delay={0.18}>
-            {/* H1 — N27 bold, calm, declarative. Sits below the kicker as
-                the "official" product line. */}
-            <h1 className="mt-6 text-3xl font-bold leading-[1.15] tracking-tight text-envrt-ink sm:text-4xl lg:text-[2.65rem]">
+            <h1 className="mt-6 text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.02em] text-envrt-ink sm:text-5xl lg:text-[3.75rem]">
               Digital Product Passports for fashion brands.
             </h1>
           </FadeUp>
 
-          <FadeUp delay={0.26}>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-envrt-charcoal/70 sm:text-lg">
+          <FadeUp delay={0.18}>
+            <p className="mt-6 max-w-lg text-lg leading-[1.55] text-envrt-charcoal/70 sm:text-xl">
               Calculate emissions, water scarcity and Eco-Score for every
-              garment. Attach a QR to the care label. Customers scan and see
-              the full story.
+              garment. Attach a QR to the care label. Customers scan and
+              see the full story.
             </p>
           </FadeUp>
 
-          <FadeUp delay={0.34}>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <FadeUp delay={0.26}>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 href="/free-dpp"
                 size="md"
-                className="sm:px-8 sm:py-4 sm:text-lg"
+                className="sm:px-7 sm:py-3.5 sm:text-base"
                 data-cta="hero-v3-free-dpp"
               >
                 Get a free DPP<span className="ml-2">→</span>
               </Button>
               <Button
                 href="/contact"
-                variant="secondary"
+                variant="ghost"
                 size="md"
-                className="sm:px-8 sm:py-4 sm:text-lg"
+                className="sm:px-2 sm:py-3.5 sm:text-base"
                 data-cta="hero-v3-book-demo"
               >
-                Book a demo
+                Book a demo<span className="ml-1.5">→</span>
               </Button>
             </div>
           </FadeUp>
 
-          <FadeUp delay={0.42}>
-            <p className="mt-8 max-w-md font-fraunces text-sm italic leading-relaxed text-envrt-charcoal/50">
+          <FadeUp delay={0.34}>
+            <p className="mt-10 text-xs font-medium uppercase tracking-[0.2em] text-envrt-charcoal/45">
               Built for fashion and apparel brands selling into the EU.
             </p>
           </FadeUp>
         </div>
 
-        {/* Right: a single, considered product photograph. No floating tiles,
-            no rotated cards — the photo is the hero, the tag is the moment. */}
-        <FadeUp delay={0.1}>
-          <div className="relative mx-auto w-full max-w-[520px]">
-            {/* Soft stone-toned scene plate behind the photo. Editorial frame. */}
-            <div
-              aria-hidden
-              className="absolute inset-x-6 top-10 bottom-6 rounded-[2.5rem] bg-envrt-stone"
+        {/* Right: product hero. Photo enters with a quiet reveal. The QR sits
+            inside a clean white care-label, ring-lit by a soft pulse. */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mx-auto w-full max-w-[560px]"
+        >
+          {/* Stone-toned scene plate behind the photo */}
+          <div
+            aria-hidden
+            className="absolute inset-x-4 bottom-2 top-12 rounded-[2.5rem] bg-envrt-stone"
+          />
+          {/* Soft teal halo behind the QR, hinting at "scannable" */}
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-[55%] z-0 h-[180px] w-[180px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-teal/15 blur-3xl"
+          />
+
+          <div className="relative aspect-[4/5] w-full">
+            <Image
+              src="/jacket.png"
+              alt="Sustainable hoodie with attached care-label QR"
+              fill
+              sizes="(min-width: 1024px) 560px, 80vw"
+              className="object-contain drop-shadow-[0_30px_60px_rgba(14,14,14,0.16)]"
+              priority
             />
-            <div className="relative aspect-[5/6] w-full">
-              <Image
-                src="/jacket.png"
-                alt="Sustainable hoodie with attached care-label QR"
-                fill
-                sizes="(min-width: 1024px) 520px, 80vw"
-                className="object-contain drop-shadow-[0_30px_60px_rgba(14,14,14,0.18)]"
-                priority
-              />
-              {/* QR placed where the care tag would be. Calm, square,
-                  with a thin label strip underneath like a real tag. */}
-              <div className="absolute left-1/2 top-[55%] z-10 w-[120px] -translate-x-1/2 -translate-y-1/2">
-                <div className="overflow-hidden rounded-[10px] bg-white shadow-[0_18px_36px_rgba(14,14,14,0.18)] ring-1 ring-envrt-ink/5">
-                  <div className="p-2">
-                    <div className="relative h-[88px] w-full">
-                      <Image
-                        src="/qr-code.png"
-                        alt="Digital Product Passport QR"
-                        fill
-                        sizes="88px"
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-                  <div className="border-t border-envrt-ink/5 bg-envrt-offwhite px-2.5 py-1.5">
-                    <p className="text-[8px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60">
-                      Scan · ENVRT passport
-                    </p>
+
+            {/* QR sits where a real care label would */}
+            <div className="absolute left-1/2 top-[55%] z-10 w-[136px] -translate-x-1/2 -translate-y-1/2">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden rounded-[12px] bg-white shadow-[0_22px_44px_rgba(14,14,14,0.22)] ring-1 ring-envrt-ink/8"
+              >
+                <div className="p-2.5">
+                  <div className="relative h-[100px] w-full">
+                    <Image
+                      src="/qr-code.png"
+                      alt="Digital Product Passport QR"
+                      fill
+                      sizes="100px"
+                      className="object-contain"
+                    />
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Editorial metadata strip under the photo, magazine caption style */}
-            <div className="mt-6 grid grid-cols-3 gap-3 border-t border-envrt-ink/8 pt-4 text-left">
-              <div>
-                <p className="font-fraunces text-xl font-medium text-envrt-ink">
-                  6.3<span className="text-xs text-envrt-muted">kg</span>
-                </p>
-                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-envrt-charcoal/55">
-                  CO₂e
-                </p>
-              </div>
-              <div>
-                <p className="font-fraunces text-xl font-medium text-envrt-ink">
-                  12.4k<span className="text-xs text-envrt-muted">L</span>
-                </p>
-                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-envrt-charcoal/55">
-                  Water
-                </p>
-              </div>
-              <div>
-                <p className="font-fraunces text-xl font-medium text-envrt-ink">
-                  69<span className="text-xs text-envrt-muted">%</span>
-                </p>
-                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-envrt-charcoal/55">
-                  Data depth
-                </p>
-              </div>
+                <div className="border-t border-envrt-ink/8 bg-envrt-offwhite px-3 py-2">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-charcoal/65">
+                    Scan · ENVRT passport
+                  </p>
+                </div>
+              </motion.div>
             </div>
           </div>
-        </FadeUp>
+        </motion.div>
       </div>
     </section>
   );
