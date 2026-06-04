@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 
 // Scroll-pinned DPP tour. The section is 4 viewport heights tall. The phone
@@ -149,10 +150,8 @@ export function ScrollTourSection() {
 
 // ─── Stop ─────────────────────────────────────────────────────────────────
 // A single tour stop on the left rail. Highlights when the scroll is within
-// its progress range. Uses useTransform to derive its own opacity/border
-// states from the section's scrollYProgress.
-
-import type { MotionValue } from "framer-motion";
+// its progress range. Uses function-form useTransform to derive opacity from
+// the section's scrollYProgress without invoking the Web Animations API.
 
 function ScrollStop({
   stop,
@@ -164,43 +163,37 @@ function ScrollStop({
   progress: MotionValue<number>;
 }) {
   const [start, end] = stop.range;
-  const fadeIn = Math.max(start - 0.05, 0);
-  const fadeOut = Math.min(end + 0.05, 1);
 
-  // Active state: full opacity within range, dimmed outside
-  const opacity = useTransform(
-    progress,
-    [fadeIn - 0.04, fadeIn, fadeOut, fadeOut + 0.04],
-    [0.32, 1, 1, 0.32],
+  // Function-form useTransform avoids the keyframes API entirely. The 4-point
+  // ramp form would push offsets outside [0, 1] for the boundary stops
+  // ([0, 0.27] and [0.75, 1]), which WAAPI rejects with "Offsets must be
+  // monotonically non-decreasing". A plain function sidesteps that.
+  const fade = 0.05;
+  const dim = 0.3;
+
+  const opacity = useTransform(progress, (p) => {
+    if (p < start - fade) return dim;
+    if (p < start) return dim + (1 - dim) * ((p - (start - fade)) / fade);
+    if (p <= end) return 1;
+    if (p <= end + fade) return dim + (1 - dim) * (1 - (p - end) / fade);
+    return dim;
+  });
+
+  const indicatorOpacity = useTransform(progress, (p) =>
+    p >= start - fade && p <= end + fade ? 1 : 0,
   );
 
-  // Number colour and border tint mirror the active state
-  const numColor = useTransform(
-    progress,
-    [fadeIn, fadeOut],
-    ["#5bbdb6", "#5bbdb6"],
-  );
-
-  const borderOpacity = useTransform(
-    progress,
-    [fadeIn - 0.04, fadeIn, fadeOut, fadeOut + 0.04],
-    [0, 1, 1, 0],
-  );
+  const isActive = useTransform(progress, (p) => p >= start && p <= end);
 
   return (
     <motion.div style={{ opacity }} className="relative grid grid-cols-[60px_1fr] gap-5">
       {/* Left edge indicator */}
       <motion.span
         aria-hidden
-        style={{ opacity: borderOpacity }}
+        style={{ opacity: indicatorOpacity }}
         className="absolute left-0 top-1 h-7 w-[2px] bg-envrt-teal-light"
       />
-      <motion.p
-        style={{ color: numColor }}
-        className="pl-4 text-3xl font-semibold leading-none tracking-[-0.02em] text-envrt-offwhite/30 sm:text-4xl"
-      >
-        {String(index + 1).padStart(2, "0")}
-      </motion.p>
+      <ActiveNumber index={index} active={isActive} />
       <div>
         <h3 className="text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-offwhite sm:text-2xl">
           {stop.title}
@@ -210,5 +203,27 @@ function ScrollStop({
         </p>
       </div>
     </motion.div>
+  );
+}
+
+// Numeral toggles between dim default and teal-light when the stop is active.
+// Uses a boolean MotionValue subscription so we get a class swap (no WAAPI).
+function ActiveNumber({
+  index,
+  active,
+}: {
+  index: number;
+  active: MotionValue<boolean>;
+}) {
+  const [on, setOn] = useState(false);
+  useEffect(() => active.on("change", setOn), [active]);
+  return (
+    <p
+      className={`pl-4 text-3xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:text-4xl ${
+        on ? "text-envrt-teal-light" : "text-envrt-offwhite/30"
+      }`}
+    >
+      {String(index + 1).padStart(2, "0")}
+    </p>
   );
 }
