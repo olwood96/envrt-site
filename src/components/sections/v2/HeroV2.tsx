@@ -99,37 +99,49 @@ function VerifiedStandardsTile() {
   );
 }
 
-// ─── Cascade layout config ────────────────────────────────────────────────
-// Tiles cascade down the left side of the right column, with each one
-// offset slightly so they overlap each other and the hoodie behind them.
+// ─── Annotated callouts layout config ─────────────────────────────────────
+// Each tile sits in a corner of the right column, with the hoodie centered
+// between them. Callouts fade in sequentially via per-tile delays. Slight
+// overlap with the hoodie reads as "callouts in front of the photo".
 
-type Slot = {
+type Callout = {
   id: number;
   Tile: React.ComponentType;
+  delay: number;
   // Desktop position as percentages of the right column.
-  desktop: { top: string; left: string; width: string; rotate?: string };
+  desktop: React.CSSProperties;
+  // Mobile is a simple stack — only the order matters.
+  mobileDelay: number;
 };
 
-const slots: Slot[] = [
+const callouts: Callout[] = [
   {
     id: 1,
     Tile: EcoScoreTile,
-    desktop: { top: "1%",  left: "0%",  width: "52%", rotate: "-1.5deg" },
+    delay: 0.25,
+    mobileDelay: 0.2,
+    desktop: { top: "1%", left: "0%", width: "32%" },
   },
   {
     id: 2,
-    Tile: HeadlineImpactTile,
-    desktop: { top: "28%", left: "6%",  width: "55%", rotate: "1deg" },
+    Tile: VerifiedStandardsTile,
+    delay: 0.4,
+    mobileDelay: 0.3,
+    desktop: { top: "1%", right: "0%", width: "30%" },
   },
   {
     id: 3,
-    Tile: SupplyChainMapTile,
-    desktop: { top: "55%", left: "1%",  width: "52%", rotate: "-1deg" },
+    Tile: HeadlineImpactTile,
+    delay: 0.55,
+    mobileDelay: 0.4,
+    desktop: { bottom: "1%", left: "0%", width: "34%" },
   },
   {
     id: 4,
-    Tile: VerifiedStandardsTile,
-    desktop: { top: "80%", left: "9%",  width: "48%", rotate: "1.5deg" },
+    Tile: SupplyChainMapTile,
+    delay: 0.7,
+    mobileDelay: 0.5,
+    desktop: { bottom: "1%", right: "0%", width: "32%" },
   },
 ];
 
@@ -189,23 +201,26 @@ export function HeroV2() {
           </FadeUp>
         </div>
 
-        {/* Right: hoodie + cascading annotation tiles */}
-        <FadeUp delay={0.2}>
-          <div className="relative mx-auto w-full max-w-[640px]">
-            {/* Desktop composition */}
-            <div className="relative hidden h-[680px] lg:block">
-              {/* Hoodie pushed right, tiles will overlap its left edge */}
-              <div className="animate-float absolute right-[-2%] top-1/2 z-0 h-[110%] w-[60%] -translate-y-1/2">
+        {/* Right: hoodie centered + annotated callouts at the four corners */}
+        <div className="relative mx-auto w-full max-w-[640px]">
+          {/* Desktop composition */}
+          <div className="relative hidden h-[680px] lg:block">
+            {/* Hoodie centered */}
+            <FadeUp delay={0.1}>
+              <div className="animate-float absolute left-1/2 top-1/2 z-0 h-full w-[44%] -translate-x-1/2 -translate-y-1/2">
                 <Image
                   src="/jacket.png"
                   alt="Sustainable hoodie"
                   fill
-                  sizes="380px"
+                  sizes="300px"
                   className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
                   priority
                 />
                 {/* QR small overlay near tag area, with pulse ring behind */}
-                <div className="absolute" style={{ width: 92, height: 92, bottom: "16%", right: "18%", transform: "rotate(8deg)" }}>
+                <div
+                  className="absolute"
+                  style={{ width: 84, height: 84, bottom: "18%", right: "10%", transform: "rotate(8deg)" }}
+                >
                   <span
                     aria-hidden
                     className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
@@ -214,32 +229,26 @@ export function HeroV2() {
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     fill
-                    sizes="92px"
+                    sizes="84px"
                     className="relative object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
                   />
                 </div>
               </div>
+            </FadeUp>
 
-              {/* Cascading tiles */}
-              {slots.map((slot, i) => (
-                <div
-                  key={slot.id}
-                  className="absolute z-10"
-                  style={{
-                    top: slot.desktop.top,
-                    left: slot.desktop.left,
-                    width: slot.desktop.width,
-                    transform: slot.desktop.rotate ? `rotate(${slot.desktop.rotate})` : undefined,
-                    zIndex: 10 + i,
-                  }}
-                >
-                  <slot.Tile />
+            {/* Corner callouts */}
+            {callouts.map((c, i) => (
+              <FadeUp key={c.id} delay={c.delay}>
+                <div className="absolute z-10" style={{ ...c.desktop, zIndex: 10 + i }}>
+                  <c.Tile />
                 </div>
-              ))}
-            </div>
+              </FadeUp>
+            ))}
+          </div>
 
-            {/* Mobile: hoodie at top, tiles stacked below */}
-            <div className="lg:hidden">
+          {/* Mobile: hoodie at top, callouts stacked below */}
+          <div className="lg:hidden">
+            <FadeUp delay={0.1}>
               <div className="relative mx-auto h-[360px] w-full max-w-[340px]">
                 <Image
                   src="/jacket.png"
@@ -253,23 +262,29 @@ export function HeroV2() {
                   className="absolute"
                   style={{ width: 80, height: 80, bottom: "14%", right: "14%", transform: "rotate(8deg)" }}
                 >
+                  <span
+                    aria-hidden
+                    className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
+                  />
                   <Image
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     fill
                     sizes="80px"
-                    className="object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
+                    className="relative object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
                   />
                 </div>
               </div>
-              <div className="mt-6 space-y-3">
-                {slots.map((slot) => (
-                  <slot.Tile key={slot.id} />
-                ))}
-              </div>
+            </FadeUp>
+            <div className="mt-6 space-y-3">
+              {callouts.map((c) => (
+                <FadeUp key={c.id} delay={c.mobileDelay}>
+                  <c.Tile />
+                </FadeUp>
+              ))}
             </div>
           </div>
-        </FadeUp>
+        </div>
       </div>
     </section>
   );
