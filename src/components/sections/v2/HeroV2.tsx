@@ -38,37 +38,105 @@ function EcoScoreTile() {
 }
 
 function HeadlineImpactTile() {
+  // Custom 2×2 grid of headline DPP metrics. Reads cleanly at narrow
+  // callout width where the captured screenshot was unreadable.
+  const metrics = [
+    { value: "6.3", unit: "kg", label: "CO₂e", accent: "text-envrt-green" },
+    { value: "12.4k", unit: "L", label: "water", accent: "text-blue-600" },
+    { value: "580", unit: "g", label: "mass", accent: "text-envrt-charcoal" },
+    { value: "69", unit: "%", label: "data", accent: "text-envrt-teal" },
+  ];
   return (
-    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+    <div className="rounded-2xl bg-white px-4 pb-3 pt-3.5 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
       <TileHeader>Headline impact</TileHeader>
-      <div className="mt-2.5">
-        <Image
-          src="/screenshots/dpp/sections/headline-metrics.png"
-          alt="CO2e, water scarcity, garment mass and transparency metric cards"
-          width={760}
-          height={500}
-          sizes="320px"
-          className="h-auto w-full"
-        />
+      <div className="mt-2.5 grid grid-cols-2 gap-2">
+        {metrics.map((m) => (
+          <div
+            key={m.label}
+            className="rounded-lg border border-envrt-charcoal/5 bg-envrt-offwhite/60 px-2.5 py-2"
+          >
+            <p className={`text-base font-bold leading-none ${m.accent}`}>
+              {m.value}
+              <span className="ml-0.5 text-[10px] font-medium text-envrt-muted">
+                {m.unit}
+              </span>
+            </p>
+            <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-envrt-muted">
+              {m.label}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 function SupplyChainMapTile() {
-  // The production-journey capture is tall (map + stage list). Show the
-  // map only by cropping to a wide aspect ratio with the map at centre.
+  // Minimal stylised mini-map: faint dotted-grid background + three country
+  // dots connected by a dashed line, labelled underneath. Reads at any size.
+  const dots = [
+    { x: 18, y: 38, code: "IN", label: "Cotton" },
+    { x: 50, y: 30, code: "TR", label: "Fabric" },
+    { x: 82, y: 44, code: "PT", label: "Assembly" },
+  ];
   return (
-    <div className="rounded-2xl bg-white px-5 pb-4 pt-4 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
+    <div className="rounded-2xl bg-white px-4 pb-3 pt-3.5 shadow-[0_22px_50px_-18px_rgba(0,0,0,0.28)]">
       <TileHeader>Production journey</TileHeader>
-      <div className="relative mt-2.5 aspect-[5/3] w-full overflow-hidden rounded-md">
-        <Image
-          src="/screenshots/dpp/sections/production-journey.png"
-          alt="World supply chain map with country dots and connections"
-          fill
-          sizes="320px"
-          style={{ objectFit: "cover", objectPosition: "center 22%" }}
+      <div className="relative mt-2.5 aspect-[5/3] w-full overflow-hidden rounded-md bg-envrt-offwhite">
+        {/* Faint dotted grid */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(30,30,30,0.15) 1px, transparent 1px)",
+            backgroundSize: "12px 12px",
+          }}
         />
+        <svg
+          viewBox="0 0 100 60"
+          className="absolute inset-0 h-full w-full"
+          preserveAspectRatio="none"
+        >
+          {/* Dashed connector */}
+          <path
+            d={`M ${dots[0].x} ${dots[0].y} Q 34 18 ${dots[1].x} ${dots[1].y} T ${dots[2].x} ${dots[2].y}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.6"
+            strokeDasharray="2 2"
+            vectorEffect="non-scaling-stroke"
+            className="text-envrt-teal/60"
+          />
+          {/* Country dots */}
+          {dots.map((d) => (
+            <g key={d.code}>
+              <circle
+                cx={d.x}
+                cy={d.y}
+                r="3"
+                className="fill-envrt-teal/20"
+              />
+              <circle
+                cx={d.x}
+                cy={d.y}
+                r="1.4"
+                className="fill-envrt-teal"
+              />
+            </g>
+          ))}
+        </svg>
+        {/* Country code chips */}
+        <div className="absolute inset-x-0 bottom-1 flex items-end justify-between px-2">
+          {dots.map((d) => (
+            <div key={d.code} className="text-center">
+              <p className="text-[9px] font-semibold uppercase tracking-wide text-envrt-charcoal/80">
+                {d.code}
+              </p>
+              <p className="text-[8px] text-envrt-muted">{d.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -205,33 +273,35 @@ export function HeroV2() {
         <div className="relative mx-auto w-full max-w-[640px]">
           {/* Desktop composition */}
           <div className="relative hidden h-[680px] lg:block">
-            {/* Hoodie centered */}
+            {/* Hoodie centered, sized to leave breathing room around the callouts */}
             <FadeUp delay={0.1}>
-              <div className="animate-float absolute left-1/2 top-1/2 z-0 h-full w-[44%] -translate-x-1/2 -translate-y-1/2">
+              <div className="animate-float absolute left-1/2 top-1/2 z-0 h-[78%] w-[42%] -translate-x-1/2 -translate-y-1/2">
                 <Image
                   src="/jacket.png"
                   alt="Sustainable hoodie"
                   fill
-                  sizes="300px"
+                  sizes="280px"
                   className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
                   priority
                 />
-                {/* QR small overlay near tag area, with pulse ring behind */}
+                {/* QR sits on the hoodie chest like a sewn-in tag, with a pulse halo */}
                 <div
-                  className="absolute"
-                  style={{ width: 84, height: 84, bottom: "18%", right: "10%", transform: "rotate(8deg)" }}
+                  className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2"
+                  style={{ width: 88, height: 88 }}
                 >
                   <span
                     aria-hidden
                     className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
                   />
-                  <Image
-                    src="/qr-code.png"
-                    alt="Digital Product Passport QR code"
-                    fill
-                    sizes="84px"
-                    className="relative object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
-                  />
+                  <div className="relative h-full w-full rounded-xl bg-white p-1.5 shadow-[0_12px_24px_rgba(0,0,0,0.18)] ring-1 ring-envrt-charcoal/5">
+                    <Image
+                      src="/qr-code.png"
+                      alt="Digital Product Passport QR code"
+                      fill
+                      sizes="88px"
+                      className="object-contain p-1"
+                    />
+                  </div>
                 </div>
               </div>
             </FadeUp>
@@ -259,20 +329,22 @@ export function HeroV2() {
                   priority
                 />
                 <div
-                  className="absolute"
-                  style={{ width: 80, height: 80, bottom: "14%", right: "14%", transform: "rotate(8deg)" }}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{ width: 84, height: 84 }}
                 >
                   <span
                     aria-hidden
                     className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
                   />
-                  <Image
-                    src="/qr-code.png"
-                    alt="Digital Product Passport QR code"
-                    fill
-                    sizes="80px"
-                    className="relative object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
-                  />
+                  <div className="relative h-full w-full rounded-xl bg-white p-1.5 shadow-[0_12px_24px_rgba(0,0,0,0.18)] ring-1 ring-envrt-charcoal/5">
+                    <Image
+                      src="/qr-code.png"
+                      alt="Digital Product Passport QR code"
+                      fill
+                      sizes="84px"
+                      className="object-contain p-1"
+                    />
+                  </div>
                 </div>
               </div>
             </FadeUp>
