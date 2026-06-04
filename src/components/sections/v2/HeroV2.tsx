@@ -136,7 +136,19 @@ const slots: Slot[] = [
 export function HeroV2() {
   return (
     <section className="relative mx-auto max-w-[1360px] overflow-x-clip px-6 pt-28 pb-16 sm:px-10 sm:pt-32 sm:pb-20 lg:px-16 lg:pb-24">
-      <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+      {/* Ambient glow blobs (decorative, behind everything) */}
+      <div
+        aria-hidden
+        className="glow-blob bg-envrt-teal/15"
+        style={{ top: "8%", left: "-6%", width: "420px", height: "420px" }}
+      />
+      <div
+        aria-hidden
+        className="glow-blob bg-envrt-green/10"
+        style={{ bottom: "4%", right: "-4%", width: "520px", height: "520px" }}
+      />
+
+      <div className="relative grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
         {/* Left: text content */}
         <div className="max-w-xl">
           <FadeUp><Badge>Ready for the EU ESPR mandate.</Badge></FadeUp>
@@ -147,9 +159,12 @@ export function HeroV2() {
           </FadeUp>
           <FadeUp delay={0.15}>
             <p className="mt-4 text-2xl font-bold leading-[1.25] tracking-tight text-envrt-charcoal/70 sm:text-3xl lg:text-4xl">
-              <em className="italic">Your</em> GARMENTS.{" "}
-              <em className="italic">Their</em> IMPACT.{" "}
-              <em className="italic">One</em> PLATFORM.
+              <em className="italic">Your</em>{" "}
+              <span className="gradient-text">GARMENTS</span>.{" "}
+              <em className="italic">Their</em>{" "}
+              <span className="gradient-text">IMPACT</span>.{" "}
+              <em className="italic">One</em>{" "}
+              <span className="gradient-text">PLATFORM</span>.
             </p>
           </FadeUp>
           <FadeUp delay={0.25}>
@@ -180,7 +195,7 @@ export function HeroV2() {
             {/* Desktop composition */}
             <div className="relative hidden h-[680px] lg:block">
               {/* Hoodie pushed right, tiles will overlap its left edge */}
-              <div className="absolute right-[-2%] top-1/2 z-0 h-[110%] w-[60%] -translate-y-1/2">
+              <div className="animate-float absolute right-[-2%] top-1/2 z-0 h-[110%] w-[60%] -translate-y-1/2">
                 <Image
                   src="/jacket.png"
                   alt="Sustainable hoodie"
@@ -189,14 +204,18 @@ export function HeroV2() {
                   className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
                   priority
                 />
-                {/* QR small overlay near tag area */}
+                {/* QR small overlay near tag area, with pulse ring behind */}
                 <div className="absolute" style={{ width: 92, height: 92, bottom: "16%", right: "18%", transform: "rotate(8deg)" }}>
+                  <span
+                    aria-hidden
+                    className="animate-pulse-ring absolute inset-0 rounded-2xl bg-envrt-teal/30"
+                  />
                   <Image
                     src="/qr-code.png"
                     alt="Digital Product Passport QR code"
                     fill
                     sizes="92px"
-                    className="object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
+                    className="relative object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
                   />
                 </div>
               </div>
