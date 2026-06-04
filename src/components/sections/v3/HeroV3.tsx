@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 
