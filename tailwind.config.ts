@@ -18,11 +18,18 @@ const config: Config = {
           offwhite: "var(--envrt-offwhite)",
           cream: "var(--envrt-cream)",
           muted: "var(--envrt-muted)",
+          // v3: deeper near-black for editorial type, warmer paper tone for
+          // layered backgrounds. See docs/homepage-v3-design-notes.md.
+          ink: "var(--envrt-ink)",
+          stone: "var(--envrt-stone)",
         },
       },
       fontFamily: {
         n27: ["N27", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         body: ["N27", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        // v3: editorial serif paired with N27. Loaded via next/font on the
+        // home-v3 route only (see src/app/preview/home-v3/page.tsx).
+        fraunces: ["var(--font-fraunces)", "Fraunces", "Georgia", "serif"],
       },
       borderRadius: {
         scene: "1.5rem",

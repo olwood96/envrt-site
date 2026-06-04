@@ -56,6 +56,9 @@
   --envrt-offwhite: #f8f7f4;
   --envrt-cream: #f0eeea;
   --envrt-muted: #9ca3a0;
+  /* v3 additions */
+  --envrt-ink: #0e0e0e;
+  --envrt-stone: #ece8e1;
 }
 
 * {
