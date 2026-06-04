@@ -33,7 +33,7 @@ export function WhatsInDppV3() {
             <p className="text-base leading-relaxed text-envrt-charcoal/70 sm:text-lg">
               Every passport pairs regulation-grade impact data with the
               story the customer cares about. Same page. One scan. No
-              jargon they can't translate.
+              jargon they can&apos;t translate.
             </p>
           </FadeUp>
         </div>
@@ -189,7 +189,7 @@ export function WhatsInDppV3() {
                 )}
               </ul>
               <p className="mt-auto pt-8 text-sm leading-relaxed text-envrt-offwhite/70">
-                Methodology that survives a regulator's PDF.
+                Methodology that survives a regulator&apos;s PDF.
               </p>
             </div>
           </FadeUp>
