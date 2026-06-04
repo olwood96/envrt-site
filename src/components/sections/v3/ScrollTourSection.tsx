@@ -61,7 +61,7 @@ export function ScrollTourSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-envrt-ink text-envrt-offwhite"
+      className="relative overflow-hidden bg-envrt-deep text-envrt-offwhite"
       style={{ height: "400vh" }}
     >
       {/* Subtle background grid for the dark surface */}
@@ -76,19 +76,19 @@ export function ScrollTourSection() {
       />
 
       <div className="sticky top-0 flex h-screen items-center">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-12 px-6 sm:px-10 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:px-16">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:px-16">
           {/* Left: narrative rail */}
           <div className="relative">
             <FadeUp>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal-light">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-5 max-w-xl text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-offwhite sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-5 max-w-xl font-manrope text-[1.75rem] font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl lg:text-[2.75rem]">
                 Scroll through a live passport.
               </h2>
             </FadeUp>
 
-            <div className="mt-12 space-y-10">
+            <div className="mt-10 space-y-8 sm:mt-12 sm:space-y-10">
               {stops.map((stop, i) => (
                 <ScrollStop
                   key={stop.title}
@@ -101,22 +101,22 @@ export function ScrollTourSection() {
           </div>
 
           {/* Right: pinned phone with scrolling DPP */}
-          <div className="relative mx-auto w-full max-w-[320px]">
-            {/* Teal halo */}
+          <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[320px]">
+            {/* Aqua halo */}
             <motion.div
               aria-hidden
               style={{ opacity: haloOpacity }}
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-teal blur-3xl"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl"
             />
 
             {/* Phone shell */}
             <div className="relative overflow-hidden rounded-[2.6rem] border-[10px] border-envrt-charcoal bg-envrt-charcoal shadow-[0_40px_80px_rgba(0,0,0,0.55)]">
               {/* Screen */}
-              <div className="relative h-[600px] overflow-hidden bg-white">
+              <div className="relative h-[500px] overflow-hidden bg-white sm:h-[560px] lg:h-[600px]">
                 <motion.div style={{ y: dppY }} className="relative w-full">
                   <Image
                     src="/screenshots/dpp/hoodie-full.png"
-                    alt="Live Digital Product Passport — pans as you scroll"
+                    alt="Live Digital Product Passport, pans as you scroll"
                     width={828}
                     height={9014}
                     sizes="300px"
@@ -138,7 +138,7 @@ export function ScrollTourSection() {
             </div>
 
             {/* Caption under the phone */}
-            <p className="mt-6 text-center text-xs font-medium uppercase tracking-[0.18em] text-envrt-offwhite/50">
+            <p className="mt-6 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-envrt-mute-cool sm:text-xs">
               dpp.envrt.com · live example
             </p>
           </div>
@@ -186,19 +186,19 @@ function ScrollStop({
   const isActive = useTransform(progress, (p) => p >= start && p <= end);
 
   return (
-    <motion.div style={{ opacity }} className="relative grid grid-cols-[60px_1fr] gap-5">
+    <motion.div style={{ opacity }} className="relative grid grid-cols-[44px_1fr] gap-4 sm:grid-cols-[60px_1fr] sm:gap-5">
       {/* Left edge indicator */}
       <motion.span
         aria-hidden
         style={{ opacity: indicatorOpacity }}
-        className="absolute left-0 top-1 h-7 w-[2px] bg-envrt-teal-light"
+        className="absolute left-0 top-1 h-7 w-[2px] bg-envrt-aqua"
       />
       <ActiveNumber index={index} active={isActive} />
       <div>
-        <h3 className="text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-offwhite sm:text-2xl">
+        <h3 className="font-manrope text-lg font-semibold leading-snug tracking-tight text-white sm:text-2xl">
           {stop.title}
         </h3>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-envrt-offwhite/65 sm:text-base">
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-mute-cool sm:mt-3 sm:text-base">
           {stop.body}
         </p>
       </div>
@@ -219,8 +219,8 @@ function ActiveNumber({
   useEffect(() => active.on("change", setOn), [active]);
   return (
     <p
-      className={`pl-4 text-3xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:text-4xl ${
-        on ? "text-envrt-teal-light" : "text-envrt-offwhite/30"
+      className={`font-manrope pl-3 text-2xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-4 sm:text-4xl ${
+        on ? "text-envrt-aqua" : "text-white/25"
       }`}
     >
       {String(index + 1).padStart(2, "0")}

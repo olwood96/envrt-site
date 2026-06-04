@@ -40,7 +40,7 @@ export function WhatsInDppV3() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
               The passport
             </p>
-            <h2 className="mt-5 text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
+            <h2 className="mt-5 font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
               What lives on a DPP.
             </h2>
           </FadeUp>

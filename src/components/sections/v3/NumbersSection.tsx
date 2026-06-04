@@ -71,7 +71,7 @@ export function NumbersSection() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
             By the numbers
           </p>
-          <h2 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
             Built for fashion, priced for fashion.
           </h2>
         </FadeUp>

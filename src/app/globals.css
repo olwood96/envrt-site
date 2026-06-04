@@ -59,6 +59,11 @@
   /* v3 additions */
   --envrt-ink: #0e0e0e;
   --envrt-stone: #ece8e1;
+  /* v3.next (NexDyne-inspired) tokens for the dark + aqua direction */
+  --envrt-deep: #0a0e10;
+  --envrt-aqua: #67e4d1;
+  --envrt-aqua-soft: #97ede0;
+  --envrt-mute-cool: #a8b8b5;
 }
 
 * {

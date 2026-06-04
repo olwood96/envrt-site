@@ -22,6 +22,11 @@ const config: Config = {
           // layered backgrounds. See docs/homepage-v3-design-notes.md.
           ink: "var(--envrt-ink)",
           stone: "var(--envrt-stone)",
+          // v3.next (NexDyne-inspired): deep + aqua direction
+          deep: "var(--envrt-deep)",
+          aqua: "var(--envrt-aqua)",
+          "aqua-soft": "var(--envrt-aqua-soft)",
+          "mute-cool": "var(--envrt-mute-cool)",
         },
       },
       fontFamily: {
@@ -41,6 +46,10 @@ const config: Config = {
           "Arial",
           "sans-serif",
         ],
+        // v3.next: Manrope display sans for h1/h2/h3 (closest free equivalent
+        // to NexDyne's Nohemi). Loaded via next/font/google on the home-v3
+        // route — see src/app/preview/home-v3/page.tsx.
+        manrope: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "sans-serif"],
       },
       borderRadius: {
         scene: "1.5rem",
