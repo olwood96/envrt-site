@@ -63,11 +63,13 @@ export function ScrollTourSection() {
   const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.18, 0.28, 0.12]);
 
   return (
-    // No overflow-hidden — that would break sticky inside.
+    // overflow-x-clip contains the phone's right-edge peek-off WITHOUT
+    // creating a scroll container — unlike overflow:hidden, clip doesn't
+    // break the sticky child.
     <section
       ref={sectionRef}
       className="relative bg-envrt-offwhite text-envrt-ink"
-      style={{ height: "500vh" }}
+      style={{ height: "500vh", overflowX: "clip" }}
     >
       {/* Sticky inner has a SOLID background so it covers whatever was above
           when it pins. Without this, the previous section bleeds through. */}
@@ -119,9 +121,13 @@ export function ScrollTourSection() {
                   phone frame. */}
               <div className="relative h-[260px] overflow-hidden bg-white sm:h-[360px] lg:h-[580px]">
                 {/* Scale wrapper: explicit width matching iframe's natural
-                    width, scale factor derived from phone width / 414. */}
+                    width. Scale factor = inner phone width / 414, where
+                    inner width = phone outer width - (2 * border width).
+                    Mobile: (140 - 12) / 414 = 0.309
+                    sm:     (180 - 14) / 414 = 0.401
+                    lg:     (310 - 20) / 414 = 0.700 */}
                 <div
-                  className="origin-top-left scale-[0.338] sm:scale-[0.435] lg:scale-[0.749]"
+                  className="origin-top-left scale-[0.309] sm:scale-[0.401] lg:scale-[0.700]"
                   style={{ width: "414px" }}
                 >
                   <motion.div style={{ y: dppY }}>

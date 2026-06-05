@@ -5,6 +5,7 @@ import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
 import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
 import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
 import { WhatsInDppV3 } from "@/components/sections/v3/WhatsInDppV3";
+import { CapabilitiesSection } from "@/components/sections/v3/CapabilitiesSection";
 import { NumbersSection } from "@/components/sections/v3/NumbersSection";
 import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
 import { InsightsTeaseSection } from "@/components/sections/v3/InsightsTeaseSection";
@@ -73,11 +74,14 @@ export default async function HomeV3PreviewPage() {
       <ScrollTourSection />
       <WhatsInDppV3 />
 
-      <SceneMark index="03" label="The proof" dark />
+      <SceneMark index="03" label="What we do" />
+      <CapabilitiesSection />
+
+      <SceneMark index="04" label="The proof" dark />
       <NumbersSection />
       <HowItWorksV3 />
 
-      <SceneMark index="04" label="Deeper" />
+      <SceneMark index="05" label="Deeper" />
       <AlignedWithCarousel />
       <InsightsTeaseSection posts={posts} />
       <FAQSection />

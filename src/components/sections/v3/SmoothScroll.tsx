@@ -22,15 +22,14 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     if (prefersReduced) return;
 
     const lenis = new Lenis({
-      // Total time (sec) for the scroll lerp to settle. 1.2s = relaxed.
-      duration: 1.2,
-      // Apple-style ease-out — fast at start, soft at end.
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      // Wheel + trackpad get the smoothing. Touch keeps native.
+      // Lerp = linear interpolation factor. Each frame the scroll position
+      // moves this fraction closer to the target. Lower = lazier, higher =
+      // snappier. 0.1 is what fairlymade.com uses — feels continuous and
+      // responsive in a way `duration` never does (duration buffers input
+      // for a fixed time before completing).
+      lerp: 0.1,
       smoothWheel: true,
-      // How aggressive the wheel input feels. 1 = native pace, lower = lazier.
       wheelMultiplier: 1,
-      // Lerp factor for touch — but only if smoothTouch is on, which it isn't.
       touchMultiplier: 1.5,
     });
 
