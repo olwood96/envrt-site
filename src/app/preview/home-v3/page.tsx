@@ -12,6 +12,7 @@ import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { StickyCta } from "@/components/sections/v3/StickyCta";
 import { ScrollProgressBar } from "@/components/sections/v3/ScrollProgressBar";
 import { SceneMark } from "@/components/sections/v3/SceneMark";
+import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { getAllPostsMeta } from "@/lib/insights";
@@ -54,6 +55,7 @@ export default async function HomeV3PreviewPage() {
   ]);
 
   return (
+    <SmoothScroll>
     <div className={`${manrope.variable} font-system bg-envrt-offwhite`}>
       <ScrollProgressBar />
 
@@ -83,5 +85,6 @@ export default async function HomeV3PreviewPage() {
       <FinalCtaV3 />
       <StickyCta />
     </div>
+    </SmoothScroll>
   );
 }
