@@ -150,15 +150,40 @@ export function NumbersSection() {
     // Single dark moment in an otherwise light page. The shift to envrt-brand-black
     // creates a scroll heartbeat and lets the big numerals carry real weight.
     <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
-      {/* Bright Lilac washes — per brand pairing "Black + Bright lilac" */}
+      {/* Dot-grid background + construction marks at corners (no halos) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 top-1/3 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-envrt-brand-lilac/[0.08] blur-3xl"
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(223,95,255,0.9) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+        }}
       />
-      <div
+      <span
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-0 h-[320px] w-[480px] rounded-full bg-envrt-brand-lilac/[0.05] blur-3xl"
-      />
+        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:left-6"
+      >
+        04x
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:right-6"
+      >
+        ENVRT/04
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-6 left-4 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:left-6"
+      >
+        BY THE NUMBERS
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-6 right-4 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:right-6"
+      >
+        N/03
+      </span>
 
       <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>

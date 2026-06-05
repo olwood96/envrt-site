@@ -48,10 +48,37 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           alt=""
           fill
           sizes="100vw"
-          className="object-cover opacity-[0.12]"
+          className="object-cover opacity-[0.10]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/60 to-white/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/65 to-white/35" />
       </motion.div>
+
+      {/* Textile cross-hatch pattern (very subtle) */}
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.04]"
+      >
+        <defs>
+          <pattern id="manifesto-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="7" stroke="black" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#manifesto-hatch)" />
+      </svg>
+
+      {/* Construction marks */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
+      >
+        ENVRT/02
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
+      >
+        WHY
+      </span>
 
       <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <FadeUp>

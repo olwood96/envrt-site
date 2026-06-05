@@ -59,9 +59,6 @@ export function ScrollTourSection() {
   // Pan the DPP iframe from top to (almost) bottom over the section.
   const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-82%"]);
 
-  // Halo intensity follows scroll: alive at the start, settled by the end.
-  const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.18, 0.28, 0.12]);
-
   return (
     // overflow-x-clip contains the phone's right-edge peek-off WITHOUT
     // creating a scroll container — unlike overflow:hidden, clip doesn't
@@ -105,12 +102,8 @@ export function ScrollTourSection() {
               the right edge of the viewport for a "peeking" effect. On
               desktop it grows back to a normal phone size. */}
           <div className="relative mx-auto w-full max-w-[140px] translate-x-3 sm:max-w-[180px] sm:translate-x-4 lg:max-w-[310px] lg:translate-x-0">
-            {/* Aqua halo */}
-            <motion.div
-              aria-hidden
-              style={{ opacity: haloOpacity }}
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine blur-3xl sm:h-[260px] sm:w-[260px] lg:h-[320px] lg:w-[320px]"
-            />
+            {/* Halo removed. Phone shell carries enough visual weight on its
+                own; the previous radial wash read as accent noise. */}
 
             {/* Phone shell */}
             <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">

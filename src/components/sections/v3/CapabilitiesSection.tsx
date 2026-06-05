@@ -97,11 +97,21 @@ export function CapabilitiesSection() {
       className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-32"
       style={{ overflowX: "clip" }}
     >
-      {/* Subtle aqua wash for atmosphere */}
-      <div
+      {/* Thin left accent rule + corner construction marks (no halos) */}
+      <span
         aria-hidden
-        className="pointer-events-none absolute left-1/4 top-[40%] h-[420px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.05] blur-3xl"
+        className="pointer-events-none absolute left-0 top-1/3 bottom-1/3 hidden w-px bg-envrt-brand-ultramarine/35 lg:block"
       />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-1/3 bottom-1/3 hidden w-px bg-envrt-brand-ultramarine/15 lg:block"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-4 top-6 hidden font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6 sm:block"
+      >
+        ENVRT/03
+      </span>
 
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         {/* Header */}

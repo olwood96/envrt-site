@@ -34,11 +34,24 @@ export function FinalCtaV3() {
         <div className="absolute inset-0 bg-envrt-stone/55" />
       </motion.div>
 
-      {/* Soft aqua halo */}
+      {/* Dot grid + thin top/bottom accent rules — no halos */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.14] blur-3xl"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(26,26,26,0.7) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
       />
+      <span aria-hidden className="pointer-events-none absolute inset-x-12 top-0 h-px bg-envrt-brand-ultramarine/30" />
+      <span aria-hidden className="pointer-events-none absolute inset-x-12 bottom-0 h-px bg-envrt-brand-ultramarine/30" />
+      <span aria-hidden className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/30 sm:left-6">
+        ENVRT/CTA
+      </span>
+      <span aria-hidden className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/30 sm:right-6">
+        v3
+      </span>
 
       <div className="relative mx-auto max-w-[1100px] px-5 text-center sm:px-8 lg:px-16">
         <FadeUp>

@@ -14,8 +14,8 @@ import { StickyCta } from "@/components/sections/v3/StickyCta";
 import { ScrollProgressBar } from "@/components/sections/v3/ScrollProgressBar";
 import { SceneMark } from "@/components/sections/v3/SceneMark";
 import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
-import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
-import { FAQSection } from "@/components/sections/FAQSection";
+import { AlignedWithCarouselV3 } from "@/components/sections/v3/AlignedWithCarouselV3";
+import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
 
@@ -100,9 +100,9 @@ export default async function HomeV3PreviewPage() {
         <HowItWorksV3 />
 
         <SceneMark index="05" label="Deeper" />
-        <AlignedWithCarousel />
+        <AlignedWithCarouselV3 />
         <InsightsTeaseSection posts={posts} />
-        <FAQSection />
+        <FAQSectionV3 />
 
         <FinalCtaV3 />
         <StickyCta />
