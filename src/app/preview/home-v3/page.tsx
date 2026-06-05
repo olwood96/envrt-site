@@ -7,13 +7,11 @@ import { WhatsInDppV3 } from "@/components/sections/v3/WhatsInDppV3";
 import { NumbersSection } from "@/components/sections/v3/NumbersSection";
 import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
-import { ComparisonSection } from "@/components/sections/ComparisonSection";
 import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
 import { FAQSection } from "@/components/sections/FAQSection";
 
-// Manrope: closest free equivalent to NexDyne's Nohemi (neo-grotesque sans).
-// Used for v3.next display headings via `font-manrope` Tailwind class. SF Pro
-// system stack stays for body/UI. N27 reserved for the brand wordmark only.
+// Manrope for display headings, paired with SF Pro system stack for body.
+// N27 reserved for the brand wordmark only.
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
@@ -38,14 +36,13 @@ export const revalidate = 3600;
 
 export default function HomeV3PreviewPage() {
   return (
-    <div className={`${manrope.variable} font-system bg-envrt-deep`}>
+    <div className={`${manrope.variable} font-system bg-envrt-offwhite`}>
       <HeroV3 />
       <ManifestoSection />
       <ScrollTourSection />
       <WhatsInDppV3 />
       <NumbersSection />
       <HowItWorksV3 />
-      <ComparisonSection />
       <AlignedWithCarousel />
       <FAQSection />
       <FinalCtaV3 />

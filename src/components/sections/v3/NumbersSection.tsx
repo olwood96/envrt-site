@@ -36,10 +36,14 @@ const stats: Stat[] = [
 ];
 
 // Count-up: animates from 0 to target the first time the section enters view.
+// The trigger uses `amount: 0.2` (20% of the element visible) which is much
+// more reliable on mobile than a pixel margin — small elements with negative
+// margins can fail to trigger.
 function CountUp({ to, display }: { to: number; display: string }) {
   const ref = useRef<HTMLSpanElement | null>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, amount: 0.2 });
   const [val, setVal] = useState(0);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (!inView) return;
@@ -50,15 +54,19 @@ function CountUp({ to, display }: { to: number; display: string }) {
       const t = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       setVal(Math.round(eased * to));
-      if (t < 1) raf = requestAnimationFrame(tick);
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setDone(true);
+      }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [inView, to]);
 
-  // For nice display: when finished, swap to the formatted display string
-  // (so "2,400" reads with the comma).
-  const shown = inView && val >= to ? display : val.toLocaleString();
+  // Once the animation completes, swap to the pre-formatted display string
+  // (e.g. "£149", "68,431"). Until then show the counting numeric value.
+  const shown = done ? display : val.toLocaleString();
 
   return <span ref={ref}>{shown}</span>;
 }

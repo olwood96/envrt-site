@@ -55,48 +55,46 @@ export function WhatsInDppV3() {
 
         {/* Bento grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:gap-5 lg:grid-cols-12 lg:gap-6">
-          {/* 1. Headline impact — wide hero tile */}
+          {/* 1. Headline impact — wide hero tile (light, aqua accent) */}
           <FadeUp className="sm:col-span-6 lg:col-span-7">
-            <TileBase className="justify-between bg-envrt-ink text-envrt-offwhite">
-              <TileLabel>
-                <span className="text-envrt-teal-light">Headline impact</span>
-              </TileLabel>
+            <TileBase className="justify-between bg-white ring-1 ring-envrt-ink/5">
+              <TileLabel>Headline impact</TileLabel>
               <div className="mt-8 grid grid-cols-3 gap-6">
                 <div>
-                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
+                  <p className="font-manrope text-4xl font-semibold leading-none tracking-[-0.02em] text-envrt-ink sm:text-5xl">
                     6.3
-                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
+                    <span className="ml-1 text-base font-medium text-envrt-muted">
                       kg
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-aqua">
                     CO₂e
                   </p>
                 </div>
                 <div>
-                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
+                  <p className="font-manrope text-4xl font-semibold leading-none tracking-[-0.02em] text-envrt-ink sm:text-5xl">
                     12.4k
-                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
+                    <span className="ml-1 text-base font-medium text-envrt-muted">
                       L
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-aqua">
                     Water scarcity
                   </p>
                 </div>
                 <div>
-                  <p className="text-4xl font-semibold leading-none tracking-[-0.02em] sm:text-5xl">
+                  <p className="font-manrope text-4xl font-semibold leading-none tracking-[-0.02em] text-envrt-ink sm:text-5xl">
                     69
-                    <span className="ml-1 text-base font-medium text-envrt-offwhite/55">
+                    <span className="ml-1 text-base font-medium text-envrt-muted">
                       %
                     </span>
                   </p>
-                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-offwhite/60">
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-aqua">
                     Data depth
                   </p>
                 </div>
               </div>
-              <p className="mt-8 max-w-md text-sm leading-relaxed text-envrt-offwhite/65">
+              <p className="mt-8 max-w-md text-sm leading-relaxed text-envrt-charcoal/70">
                 Numbers calculated per garment, peer-reviewed methods, ready
                 to drop into an audit pack.
               </p>
@@ -180,7 +178,7 @@ export function WhatsInDppV3() {
           <FadeUp delay={0.18} className="sm:col-span-3 lg:col-span-4">
             <TileBase className="bg-envrt-green text-envrt-offwhite">
               <TileLabel>
-                <span className="text-envrt-teal-light">Verified against</span>
+                <span className="text-envrt-aqua">Verified against</span>
               </TileLabel>
               <ul className="mt-6 space-y-3">
                 {["EU PEF", "ISO 14040 / 14067", "AWARE water stress"].map(
@@ -190,7 +188,7 @@ export function WhatsInDppV3() {
                       className="flex items-center gap-3 text-base font-medium"
                     >
                       <svg
-                        className="h-3 w-3 flex-shrink-0 text-envrt-teal-light"
+                        className="h-3 w-3 flex-shrink-0 text-envrt-aqua"
                         viewBox="0 0 16 16"
                         fill="none"
                         stroke="currentColor"

@@ -5,11 +5,11 @@ import { FadeUp } from "@/components/ui/Motion";
 
 export function FinalCtaV3() {
   return (
-    <section className="relative overflow-hidden bg-envrt-deep py-20 sm:py-28 lg:py-36">
-      {/* Aqua halo */}
+    <section className="relative overflow-hidden bg-envrt-stone py-20 sm:py-28 lg:py-36">
+      {/* Soft aqua halo */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua/[0.10] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua/[0.14] blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[1100px] px-5 text-center sm:px-8 lg:px-16">
@@ -19,12 +19,12 @@ export function FinalCtaV3() {
           </p>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="mx-auto mt-6 max-w-3xl font-manrope text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
+          <h2 className="mx-auto mt-6 max-w-3xl font-manrope text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
             Try ENVRT on one garment. See if it earns the QR.
           </h2>
         </FadeUp>
         <FadeUp delay={0.18}>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-envrt-mute-cool sm:mt-6 sm:text-base lg:text-lg">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-envrt-charcoal/70 sm:mt-6 sm:text-base lg:text-lg">
             Submit a single product. We&apos;ll return a regulation-ready
             Digital Product Passport within a day, no card required.
           </p>
@@ -43,7 +43,7 @@ export function FinalCtaV3() {
               href="/contact"
               variant="secondary"
               size="md"
-              className="w-full border-white/15 text-white hover:bg-white/[0.04] sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
+              className="w-full sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
               data-cta="final-v3-book-demo"
             >
               Book a demo

@@ -59,22 +59,14 @@ export function ScrollTourSection() {
   const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.18, 0.28, 0.12]);
 
   return (
+    // Don't set overflow-hidden on this section — sticky positioning inside
+    // an overflow-hidden ancestor breaks (the section becomes the sticky
+    // child's scrolling container, but the section itself doesn't scroll).
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-envrt-deep text-envrt-offwhite"
+      className="relative bg-envrt-offwhite text-envrt-ink"
       style={{ height: "400vh" }}
     >
-      {/* Subtle background grid for the dark surface */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
       <div className="sticky top-0 flex h-screen items-center">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:px-16">
           {/* Left: narrative rail */}
@@ -83,7 +75,7 @@ export function ScrollTourSection() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-5 max-w-xl font-manrope text-[1.75rem] font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-5 max-w-xl font-manrope text-[1.75rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
                 Scroll through a live passport.
               </h2>
             </FadeUp>
@@ -102,15 +94,15 @@ export function ScrollTourSection() {
 
           {/* Right: pinned phone with scrolling DPP */}
           <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[320px]">
-            {/* Aqua halo */}
+            {/* Soft aqua halo, clipped to the phone container */}
             <motion.div
               aria-hidden
               style={{ opacity: haloOpacity }}
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl"
             />
 
             {/* Phone shell */}
-            <div className="relative overflow-hidden rounded-[2.6rem] border-[10px] border-envrt-charcoal bg-envrt-charcoal shadow-[0_40px_80px_rgba(0,0,0,0.55)]">
+            <div className="relative overflow-hidden rounded-[2.6rem] border-[10px] border-envrt-ink bg-envrt-ink shadow-[0_30px_60px_-15px_rgba(14,14,14,0.35)]">
               {/* Screen */}
               <div className="relative h-[500px] overflow-hidden bg-white sm:h-[560px] lg:h-[600px]">
                 <motion.div style={{ y: dppY }} className="relative w-full">
@@ -138,7 +130,7 @@ export function ScrollTourSection() {
             </div>
 
             {/* Caption under the phone */}
-            <p className="mt-6 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-envrt-mute-cool sm:text-xs">
+            <p className="mt-6 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60 sm:text-xs">
               dpp.envrt.com · live example
             </p>
           </div>
@@ -195,10 +187,10 @@ function ScrollStop({
       />
       <ActiveNumber index={index} active={isActive} />
       <div>
-        <h3 className="font-manrope text-lg font-semibold leading-snug tracking-tight text-white sm:text-2xl">
+        <h3 className="font-manrope text-lg font-semibold leading-snug tracking-tight text-envrt-ink sm:text-2xl">
           {stop.title}
         </h3>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-mute-cool sm:mt-3 sm:text-base">
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-charcoal/70 sm:mt-3 sm:text-base">
           {stop.body}
         </p>
       </div>
@@ -220,7 +212,7 @@ function ActiveNumber({
   return (
     <p
       className={`font-manrope pl-3 text-2xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-4 sm:text-4xl ${
-        on ? "text-envrt-aqua" : "text-white/25"
+        on ? "text-envrt-aqua" : "text-envrt-ink/15"
       }`}
     >
       {String(index + 1).padStart(2, "0")}
