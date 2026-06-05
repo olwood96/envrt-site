@@ -123,49 +123,24 @@ export function WhatsInDppV3() {
             </TileBase>
           </FadeUp>
 
-          {/* 3. Provenance map */}
+          {/* 3. Provenance — loom photo with overlay caption */}
           <FadeUp delay={0.12} className="sm:col-span-3 lg:col-span-5">
             <TileBase className="bg-white ring-1 ring-envrt-ink/5">
               <TileLabel>Provenance</TileLabel>
               <p className="mt-3 text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
                 Fibre to finished garment.
               </p>
-              <div className="relative mt-5 aspect-[5/3] w-full overflow-hidden rounded-2xl bg-envrt-stone/60">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 opacity-50"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, rgba(14,14,14,0.15) 1px, transparent 1px)",
-                    backgroundSize: "14px 14px",
-                  }}
+              <div className="relative mt-5 aspect-[5/3] w-full overflow-hidden rounded-2xl">
+                <Image
+                  src="/v3-assets/provenance-loom.jpg"
+                  alt="Coloured warp yarns on a textile loom"
+                  fill
+                  sizes="(min-width: 1024px) 40vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
                 />
-                <svg
-                  viewBox="0 0 100 60"
-                  className="absolute inset-0 h-full w-full"
-                  preserveAspectRatio="none"
-                >
-                  <path
-                    d="M 18 38 Q 34 18 50 30 T 82 44"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="0.6"
-                    strokeDasharray="2 2"
-                    vectorEffect="non-scaling-stroke"
-                    className="text-envrt-teal/60"
-                  />
-                  {[
-                    { x: 18, y: 38 },
-                    { x: 50, y: 30 },
-                    { x: 82, y: 44 },
-                  ].map((d, i) => (
-                    <g key={i}>
-                      <circle cx={d.x} cy={d.y} r={3} className="fill-envrt-teal/25" />
-                      <circle cx={d.x} cy={d.y} r={1.5} className="fill-envrt-teal" />
-                    </g>
-                  ))}
-                </svg>
-                <div className="absolute inset-x-0 bottom-2 flex items-end justify-between px-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-envrt-ink/70">
+                {/* Subtle bottom gradient for label legibility */}
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+                <div className="absolute inset-x-0 bottom-2 flex items-end justify-between px-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">
                   <span>IN · Cotton</span>
                   <span>TR · Fabric</span>
                   <span>PT · Assembly</span>

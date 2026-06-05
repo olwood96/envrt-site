@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
 
 type Step = {
@@ -7,6 +8,8 @@ type Step = {
   title: string;
   body: string;
   caption: string;
+  /** Square thumbnail rendered to the right on desktop, below the body on mobile. */
+  image: { src: string; alt: string };
 };
 
 const steps: Step[] = [
@@ -15,18 +18,30 @@ const steps: Step[] = [
     title: "Upload your collection.",
     body: "CSV, line sheet, or the ENVRT collection form. Garment names, materials, weights, suppliers, country of origin. Whatever you have.",
     caption: "≈ 30 minutes for a typical SS collection",
+    image: {
+      src: "/v3-assets/step1-studio.jpg",
+      alt: "Fashion design studio with line-sheet sketches",
+    },
   },
   {
     index: "02",
     title: "ENVRT fills the gaps.",
     body: "Our calculator pulls verified factors for fibres, processing, transport. Missing entries are flagged with a confidence score so you can review.",
     caption: "EU PEF · ISO 14040 · AWARE",
+    image: {
+      src: "/v3-assets/step2-swatches.jpg",
+      alt: "Fabric swatches in warm neutral tones",
+    },
   },
   {
     index: "03",
     title: "Ship the QR.",
     body: "Each garment gets a hosted passport at a permanent URL. Attach the QR to the care label, hangtag, or packaging. Customers scan, regulators audit.",
     caption: "Hosted on envrt.com or your own domain",
+    image: {
+      src: "/v3-assets/step3-qr.jpg",
+      alt: "Phone scanning a QR code on a printed card",
+    },
   },
 ];
 
@@ -46,8 +61,9 @@ export function HowItWorksV3() {
         <div className="mt-14 border-t border-envrt-ink/8">
           {steps.map((step, i) => (
             <FadeUp key={step.index} delay={0.08 + i * 0.08}>
-              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-ink/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[120px_1fr_240px] sm:items-baseline sm:gap-12 sm:px-2 sm:py-14">
-                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-ink/15 transition-colors duration-300 group-hover:text-envrt-teal sm:text-6xl">
+              {/* 4 col on desktop: numeral / text / thumbnail / caption */}
+              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-ink/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[80px_1fr_160px_200px] sm:items-center sm:gap-8 sm:px-2 sm:py-12 lg:gap-10">
+                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-ink/15 transition-colors duration-300 group-hover:text-envrt-aqua sm:text-6xl">
                   {step.index}
                 </p>
                 <div>
@@ -58,7 +74,17 @@ export function HowItWorksV3() {
                     {step.body}
                   </p>
                 </div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-teal sm:text-right">
+                {/* Thumbnail */}
+                <div className="relative aspect-square w-full max-w-[160px] overflow-hidden rounded-2xl bg-envrt-stone">
+                  <Image
+                    src={step.image.src}
+                    alt={step.image.alt}
+                    fill
+                    sizes="(min-width: 640px) 160px, 60vw"
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-aqua sm:text-right">
                   {step.caption}
                 </p>
               </div>
