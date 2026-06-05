@@ -1,15 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 
 export function FinalCtaV3() {
+  // Subtle parallax on the background image — moves slower than the page
+  // scroll over the section's height.
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+
   return (
-    <section className="relative overflow-hidden bg-envrt-stone py-20 sm:py-28 lg:py-36">
-      {/* Background photo: knit textile stack, very subtle so the text and
-          halo stay the focus */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
+    <section ref={ref} className="relative overflow-hidden bg-envrt-stone py-20 sm:py-28 lg:py-36">
+      {/* Background photo with parallax shift */}
+      <motion.div
+        aria-hidden
+        style={{ y: bgY }}
+        className="pointer-events-none absolute inset-x-0 -top-[6%] -bottom-[6%]"
+      >
         <Image
           src="/v3-assets/cta-texture.jpg"
           alt=""
@@ -17,9 +31,8 @@ export function FinalCtaV3() {
           sizes="100vw"
           className="object-cover opacity-[0.18]"
         />
-        {/* Warm stone wash on top to hold the brand tone */}
         <div className="absolute inset-0 bg-envrt-stone/55" />
-      </div>
+      </motion.div>
 
       {/* Soft aqua halo */}
       <div

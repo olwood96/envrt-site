@@ -73,33 +73,40 @@ function CountUp({ to, display }: { to: number; display: string }) {
 
 export function NumbersSection() {
   return (
-    <section className="bg-white py-20 sm:py-24 lg:py-32">
-      <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
+    // Single dark moment in an otherwise light page. The shift to envrt-ink
+    // creates a scroll heartbeat and lets the big numerals carry real weight.
+    <section className="relative overflow-hidden bg-envrt-ink py-20 sm:py-24 lg:py-32">
+      {/* Subtle aqua wash to soften the dark slab */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-32 top-1/3 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-envrt-aqua/[0.07] blur-3xl"
+      />
+      <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua">
             By the numbers
           </p>
-          <h2 className="mt-5 max-w-3xl font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-offwhite sm:text-4xl lg:text-[2.75rem]">
             Built for fashion, priced for fashion.
           </h2>
         </FadeUp>
 
-        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-envrt-ink/8 pt-12 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-envrt-ink/8">
+        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-envrt-offwhite/12 pt-12 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-envrt-offwhite/12">
           {stats.map((s, i) => (
             <FadeUp key={s.label} delay={0.1 + i * 0.08}>
               <div className="sm:px-8 sm:first:pl-0 sm:last:pr-0">
-                <p className="text-[4.5rem] font-semibold leading-none tracking-[-0.04em] text-envrt-ink sm:text-[5.5rem] lg:text-[6.5rem]">
+                <p className="font-manrope text-[4.5rem] font-semibold leading-none tracking-[-0.04em] text-envrt-offwhite sm:text-[5.5rem] lg:text-[6.5rem]">
                   <CountUp to={s.number} display={s.display} />
                   {s.unit && (
-                    <span className="ml-1 align-top text-2xl font-medium tracking-normal text-envrt-muted sm:text-3xl">
+                    <span className="ml-1 align-top text-2xl font-medium tracking-normal text-envrt-offwhite/45 sm:text-3xl">
                       {s.unit}
                     </span>
                   )}
                 </p>
-                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-envrt-teal">
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-envrt-aqua">
                   {s.label}
                 </p>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-envrt-charcoal/70">
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-envrt-offwhite/65">
                   {s.body}
                 </p>
               </div>

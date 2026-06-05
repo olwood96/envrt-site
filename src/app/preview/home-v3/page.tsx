@@ -10,9 +10,12 @@ import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
 import { InsightsTeaseSection } from "@/components/sections/v3/InsightsTeaseSection";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { StickyCta } from "@/components/sections/v3/StickyCta";
+import { ScrollProgressBar } from "@/components/sections/v3/ScrollProgressBar";
+import { SceneMark } from "@/components/sections/v3/SceneMark";
 import { AlignedWithCarousel } from "@/components/sections/AlignedWithCarousel";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { getAllPostsMeta } from "@/lib/insights";
+import { fetchPlatformStats } from "@/lib/impact-stats";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -36,25 +39,47 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function HomeV3PreviewPage() {
-  // Filter drafts and any post with an unparseable date so the tease only
-  // shows shippable, well-formed articles (in dev, drafts otherwise leak in).
-  const posts = getAllPostsMeta()
-    .filter((post) => !post.draft && !Number.isNaN(new Date(post.date).getTime()))
-    .slice(0, 3);
+export default async function HomeV3PreviewPage() {
+  // Fetch posts list and platform stats in parallel. revalidate=3600 means
+  // both get cached at the page level for 1 hour.
+  const [posts, stats] = await Promise.all([
+    Promise.resolve(
+      getAllPostsMeta()
+        .filter(
+          (post) => !post.draft && !Number.isNaN(new Date(post.date).getTime()),
+        )
+        .slice(0, 3),
+    ),
+    fetchPlatformStats(),
+  ]);
 
   return (
     <div className={`${manrope.variable} font-system bg-envrt-offwhite`}>
+      <ScrollProgressBar />
+
       <HeroV3 />
-      <ManifestoSection />
+      <ManifestoSection
+        stats={{
+          dppScans: stats.dppScans,
+          countryCount: stats.countryCount,
+          co2Kg: stats.co2Kg,
+        }}
+      />
       <EsprCountdownSection />
+
+      <SceneMark index="02" label="The passport" />
       <ScrollTourSection />
       <WhatsInDppV3 />
+
+      <SceneMark index="03" label="The proof" dark />
       <NumbersSection />
       <HowItWorksV3 />
+
+      <SceneMark index="04" label="Deeper" />
       <AlignedWithCarousel />
       <InsightsTeaseSection posts={posts} />
       <FAQSection />
+
       <FinalCtaV3 />
       <StickyCta />
     </div>
