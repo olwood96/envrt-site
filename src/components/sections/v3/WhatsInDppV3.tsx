@@ -193,8 +193,10 @@ export function WhatsInDppV3() {
                   sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover"
                 />
-                {/* Bottom gradient for label legibility */}
-                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+                {/* Bottom gradient for label legibility — stronger than the
+                    original so type contrast holds against the chair/clothes
+                    photo on smaller screens. */}
+                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-envrt-aqua">
                     Your story

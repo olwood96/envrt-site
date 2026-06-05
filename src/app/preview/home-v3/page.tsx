@@ -37,7 +37,11 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function HomeV3PreviewPage() {
-  const posts = getAllPostsMeta().slice(0, 3);
+  // Filter drafts and any post with an unparseable date so the tease only
+  // shows shippable, well-formed articles (in dev, drafts otherwise leak in).
+  const posts = getAllPostsMeta()
+    .filter((post) => !post.draft && !Number.isNaN(new Date(post.date).getTime()))
+    .slice(0, 3);
 
   return (
     <div className={`${manrope.variable} font-system bg-envrt-offwhite`}>

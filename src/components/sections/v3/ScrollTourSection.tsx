@@ -5,10 +5,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 
-// Scroll-pinned DPP tour. Section is 5 viewport heights tall. The phone is
-// pinned; as the user scrolls, the live DPP iframe inside it pans from top to
-// bottom, and the active stop on the left rail highlights when its DPP
-// section is in view. Stop ranges are derived from real DPP section positions
+// Scroll-pinned DPP tour. The section is 5 viewport heights tall. Phone
+// stays pinned; as the user scrolls, the live DPP iframe inside pans top to
+// bottom, and the active stop on the rail highlights when its DPP section
+// is on-screen. Stop ranges derived from real DPP section positions
 // captured in public/screenshots/dpp/measurements.json.
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
@@ -56,38 +56,38 @@ export function ScrollTourSection() {
     offset: ["start start", "end end"],
   });
 
-  // Pan the live DPP iframe inside its phone frame from top to (almost)
-  // bottom over the section. -82% maps to ~95% of DPP content reaching the
-  // bottom of the phone screen, which leaves a tiny "more below" hint.
+  // Pan the DPP iframe from top to (almost) bottom over the section.
   const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-82%"]);
 
   // Halo intensity follows scroll: alive at the start, settled by the end.
   const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.18, 0.28, 0.12]);
 
   return (
-    // No overflow-hidden on the section — that would break sticky inside.
+    // No overflow-hidden — that would break sticky inside.
     <section
       ref={sectionRef}
       className="relative bg-envrt-offwhite text-envrt-ink"
       style={{ height: "500vh" }}
     >
-      <div className="sticky top-0 flex h-screen items-center">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-8 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
+      {/* Sticky inner has a SOLID background so it covers whatever was above
+          when it pins. Without this, the previous section bleeds through. */}
+      <div className="sticky top-0 flex h-screen items-center bg-envrt-offwhite">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_140px] items-center gap-3 px-5 sm:grid-cols-[1fr_180px] sm:gap-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
           {/* Left: narrative rail */}
-          <div className="relative">
+          <div className="relative min-w-0">
             <FadeUp>
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-4 max-w-xl font-manrope text-[1.6rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-5 sm:text-3xl lg:text-[2.5rem]">
+              <h2 className="mt-3 max-w-xl font-manrope text-[1.35rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
-              <p className="mt-3 max-w-md text-xs leading-relaxed text-envrt-charcoal/60 sm:text-sm">
+              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-charcoal/60 sm:block sm:text-sm">
                 Five moments of a real DPP. The phone tracks your scroll.
               </p>
             </FadeUp>
 
-            <div className="mt-8 space-y-6 sm:mt-10 sm:space-y-7">
+            <div className="mt-5 space-y-4 sm:mt-8 sm:space-y-6 lg:space-y-7">
               {stops.map((stop, i) => (
                 <ScrollStop
                   key={stop.title}
@@ -99,22 +99,23 @@ export function ScrollTourSection() {
             </div>
           </div>
 
-          {/* Right: pinned phone with live DPP iframe */}
-          <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[310px]">
+          {/* Right: pinned phone. On mobile it's small (140px) and overlaps
+              the right edge of the viewport for a "peeking" effect. On
+              desktop it grows back to a normal phone size. */}
+          <div className="relative mx-auto w-full max-w-[140px] translate-x-3 sm:max-w-[180px] sm:translate-x-4 lg:max-w-[310px] lg:translate-x-0">
             {/* Aqua halo */}
             <motion.div
               aria-hidden
               style={{ opacity: haloOpacity }}
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl sm:h-[260px] sm:w-[260px] lg:h-[320px] lg:w-[320px]"
             />
 
             {/* Phone shell */}
-            <div className="relative overflow-hidden rounded-[2.4rem] border-[9px] border-envrt-ink bg-envrt-ink shadow-[0_30px_60px_-15px_rgba(14,14,14,0.35)] sm:rounded-[2.6rem] sm:border-[10px]">
-              {/* Screen — iframe is positioned absolute and translated upward by
-                  dppY so the phone reveals different DPP sections as the page
-                  scrolls. pointer-events-none keeps page scroll from being
+            <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-ink bg-envrt-ink shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">
+              {/* Screen — iframe is positioned absolute and translated upward
+                  by dppY. pointer-events-none keeps page scroll from being
                   hijacked by iframe interaction. */}
-              <div className="relative h-[440px] overflow-hidden bg-white sm:h-[520px] lg:h-[580px]">
+              <div className="relative h-[260px] overflow-hidden bg-white sm:h-[360px] lg:h-[580px]">
                 <motion.div
                   style={{ y: dppY }}
                   className="absolute inset-x-0 top-0 h-[600vh] w-full"
@@ -130,17 +131,18 @@ export function ScrollTourSection() {
                 {/* Top + bottom fade masks */}
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-white to-transparent"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white to-transparent sm:h-10"
                 />
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent sm:h-12"
                 />
               </div>
             </div>
 
-            {/* Caption + open-live link */}
-            <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6">
+            {/* Caption + open-live link — hidden on mobile, the phone is the
+                story there. Shown from sm: up. */}
+            <div className="mt-4 hidden flex-col items-center gap-2 sm:mt-5 sm:flex">
               <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60 sm:text-[11px]">
                 dpp.envrt.com · live
               </p>
@@ -157,14 +159,27 @@ export function ScrollTourSection() {
           </div>
         </div>
       </div>
+
+      {/* Mobile-only "open the live passport" CTA below the sticky tour.
+          Renders once at the end of the scroll-tour scroll range. */}
+      <div className="absolute inset-x-0 bottom-0 z-10 sm:hidden">
+        <div className="mx-auto max-w-[1320px] px-5 pb-6">
+          <a
+            href={DPP_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center justify-between gap-3 rounded-2xl border border-envrt-ink/10 bg-white px-4 py-3 text-sm font-semibold text-envrt-ink shadow-sm hover:border-envrt-aqua/30 hover:text-envrt-aqua"
+          >
+            <span>Open the live passport</span>
+            <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
 
 // ─── Stop ─────────────────────────────────────────────────────────────────
-// A single tour stop on the left rail. Highlights when the scroll is within
-// its progress range. Uses function-form useTransform to derive opacity from
-// the section's scrollYProgress without invoking the Web Animations API.
 
 function ScrollStop({
   stop,
@@ -194,18 +209,21 @@ function ScrollStop({
   const isActive = useTransform(progress, (p) => p >= start && p <= end);
 
   return (
-    <motion.div style={{ opacity }} className="relative grid grid-cols-[40px_1fr] gap-3 sm:grid-cols-[56px_1fr] sm:gap-4">
+    <motion.div
+      style={{ opacity }}
+      className="relative grid grid-cols-[28px_1fr] gap-2 sm:grid-cols-[44px_1fr] sm:gap-3"
+    >
       <motion.span
         aria-hidden
         style={{ opacity: indicatorOpacity }}
-        className="absolute left-0 top-1 h-6 w-[2px] bg-envrt-aqua"
+        className="absolute left-0 top-1 h-5 w-[2px] bg-envrt-aqua sm:h-6"
       />
       <ActiveNumber index={index} active={isActive} />
-      <div>
-        <h3 className="font-manrope text-base font-semibold leading-snug tracking-tight text-envrt-ink sm:text-xl">
+      <div className="min-w-0">
+        <h3 className="font-manrope text-sm font-semibold leading-tight tracking-tight text-envrt-ink sm:text-base lg:text-xl">
           {stop.title}
         </h3>
-        <p className="mt-1.5 max-w-md text-xs leading-relaxed text-envrt-charcoal/65 sm:mt-2 sm:text-sm">
+        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-envrt-charcoal/65 sm:mt-1.5 sm:text-xs lg:text-sm">
           {stop.body}
         </p>
       </div>
@@ -224,7 +242,7 @@ function ActiveNumber({
   useEffect(() => active.on("change", setOn), [active]);
   return (
     <p
-      className={`font-manrope pl-2 text-xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-3 sm:text-3xl ${
+      className={`font-manrope pl-2 text-base font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-2.5 sm:text-xl lg:text-3xl ${
         on ? "text-envrt-aqua" : "text-envrt-ink/15"
       }`}
     >
