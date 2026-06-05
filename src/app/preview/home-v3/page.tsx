@@ -4,7 +4,7 @@ import { HeroV3 } from "@/components/sections/v3/HeroV3";
 import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
 import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
 import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
-import { WhatsInDppV3 } from "@/components/sections/v3/WhatsInDppV3";
+import { InTheWildSection } from "@/components/sections/v3/InTheWildSection";
 import { CapabilitiesSection } from "@/components/sections/v3/CapabilitiesSection";
 import { NumbersSection } from "@/components/sections/v3/NumbersSection";
 import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
@@ -72,7 +72,7 @@ export default async function HomeV3PreviewPage() {
 
       <SceneMark index="02" label="The passport" />
       <ScrollTourSection />
-      <WhatsInDppV3 />
+      <InTheWildSection />
 
       <SceneMark index="03" label="What we do" />
       <CapabilitiesSection />
