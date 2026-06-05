@@ -64,9 +64,10 @@ const config: Config = {
         // route — see src/app/preview/home-v3/page.tsx.
         manrope: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "sans-serif"],
         // v3 brand: Big Shoulders Text (headlines) + Karla (body), loaded on
-        // the home-v3 route. Per 2022 ENVRT brand guidelines.
+        // the home-v3 route. Per 2022 ENVRT brand guidelines. Renamed from
+        // `body` to `karla` to avoid clashing with the existing `body` key.
         display: ["var(--font-display)", "Big Shoulders Text", "Impact", "ui-sans-serif", "sans-serif"],
-        body: ["var(--font-body)", "Karla", "ui-sans-serif", "sans-serif"],
+        karla: ["var(--font-body)", "Karla", "ui-sans-serif", "sans-serif"],
       },
       borderRadius: {
         scene: "1.5rem",

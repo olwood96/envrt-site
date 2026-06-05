@@ -99,7 +99,11 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
           delay: index * 0.08,
           ease: [0.16, 1, 0.3, 1],
         }}
-        className="font-display text-[4.5rem] font-semibold leading-none tracking-[-0.04em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
+        // Big stat numerals use N27 — the brand's wordmark font. Its blocky
+        // letterforms read as "ENVRT-stamped" at display sizes and give the
+        // page's most visible numbers their own voice (vs the generic display
+        // font everywhere else).
+        className="font-n27 text-[4.5rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
       >
         <CountUp to={stat.number} display={stat.display} prefix={stat.prefix} />
         {stat.unit && (

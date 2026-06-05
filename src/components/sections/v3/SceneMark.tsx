@@ -26,10 +26,11 @@ export function SceneMark({ index, label, dark = false }: SceneMarkProps) {
       <div className="mx-auto flex max-w-[1320px] items-center gap-4 px-5 py-10 sm:px-8 sm:py-14 lg:px-16">
         <span className={`h-px flex-1 ${rule}`} />
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <span
-            className={`font-mono text-[10px] font-medium leading-none tracking-[0.28em] sm:text-[11px] ${accent}`}
-          >
-            ▽&nbsp;ENVRT
+          {/* "ENVRT" in N27 — uses the wordmark font so the cipher reads as a
+              true brand fingerprint, not a generic mono caps label. */}
+          <span className={`text-[10px] leading-none tracking-[0.16em] sm:text-[11px] ${accent}`}>
+            <span className="font-mono">▽&nbsp;</span>
+            <span className="font-n27 font-bold tracking-[0.08em]">ENVRT</span>
           </span>
           <span className={`font-mono text-[10px] leading-none ${muted}`}>/</span>
           <span

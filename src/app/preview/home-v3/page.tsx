@@ -74,7 +74,7 @@ export default async function HomeV3PreviewPage() {
   return (
     <SmoothScroll>
       <div
-        className={`${display.variable} ${body.variable} ${manrope.variable} font-body bg-envrt-brand-vista text-envrt-brand-black`}
+        className={`${display.variable} ${body.variable} ${manrope.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
       >
         <ScrollProgressBar />
 
