@@ -55,18 +55,18 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
 
       <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
             Why ENVRT
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <p className="mt-6 font-manrope text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.02em] text-envrt-ink sm:mt-8 sm:text-4xl lg:text-[3rem]">
+          <p className="mt-6 font-display text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
             Compliance is the floor. The ceiling is a passport a customer
             actually wants to scan.
           </p>
         </FadeUp>
         <FadeUp delay={0.22}>
-          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-envrt-charcoal/70 sm:mt-8 sm:text-base lg:text-lg">
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-envrt-brand-black/70 sm:mt-8 sm:text-base lg:text-lg">
             Every garment carries a Digital Product Passport that satisfies
             EU ESPR and rewards the customer who picks it up. Audit-grade
             data underneath. Editorial finish on top.
@@ -75,14 +75,14 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
 
         {/* Live ticker — small strip with platform stats */}
         <FadeUp delay={0.32}>
-          <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-ink/8 pt-6 sm:mt-14 sm:gap-x-7">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
+          <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-brand-black/8 pt-6 sm:mt-14 sm:gap-x-7">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
               <span
                 aria-hidden
                 className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
               >
-                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-aqua opacity-75" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-aqua" />
+                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-ultramarine opacity-75" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-ultramarine" />
               </span>
               Live
             </span>
@@ -100,16 +100,16 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
 
 function Stat({ value, unit, label }: { value: string; unit?: string; label: string }) {
   return (
-    <span className="inline-flex items-baseline gap-1.5 text-xs text-envrt-charcoal/70 sm:text-sm">
-      <span className="font-manrope text-base font-semibold tracking-tight text-envrt-ink sm:text-lg">
+    <span className="inline-flex items-baseline gap-1.5 text-xs text-envrt-brand-black/70 sm:text-sm">
+      <span className="font-display text-base font-semibold tracking-tight text-envrt-brand-black sm:text-lg">
         {value}
         {unit && (
-          <span className="ml-0.5 text-[10px] font-medium text-envrt-muted sm:text-xs">
+          <span className="ml-0.5 text-[10px] font-medium text-envrt-brand-black/45 sm:text-xs">
             {unit}
           </span>
         )}
       </span>
-      <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-charcoal/55 sm:text-[11px]">
+      <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-brand-black/55 sm:text-[11px]">
         {label}
       </span>
     </span>
@@ -118,6 +118,6 @@ function Stat({ value, unit, label }: { value: string; unit?: string; label: str
 
 function Sep() {
   return (
-    <span aria-hidden className="hidden h-3 w-px bg-envrt-ink/15 sm:inline-block" />
+    <span aria-hidden className="hidden h-3 w-px bg-envrt-brand-black/15 sm:inline-block" />
   );
 }

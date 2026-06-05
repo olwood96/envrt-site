@@ -27,6 +27,19 @@ const config: Config = {
           aqua: "var(--envrt-aqua)",
           "aqua-soft": "var(--envrt-aqua-soft)",
           "mute-cool": "var(--envrt-mute-cool)",
+          // v3 brand identity (from 2022 brand guidelines, scoped to v3 only)
+          "brand-ultramarine": "#3E00FF",
+          "brand-shamrock": "#00B92C",
+          "brand-royal": "#1F5BFF",
+          "brand-vibrant": "#20E036",
+          "brand-aqua": "#00DAFF",
+          "brand-golden": "#FFBF00",
+          "brand-lilac": "#DF5FFF",
+          "brand-sunny": "#FFE50F",
+          "brand-crimson": "#B50003",
+          "brand-neon": "#EDFF00",
+          "brand-black": "#1A1A1A",
+          "brand-vista": "#FCF9F0",
         },
       },
       fontFamily: {
@@ -50,6 +63,10 @@ const config: Config = {
         // to NexDyne's Nohemi). Loaded via next/font/google on the home-v3
         // route — see src/app/preview/home-v3/page.tsx.
         manrope: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "sans-serif"],
+        // v3 brand: Big Shoulders Text (headlines) + Karla (body), loaded on
+        // the home-v3 route. Per 2022 ENVRT brand guidelines.
+        display: ["var(--font-display)", "Big Shoulders Text", "Impact", "ui-sans-serif", "sans-serif"],
+        body: ["var(--font-body)", "Karla", "ui-sans-serif", "sans-serif"],
       },
       borderRadius: {
         scene: "1.5rem",

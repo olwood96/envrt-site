@@ -68,23 +68,23 @@ export function ScrollTourSection() {
     // break the sticky child.
     <section
       ref={sectionRef}
-      className="relative bg-envrt-offwhite text-envrt-ink"
+      className="relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ height: "500vh", overflowX: "clip" }}
     >
       {/* Sticky inner has a SOLID background so it covers whatever was above
           when it pins. Without this, the previous section bleeds through. */}
-      <div className="sticky top-0 flex h-screen items-center bg-envrt-offwhite">
+      <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_140px] items-center gap-3 px-5 sm:grid-cols-[1fr_180px] sm:gap-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
           {/* Left: narrative rail */}
           <div className="relative min-w-0">
             <FadeUp>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-3 max-w-xl font-manrope text-[1.35rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
+              <h2 className="mt-3 max-w-xl font-display text-[1.35rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
-              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-charcoal/60 sm:block sm:text-sm">
+              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
                 Five moments of a real DPP. The phone tracks your scroll.
               </p>
             </FadeUp>
@@ -109,11 +109,11 @@ export function ScrollTourSection() {
             <motion.div
               aria-hidden
               style={{ opacity: haloOpacity }}
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua blur-3xl sm:h-[260px] sm:w-[260px] lg:h-[320px] lg:w-[320px]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine blur-3xl sm:h-[260px] sm:w-[260px] lg:h-[320px] lg:w-[320px]"
             />
 
             {/* Phone shell */}
-            <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-ink bg-envrt-ink shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">
+            <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">
               {/* Screen window — fixed visible height, overflow clipped.
                   The iframe inside is rendered at IFRAME_W (414px, a real
                   mobile viewport width so the DPP's responsive layout reads
@@ -156,14 +156,14 @@ export function ScrollTourSection() {
             {/* Caption + open-live link — hidden on mobile, the phone is the
                 story there. Shown from sm: up. */}
             <div className="mt-4 hidden flex-col items-center gap-2 sm:mt-5 sm:flex">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60 sm:text-[11px]">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/60 sm:text-[11px]">
                 dpp.envrt.com · live
               </p>
               <a
                 href={DPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="group inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-ink underline-offset-4 hover:text-envrt-aqua hover:underline"
+                className="group inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-brand-black underline-offset-4 hover:text-envrt-brand-ultramarine hover:underline"
               >
                 Open the live passport
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
@@ -181,7 +181,7 @@ export function ScrollTourSection() {
             href={DPP_URL}
             target="_blank"
             rel="noreferrer"
-            className="group flex items-center justify-between gap-3 rounded-2xl border border-envrt-ink/10 bg-white px-4 py-3 text-sm font-semibold text-envrt-ink shadow-sm hover:border-envrt-aqua/30 hover:text-envrt-aqua"
+            className="group flex items-center justify-between gap-3 rounded-2xl border border-envrt-brand-black/10 bg-white px-4 py-3 text-sm font-semibold text-envrt-brand-black shadow-sm hover:border-envrt-brand-ultramarine/30 hover:text-envrt-brand-ultramarine"
           >
             <span>Open the live passport</span>
             <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
@@ -229,14 +229,14 @@ function ScrollStop({
       <motion.span
         aria-hidden
         style={{ opacity: indicatorOpacity }}
-        className="absolute left-0 top-1 h-5 w-[2px] bg-envrt-aqua sm:h-6"
+        className="absolute left-0 top-1 h-5 w-[2px] bg-envrt-brand-ultramarine sm:h-6"
       />
       <ActiveNumber index={index} active={isActive} />
       <div className="min-w-0">
-        <h3 className="font-manrope text-sm font-semibold leading-tight tracking-tight text-envrt-ink sm:text-base lg:text-xl">
+        <h3 className="font-display text-sm font-semibold leading-tight tracking-tight text-envrt-brand-black sm:text-base lg:text-xl">
           {stop.title}
         </h3>
-        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-envrt-charcoal/65 sm:mt-1.5 sm:text-xs lg:text-sm">
+        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-envrt-brand-black/65 sm:mt-1.5 sm:text-xs lg:text-sm">
           {stop.body}
         </p>
       </div>
@@ -255,8 +255,8 @@ function ActiveNumber({
   useEffect(() => active.on("change", setOn), [active]);
   return (
     <p
-      className={`font-manrope pl-2 text-base font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-2.5 sm:text-xl lg:text-3xl ${
-        on ? "text-envrt-aqua" : "text-envrt-ink/15"
+      className={`font-display pl-2 text-base font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-2.5 sm:text-xl lg:text-3xl ${
+        on ? "text-envrt-brand-ultramarine" : "text-envrt-brand-black/15"
       }`}
     >
       {String(index + 1).padStart(2, "0")}

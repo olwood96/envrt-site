@@ -33,28 +33,28 @@ const CHIPS = ["Composition", "Supply chain", "Brand voice", "Care + LCA", "Scan
 
 export function HeroV3() {
   return (
-    <section className="relative overflow-hidden bg-envrt-offwhite">
+    <section className="relative overflow-hidden bg-envrt-brand-vista">
       {/* Aqua wash behind the hero */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[50%] h-[440px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua/[0.08] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-[50%] h-[440px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.08] blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[1280px] px-5 pt-24 pb-16 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-24">
         {/* Left: copy */}
         <div className="max-w-xl lg:py-12">
           <FadeUp>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
               EU ESPR · Ready
             </p>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h1 className="mt-5 font-manrope text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-ink sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="mt-5 font-display text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
               Digital Product Passports for fashion brands.
             </h1>
           </FadeUp>
           <FadeUp delay={0.16}>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-charcoal/70 sm:text-base">
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
               Emissions, water scarcity and Eco-Score for every garment. Attach
               a QR to the care label. Customers scan, regulators audit.
             </p>
@@ -102,9 +102,9 @@ export function HeroV3() {
                   {CHIPS.map((c) => (
                     <li
                       key={c}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-envrt-ink/10 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-envrt-charcoal/75 sm:text-[11px]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-envrt-brand-black/10 bg-white px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-envrt-brand-black/75 sm:text-[11px]"
                     >
-                      <span aria-hidden className="h-1 w-1 rounded-full bg-envrt-aqua" />
+                      <span aria-hidden className="h-1 w-1 rounded-full bg-envrt-brand-ultramarine" />
                       {c}
                     </li>
                   ))}
@@ -143,7 +143,7 @@ function GarmentComposition() {
 
       {/* Angry Pablo tag — small side detail, not the centerpiece */}
       <div className="absolute right-0 top-8 z-20 w-32 -rotate-6 sm:w-36 lg:w-40">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)] ring-1 ring-envrt-ink/8">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)] ring-1 ring-envrt-brand-black/8">
           <Image
             src="/v3-assets/angry-pablo-tag.jpg"
             alt="ENVRT-issued Angry Pablo hangtag"
@@ -152,7 +152,7 @@ function GarmentComposition() {
             className="object-cover"
           />
         </div>
-        <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-envrt-charcoal/55">
+        <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
           Angry Pablo · live
         </p>
       </div>
@@ -176,14 +176,14 @@ function GarmentComposition() {
               strokeWidth="0.6"
               strokeDasharray={i % 2 ? "1.2 1.2" : "none"}
               vectorEffect="non-scaling-stroke"
-              className="text-envrt-aqua/55"
+              className="text-envrt-brand-ultramarine/55"
             />
             {/* Anchor dot on garment */}
             <circle
               cx={a.point.x}
               cy={a.point.y}
               r="0.5"
-              className="fill-envrt-aqua"
+              className="fill-envrt-brand-ultramarine"
             />
             <circle
               cx={a.point.x}
@@ -199,7 +199,7 @@ function GarmentComposition() {
       {ANNOTATIONS.map((a) => (
         <p
           key={`label-${a.label}`}
-          className="absolute z-30 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-charcoal/85"
+          className="absolute z-30 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-brand-black/85"
           style={{
             left: `${a.label_at.x}%`,
             top: `${a.label_at.y}%`,
@@ -233,7 +233,7 @@ function GarmentCompositionMobile() {
       </div>
       {/* Tag detail (smaller on mobile) */}
       <div className="absolute right-2 top-4 z-20 w-20 -rotate-6 sm:right-4 sm:w-24">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)] ring-1 ring-envrt-ink/8">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)] ring-1 ring-envrt-brand-black/8">
           <Image
             src="/v3-assets/angry-pablo-tag.jpg"
             alt="ENVRT-issued Angry Pablo hangtag"

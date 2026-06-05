@@ -99,7 +99,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
           delay: index * 0.08,
           ease: [0.16, 1, 0.3, 1],
         }}
-        className="font-manrope text-[4.5rem] font-semibold leading-none tracking-[-0.04em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
+        className="font-display text-[4.5rem] font-semibold leading-none tracking-[-0.04em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
       >
         <CountUp to={stat.number} display={stat.display} prefix={stat.prefix} />
         {stat.unit && (
@@ -123,7 +123,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
         initial={{ opacity: 0, y: 8 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.6 + index * 0.08, ease: "easeOut" }}
-        className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-envrt-aqua"
+        className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine"
       >
         {stat.label}
       </motion.p>
@@ -143,26 +143,26 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
 
 export function NumbersSection() {
   return (
-    // Single dark moment in an otherwise light page. The shift to envrt-ink
+    // Single dark moment in an otherwise light page. The shift to envrt-brand-black
     // creates a scroll heartbeat and lets the big numerals carry real weight.
-    <section className="relative overflow-hidden bg-envrt-ink py-20 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
       {/* Subtle aqua wash */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 top-1/3 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-envrt-aqua/[0.07] blur-3xl"
+        className="pointer-events-none absolute -right-32 top-1/3 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.07] blur-3xl"
       />
       {/* Faint top-left aqua ribbon for depth */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-0 h-[320px] w-[480px] rounded-full bg-envrt-aqua/[0.04] blur-3xl"
+        className="pointer-events-none absolute -left-40 top-0 h-[320px] w-[480px] rounded-full bg-envrt-brand-ultramarine/[0.04] blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
             By the numbers
           </p>
-          <h2 className="mt-5 max-w-3xl font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-display text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl lg:text-[2.75rem]">
             Built for fashion, priced for fashion.
           </h2>
         </FadeUp>

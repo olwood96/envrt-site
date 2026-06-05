@@ -47,30 +47,30 @@ const steps: Step[] = [
 
 export function HowItWorksV3() {
   return (
-    <section className="bg-envrt-offwhite py-20 sm:py-24 lg:py-32">
+    <section className="bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-teal">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
             How it works
           </p>
-          <h2 className="mt-5 max-w-3xl font-manrope text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-display text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
             Three steps. Half a day. One passport per garment.
           </h2>
         </FadeUp>
 
-        <div className="mt-14 border-t border-envrt-ink/8">
+        <div className="mt-14 border-t border-envrt-brand-black/8">
           {steps.map((step, i) => (
             <FadeUp key={step.index} delay={0.08 + i * 0.08}>
               {/* 4 col on desktop: numeral / text / thumbnail / caption */}
-              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-ink/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[80px_1fr_160px_200px] sm:items-center sm:gap-8 sm:px-2 sm:py-12 lg:gap-10">
-                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-ink/15 transition-colors duration-300 group-hover:text-envrt-aqua sm:text-6xl">
+              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-brand-black/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[80px_1fr_160px_200px] sm:items-center sm:gap-8 sm:px-2 sm:py-12 lg:gap-10">
+                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-brand-black/15 transition-colors duration-300 group-hover:text-envrt-brand-ultramarine sm:text-6xl">
                   {step.index}
                 </p>
                 <div>
-                  <h3 className="text-2xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink sm:text-[1.75rem]">
+                  <h3 className="text-2xl font-semibold leading-snug tracking-[-0.01em] text-envrt-brand-black sm:text-[1.75rem]">
                     {step.title}
                   </h3>
-                  <p className="mt-4 max-w-xl text-base leading-relaxed text-envrt-charcoal/70">
+                  <p className="mt-4 max-w-xl text-base leading-relaxed text-envrt-brand-black/70">
                     {step.body}
                   </p>
                 </div>
@@ -84,7 +84,7 @@ export function HowItWorksV3() {
                     className="object-cover"
                   />
                 </div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-aqua sm:text-right">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-right">
                   {step.caption}
                 </p>
               </div>

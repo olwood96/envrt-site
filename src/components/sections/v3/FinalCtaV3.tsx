@@ -37,22 +37,22 @@ export function FinalCtaV3() {
       {/* Soft aqua halo */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-aqua/[0.14] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.14] blur-3xl"
       />
 
       <div className="relative mx-auto max-w-[1100px] px-5 text-center sm:px-8 lg:px-16">
         <FadeUp>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
             One last thing
           </p>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="mx-auto mt-6 max-w-3xl font-manrope text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
             Try ENVRT on one garment. See if it earns the QR.
           </h2>
         </FadeUp>
         <FadeUp delay={0.18}>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-envrt-charcoal/70 sm:mt-6 sm:text-base lg:text-lg">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-envrt-brand-black/70 sm:mt-6 sm:text-base lg:text-lg">
             Submit a single product. We&apos;ll return a regulation-ready
             Digital Product Passport within a day, no card required.
           </p>

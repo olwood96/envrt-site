@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Big_Shoulders_Text, Karla, Manrope } from "next/font/google";
 import { HeroV3 } from "@/components/sections/v3/HeroV3";
 import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
 import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
@@ -19,10 +19,28 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
 
+// Brand fonts per 2022 ENVRT brand guidelines (scoped to v3 only via CSS
+// variable). Big Shoulders Text = display, Karla = body.
+const display = Big_Shoulders_Text({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const body = Karla({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+
+// Manrope kept as a fallback for any v3 component still referencing the
+// previous display family while the brand sweep lands.
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -42,8 +60,6 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function HomeV3PreviewPage() {
-  // Fetch posts list and platform stats in parallel. revalidate=3600 means
-  // both get cached at the page level for 1 hour.
   const [posts, stats] = await Promise.all([
     Promise.resolve(
       getAllPostsMeta()
@@ -57,38 +73,40 @@ export default async function HomeV3PreviewPage() {
 
   return (
     <SmoothScroll>
-    <div className={`${manrope.variable} font-system bg-envrt-offwhite`}>
-      <ScrollProgressBar />
+      <div
+        className={`${display.variable} ${body.variable} ${manrope.variable} font-body bg-envrt-brand-vista text-envrt-brand-black`}
+      >
+        <ScrollProgressBar />
 
-      <HeroV3 />
-      <ManifestoSection
-        stats={{
-          dppScans: stats.dppScans,
-          countryCount: stats.countryCount,
-          co2Kg: stats.co2Kg,
-        }}
-      />
-      <EsprCountdownSection />
+        <HeroV3 />
+        <ManifestoSection
+          stats={{
+            dppScans: stats.dppScans,
+            countryCount: stats.countryCount,
+            co2Kg: stats.co2Kg,
+          }}
+        />
+        <EsprCountdownSection />
 
-      <SceneMark index="02" label="The passport" />
-      <ScrollTourSection />
-      <InTheWildSection />
+        <SceneMark index="02" label="The passport" />
+        <ScrollTourSection />
+        <InTheWildSection />
 
-      <SceneMark index="03" label="What we do" />
-      <CapabilitiesSection />
+        <SceneMark index="03" label="What we do" />
+        <CapabilitiesSection />
 
-      <SceneMark index="04" label="The proof" dark />
-      <NumbersSection />
-      <HowItWorksV3 />
+        <SceneMark index="04" label="The proof" dark />
+        <NumbersSection />
+        <HowItWorksV3 />
 
-      <SceneMark index="05" label="Deeper" />
-      <AlignedWithCarousel />
-      <InsightsTeaseSection posts={posts} />
-      <FAQSection />
+        <SceneMark index="05" label="Deeper" />
+        <AlignedWithCarousel />
+        <InsightsTeaseSection posts={posts} />
+        <FAQSection />
 
-      <FinalCtaV3 />
-      <StickyCta />
-    </div>
+        <FinalCtaV3 />
+        <StickyCta />
+      </div>
     </SmoothScroll>
   );
 }

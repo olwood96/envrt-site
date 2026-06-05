@@ -46,12 +46,12 @@ export function StickyCta() {
       }`}
     >
       <div className="mx-auto max-w-[1320px] px-3 pb-3 sm:px-6 sm:pb-5 lg:px-12">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-envrt-ink/10 bg-envrt-ink p-3 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.45)] sm:gap-4 sm:p-4">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-envrt-brand-black/10 bg-envrt-brand-black p-3 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.45)] sm:gap-4 sm:p-4">
           {/* Message */}
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <span
               aria-hidden
-              className="hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-envrt-aqua/15 text-envrt-aqua sm:inline-flex"
+              className="hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine sm:inline-flex"
             >
               ⚡
             </span>
@@ -67,7 +67,7 @@ export function StickyCta() {
           <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
             <Link
               href="/free-dpp"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-envrt-aqua px-3 py-2 text-xs font-semibold text-envrt-ink transition-colors duration-200 hover:bg-envrt-aqua-soft sm:px-4 sm:py-2.5 sm:text-sm"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-envrt-brand-ultramarine px-3 py-2 text-xs font-semibold text-envrt-brand-black transition-colors duration-200 hover:bg-envrt-brand-ultramarine/30 sm:px-4 sm:py-2.5 sm:text-sm"
               data-cta="sticky-v3-free-dpp"
             >
               Start
