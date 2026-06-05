@@ -61,10 +61,12 @@ export function HeroV3() {
           </FadeUp>
           <FadeUp delay={0.24}>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              {/* Brand-aligned primary: ultramarine + white. Overrides the
+                  standard envrt-green so the page reads as one system. */}
               <Button
                 href="/free-dpp"
                 size="md"
-                className="w-full sm:w-auto sm:px-7 sm:py-3 sm:text-base"
+                className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-7 sm:py-3 sm:text-base"
                 data-cta="hero-v3-free-dpp"
               >
                 Get a free DPP<span className="ml-2">→</span>

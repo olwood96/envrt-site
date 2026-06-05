@@ -60,7 +60,7 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <p className="mt-6 font-display text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
+          <p className="mt-6 font-display text-[1.75rem] font-medium leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
             Compliance is the floor. The ceiling is a passport a customer
             actually wants to scan.
           </p>
@@ -73,16 +73,17 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           </p>
         </FadeUp>
 
-        {/* Live ticker — small strip with platform stats */}
+        {/* Live ticker — pulse uses Vibrant Green per brand pairing
+            "Vibrant green + Vista white". */}
         <FadeUp delay={0.32}>
           <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-brand-black/8 pt-6 sm:mt-14 sm:gap-x-7">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-vibrant sm:text-[11px]">
               <span
                 aria-hidden
                 className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
               >
-                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-ultramarine opacity-75" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-ultramarine" />
+                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
               </span>
               Live
             </span>

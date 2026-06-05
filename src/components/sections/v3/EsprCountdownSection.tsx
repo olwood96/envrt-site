@@ -27,20 +27,22 @@ export function EsprCountdownSection() {
     <section className="bg-envrt-stone py-12 sm:py-16">
       <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
-          <div className="relative overflow-hidden rounded-3xl border border-envrt-brand-black/8 bg-white p-6 sm:p-8 lg:p-10">
-            {/* Soft aqua wash on the right */}
+          {/* Deadline alert: Crimson Red accents per brand pairing
+              "Vista white + Crimson red". The countdown IS an alert message. */}
+          <div className="relative overflow-hidden rounded-3xl border-l-[3px] border-envrt-brand-crimson border-y border-r border-y-envrt-brand-black/8 border-r-envrt-brand-black/8 bg-white p-6 sm:p-8 lg:p-10">
+            {/* Soft Crimson wash */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-20 top-1/2 h-[280px] w-[280px] -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/[0.12] blur-3xl"
+              className="pointer-events-none absolute -right-20 top-1/2 h-[280px] w-[280px] -translate-y-1/2 rounded-full bg-envrt-brand-crimson/[0.08] blur-3xl"
             />
 
             <div className="relative grid grid-cols-1 items-center gap-6 sm:grid-cols-[1fr_auto] sm:gap-8">
               {/* Left: label + heading + body */}
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-crimson sm:text-[11px]">
                   ESPR · Textile DPP
                 </p>
-                <h3 className="mt-3 font-display text-xl font-semibold leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-[1.65rem]">
+                <h3 className="mt-3 font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-[1.65rem]">
                   Mandatory passports phase in from 2027.
                 </h3>
                 <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
@@ -50,7 +52,7 @@ export function EsprCountdownSection() {
                 </p>
                 <a
                   href="/dpp-timeline"
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-brand-black underline-offset-4 hover:text-envrt-brand-ultramarine hover:underline sm:text-sm"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-brand-crimson underline-offset-4 hover:underline sm:text-sm"
                 >
                   See the full timeline
                   <span>→</span>
@@ -61,7 +63,7 @@ export function EsprCountdownSection() {
               <div className="flex flex-col items-start sm:items-end">
                 <p
                   aria-live="polite"
-                  className="font-display text-5xl font-semibold leading-none tracking-[-0.03em] text-envrt-brand-black tabular-nums sm:text-6xl lg:text-7xl"
+                  className="font-display text-5xl font-semibold leading-none tracking-[-0.03em] text-envrt-brand-crimson tabular-nums sm:text-6xl lg:text-7xl"
                 >
                   {days === null ? "—" : days.toLocaleString()}
                 </p>

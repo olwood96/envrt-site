@@ -53,7 +53,7 @@ export function HowItWorksV3() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
             How it works
           </p>
-          <h2 className="mt-5 max-w-3xl font-display text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
             Three steps. Half a day. One passport per garment.
           </h2>
         </FadeUp>

@@ -20,18 +20,20 @@ export function InTheWildSection() {
         {/* Header */}
         <FadeUp>
           <div className="flex items-center gap-3">
+            {/* Live pulse: Vibrant Green per brand pairing
+                "Vibrant green + Vista white". */}
             <span
               aria-hidden
               className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
             >
-              <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-ultramarine opacity-75" />
-              <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-ultramarine" />
+              <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
             </span>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-vibrant sm:text-[11px]">
               Live · in the wild
             </p>
           </div>
-          <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
+          <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
             Real garments.<br />
             <span className="text-envrt-brand-black/35">Real passports.</span>
           </h2>
@@ -50,10 +52,11 @@ export function InTheWildSection() {
                   sizes="(min-width: 1024px) 580px, 100vw"
                   className="object-cover"
                 />
-              </div>
-              {/* Floating Eco-Score label overlay */}
-              <div className="absolute -bottom-5 left-5 sm:left-8 lg:-left-6">
-                <EcoScoreLabel score={1573} perHundredG={449} envrtAccent />
+                {/* Eco-Score label, anchored as an inside corner overlay so it
+                    reads as part of the photo (not floating beside it). */}
+                <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+                  <EcoScoreLabel score={1573} perHundredG={449} envrtAccent />
+                </div>
               </div>
             </div>
 
@@ -116,12 +119,13 @@ export function InTheWildSection() {
                 </div>
               </dl>
 
-              {/* Live link */}
+              {/* Live passport CTA — given real weight as a button-style link,
+                  not a tiny mono caption. */}
               <a
                 href="https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882"
                 target="_blank"
                 rel="noreferrer"
-                className="group mt-10 inline-flex items-center gap-2 self-start border-b border-envrt-brand-black/15 pb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-envrt-brand-black transition-colors duration-200 hover:border-envrt-brand-ultramarine hover:text-envrt-brand-ultramarine sm:text-xs"
+                className="group mt-10 inline-flex items-center gap-2 self-start rounded-xl bg-envrt-brand-ultramarine px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(62,0,255,0.6)] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
               >
                 Open the live passport
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">

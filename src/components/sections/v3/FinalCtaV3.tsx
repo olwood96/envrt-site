@@ -47,7 +47,7 @@ export function FinalCtaV3() {
           </p>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.85rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
             Try ENVRT on one garment. See if it earns the QR.
           </h2>
         </FadeUp>
@@ -59,10 +59,11 @@ export function FinalCtaV3() {
         </FadeUp>
         <FadeUp delay={0.26}>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row">
+            {/* Brand-aligned primary, matches hero. */}
             <Button
               href="/free-dpp"
               size="md"
-              className="w-full sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
+              className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
               data-cta="final-v3-free-dpp"
             >
               Get a free DPP<span className="ml-2">→</span>

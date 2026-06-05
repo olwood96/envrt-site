@@ -25,7 +25,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
                 Insights
               </p>
-              <h2 className="mt-4 max-w-2xl font-display text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-5 sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-4 max-w-2xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-5 sm:text-4xl lg:text-[2.75rem]">
                 Notes from inside the DPP build.
               </h2>
             </div>

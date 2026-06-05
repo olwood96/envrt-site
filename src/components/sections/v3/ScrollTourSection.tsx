@@ -81,7 +81,7 @@ export function ScrollTourSection() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-3 max-w-xl font-display text-[1.35rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
+              <h2 className="mt-3 max-w-xl font-display text-[1.35rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
               <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
@@ -155,15 +155,23 @@ export function ScrollTourSection() {
 
             {/* Caption + open-live link — hidden on mobile, the phone is the
                 story there. Shown from sm: up. */}
-            <div className="mt-4 hidden flex-col items-center gap-2 sm:mt-5 sm:flex">
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/60 sm:text-[11px]">
+            <div className="mt-4 hidden flex-col items-center gap-3 sm:mt-5 sm:flex">
+              <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant sm:text-[11px]">
+                <span
+                  aria-hidden
+                  className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
+                >
+                  <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
+                </span>
                 dpp.envrt.com · live
               </p>
+              {/* Boosted to a real button-style CTA. */}
               <a
                 href={DPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="group inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-brand-black underline-offset-4 hover:text-envrt-brand-ultramarine hover:underline"
+                className="group inline-flex items-center gap-1.5 rounded-xl bg-envrt-brand-ultramarine px-4 py-2.5 text-xs font-semibold text-white shadow-[0_10px_22px_-12px_rgba(62,0,255,0.55)] transition-transform duration-200 hover:-translate-y-0.5 sm:text-sm"
               >
                 Open the live passport
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>

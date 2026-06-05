@@ -113,7 +113,7 @@ export function CapabilitiesSection() {
               </p>
               <span aria-hidden className="h-px w-12 bg-envrt-brand-ultramarine/40 sm:w-16" />
             </div>
-            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
+            <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
               Nine capabilities.<br />
               <span className="text-envrt-brand-black/35">One platform.</span>
             </h2>
