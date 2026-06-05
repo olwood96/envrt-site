@@ -215,16 +215,16 @@ export function WhatsInDppV3() {
             <TileBase className="justify-between bg-white ring-1 ring-envrt-ink/5">
               <TileLabel>Scan-ready</TileLabel>
               <div className="my-5 flex items-center gap-5">
-                <div className="relative h-16 w-16 flex-shrink-0">
+                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg ring-1 ring-envrt-ink/8">
                   <Image
                     src="/qr-code.png"
                     alt="DPP QR"
                     fill
                     sizes="64px"
-                    className="object-contain"
+                    className="object-contain p-1"
                   />
                 </div>
-                <p className="text-lg font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
+                <p className="font-manrope text-lg font-semibold leading-snug tracking-tight text-envrt-ink">
                   One QR. One scan. The full passport.
                 </p>
               </div>

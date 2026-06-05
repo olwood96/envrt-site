@@ -153,6 +153,32 @@ export function HeroV3() {
               </div>
 
               <div className="relative">
+                {/* Construction marks: tiny aqua brackets framing the card,
+                    NexDyne-style. Desktop only — they read as noise on mobile. */}
+                <span
+                  aria-hidden
+                  className="absolute -left-5 -top-3 hidden font-mono text-[9px] font-medium uppercase tracking-[0.15em] text-envrt-aqua/55 xl:block"
+                >
+                  ┌─ 04x
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute -right-5 -top-3 hidden font-mono text-[9px] font-medium uppercase tracking-[0.15em] text-envrt-aqua/55 xl:block"
+                >
+                  08x ─┐
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute -left-5 -bottom-3 hidden font-mono text-[9px] font-medium uppercase tracking-[0.15em] text-envrt-aqua/55 xl:block"
+                >
+                  └─ DPP
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute -right-5 -bottom-3 hidden font-mono text-[9px] font-medium uppercase tracking-[0.15em] text-envrt-aqua/55 xl:block"
+                >
+                  v3 ─┘
+                </span>
                 <DppCard />
               </div>
 

@@ -1,14 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 
-// Scroll-pinned DPP tour. The section is 4 viewport heights tall. The phone
-// stays pinned; as the user scrolls, the DPP image inside pans, and the
-// active annotation in the side rail highlights. Apple/Stripe pattern.
+// Scroll-pinned DPP tour. Section is 5 viewport heights tall. The phone is
+// pinned; as the user scrolls, the live DPP iframe inside it pans from top to
+// bottom, and the active stop on the left rail highlights when its DPP
+// section is in view. Stop ranges are derived from real DPP section positions
+// captured in public/screenshots/dpp/measurements.json.
+
+const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
 type Stop = {
   title: string;
@@ -20,67 +23,71 @@ type Stop = {
 const stops: Stop[] = [
   {
     title: "The scan moment",
-    body: "Customer scans the QR on the care label. They land on a hosted page with the garment's hero photo, brand voice, and the headline impact metrics.",
-    range: [0.0, 0.27],
+    body: "Customer scans the QR on the care label. They land on a hosted page with the garment's hero image and brand voice.",
+    range: [0.0, 0.18],
   },
   {
-    title: "Audit-grade numbers",
-    body: "CO₂e, water scarcity and data depth — calculated per garment with EU PEF and ISO 14040 methodology. Drop into a compliance pack without rework.",
-    range: [0.27, 0.5],
+    title: "Headline impact",
+    body: "CO₂e, water scarcity and data depth, calculated per garment with EU PEF and ISO 14040 methodology.",
+    range: [0.18, 0.36],
   },
   {
-    title: "Fibre to finished garment",
-    body: "Every stage of the supply chain plotted on a map. Country, factory tier, verification status. Customers see provenance, regulators see traceability.",
-    range: [0.5, 0.75],
+    title: "Materials and journey",
+    body: "Every fibre, every tier, every country mapped. Customers see provenance, regulators see traceability.",
+    range: [0.36, 0.60],
   },
   {
     title: "Recognised standards",
-    body: "French Eco-Score, EU PEF, ISO 14040 / 14067, AWARE water stress. Methodology that passes a regulator's PDF on the first read.",
-    range: [0.75, 1.0],
+    body: "French Eco-Score, EU PEF, ISO 14040, AWARE water stress. Certifications listed with issuing bodies and expiry dates.",
+    range: [0.60, 0.80],
+  },
+  {
+    title: "Care and end of life",
+    body: "Repair guidance, washing instructions, take-back and recycling options. The story doesn't stop at the till.",
+    range: [0.80, 1.0],
   },
 ];
 
 export function ScrollTourSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Track section progress 0–1 from when the top hits the top to when the
-  // bottom hits the bottom.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // The DPP screenshot is ~9000px tall. We pan it from 0% to -70%, leaving
-  // enough at the bottom that the final stop still has content visible.
-  const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-72%"]);
+  // Pan the live DPP iframe inside its phone frame from top to (almost)
+  // bottom over the section. -82% maps to ~95% of DPP content reaching the
+  // bottom of the phone screen, which leaves a tiny "more below" hint.
+  const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-82%"]);
 
-  // Soft halo intensity follows scroll progress — page feels alive at the
-  // start, settles by the end.
+  // Halo intensity follows scroll: alive at the start, settled by the end.
   const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.18, 0.28, 0.12]);
 
   return (
-    // Don't set overflow-hidden on this section — sticky positioning inside
-    // an overflow-hidden ancestor breaks (the section becomes the sticky
-    // child's scrolling container, but the section itself doesn't scroll).
+    // No overflow-hidden on the section — that would break sticky inside.
     <section
       ref={sectionRef}
       className="relative bg-envrt-offwhite text-envrt-ink"
-      style={{ height: "400vh" }}
+      style={{ height: "500vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:px-16">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-8 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
           {/* Left: narrative rail */}
           <div className="relative">
             <FadeUp>
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">
                 Tour · the passport
               </p>
-              <h2 className="mt-5 max-w-xl font-manrope text-[1.75rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-4 max-w-xl font-manrope text-[1.6rem] font-semibold leading-[1.1] tracking-[-0.02em] text-envrt-ink sm:mt-5 sm:text-3xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
+              <p className="mt-3 max-w-md text-xs leading-relaxed text-envrt-charcoal/60 sm:text-sm">
+                Five moments of a real DPP. The phone tracks your scroll.
+              </p>
             </FadeUp>
 
-            <div className="mt-10 space-y-8 sm:mt-12 sm:space-y-10">
+            <div className="mt-8 space-y-6 sm:mt-10 sm:space-y-7">
               {stops.map((stop, i) => (
                 <ScrollStop
                   key={stop.title}
@@ -92,9 +99,9 @@ export function ScrollTourSection() {
             </div>
           </div>
 
-          {/* Right: pinned phone with scrolling DPP */}
-          <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[320px]">
-            {/* Soft aqua halo, clipped to the phone container */}
+          {/* Right: pinned phone with live DPP iframe */}
+          <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[310px]">
+            {/* Aqua halo */}
             <motion.div
               aria-hidden
               style={{ opacity: haloOpacity }}
@@ -102,37 +109,51 @@ export function ScrollTourSection() {
             />
 
             {/* Phone shell */}
-            <div className="relative overflow-hidden rounded-[2.6rem] border-[10px] border-envrt-ink bg-envrt-ink shadow-[0_30px_60px_-15px_rgba(14,14,14,0.35)]">
-              {/* Screen */}
-              <div className="relative h-[500px] overflow-hidden bg-white sm:h-[560px] lg:h-[600px]">
-                <motion.div style={{ y: dppY }} className="relative w-full">
-                  <Image
-                    src="/screenshots/dpp/hoodie-full.png"
-                    alt="Live Digital Product Passport, pans as you scroll"
-                    width={828}
-                    height={9014}
-                    sizes="300px"
-                    className="block w-full"
-                    priority
+            <div className="relative overflow-hidden rounded-[2.4rem] border-[9px] border-envrt-ink bg-envrt-ink shadow-[0_30px_60px_-15px_rgba(14,14,14,0.35)] sm:rounded-[2.6rem] sm:border-[10px]">
+              {/* Screen — iframe is positioned absolute and translated upward by
+                  dppY so the phone reveals different DPP sections as the page
+                  scrolls. pointer-events-none keeps page scroll from being
+                  hijacked by iframe interaction. */}
+              <div className="relative h-[440px] overflow-hidden bg-white sm:h-[520px] lg:h-[580px]">
+                <motion.div
+                  style={{ y: dppY }}
+                  className="absolute inset-x-0 top-0 h-[600vh] w-full"
+                >
+                  <iframe
+                    src={DPP_URL}
+                    title="Live ENVRT Digital Product Passport"
+                    className="pointer-events-none h-full w-full border-0"
+                    loading="lazy"
                   />
                 </motion.div>
 
-                {/* Top + bottom fade masks so the edges feel framed */}
+                {/* Top + bottom fade masks */}
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white to-transparent"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-white to-transparent"
                 />
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent"
                 />
               </div>
             </div>
 
-            {/* Caption under the phone */}
-            <p className="mt-6 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60 sm:text-xs">
-              dpp.envrt.com · live example
-            </p>
+            {/* Caption + open-live link */}
+            <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-charcoal/60 sm:text-[11px]">
+                dpp.envrt.com · live
+              </p>
+              <a
+                href={DPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-1.5 text-xs font-semibold text-envrt-ink underline-offset-4 hover:text-envrt-aqua hover:underline"
+              >
+                Open the live passport
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -155,13 +176,8 @@ function ScrollStop({
   progress: MotionValue<number>;
 }) {
   const [start, end] = stop.range;
-
-  // Function-form useTransform avoids the keyframes API entirely. The 4-point
-  // ramp form would push offsets outside [0, 1] for the boundary stops
-  // ([0, 0.27] and [0.75, 1]), which WAAPI rejects with "Offsets must be
-  // monotonically non-decreasing". A plain function sidesteps that.
-  const fade = 0.05;
-  const dim = 0.3;
+  const fade = 0.04;
+  const dim = 0.28;
 
   const opacity = useTransform(progress, (p) => {
     if (p < start - fade) return dim;
@@ -178,19 +194,18 @@ function ScrollStop({
   const isActive = useTransform(progress, (p) => p >= start && p <= end);
 
   return (
-    <motion.div style={{ opacity }} className="relative grid grid-cols-[44px_1fr] gap-4 sm:grid-cols-[60px_1fr] sm:gap-5">
-      {/* Left edge indicator */}
+    <motion.div style={{ opacity }} className="relative grid grid-cols-[40px_1fr] gap-3 sm:grid-cols-[56px_1fr] sm:gap-4">
       <motion.span
         aria-hidden
         style={{ opacity: indicatorOpacity }}
-        className="absolute left-0 top-1 h-7 w-[2px] bg-envrt-aqua"
+        className="absolute left-0 top-1 h-6 w-[2px] bg-envrt-aqua"
       />
       <ActiveNumber index={index} active={isActive} />
       <div>
-        <h3 className="font-manrope text-lg font-semibold leading-snug tracking-tight text-envrt-ink sm:text-2xl">
+        <h3 className="font-manrope text-base font-semibold leading-snug tracking-tight text-envrt-ink sm:text-xl">
           {stop.title}
         </h3>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-charcoal/70 sm:mt-3 sm:text-base">
+        <p className="mt-1.5 max-w-md text-xs leading-relaxed text-envrt-charcoal/65 sm:mt-2 sm:text-sm">
           {stop.body}
         </p>
       </div>
@@ -198,8 +213,6 @@ function ScrollStop({
   );
 }
 
-// Numeral toggles between dim default and teal-light when the stop is active.
-// Uses a boolean MotionValue subscription so we get a class swap (no WAAPI).
 function ActiveNumber({
   index,
   active,
@@ -211,7 +224,7 @@ function ActiveNumber({
   useEffect(() => active.on("change", setOn), [active]);
   return (
     <p
-      className={`font-manrope pl-3 text-2xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-4 sm:text-4xl ${
+      className={`font-manrope pl-2 text-xl font-semibold leading-none tracking-[-0.02em] transition-colors duration-300 sm:pl-3 sm:text-3xl ${
         on ? "text-envrt-aqua" : "text-envrt-ink/15"
       }`}
     >
