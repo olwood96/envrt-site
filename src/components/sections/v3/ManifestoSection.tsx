@@ -1,25 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
 
 export function ManifestoSection() {
   return (
     <section className="relative overflow-hidden bg-white py-20 sm:py-28 lg:py-36">
-      {/* Background photo: garment factory seamstress, very low opacity so it
-          reads as a textural mood rather than a foreground image */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <Image
-          src="/v3-assets/manifesto.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover opacity-[0.12]"
-        />
-        {/* Soft white fade to keep text legible */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/60 to-white/30" />
-      </div>
-
       <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-aqua sm:text-[11px]">

@@ -207,31 +207,17 @@ export function WhatsInDppV3() {
             </TileBase>
           </FadeUp>
 
-          {/* 5. Brand story — photo as primary visual */}
+          {/* 5. Brand story */}
           <FadeUp delay={0.24} className="sm:col-span-3 lg:col-span-4">
-            <TileBase className="relative overflow-hidden bg-envrt-stone p-0">
-              <div className="relative aspect-[4/5] w-full sm:aspect-auto sm:flex-1">
-                <Image
-                  src="/v3-assets/folded-clothes.jpg"
-                  alt="Folded garments, editorial detail"
-                  fill
-                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover"
-                />
-                {/* Bottom gradient for label legibility */}
-                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-envrt-aqua">
-                    Your story
-                  </p>
-                  <p className="mt-2 font-manrope text-xl font-semibold leading-snug tracking-tight text-white">
-                    Photography, provenance, repair.
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/80">
-                    Your editorial voice, your assets, your control.
-                  </p>
-                </div>
-              </div>
+            <TileBase className="bg-envrt-stone">
+              <TileLabel>Your story</TileLabel>
+              <p className="mt-6 text-xl font-semibold leading-snug tracking-[-0.01em] text-envrt-ink">
+                Photography, provenance, repair guidance — your editorial
+                voice, your assets, your control.
+              </p>
+              <p className="mt-auto pt-8 text-sm leading-relaxed text-envrt-charcoal/65">
+                The numbers earn the trust. The story earns the loyalty.
+              </p>
             </TileBase>
           </FadeUp>
 
