@@ -47,28 +47,22 @@ function HookCard({ hook }: { hook: Hook }) {
 }
 
 // ─── Centre DPP card ─────────────────────────────────────────────────────
+// Real-world hangtag from Angry Pablo, an ENVRT-equipped brand. The photo
+// IS the proof — the 8 hooks around it describe what scanning the QR opens.
 function DppCard() {
-  const rows = [
-    { k: "Composition",    v: "100% Organic Cotton" },
-    { k: "Origin",         v: "Türkiye, Izmir" },
-    { k: "Care",           v: "Machine wash 30°" },
-    { k: "CO₂e",           v: "6.3 kg" },
-    { k: "Water",          v: "12,400 L AWARE" },
-    { k: "Certifications", v: "GOTS · OEKO-TEX 100" },
-  ];
-
   return (
     <div className="overflow-hidden rounded-3xl border border-envrt-ink/8 bg-white shadow-[0_30px_60px_-25px_rgba(14,14,14,0.18)]">
-      {/* Photo block */}
-      <div className="relative aspect-[5/4] w-full bg-envrt-stone">
+      {/* Photo block — the real product */}
+      <div className="relative aspect-[4/5] w-full bg-envrt-stone">
         <Image
-          src="/jacket.png"
-          alt="Organic cotton hoodie, sample DPP product"
+          src="/v3-assets/angry-pablo-tag.jpg"
+          alt="Angry Pablo cycling jersey hangtag with ENVRT QR Digital Product Passport"
           fill
-          sizes="(min-width: 1024px) 380px, (min-width: 640px) 60vw, 80vw"
-          className="object-contain"
+          sizes="(min-width: 1024px) 420px, (min-width: 640px) 60vw, 80vw"
+          className="object-cover"
           priority
         />
+        {/* Scanned & verified pill, top-left */}
         <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 shadow-sm backdrop-blur-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-envrt-green" />
           <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-envrt-charcoal">
@@ -77,30 +71,17 @@ function DppCard() {
         </div>
       </div>
 
-      {/* Data block */}
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <h3 className="font-manrope text-lg font-semibold tracking-tight text-envrt-ink sm:text-xl">
-          Organic Cotton Hoodie
-        </h3>
-        <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-muted">
-          DPP-FA-2026-00742
+      {/* Caption strip */}
+      <div className="border-t border-envrt-ink/8 px-5 py-4 sm:px-6 sm:py-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-aqua">
+          In the wild
         </p>
-
-        <dl className="mt-4 space-y-2.5 border-t border-envrt-ink/8 pt-4">
-          {rows.map((r) => (
-            <div key={r.k} className="flex items-baseline justify-between gap-3 text-xs sm:text-[13px]">
-              <dt className="text-envrt-muted">{r.k}</dt>
-              <dd className="text-right font-medium text-envrt-ink">{r.v}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <div className="mt-5 flex items-center gap-1.5 border-t border-envrt-ink/8 pt-3.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-envrt-green" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-envrt-muted">
-            W3C VC · eIDAS aligned
-          </span>
-        </div>
+        <p className="mt-1.5 font-manrope text-base font-semibold leading-snug tracking-tight text-envrt-ink sm:text-lg">
+          Angry Pablo · Short Sleeve Cycling Jersey
+        </p>
+        <p className="mt-1 text-xs text-envrt-charcoal/60 sm:text-[13px]">
+          Care label, ENVRT-verified Digital Product Passport.
+        </p>
       </div>
     </div>
   );

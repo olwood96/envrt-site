@@ -1,11 +1,26 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
 
 export function FinalCtaV3() {
   return (
     <section className="relative overflow-hidden bg-envrt-stone py-20 sm:py-28 lg:py-36">
+      {/* Background photo: knit textile stack, very subtle so the text and
+          halo stay the focus */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <Image
+          src="/v3-assets/cta-texture.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-[0.18]"
+        />
+        {/* Warm stone wash on top to hold the brand tone */}
+        <div className="absolute inset-0 bg-envrt-stone/55" />
+      </div>
+
       {/* Soft aqua halo */}
       <div
         aria-hidden
