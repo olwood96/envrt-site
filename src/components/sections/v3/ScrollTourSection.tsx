@@ -112,21 +112,28 @@ export function ScrollTourSection() {
 
             {/* Phone shell */}
             <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-ink bg-envrt-ink shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">
-              {/* Screen — iframe is positioned absolute and translated upward
-                  by dppY. pointer-events-none keeps page scroll from being
-                  hijacked by iframe interaction. */}
+              {/* Screen window — fixed visible height, overflow clipped.
+                  The iframe inside is rendered at IFRAME_W (414px, a real
+                  mobile viewport width so the DPP's responsive layout reads
+                  correctly), then scaled down per breakpoint to fit the
+                  phone frame. */}
               <div className="relative h-[260px] overflow-hidden bg-white sm:h-[360px] lg:h-[580px]">
-                <motion.div
-                  style={{ y: dppY }}
-                  className="absolute inset-x-0 top-0 h-[600vh] w-full"
+                {/* Scale wrapper: explicit width matching iframe's natural
+                    width, scale factor derived from phone width / 414. */}
+                <div
+                  className="origin-top-left scale-[0.338] sm:scale-[0.435] lg:scale-[0.749]"
+                  style={{ width: "414px" }}
                 >
-                  <iframe
-                    src={DPP_URL}
-                    title="Live ENVRT Digital Product Passport"
-                    className="pointer-events-none h-full w-full border-0"
-                    loading="lazy"
-                  />
-                </motion.div>
+                  <motion.div style={{ y: dppY }}>
+                    <iframe
+                      src={DPP_URL}
+                      title="Live ENVRT Digital Product Passport"
+                      style={{ width: "414px", height: "4700px" }}
+                      className="pointer-events-none block border-0"
+                      loading="lazy"
+                    />
+                  </motion.div>
+                </div>
 
                 {/* Top + bottom fade masks */}
                 <div
