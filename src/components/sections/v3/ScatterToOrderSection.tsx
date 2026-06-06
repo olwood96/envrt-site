@@ -186,7 +186,7 @@ export function ScatterToOrderSection() {
   return (
     <section
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
-      style={{ overflowX: "clip" }}
+      style={{ overflow: "hidden" }}
     >
       <SectionCorners left="ENVRT/SCATTER" right="Before → After" />
 
@@ -222,12 +222,14 @@ function DesktopScatter() {
   );
   const step3Opacity = useTransform(scrollYProgress, [0.56, 0.66], [0, 1]);
 
-  // DPP slides UP from below the viewport (60vh down → 0) over the same
-  // window where the cards lift upward off-screen. Spatial swap.
+  // DPP slides up from below into the centred position over 0.50 → 0.68.
+  // Using "%" units so framer animates translateY(80% → 0) of the motion
+  // div's own height (520px right pane) — reliably tweened, no string-unit
+  // edge cases.
   const dppY = useTransform(
     scrollYProgress,
     [0.50, 0.68],
-    ["60vh", "0vh"],
+    ["80%", "0%"],
     { ease: [easeOut] },
   );
   const dppOpacity = useTransform(scrollYProgress, [0.50, 0.66], [0, 1], {
