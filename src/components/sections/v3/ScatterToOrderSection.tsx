@@ -205,37 +205,38 @@ function DesktopScatter() {
   //   "Today" while cards are flying in (0 → 0.30)
   //   "The shift" while cards are converging + DPP starts (0.30 → 0.55)
   //   "The output" while DPP fills (0.55 → end)
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.24, 0.30], [1, 1, 0]);
+  // All animation phases finish by progress 0.75, leaving 25% of scroll
+  // (≈80vh on a 320vh section) of dwell time at the final state so the
+  // user can actually see the resolution before scrolling out.
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.18, 0.24], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.28, 0.34, 0.52, 0.58],
+    [0.22, 0.30, 0.45, 0.52],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.56, 0.64], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.50, 0.58], [0, 1]);
 
-  // DPP card emerges earlier and lands sooner — overlapping with cards
-  // fading out so there's never an empty centre.
-  const dppOpacity = useTransform(scrollYProgress, [0.40, 0.58], [0, 1], {
+  const dppOpacity = useTransform(scrollYProgress, [0.38, 0.54], [0, 1], {
     ease: [easeOut],
   });
   const dppScale = useTransform(
     scrollYProgress,
-    [0.40, 0.58, 0.85],
+    [0.38, 0.54, 0.75],
     [0.88, 1.03, 1],
     { ease: [easeOut, easeInOut] },
   );
   const flourishOpacity = useTransform(
     scrollYProgress,
-    [0.40, 0.55, 0.80],
+    [0.38, 0.50, 0.72],
     [0, 0.55, 0],
   );
-  const flourishScale = useTransform(scrollYProgress, [0.40, 0.85], [0.6, 1.6]);
+  const flourishScale = useTransform(scrollYProgress, [0.38, 0.75], [0.6, 1.6]);
 
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "260vh" }}
+      style={{ height: "320vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
@@ -265,13 +266,20 @@ function DesktopScatter() {
           </div>
 
           {/* Right: animated stage.
-              Explicit fixed dimensions (no aspect-ratio + container-type
-              combination) so layout is unambiguous and cqw/cqh resolve
-              consistently in every browser. */}
+              overflow: hidden clips cards positioned beyond the stage edges
+              so they never render visually in the section above (which was
+              happening because the transform put them at negative cqh
+              values). Cards become visible by physically crossing into the
+              stage box, which is what "flying in from off-screen" looks
+              like. Fixed height + containerType: size so cqw/cqh resolve. */}
           <div className="relative">
             <div
               className="relative mx-auto w-full max-w-[620px]"
-              style={{ height: "520px", containerType: "size" }}
+              style={{
+                height: "520px",
+                containerType: "size",
+                overflow: "hidden",
+              }}
             >
               {/* Flourish bloom — flexbox centres the wrapper, motion div
                   scales + fades. No transform stack to fight with framer. */}
