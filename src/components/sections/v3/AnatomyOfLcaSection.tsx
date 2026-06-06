@@ -339,10 +339,12 @@ function StageCard({
   progress: MotionValue<number>;
   size: "desktop" | "mobile";
 }) {
-  // Typewriter window
+  // Typewriter window — short enough that the equation fills in promptly
+  // once a stage activates, so the reader gets the whole snippet without a
+  // long wait.
   const typeActive = useTransform(
     progress,
-    [stage.activation, stage.activation + 0.10],
+    [stage.activation, stage.activation + 0.06],
     [0, 1],
     { ease: [easeOut] },
   );
@@ -438,12 +440,14 @@ function DesktopAnatomy() {
   );
 
   // Horizontal track — translates left as scroll progresses. Cards 60% of
-  // container width with 20% padding-left so the first card starts centred,
-  // and translateX goes from 0 to -(N-1)*60% to bring each card in turn.
+  // VIEWPORT width with 20vw padding-left so the first card starts centred,
+  // and translateX goes from 0 to -(N-1)*60vw to bring each card in turn.
+  // Track is intentionally pulled outside the max-w-1320px container so it
+  // spans the full viewport, breaking up the rigid central column.
   const trackX = useTransform(
     scrollYProgress,
     [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
-    ["0cqw", `-${60 * (STAGES.length - 1)}cqw`],
+    ["0vw", `-${60 * (STAGES.length - 1)}vw`],
     { ease: [easeInOut] },
   );
 
@@ -454,37 +458,36 @@ function DesktopAnatomy() {
       style={{ height: "400vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
+        {/* Header + pipeline inside the constrained max-w container */}
         <div className="mx-auto w-full max-w-[1320px] px-16">
           <Header />
 
-          {/* Pipeline + labels */}
           <div className="mx-auto mt-14 max-w-[1100px]">
             <Pipeline progress={scrollYProgress} activeIndex={activeIndex} />
             <PipelineLabels activeIndex={activeIndex} />
           </div>
+        </div>
 
-          {/* Horizontal card track. Container query units make card width
-              and padding scale with the track container, not the viewport. */}
-          <div
-            className="mt-10 overflow-hidden"
-            style={{ containerType: "inline-size" }}
+        {/* Card track — full viewport width, breaks out of the container */}
+        <div className="mt-10 overflow-hidden">
+          <motion.div
+            style={{ x: trackX, willChange: "transform" }}
+            className="flex gap-4 pl-[20vw] pr-[20vw]"
           >
-            <motion.div
-              style={{ x: trackX, willChange: "transform" }}
-              className="flex gap-4 pl-[20cqw] pr-[20cqw]"
-            >
-              {STAGES.map((stage) => (
-                <div key={stage.index} className="w-[60cqw] flex-shrink-0">
-                  <StageCard
-                    stage={stage}
-                    progress={scrollYProgress}
-                    size="desktop"
-                  />
-                </div>
-              ))}
-            </motion.div>
-          </div>
+            {STAGES.map((stage) => (
+              <div key={stage.index} className="w-[60vw] flex-shrink-0">
+                <StageCard
+                  stage={stage}
+                  progress={scrollYProgress}
+                  size="desktop"
+                />
+              </div>
+            ))}
+          </motion.div>
+        </div>
 
+        {/* Stats + closing tag back inside the constrained container */}
+        <div className="mx-auto w-full max-w-[1320px] px-16">
           <div className="mt-10">
             <Stats />
           </div>

@@ -58,7 +58,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
-    fromX: -40, fromY: -40, fromRotate: -12,
+    fromX: -20, fromY: -20, fromRotate: -12,
     stackDx: -4, stackDy: -8, z: 7,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
@@ -69,7 +69,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
-    fromX: 60, fromY: -45, fromRotate: 14,
+    fromX: 60, fromY: -25, fromRotate: 14,
     stackDx: 2, stackDy: -4, z: 6,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
@@ -80,7 +80,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "CSV",
     tone: "vibrant",
     pill: null,
-    fromX: 145, fromY: 12, fromRotate: 16,
+    fromX: 125, fromY: 12, fromRotate: 16,
     stackDx: 5, stackDy: 0, z: 5,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
@@ -91,7 +91,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
-    fromX: -50, fromY: 32, fromRotate: -10,
+    fromX: -25, fromY: 32, fromRotate: -10,
     stackDx: -6, stackDy: 3, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
@@ -102,7 +102,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Folder",
     tone: "neutral",
     pill: null,
-    fromX: 35, fromY: -55, fromRotate: 8,
+    fromX: 35, fromY: -30, fromRotate: 8,
     stackDx: 0, stackDy: 0, z: 3,
     rowLabel: "Tier 1 supply",
     rowValue: "Turkey · Aydın",
@@ -113,7 +113,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "EML",
     tone: "ultramarine",
     pill: null,
-    fromX: 150, fromY: 55, fromRotate: 12,
+    fromX: 125, fromY: 55, fromRotate: 12,
     stackDx: 4, stackDy: 5, z: 8,
     rowLabel: "Tier 3 supply",
     rowValue: "Portugal · Viana do Castelo",
@@ -124,7 +124,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "PDF",
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
-    fromX: -50, fromY: 75, fromRotate: -14,
+    fromX: -25, fromY: 75, fromRotate: -14,
     stackDx: -3, stackDy: 6, z: 2,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
@@ -135,7 +135,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Chat",
     tone: "vibrant",
     pill: null,
-    fromX: 50, fromY: 145, fromRotate: 10,
+    fromX: 50, fromY: 125, fromRotate: 10,
     stackDx: 1, stackDy: 8, z: 1,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
@@ -289,18 +289,32 @@ function DesktopScatter() {
               className="relative mx-auto aspect-[5/4] w-full max-w-[620px]"
               style={{ containerType: "size" }}
             >
-              {/* Flourish bloom behind everything */}
+              {/* Flourish bloom behind everything. Centring done via
+                  framer's x/y so it composes with scale, instead of
+                  Tailwind translate classes which would be overwritten by
+                  the motion-driven transform. */}
               <motion.div
                 aria-hidden
-                style={{ opacity: flourishOpacity, scale: flourishScale }}
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
+                style={{
+                  opacity: flourishOpacity,
+                  scale: flourishScale,
+                  x: "-50%",
+                  y: "-50%",
+                }}
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px] rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
               />
 
-              {/* DPP card emerges centred. Larger and earlier so the
-                  resolution actually lands. */}
+              {/* DPP card emerges centred. Same fix — x/y -50% inside the
+                  motion style, no Tailwind translate classes, so the scale
+                  transform doesn't wipe out the centring translate. */}
               <motion.div
-                style={{ opacity: dppOpacity, scale: dppScale }}
-                className="absolute left-1/2 top-1/2 z-10 w-[88%] -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  opacity: dppOpacity,
+                  scale: dppScale,
+                  x: "-50%",
+                  y: "-50%",
+                }}
+                className="absolute left-1/2 top-1/2 z-10 w-[88%]"
               >
                 <DppCard progress={scrollYProgress} />
               </motion.div>
