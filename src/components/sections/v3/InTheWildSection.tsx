@@ -3,12 +3,7 @@
 import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
 import { EcoScoreLabel } from "@/components/sections/v3/EcoScoreLabel";
-
-// ─── In the wild ─────────────────────────────────────────────────────────
-// Replaces the previous "What's in a DPP" bento — that content is already
-// covered interactively in the scroll tour. This section instead shows a
-// real ENVRT-equipped product so the visitor sees the platform in production
-// without marketing scaffolding.
+import { LivePill } from "./_shared";
 
 export function InTheWildSection() {
   return (
@@ -17,22 +12,8 @@ export function InTheWildSection() {
       style={{ overflowX: "clip" }}
     >
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
-        {/* Header */}
         <FadeUp>
-          <div className="flex items-center gap-3">
-            {/* Live pulse: Vibrant Green per brand pairing
-                "Vibrant green + Vista white". */}
-            <span
-              aria-hidden
-              className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-            >
-              <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
-              <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-            </span>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-vibrant sm:text-[11px]">
-              Live · in the wild
-            </p>
-          </div>
+          <LivePill label="Live · in the wild" />
           <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
             Real garments.<br />
             <span className="text-envrt-brand-black/35">Real passports.</span>

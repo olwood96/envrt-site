@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Big_Shoulders_Text, Karla, Manrope } from "next/font/google";
+import { Big_Shoulders_Text, Karla } from "next/font/google";
 import { HeroV3 } from "@/components/sections/v3/HeroV3";
 import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
 import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
@@ -21,8 +21,6 @@ import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSectio
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
 
-// Brand fonts per 2022 ENVRT brand guidelines (scoped to v3 only via CSS
-// variable). Big Shoulders Text = display, Karla = body.
 const display = Big_Shoulders_Text({
   subsets: ["latin"],
   variable: "--font-display",
@@ -34,15 +32,6 @@ const body = Karla({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "700"],
-  display: "swap",
-});
-
-// Manrope kept as a fallback for any v3 component still referencing the
-// previous display family while the brand sweep lands.
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -76,7 +65,7 @@ export default async function HomeV3PreviewPage() {
   return (
     <SmoothScroll>
       <div
-        className={`${display.variable} ${body.variable} ${manrope.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+        className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
       >
         <ScrollProgressBar />
 

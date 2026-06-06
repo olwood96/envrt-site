@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
+import { Eyebrow, LivePill, SectionCorners } from "./_shared";
 
 type ManifestoStats = {
   dppScans: number;
@@ -18,8 +19,6 @@ function formatCompact(n: number): string {
 }
 
 export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
-  // Subtle parallax on the background photograph — moves 60px slower than the
-  // page scroll over the section's height. Eye-perception of depth, no commit.
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -27,8 +26,6 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
 
-  // Default fallback values if stats fetch fails — clearly modest to avoid
-  // overclaiming when the API is unreachable.
   const safe = {
     dppScans: stats?.dppScans ?? 0,
     countryCount: stats?.countryCount ?? 0,
@@ -37,7 +34,6 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
 
   return (
     <section ref={ref} className="relative overflow-hidden bg-white py-20 sm:py-28 lg:py-36">
-      {/* Background photo, parallax-shifted */}
       <motion.div
         aria-hidden
         style={{ y: bgY }}
@@ -53,7 +49,6 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
         <div className="absolute inset-0 bg-gradient-to-r from-white via-white/65 to-white/35" />
       </motion.div>
 
-      {/* Textile cross-hatch pattern (very subtle) */}
       <svg
         aria-hidden
         className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.04]"
@@ -66,25 +61,11 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
         <rect width="100%" height="100%" fill="url(#manifesto-hatch)" />
       </svg>
 
-      {/* Construction marks */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/02
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        WHY
-      </span>
+      <SectionCorners left="ENVRT/02" right="WHY" />
 
       <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-            Why ENVRT
-          </p>
+          <Eyebrow>Why ENVRT</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.1}>
           <p className="mt-6 font-display text-[1.75rem] font-medium leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
@@ -100,20 +81,9 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           </p>
         </FadeUp>
 
-        {/* Live ticker — pulse uses Vibrant Green per brand pairing
-            "Vibrant green + Vista white". */}
         <FadeUp delay={0.32}>
           <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-brand-black/8 pt-6 sm:mt-14 sm:gap-x-7">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-vibrant sm:text-[11px]">
-              <span
-                aria-hidden
-                className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-              >
-                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-              </span>
-              Live
-            </span>
+            <LivePill />
             <Stat value={`${formatCompact(safe.dppScans)}+`} label="passports served" />
             <Sep />
             <Stat value={`${safe.countryCount}`} label="countries" />

@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { FadeUp } from "@/components/ui/Motion";
 
-// ESPR textile DPP enforcement target. The delegated act for textiles is
-// expected to land mid-2026, with mandatory DPPs phasing in from early 2027.
-// Using 2027-01-01 as a defensible visual anchor — when the actual date is
-// firmed up, swap this constant.
+// ESPR textile DPP target. Update when the delegated act lands.
 const ESPR_TARGET_ISO = "2027-01-01T00:00:00Z";
 
 function daysUntil(targetIso: string): number {
@@ -16,8 +13,7 @@ function daysUntil(targetIso: string): number {
 }
 
 export function EsprCountdownSection() {
-  // Render 0 on the server to avoid a hydration mismatch, then swap to the
-  // live count on the client.
+  // null until client mount so SSR/CSR markup matches.
   const [days, setDays] = useState<number | null>(null);
   useEffect(() => {
     setDays(daysUntil(ESPR_TARGET_ISO));
@@ -27,17 +23,13 @@ export function EsprCountdownSection() {
     <section className="bg-envrt-stone py-12 sm:py-16">
       <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
-          {/* Deadline alert: Crimson Red accents per brand pairing
-              "Vista white + Crimson red". The countdown IS an alert message. */}
-          <div className="relative overflow-hidden rounded-3xl border-l-[3px] border-envrt-brand-crimson border-y border-r border-y-envrt-brand-black/8 border-r-envrt-brand-black/8 bg-white p-6 sm:p-8 lg:p-10">
-            {/* Soft Crimson wash */}
+          <div className="relative overflow-hidden rounded-3xl border border-envrt-brand-black/8 border-l-[3px] border-l-envrt-brand-crimson bg-white p-6 sm:p-8 lg:p-10">
             <div
               aria-hidden
               className="pointer-events-none absolute -right-20 top-1/2 h-[280px] w-[280px] -translate-y-1/2 rounded-full bg-envrt-brand-crimson/[0.08] blur-3xl"
             />
 
             <div className="relative grid grid-cols-1 items-center gap-6 sm:grid-cols-[1fr_auto] sm:gap-8">
-              {/* Left: label + heading + body */}
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-crimson sm:text-[11px]">
                   ESPR · Textile DPP

@@ -1,34 +1,24 @@
-// ─── ENVRT cipher + scene break ──────────────────────────────────────────
-// A small typographic divider that doubles as a brand fingerprint. The cipher
-// itself is a small ∇ glyph in monospace tracking with the wordmark — quiet
-// enough to read as decoration, distinctive enough to repeat.
-//
-// Used between major content groups on the v3 page. Light backgrounds get
-// "default" tone; place the `dark` variant inside any envrt-brand-black section.
+// Small typographic divider between major content groups. ENVRT wordmark in
+// N27 with an index + label, flanked by hairline rules. `dark` flips it for
+// envrt-brand-black grounds.
 
 type SceneMarkProps = {
   index: string;
   label: string;
-  /** Use on dark grounds. */
   dark?: boolean;
 };
 
 export function SceneMark({ index, label, dark = false }: SceneMarkProps) {
-  const accent = dark ? "text-envrt-brand-ultramarine" : "text-envrt-brand-ultramarine";
   const muted = dark ? "text-envrt-brand-vista/40" : "text-envrt-brand-black/40";
   const rule = dark ? "bg-envrt-brand-vista/12" : "bg-envrt-brand-black/8";
+  const bg = dark ? "bg-envrt-brand-black" : "bg-envrt-brand-vista";
 
   return (
-    <div
-      aria-hidden
-      className={`${dark ? "bg-envrt-brand-black" : "bg-envrt-brand-vista"}`}
-    >
+    <div aria-hidden className={bg}>
       <div className="mx-auto flex max-w-[1320px] items-center gap-4 px-5 py-10 sm:px-8 sm:py-14 lg:px-16">
         <span className={`h-px flex-1 ${rule}`} />
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* "ENVRT" in N27 — uses the wordmark font so the cipher reads as a
-              true brand fingerprint, not a generic mono caps label. */}
-          <span className={`text-[10px] leading-none tracking-[0.16em] sm:text-[11px] ${accent}`}>
+          <span className="text-[10px] leading-none tracking-[0.16em] text-envrt-brand-ultramarine sm:text-[11px]">
             <span className="font-mono">▽&nbsp;</span>
             <span className="font-n27 font-bold tracking-[0.08em]">ENVRT</span>
           </span>

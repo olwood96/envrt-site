@@ -4,12 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-
-// Scroll-pinned DPP tour. The section is 5 viewport heights tall. Phone
-// stays pinned; as the user scrolls, the live DPP iframe inside pans top to
-// bottom, and the active stop on the rail highlights when its DPP section
-// is on-screen. Stop ranges derived from real DPP section positions
-// captured in public/screenshots/dpp/measurements.json.
+import { Eyebrow, LivePill } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
@@ -56,28 +51,20 @@ export function ScrollTourSection() {
     offset: ["start start", "end end"],
   });
 
-  // Pan the DPP iframe from top to (almost) bottom over the section.
+  // Pan the iframe top → bottom across the section.
   const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-82%"]);
 
   return (
-    // overflow-x-clip contains the phone's right-edge peek-off WITHOUT
-    // creating a scroll container — unlike overflow:hidden, clip doesn't
-    // break the sticky child.
     <section
       ref={sectionRef}
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ height: "500vh", overflowX: "clip" }}
     >
-      {/* Sticky inner has a SOLID background so it covers whatever was above
-          when it pins. Without this, the previous section bleeds through. */}
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_140px] items-center gap-3 px-5 sm:grid-cols-[1fr_180px] sm:gap-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
-          {/* Left: narrative rail */}
           <div className="relative min-w-0">
             <FadeUp>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-                Tour · the passport
-              </p>
+              <Eyebrow>Tour · the passport</Eyebrow>
               <h2 className="mt-3 max-w-xl font-display text-[1.35rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
@@ -146,20 +133,8 @@ export function ScrollTourSection() {
               </div>
             </div>
 
-            {/* Caption + open-live link — hidden on mobile, the phone is the
-                story there. Shown from sm: up. */}
             <div className="mt-4 hidden flex-col items-center gap-3 sm:mt-5 sm:flex">
-              <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant sm:text-[11px]">
-                <span
-                  aria-hidden
-                  className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-                >
-                  <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-75" />
-                  <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-                </span>
-                dpp.envrt.com · live
-              </p>
-              {/* Boosted to a real button-style CTA. */}
+              <LivePill label="dpp.envrt.com · live" />
               <a
                 href={DPP_URL}
                 target="_blank"

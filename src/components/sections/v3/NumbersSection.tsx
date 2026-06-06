@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
+import { DotGridBackground, SectionCorners } from "./_shared";
 
 type Stat = {
   number: number;
@@ -147,43 +148,15 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
 
 export function NumbersSection() {
   return (
-    // Single dark moment in an otherwise light page. The shift to envrt-brand-black
-    // creates a scroll heartbeat and lets the big numerals carry real weight.
     <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
-      {/* Dot-grid background + construction marks at corners (no halos) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(223,95,255,0.9) 1px, transparent 1px)",
-          backgroundSize: "26px 26px",
-        }}
+      <DotGridBackground tone="lilac" opacity={0.06} size={26} />
+      <SectionCorners
+        tone="dark"
+        left="04x"
+        right="ENVRT/04"
+        bottomLeft="BY THE NUMBERS"
+        bottomRight="N/03"
       />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:left-6"
-      >
-        04x
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:right-6"
-      >
-        ENVRT/04
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute bottom-6 left-4 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:left-6"
-      >
-        BY THE NUMBERS
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute bottom-6 right-4 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-lilac/45 sm:right-6"
-      >
-        N/03
-      </span>
 
       <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>

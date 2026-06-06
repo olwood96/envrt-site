@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
+import { Eyebrow } from "./_shared";
 
 type Step = {
   index: string;
@@ -50,9 +51,7 @@ export function HowItWorksV3() {
     <section className="bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
-            How it works
-          </p>
+          <Eyebrow>How it works</Eyebrow>
           <h2 className="mt-5 max-w-3xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
             Three steps. Half a day. One passport per garment.
           </h2>

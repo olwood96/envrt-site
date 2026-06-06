@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { InsightsPostMeta } from "@/lib/insights";
 import { FadeUp } from "@/components/ui/Motion";
+import { Eyebrow } from "./_shared";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -14,7 +15,6 @@ function formatDate(iso: string) {
 
 export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
   if (!posts.length) return null;
-  const three = posts.slice(0, 3);
 
   return (
     <section className="bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
@@ -22,9 +22,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
         <FadeUp>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end sm:gap-6">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-                Insights
-              </p>
+              <Eyebrow>Insights</Eyebrow>
               <h2 className="mt-4 max-w-2xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-5 sm:text-4xl lg:text-[2.75rem]">
                 Notes from inside the DPP build.
               </h2>
@@ -40,7 +38,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
         </FadeUp>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3 lg:mt-12 lg:gap-6">
-          {three.map((post, i) => (
+          {posts.map((post, i) => (
             <FadeUp key={post.slug} delay={0.08 + i * 0.06}>
               <Link
                 href={`/insights/${post.slug}`}

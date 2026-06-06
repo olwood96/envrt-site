@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
+import { Eyebrow } from "./_shared";
 
 // ─── Data ────────────────────────────────────────────────────────────────
 
@@ -119,9 +120,7 @@ export function CapabilitiesSection() {
         <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           <FadeUp>
             <div className="flex items-center gap-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-                What we do
-              </p>
+              <Eyebrow>What we do</Eyebrow>
               <span aria-hidden className="h-px w-12 bg-envrt-brand-ultramarine/40 sm:w-16" />
             </div>
             <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">

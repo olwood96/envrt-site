@@ -12,14 +12,11 @@ import {
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
+import { Eyebrow, SectionCorners } from "./_shared";
 
-// "We built the engine" — anatomy of the in-house LCA. Refined horizontal
-// pipeline (HTML circle nodes, no SVG ovals) with progressive fill, and a
-// horizontal card track underneath that slides right-to-left in lockstep
-// with the pipeline. Each card holds real Hoodie 0509-1882 stage data and
-// types out its equation as it becomes active.
-
-// ─── Real Hoodie 0509-1882 breakdown ──────────────────────────────────────
+// Anatomy of the in-house LCA: horizontal pipeline rail + a card track
+// below that slides right-to-left in lockstep, each card typing out its
+// equation as it lands centred. Real Hoodie 0509-1882 stage breakdown.
 
 type Stage = {
   index: string;
@@ -115,18 +112,7 @@ export function AnatomyOfLcaSection() {
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ overflowX: "clip" }}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/LAB
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        IN-HOUSE LCA
-      </span>
+      <SectionCorners left="ENVRT/LAB" right="IN-HOUSE LCA" />
 
       <DesktopAnatomy />
       <MobileAnatomy />
@@ -140,9 +126,7 @@ function Header() {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <FadeUp>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-          Our USP
-        </p>
+        <Eyebrow>Our USP</Eyebrow>
         <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
           We built the engine.{" "}
           <span className="text-envrt-brand-black/40">Not licensed it.</span>
@@ -198,16 +182,25 @@ function Typewriter({
   text: string;
   active: MotionValue<number>;
 }) {
-  const [shown, setShown] = useState("");
+  // Direct DOM mutation via a ref. Avoids re-rendering the React tree at
+  // ~60fps just to slice a string — the caret span never changes, so React
+  // never touches it, and the text node updates without reconciliation.
+  const ref = useRef<HTMLSpanElement>(null);
+  const last = useRef(-1);
 
   useMotionValueEvent(active, "change", (latest) => {
-    const n = Math.max(0, Math.min(text.length, Math.floor(latest * text.length)));
-    setShown(text.slice(0, n));
+    const n = Math.max(
+      0,
+      Math.min(text.length, Math.floor(latest * text.length)),
+    );
+    if (n === last.current) return;
+    last.current = n;
+    if (ref.current) ref.current.textContent = text.slice(0, n);
   });
 
   return (
     <span>
-      {shown}
+      <span ref={ref} />
       <span className="ml-[1px] inline-block w-[1ch] animate-pulse text-envrt-brand-ultramarine/70">
         ▍
       </span>

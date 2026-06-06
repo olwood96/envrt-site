@@ -8,6 +8,7 @@ import {
   ALIGNED_WITH_LOGOS,
   ALIGNED_WITH_STANDARDS,
 } from "@/lib/aligned-with";
+import { Eyebrow, SectionCorners } from "./_shared";
 
 // V3-styled variant of AlignedWithCarousel. Same data, brand-aligned styling.
 // Logos animate in with a staggered cascade similar to merloop's pattern —
@@ -21,25 +22,11 @@ export function AlignedWithCarouselV3() {
       className="relative bg-envrt-brand-vista py-16 sm:py-20 lg:py-24"
       style={{ overflowX: "clip" }}
     >
-      {/* Construction marks at corners (no halos) */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/05
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        Aligned
-      </span>
+      <SectionCorners left="ENVRT/05" right="Aligned" />
 
       <Container>
         <FadeUp>
-          <p className="text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-            Aligned with
-          </p>
+          <Eyebrow className="text-center">Aligned with</Eyebrow>
           <h2
             id="aligned-with-v3-heading"
             className="mx-auto mt-4 max-w-2xl text-center font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-3xl lg:text-[2.25rem]"

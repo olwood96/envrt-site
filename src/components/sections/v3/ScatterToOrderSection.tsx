@@ -11,14 +11,10 @@ import {
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
+import { Eyebrow, LivePill, SectionCorners } from "./_shared";
 
-// Scatter-to-order. Cards ride a single linear arc from just off-screen to
-// a tight centre stack — no waypoint, no velocity dip, constant speed
-// throughout. They fade in immediately on entry, sweep into view, then fade
-// out as the DPP card lands prominently at centre with its eight rows
-// populating top to bottom. Real Hoodie 0509-1882 numbers throughout.
-
-// ─── Real hoodie ──────────────────────────────────────────────────────────
+// Scatter-to-order: eight supplier inputs sweep in from off-screen, fade
+// out as a single DPP card lands at centre. Real Hoodie 0509-1882 data.
 
 const HOODIE = {
   name: "Hoodie 0509-1882",
@@ -28,7 +24,7 @@ const HOODIE = {
 // ─── Cards ────────────────────────────────────────────────────────────────
 
 type Tone = "crimson" | "vibrant" | "ultramarine" | "neutral";
-type Pill = { label: string; tone: "crimson" | "golden" | "ultramarine" } | null;
+type Pill = { label: string; tone: "crimson" | "ultramarine" } | null;
 
 type ScatterCard = {
   filename: string;
@@ -172,7 +168,6 @@ const TONE_ROW_ACCENT: Record<Tone, string> = {
 
 const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   crimson: "bg-envrt-brand-crimson/15 text-envrt-brand-crimson",
-  golden: "bg-envrt-brand-golden/30 text-envrt-brand-black",
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
@@ -188,18 +183,7 @@ export function ScatterToOrderSection() {
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ overflowX: "clip" }}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/SCATTER
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        Before → After
-      </span>
+      <SectionCorners left="ENVRT/SCATTER" right="Before → After" />
 
       <DesktopScatter />
       <MobileScatter />
@@ -255,11 +239,8 @@ function DesktopScatter() {
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
-          {/* Left: stepped narrative */}
           <div className="relative min-h-[320px]">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-              The before / after
-            </p>
+            <Eyebrow>The before / after</Eyebrow>
 
             <div className="relative mt-6 min-h-[280px]">
               <Step
@@ -471,16 +452,7 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
     <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-6 shadow-[0_40px_80px_-30px_rgba(62,0,255,0.55)] lg:p-7">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant lg:text-[11px]">
-          <span
-            aria-hidden
-            className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-          >
-            <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-70" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-          </span>
-          Live · verified
-        </span>
+        <LivePill label="Live · verified" />
         <span className="font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45 lg:text-[10px]">
           ENVRT/DPP
         </span>
@@ -493,7 +465,6 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
         {HOODIE.name}
       </p>
 
-      {/* Rows */}
       <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
         {CARDS.map((card, i) => (
           <DppRowItem
@@ -577,9 +548,7 @@ function MobileScatter() {
   return (
     <div className="lg:hidden">
       <div className="mx-auto max-w-[640px] px-5 py-20 sm:px-8 sm:py-24">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-          Today
-        </p>
+        <Eyebrow>Today</Eyebrow>
         <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
           Compliance lives in your inbox.
         </h2>
@@ -609,9 +578,7 @@ function MobileScatter() {
           <span aria-hidden className="h-px flex-1 bg-envrt-brand-black/15" />
         </div>
 
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-          The output
-        </p>
+        <Eyebrow>The output</Eyebrow>
         <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
           garment.dpp
         </h2>
@@ -622,16 +589,7 @@ function MobileScatter() {
 
         <div className="mt-8 rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] sm:p-6">
           <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant">
-              <span
-                aria-hidden
-                className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-              >
-                <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-70" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-              </span>
-              Live · verified
-            </span>
+            <LivePill label="Live · verified" />
             <span className="font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45">
               ENVRT/DPP
             </span>

@@ -5,10 +5,9 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
+import { DotGridBackground, Eyebrow, SectionCorners } from "./_shared";
 
 export function FinalCtaV3() {
-  // Subtle parallax on the background image — moves slower than the page
-  // scroll over the section's height.
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -34,30 +33,14 @@ export function FinalCtaV3() {
         <div className="absolute inset-0 bg-envrt-stone/55" />
       </motion.div>
 
-      {/* Dot grid + thin top/bottom accent rules — no halos */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(26,26,26,0.7) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
+      <DotGridBackground />
       <span aria-hidden className="pointer-events-none absolute inset-x-12 top-0 h-px bg-envrt-brand-ultramarine/30" />
       <span aria-hidden className="pointer-events-none absolute inset-x-12 bottom-0 h-px bg-envrt-brand-ultramarine/30" />
-      <span aria-hidden className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/30 sm:left-6">
-        ENVRT/CTA
-      </span>
-      <span aria-hidden className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/30 sm:right-6">
-        v3
-      </span>
+      <SectionCorners left="ENVRT/CTA" right="v3" />
 
       <div className="relative mx-auto max-w-[1100px] px-5 text-center sm:px-8 lg:px-16">
         <FadeUp>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-            One last thing
-          </p>
+          <Eyebrow>One last thing</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.08}>
           <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.85rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">

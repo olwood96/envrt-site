@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
+import { DotGridBackground, Eyebrow } from "./_shared";
 
 // ─── Hero v3 ─────────────────────────────────────────────────────────────
 // Split A/B annotation test. Top 3 callouts use the SPEC-SHEET pattern
@@ -45,26 +46,14 @@ const CHIPS = ["Composition", "Supply chain", "Brand voice", "Care + LCA", "Scan
 export function HeroV3() {
   return (
     <section className="relative overflow-hidden bg-envrt-brand-vista">
-      {/* Dot-grid background instead of the radial halo */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(26,26,26,0.7) 1px, transparent 1px)",
-          backgroundSize: "22px 22px",
-        }}
-      />
-      {/* Construction marks at corners */}
+      <DotGridBackground opacity={0.04} size={22} />
       <ConstructionMarks />
 
       <div className="relative mx-auto max-w-[1280px] px-5 pt-24 pb-16 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-24">
         {/* Left: copy */}
         <div className="max-w-xl lg:py-12">
           <FadeUp>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-              EU ESPR · Ready
-            </p>
+            <Eyebrow>EU ESPR · Ready</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
             <h1 className="mt-5 font-display text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">

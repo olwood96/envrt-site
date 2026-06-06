@@ -6,34 +6,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { FadeUp } from "@/components/ui/Motion";
 import { faqItems } from "@/lib/config";
-
-// V3-styled FAQ. Inline accordion (instead of the shared Accordion component)
-// so the styling stays scoped to v3 brand rules.
+import { Eyebrow, SectionCorners } from "./_shared";
 
 export function FAQSectionV3() {
   return (
     <section id="faq" className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
-      {/* Construction marks */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/FAQ
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        Q
-      </span>
+      <SectionCorners left="ENVRT/FAQ" right="Q" />
 
       <Container>
         <div className="mx-auto max-w-2xl">
           <FadeUp>
             <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-                FAQ
-              </p>
+              <Eyebrow>FAQ</Eyebrow>
               <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-4xl">
                 Common questions.
               </h2>
