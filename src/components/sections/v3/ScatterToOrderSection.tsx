@@ -54,7 +54,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
-    fromX: -20, fromY: -20, fromRotate: -12,
+    fromX: -80, fromY: -90, fromRotate: -18,
     stackDx: -4, stackDy: -8, z: 7,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
@@ -65,7 +65,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
-    fromX: 60, fromY: -25, fromRotate: 14,
+    fromX: 60, fromY: -110, fromRotate: 20,
     stackDx: 2, stackDy: -4, z: 6,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
@@ -76,7 +76,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "CSV",
     tone: "vibrant",
     pill: null,
-    fromX: 125, fromY: 12, fromRotate: 16,
+    fromX: 200, fromY: 12, fromRotate: 24,
     stackDx: 5, stackDy: 0, z: 5,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
@@ -87,7 +87,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
-    fromX: -25, fromY: 32, fromRotate: -10,
+    fromX: -110, fromY: 30, fromRotate: -16,
     stackDx: -6, stackDy: 3, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
@@ -98,7 +98,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Folder",
     tone: "neutral",
     pill: null,
-    fromX: 35, fromY: -30, fromRotate: 8,
+    fromX: 35, fromY: -120, fromRotate: 14,
     stackDx: 0, stackDy: 0, z: 3,
     rowLabel: "Tier 1 supply",
     rowValue: "Turkey · Aydın",
@@ -109,7 +109,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "EML",
     tone: "ultramarine",
     pill: null,
-    fromX: 125, fromY: 55, fromRotate: 12,
+    fromX: 200, fromY: 70, fromRotate: 22,
     stackDx: 4, stackDy: 5, z: 8,
     rowLabel: "Tier 3 supply",
     rowValue: "Portugal · Viana do Castelo",
@@ -120,7 +120,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "PDF",
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
-    fromX: -25, fromY: 75, fromRotate: -14,
+    fromX: -110, fromY: 75, fromRotate: -22,
     stackDx: -3, stackDy: 6, z: 2,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
@@ -131,7 +131,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Chat",
     tone: "vibrant",
     pill: null,
-    fromX: 50, fromY: 125, fromRotate: 10,
+    fromX: 50, fromY: 200, fromRotate: 18,
     stackDx: 1, stackDy: 8, z: 1,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
@@ -273,34 +273,27 @@ function DesktopScatter() {
               className="relative mx-auto w-full max-w-[620px]"
               style={{ height: "520px", containerType: "size" }}
             >
-              {/* Flourish bloom. Outer wrapper handles -50% centring via a
-                  static CSS transform so it can't be overwritten by the
-                  motion-driven inner transform. Inner motion div animates
-                  opacity + scale only. */}
-              <div
+              {/* Flourish bloom — flexbox centres the wrapper, motion div
+                  scales + fades. No transform stack to fight with framer. */}
+              <motion.div
                 aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px]"
-                style={{ transform: "translate(-50%, -50%)" }}
+                style={{ opacity: flourishOpacity, scale: flourishScale }}
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
               >
-                <motion.div
-                  style={{ opacity: flourishOpacity, scale: flourishScale }}
-                  className="h-full w-full rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
-                />
-              </div>
+                <div className="h-[340px] w-[340px] rounded-full bg-envrt-brand-ultramarine/18 blur-3xl" />
+              </motion.div>
 
-              {/* DPP card. Same wrapper pattern — outer div centres, inner
-                  motion div scales + fades. Transforms on two separate
-                  elements never collide. */}
-              <div
-                className="absolute left-1/2 top-1/2 z-10 w-[88%]"
-                style={{ transform: "translate(-50%, -50%)" }}
+              {/* DPP card — same pattern. The motion div fills the stage,
+                  flexbox centres the inner card. Scale grows the card from
+                  centre via the default transform-origin. */}
+              <motion.div
+                style={{ opacity: dppOpacity, scale: dppScale }}
+                className="absolute inset-0 z-10 flex items-center justify-center"
               >
-                <motion.div
-                  style={{ opacity: dppOpacity, scale: dppScale }}
-                >
+                <div className="w-[88%]">
                   <DppCard progress={scrollYProgress} />
-                </motion.div>
-              </div>
+                </div>
+              </motion.div>
 
               {/* Scatter cards above the DPP, fade out as DPP emerges */}
               {CARDS.map((card) => (
@@ -355,30 +348,21 @@ function ScatterCardEl({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // SINGLE linear keyframe range — cards move at CONSTANT speed from
-  // off-screen to centre stack. No waypoint, no velocity dip, no mode
-  // switch. Each card travels its own straight line at its own constant
-  // velocity, but never changes speed mid-flight.
-
+  // Single linear arc from off-screen origin to centre stack. Constant
+  // speed throughout, no waypoint.
   const x = useTransform(progress, [0, 0.50], [card.fromX, 50 + card.stackDx]);
   const y = useTransform(progress, [0, 0.50], [card.fromY, 50 + card.stackDy]);
   const rotate = useTransform(progress, [0, 0.50], [card.fromRotate, 0]);
 
-  // Quick fade-in as cards enter the stage.
-  const entryOpacity = useTransform(progress, [0, 0.05], [0, 1], {
-    ease: [easeOut],
-  });
-  // Cards hand off to the DPP card. Fade overlaps with DPP emergence.
-  const exitOpacity = useTransform(progress, [0.40, 0.52], [1, 0], {
+  // No opacity entry fade — cards stay at full opacity through their flight.
+  // They start far off-screen and become visible naturally as they cross
+  // into the stage, like real objects entering frame. Section's overflow
+  // clip handles anything off-canvas.
+  const opacity = useTransform(progress, [0.40, 0.52], [1, 0], {
     ease: [easeInOut],
   });
-  const opacity = useTransform([entryOpacity, exitOpacity], (vals) => {
-    const a = vals as number[];
-    return Math.min(a[0], a[1]);
-  });
 
-  // Decorations strip first — pill + filename strip lose presence as cards
-  // near the centre, drawing the eye to the icon and the impending DPP row.
+  // Decorations strip as the card nears centre, drawing the eye in.
   const decorationOpacity = useTransform(progress, [0.30, 0.42], [1, 0], {
     ease: [easeInOut],
   });
