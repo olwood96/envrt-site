@@ -33,16 +33,18 @@ type ScatterCard = {
   tone: Tone;
   pill: Pill;
   // Off-screen entry origin. fromX in vw, fromY in vh — viewport units so
-  // cards genuinely fly in from beyond the viewport edges in all directions,
-  // with no clipping box.
+  // cards genuinely fly in from beyond the viewport edges in all directions.
   fromX: number;
   fromY: number;
   fromRotate: number;
-  // Per-card offset around centre stack (px)
-  stackDx: number;
-  stackDy: number;
+  // Where the card lands inside the DPP card — its row's vertical position
+  // (vh) relative to the right-pane centre anchor. Cards distribute up and
+  // down the DPP rather than all converging at one point.
+  finalY: number;
+  // Scroll progress at which this card hits its row. Staggered so each card
+  // arrives at a different time and morphs into its row in turn.
+  arrivalTime: number;
   z: number;
-  // Matching DPP row info
   rowLabel: string;
   rowValue: string;
 };
@@ -59,7 +61,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
     fromX: -110, fromY: -90, fromRotate: -22, // top-left
-    stackDx: -8, stackDy: -10, z: 7,
+    finalY: -14, arrivalTime: 0.15, z: 1,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
   },
@@ -70,7 +72,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
     fromX: -10, fromY: -110, fromRotate: 18, // top
-    stackDx: 4, stackDy: -6, z: 6,
+    finalY: -10, arrivalTime: 0.20, z: 2,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
   },
@@ -81,7 +83,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: 85, fromY: -85, fromRotate: 24, // top-right
-    stackDx: 8, stackDy: 0, z: 5,
+    finalY: -6, arrivalTime: 0.25, z: 3,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
   },
@@ -92,7 +94,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
     fromX: -120, fromY: 10, fromRotate: -18, // left
-    stackDx: -10, stackDy: 4, z: 4,
+    finalY: -2, arrivalTime: 0.30, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
   },
@@ -103,7 +105,7 @@ const CARDS: ScatterCard[] = [
     tone: "neutral",
     pill: null,
     fromX: 95, fromY: 5, fromRotate: 14, // right
-    stackDx: 0, stackDy: 0, z: 3,
+    finalY: 2, arrivalTime: 0.35, z: 5,
     rowLabel: "Tier 1 supply",
     rowValue: "Turkey · Aydın",
   },
@@ -114,7 +116,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: null,
     fromX: 80, fromY: 85, fromRotate: 26, // bottom-right
-    stackDx: 6, stackDy: 6, z: 8,
+    finalY: 6, arrivalTime: 0.40, z: 6,
     rowLabel: "Tier 3 supply",
     rowValue: "Portugal · Viana do Castelo",
   },
@@ -125,7 +127,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
     fromX: -100, fromY: 75, fromRotate: -24, // bottom-left
-    stackDx: -4, stackDy: 8, z: 2,
+    finalY: 10, arrivalTime: 0.45, z: 7,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
   },
@@ -136,7 +138,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: -5, fromY: 100, fromRotate: 16, // bottom
-    stackDx: 2, stackDy: 10, z: 1,
+    finalY: 14, arrivalTime: 0.50, z: 8,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
   },
@@ -209,17 +211,18 @@ function DesktopScatter() {
   //   "Today" while cards are flying in (0 → 0.30)
   //   "The shift" while cards are converging + DPP starts (0.30 → 0.55)
   //   "The output" while DPP fills (0.55 → end)
-  // Three-step narrative on the left, in lockstep with the visual.
-  //   "Today" while cards fly in (0 → 0.30)
-  //   "The shift" while cards converge + start lifting (0.30 → 0.58)
-  //   "The output" while DPP rises + rows populate (0.56 → end)
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.24, 0.30], [1, 1, 0]);
+  // Three-step narrative on the left, in lockstep with the staggered card
+  // arrivals on the right.
+  //   "Today" while the first cards fly in (0 → 0.20)
+  //   "The shift" while cards land + morph into rows one by one (0.20 → 0.55)
+  //   "The output" once the full DPP is revealed (0.58 → end)
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.14, 0.20], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.28, 0.36, 0.52, 0.58],
+    [0.18, 0.26, 0.50, 0.56],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.56, 0.66], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.54, 0.62], [0, 1]);
 
   // DPP card is rendered STATIC behind the scatter cards (z-0). It's
   // permanently in the DOM at opacity 1 from the moment the page loads;
@@ -228,12 +231,14 @@ function DesktopScatter() {
   // which reveals the DPP underneath. No motion-driven entry to debug,
   // no possibility the DPP is hidden behind a broken transform: it's
   // just there.
+  // Flourish pulses across the arrival window: cards land 0.15 → 0.50,
+  // and the bloom peaks near the middle to subtly highlight the morph.
   const flourishOpacity = useTransform(
     scrollYProgress,
-    [0.45, 0.58, 0.78],
-    [0, 0.55, 0],
+    [0.15, 0.35, 0.60],
+    [0, 0.5, 0],
   );
-  const flourishScale = useTransform(scrollYProgress, [0.45, 0.78], [0.6, 1.6]);
+  const flourishScale = useTransform(scrollYProgress, [0.15, 0.60], [0.6, 1.6]);
 
   return (
     <div
@@ -351,69 +356,51 @@ function ScatterCardEl({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // Entry: card flies from its off-screen origin (fromX vw, fromY vh,
-  // truly beyond viewport edges) to a small offset around the right pane
-  // centre over scroll 0 → 0.50. Linear, constant speed.
-  const entryX = useTransform(
-    progress,
-    [0, 0.50],
-    [card.fromX, card.stackDx * 0.01],
-  );
-  const entryY = useTransform(
-    progress,
-    [0, 0.50],
-    [card.fromY, card.stackDy * 0.01],
-  );
+  // Per-card staggered timeline:
+  //   0           → arrivalTime    Card flies from off-screen origin
+  //                                 (fromX vw, fromY vh) to its row's Y
+  //                                 position inside the DPP card.
+  //   arrivalTime → arrivalTime+0.04  Morph: card scales vertically into
+  //                                    a thin row-shaped strip at its row.
+  //   arrivalTime+0.04 → arrivalTime+0.10  Fade out, leaving the static
+  //                                         DPP row underneath visible.
+  const at = card.arrivalTime;
 
-  // Exit: card lifts upward off-screen between 0.55 → 0.66, with a small
-  // horizontal drift for richness. y goes from 0 to -80vh (well above
-  // viewport).
-  const exitX = useTransform(progress, [0.55, 0.66], [0, card.stackDx * 0.02]);
-  const exitY = useTransform(progress, [0.55, 0.66], [0, -80]);
+  // Translation: off-screen → row position
+  const x = useTransform(progress, [0, at], [card.fromX, 0]);
+  const y = useTransform(progress, [0, at], [card.fromY, card.finalY]);
+  const rotate = useTransform(progress, [0, at], [card.fromRotate, 0]);
 
-  // Combine entry + exit. One phase is non-zero at any given progress.
-  const x = useTransform(
-    [entryX, exitX],
-    (vals) => (vals as number[])[0] + (vals as number[])[1],
-  );
-  const y = useTransform(
-    [entryY, exitY],
-    (vals) => (vals as number[])[0] + (vals as number[])[1],
-  );
-
-  // Rotate from entry tilt → 0 at centre → slight tilt on exit
-  const rotate = useTransform(
-    progress,
-    [0, 0.50, 0.55, 0.66],
-    [card.fromRotate, 0, 0, card.fromRotate * 0.4],
-  );
-
-  // Section-pin gate: cards have opacity 0 until scroll progress goes
-  // positive (which only happens when sticky activates and the section is
-  // genuinely pinned in viewport). Before pin, progress clamps to 0 →
-  // cards are invisible → no bleed into the section above.
-  const pinGate = useTransform(progress, [0, 0.02], [0, 1]);
-
-  // Exit fade: cards lift away over 0.55 → 0.66
-  const exitFade = useTransform(progress, [0.55, 0.66], [1, 0], {
+  // Morph: shrink Y, widen X to row-strip proportions
+  const scaleY = useTransform(progress, [at, at + 0.04], [1, 0.12], {
+    ease: [easeOut],
+  });
+  const scaleX = useTransform(progress, [at, at + 0.04], [1, 1.9], {
     ease: [easeOut],
   });
 
-  // Final opacity = pin gate × exit fade. Invisible before sticky pins,
-  // visible during entry + centre, fades out on exit.
+  // Section-pin gate: invisible before sticky activates
+  const pinGate = useTransform(progress, [0, 0.02], [0, 1]);
+
+  // Per-card exit: fade out after morph completes
+  const exitFade = useTransform(progress, [at + 0.04, at + 0.10], [1, 0], {
+    ease: [easeOut],
+  });
+
   const opacity = useTransform(
     [pinGate, exitFade],
     (vals) => (vals as number[])[0] * (vals as number[])[1],
   );
 
-  const decorationOpacity = useTransform(progress, [0.32, 0.48], [1, 0], {
-    ease: [easeInOut],
-  });
+  // Decorations drop just before the card lands
+  const decorationOpacity = useTransform(
+    progress,
+    [at - 0.06, at - 0.01],
+    [1, 0],
+    { ease: [easeInOut] },
+  );
 
-  // Anchored at left:50% / top:50% of the right pane. Outer translate moves
-  // the card by (x vw, y vh); inner translate(-50%, -50%) centres the card
-  // box on that point.
-  const transform = useMotionTemplate`translate(${x}vw, ${y}vh) translate(-50%, -50%) rotate(${rotate}deg)`;
+  const transform = useMotionTemplate`translate(${x}vw, ${y}vh) translate(-50%, -50%) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`;
 
   return (
     <motion.div
