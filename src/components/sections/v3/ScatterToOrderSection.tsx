@@ -10,12 +10,12 @@ import {
 import type { MotionValue } from "framer-motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
 
-// Scatter-to-order pain-state section. The right pane opens with eight messy
-// supplier inputs (PDF spec sheets, expired invoices, supplier emails, chat
-// exports, MISSING pills). As the user scrolls, every card converges to the
-// centre, rotates upright and fades into a single clean garment.dpp card —
-// the argument for ENVRT in a single scene. Left pane copy steps through
-// three beats in time with the visual.
+// Scatter-to-order pain-state section. Desktop runs a scroll-pinned story:
+// cards fly in from off-screen, settle into a scatter, converge to centre,
+// shed their pills + filenames, fade out, and one clean garment.dpp card
+// emerges. Mobile gets a static side-by-side instead, no sticky.
+
+// ─── Card data ─────────────────────────────────────────────────────────────
 
 type Tone = "crimson" | "vibrant" | "ultramarine" | "neutral";
 type Pill = { label: string; tone: "crimson" | "golden" | "ultramarine" } | null;
@@ -26,11 +26,19 @@ type ScatterCard = {
   typeLabel: string;
   tone: Tone;
   pill: Pill;
-  /* Scatter resting position, percent of stage box width/height. */
+  // Scatter resting position (% of stage box)
   x: number;
   y: number;
   rotate: number;
-  /* Z-stacking order so overlapping cards layer plausibly. */
+  // Off-screen origin for entry phase
+  fromX: number;
+  fromY: number;
+  fromRotate: number;
+  // Final tight-stack offset around centre (% of stage box)
+  dx: number;
+  dy: number;
+  finalRotate: number;
+  // Z-stacking
   z: number;
 };
 
@@ -41,9 +49,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "PDF",
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
-    x: 8,
-    y: 4,
-    rotate: -6,
+    x: 8, y: 4, rotate: -6,
+    fromX: -40, fromY: -40, fromRotate: -25,
+    dx: -3, dy: -3, finalRotate: -3,
     z: 5,
   },
   {
@@ -52,9 +60,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
-    x: 55,
-    y: 0,
-    rotate: 5,
+    x: 60, y: 0, rotate: 5,
+    fromX: 60, fromY: -50, fromRotate: 20,
+    dx: 2, dy: -2, finalRotate: 2,
     z: 4,
   },
   {
@@ -63,9 +71,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "EML",
     tone: "ultramarine",
     pill: null,
-    x: 70,
-    y: 26,
-    rotate: 8,
+    x: 80, y: 26, rotate: 8,
+    fromX: 130, fromY: 26, fromRotate: 25,
+    dx: 3, dy: 1, finalRotate: 4,
     z: 3,
   },
   {
@@ -74,9 +82,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Folder",
     tone: "neutral",
     pill: null,
-    x: 0,
-    y: 38,
-    rotate: -4,
+    x: 0, y: 38, rotate: -4,
+    fromX: -50, fromY: 38, fromRotate: -20,
+    dx: -3, dy: 0, finalRotate: -2,
     z: 6,
   },
   {
@@ -85,9 +93,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "vibrant",
     pill: { label: "Overdue", tone: "crimson" },
-    x: 38,
-    y: 42,
-    rotate: 2,
+    x: 38, y: 42, rotate: 2,
+    fromX: -30, fromY: 130, fromRotate: 15,
+    dx: 0, dy: 2, finalRotate: 1,
     z: 7,
   },
   {
@@ -96,9 +104,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Chat",
     tone: "ultramarine",
     pill: null,
-    x: 60,
-    y: 65,
-    rotate: 4,
+    x: 70, y: 65, rotate: 4,
+    fromX: 130, fromY: 65, fromRotate: 30,
+    dx: 3, dy: 0, finalRotate: 3,
     z: 2,
   },
   {
@@ -107,9 +115,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "vibrant",
     pill: { label: "Draft", tone: "golden" },
-    x: 5,
-    y: 70,
-    rotate: -7,
+    x: 5, y: 70, rotate: -7,
+    fromX: -40, fromY: 130, fromRotate: -25,
+    dx: -2, dy: 2, finalRotate: -4,
     z: 8,
   },
   {
@@ -118,9 +126,9 @@ const CARDS: ScatterCard[] = [
     typeLabel: "CSV",
     tone: "neutral",
     pill: null,
-    x: 32,
-    y: 80,
-    rotate: 3,
+    x: 32, y: 84, rotate: 3,
+    fromX: 32, fromY: 130, fromRotate: 30,
+    dx: 0, dy: -1, finalRotate: 2,
     z: 1,
   },
 ];
@@ -152,102 +160,135 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
+// ─── Section ──────────────────────────────────────────────────────────────
+
 export function ScatterToOrderSection() {
-  const sectionRef = useRef<HTMLElement>(null);
+  return (
+    <section
+      className="relative bg-envrt-brand-vista text-envrt-brand-black"
+      style={{ overflowX: "clip" }}
+    >
+      {/* Construction marks */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
+      >
+        ENVRT/SCATTER
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-4 top-6 z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
+      >
+        Before → After
+      </span>
+
+      <DesktopScatter />
+      <MobileScatter />
+    </section>
+  );
+}
+
+// ─── Desktop: scroll-pinned story ─────────────────────────────────────────
+
+function DesktopScatter() {
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Phase 1: cards drift slightly (0 → 0.3, still scattered)
-  // Phase 2: cards converge to centre, rotate to 0 (0.3 → 0.65)
-  // Phase 3: scattered cards fade, dpp card emerges (0.65 → 0.95)
+  // Phase markers used across cards + copy:
+  //   0      → 0.08  entry from off-screen
+  //   0.08   → 0.30  idle scatter
+  //   0.30   → 0.50  converge to centre
+  //   0.40   → 0.55  decorations (pills + filenames) fade
+  //   0.50   → 0.62  cards fade out
+  //   0.55   → 0.72  dpp card emerges with flourish
 
-  const dppOpacity = useTransform(scrollYProgress, [0.6, 0.78], [0, 1]);
-  const dppScale = useTransform(scrollYProgress, [0.6, 0.85], [0.85, 1]);
-  const cardsFade = useTransform(scrollYProgress, [0.55, 0.82], [1, 0]);
-
-  // Step copy on the left — fades between three states
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.25, 0.32], [1, 1, 0]);
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.18, 0.26], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.3, 0.4, 0.55, 0.62],
+    [0.24, 0.32, 0.48, 0.55],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.6, 0.72], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.55, 0.67], [0, 1]);
+
+  const dppOpacity = useTransform(scrollYProgress, [0.55, 0.70], [0, 1]);
+  const dppScale = useTransform(
+    scrollYProgress,
+    [0.55, 0.68, 0.80],
+    [0.72, 1.04, 1],
+  );
+  const flourishOpacity = useTransform(
+    scrollYProgress,
+    [0.55, 0.65, 0.82],
+    [0, 0.55, 0],
+  );
+  const flourishScale = useTransform(scrollYProgress, [0.55, 0.85], [0.7, 1.6]);
 
   return (
-    <section
+    <div
       ref={sectionRef}
-      className="relative bg-envrt-brand-vista text-envrt-brand-black"
-      style={{ height: "260vh", overflowX: "clip" }}
+      className="relative hidden lg:block"
+      style={{ height: "260vh" }}
     >
-      {/* Construction marks */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6"
-      >
-        ENVRT/SCATTER
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-6 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:right-6"
-      >
-        Before → After
-      </span>
-
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:gap-16 lg:px-16">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
           {/* Left: stepped narrative */}
-          <div className="relative min-h-[300px]">
-            <div className="relative">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-                The before / after
-              </p>
+          <div className="relative min-h-[320px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+              The before / after
+            </p>
 
-              <div className="relative mt-5 min-h-[260px] sm:mt-6">
-                <Step
-                  opacity={step1Opacity}
-                  eyebrow="Today"
-                  heading="Compliance lives in your inbox."
-                  body="PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight inboxes serving one regulator, and a deadline that doesn't care which folder it's in."
-                />
-                <Step
-                  opacity={step2Opacity}
-                  eyebrow="The shift"
-                  heading="One source of truth, per garment."
-                  body="Every input normalised against the same database. Materials, suppliers, certificates, claims, all dated, all versioned, all linked back to source."
-                />
-                <Step
-                  opacity={step3Opacity}
-                  eyebrow="The output"
-                  heading="garment.dpp"
-                  body="Hosted at a permanent URL. Scannable by a customer, exportable to a regulator. The work you already did, finally in one place."
-                />
-              </div>
+            <div className="relative mt-6 min-h-[280px]">
+              <Step
+                opacity={step1Opacity}
+                eyebrow="Today"
+                heading="Compliance lives in your inbox."
+                body="PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight inboxes serving one regulator, and a deadline that doesn't care which folder it's in."
+              />
+              <Step
+                opacity={step2Opacity}
+                eyebrow="The shift"
+                heading="One source of truth, per garment."
+                body="Every input normalised against the same database. Materials, suppliers, certificates, claims, all dated, all versioned, all linked back to source."
+              />
+              <Step
+                opacity={step3Opacity}
+                eyebrow="The output"
+                heading="garment.dpp"
+                body="Hosted at a permanent URL. Scannable by a customer, exportable to a regulator. The work you already did, finally in one place."
+              />
             </div>
           </div>
 
           {/* Right: animated stage */}
           <div className="relative">
             <div className="relative mx-auto aspect-[5/4] w-full max-w-[560px]">
-              {/* Stage canvas */}
-              <motion.div style={{ opacity: cardsFade }} className="absolute inset-0">
-                {CARDS.map((card, i) => (
-                  <ScatterCardEl
-                    key={card.filename}
-                    card={card}
-                    index={i}
-                    progress={scrollYProgress}
-                  />
-                ))}
-              </motion.div>
+              {CARDS.map((card, i) => (
+                <ScatterCardEl
+                  key={card.filename}
+                  card={card}
+                  index={i}
+                  progress={scrollYProgress}
+                />
+              ))}
 
-              {/* Clean dpp card emerges at centre */}
+              {/* Flourish ring expanding from centre as DPP emerges */}
+              <motion.div
+                aria-hidden
+                style={{
+                  opacity: flourishOpacity,
+                  scale: flourishScale,
+                }}
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/15 blur-2xl"
+              />
+
+              {/* Clean DPP card */}
               <motion.div
                 style={{ opacity: dppOpacity, scale: dppScale }}
-                className="absolute left-1/2 top-1/2 w-[68%] -translate-x-1/2 -translate-y-1/2"
+                className="absolute left-1/2 top-1/2 w-[72%] -translate-x-1/2 -translate-y-1/2"
               >
                 <DppCard />
               </motion.div>
@@ -255,11 +296,11 @@ export function ScatterToOrderSection() {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-// ─── Step ──────────────────────────────────────────────────────────────────
+// ─── Scroll-driven step copy ──────────────────────────────────────────────
 
 function Step({
   opacity,
@@ -287,66 +328,77 @@ function Step({
   );
 }
 
-// ─── Scatter card ──────────────────────────────────────────────────────────
+// ─── Single scatter card ──────────────────────────────────────────────────
 
 function ScatterCardEl({
   card,
-  index,
   progress,
 }: {
   card: ScatterCard;
   index: number;
   progress: MotionValue<number>;
 }) {
-  // Animate CSS left/top directly (in %) so the card's anchor moves from
-  // (card.x, card.y) → (50, 50) across the stage. CSS translate(%) on a
-  // transform is relative to the element itself, so we can't use x/y here.
-  // Small per-card stagger so arrivals fan in rather than land in sync.
-  const stagger = index * 0.012;
-  const start = 0.3 + stagger;
-  const end = 0.6 + stagger;
-
-  const leftPct = useTransform(progress, [0, start, end], [card.x, card.x, 50]);
-  const topPct = useTransform(progress, [0, start, end], [card.y, card.y, 50]);
+  // Position track: off-screen → scatter → hold → centre stack
+  const leftPct = useTransform(
+    progress,
+    [0, 0.08, 0.30, 0.50],
+    [card.fromX, card.x, card.x, 50 + card.dx],
+  );
+  const topPct = useTransform(
+    progress,
+    [0, 0.08, 0.30, 0.50],
+    [card.fromY, card.y, card.y, 50 + card.dy],
+  );
   const rotate = useTransform(
     progress,
-    [0, start, end],
-    [card.rotate, card.rotate, 0],
+    [0, 0.08, 0.30, 0.50],
+    [card.fromRotate, card.rotate, card.rotate, card.finalRotate],
   );
+
+  // Decorations (pill + footer) fade ahead of the card itself
+  const decorationOpacity = useTransform(progress, [0.40, 0.55], [1, 0]);
+  // Card fades to zero
+  const cardOpacity = useTransform(progress, [0.50, 0.62], [1, 0]);
 
   const left = useMotionTemplate`${leftPct}%`;
   const top = useMotionTemplate`${topPct}%`;
 
   return (
     <motion.div
-      style={{ left, top, zIndex: card.z, rotate }}
+      style={{ left, top, zIndex: card.z, rotate, opacity: cardOpacity }}
       className="absolute"
     >
-      {/* Inner div carries the -50% / -50% centring transform so the card's
-          visual centre lands on the left/top anchor point. Kept separate from
-          the parent's left/top + rotate so they don't fight. */}
+      {/* Inner div carries the -50% centring transform so the card's visual
+          centre lands on the left/top anchor point. */}
       <div className="-translate-x-1/2 -translate-y-1/2">
-        <CardChrome card={card} />
+        <CardChrome card={card} decorationOpacity={decorationOpacity} />
       </div>
     </motion.div>
   );
 }
 
-function CardChrome({ card }: { card: ScatterCard }) {
+// ─── Card chrome (decoration motion values applied) ───────────────────────
+
+function CardChrome({
+  card,
+  decorationOpacity,
+}: {
+  card: ScatterCard;
+  decorationOpacity?: MotionValue<number>;
+}) {
   return (
     <div
       className={`relative w-[150px] overflow-hidden rounded-2xl shadow-[0_18px_40px_-22px_rgba(14,14,14,0.35)] ring-1 ring-envrt-brand-black/8 sm:w-[170px] ${TONE_BG[card.tone]}`}
     >
-      {/* Pill (status) */}
       {card.pill && (
-        <span
+        <motion.span
+          style={decorationOpacity ? { opacity: decorationOpacity } : undefined}
           className={`absolute right-2.5 top-2.5 rounded-full px-2 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.16em] ${PILL_STYLE[card.pill.tone]}`}
         >
           {card.pill.label}
-        </span>
+        </motion.span>
       )}
 
-      {/* Icon panel */}
       <div className="flex h-[88px] items-center justify-center sm:h-[100px]">
         <AssetIcon
           type={card.icon}
@@ -355,8 +407,8 @@ function CardChrome({ card }: { card: ScatterCard }) {
         />
       </div>
 
-      {/* Footer with type + filename */}
-      <div
+      <motion.div
+        style={decorationOpacity ? { opacity: decorationOpacity } : undefined}
         className={`flex items-center gap-2 px-3 py-2 ${TONE_FOOT[card.tone]}`}
       >
         <span className="rounded px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em]">
@@ -365,7 +417,7 @@ function CardChrome({ card }: { card: ScatterCard }) {
         <span className="truncate font-mono text-[10px] text-envrt-brand-black/70">
           {card.filename}
         </span>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -374,7 +426,7 @@ function CardChrome({ card }: { card: ScatterCard }) {
 
 function DppCard() {
   return (
-    <div className="relative rounded-3xl border border-envrt-brand-black/10 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.35)] sm:p-6">
+    <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] sm:p-6">
       {/* Status row */}
       <div className="flex items-center justify-between gap-3">
         <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant sm:text-[11px]">
@@ -385,14 +437,13 @@ function DppCard() {
             <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-70" />
             <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
           </span>
-          Live
+          Live · verified
         </span>
         <span className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-brand-black/45">
           ENVRT/DPP
         </span>
       </div>
 
-      {/* Filename */}
       <p className="mt-4 font-mono text-xs font-medium text-envrt-brand-black/55 sm:text-sm">
         garment.dpp
       </p>
@@ -400,7 +451,6 @@ function DppCard() {
         Hoodie 0509-1882
       </p>
 
-      {/* Data rows */}
       <div className="mt-5 grid grid-cols-2 gap-3 border-t border-envrt-brand-black/10 pt-4">
         <DataRow label="CO₂e" value="6.8 kg" />
         <DataRow label="Water" value="2,134 L" />
@@ -408,7 +458,6 @@ function DppCard() {
         <DataRow label="Standards" value="PEF · ISO" />
       </div>
 
-      {/* QR + permalink */}
       <div className="mt-5 flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-3">
         <div className="flex items-center gap-2.5">
           <AssetIcon type="qr" size={28} className="text-envrt-brand-black" />
@@ -438,6 +487,71 @@ function DataRow({ label, value }: { label: string; value: string }) {
       <p className="mt-0.5 font-display text-base font-medium tracking-tight text-envrt-brand-black sm:text-lg">
         {value}
       </p>
+    </div>
+  );
+}
+
+// ─── Mobile: static before/after presentation ─────────────────────────────
+
+function MobileScatter() {
+  // Four cards visible as a tilted cluster on mobile, no scroll choreography.
+  const mobileCards = [CARDS[0], CARDS[2], CARDS[4], CARDS[6]];
+
+  return (
+    <div className="lg:hidden">
+      <div className="mx-auto max-w-[640px] px-5 py-20 sm:px-8 sm:py-24">
+        {/* Before block */}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+          Today
+        </p>
+        <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
+          Compliance lives in your inbox.
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
+          PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight
+          inboxes serving one regulator, and a deadline that doesn&apos;t care
+          which folder it&apos;s in.
+        </p>
+
+        {/* Tilted card cluster (static, no animation). Light rotation per
+            card via transform: rotate() — broad browser support. */}
+        <div className="relative mx-auto mt-10 grid w-full max-w-[420px] grid-cols-2 gap-x-3 gap-y-4">
+          {mobileCards.map((card, i) => (
+            <div
+              key={card.filename}
+              style={{ transform: `rotate(${[-4, 3, -2, 4][i]}deg)` }}
+              className="flex justify-self-center"
+            >
+              <CardChrome card={card} />
+            </div>
+          ))}
+        </div>
+
+        {/* Divider arrow */}
+        <div className="my-12 flex items-center gap-3 sm:my-14">
+          <span aria-hidden className="h-px flex-1 bg-envrt-brand-black/15" />
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+            ENVRT ↓
+          </span>
+          <span aria-hidden className="h-px flex-1 bg-envrt-brand-black/15" />
+        </div>
+
+        {/* After block */}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
+          The output
+        </p>
+        <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
+          garment.dpp
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
+          Hosted at a permanent URL. Scannable by a customer, exportable to a
+          regulator. The work you already did, finally in one place.
+        </p>
+
+        <div className="mt-8">
+          <DppCard />
+        </div>
+      </div>
     </div>
   );
 }
