@@ -186,7 +186,7 @@ export function ScatterToOrderSection() {
   return (
     <section
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
-      style={{ overflow: "hidden" }}
+      style={{ overflowX: "clip" }}
     >
       <SectionCorners left="ENVRT/SCATTER" right="Before → After" />
 
@@ -222,16 +222,12 @@ function DesktopScatter() {
   );
   const step3Opacity = useTransform(scrollYProgress, [0.56, 0.66], [0, 1]);
 
-  // DPP slides up from below into the centred position over 0.50 → 0.68.
-  // Using "%" units so framer animates translateY(80% → 0) of the motion
-  // div's own height (520px right pane) — reliably tweened, no string-unit
-  // edge cases.
-  const dppY = useTransform(
-    scrollYProgress,
-    [0.50, 0.68],
-    ["80%", "0%"],
-    { ease: [easeOut] },
-  );
+  // DPP slides up from 500px below the centred position to 0 between
+  // 0.50 → 0.68. Numeric px values so framer interpolates the y prop as
+  // pure translateY pixels — no string-unit ambiguity.
+  const dppY = useTransform(scrollYProgress, [0.50, 0.68], [500, 0], {
+    ease: [easeOut],
+  });
   const dppOpacity = useTransform(scrollYProgress, [0.50, 0.66], [0, 1], {
     ease: [easeOut],
   });
@@ -394,10 +390,23 @@ function ScatterCardEl({
     [card.fromRotate, 0, 0, card.fromRotate * 0.4],
   );
 
-  // Cards stay opaque through entry and centre. Fade over the exit window.
-  const opacity = useTransform(progress, [0.55, 0.66], [1, 0], {
+  // Section-pin gate: cards have opacity 0 until scroll progress goes
+  // positive (which only happens when sticky activates and the section is
+  // genuinely pinned in viewport). Before pin, progress clamps to 0 →
+  // cards are invisible → no bleed into the section above.
+  const pinGate = useTransform(progress, [0, 0.02], [0, 1]);
+
+  // Exit fade: cards lift away over 0.55 → 0.66
+  const exitFade = useTransform(progress, [0.55, 0.66], [1, 0], {
     ease: [easeOut],
   });
+
+  // Final opacity = pin gate × exit fade. Invisible before sticky pins,
+  // visible during entry + centre, fades out on exit.
+  const opacity = useTransform(
+    [pinGate, exitFade],
+    (vals) => (vals as number[])[0] * (vals as number[])[1],
+  );
 
   const decorationOpacity = useTransform(progress, [0.32, 0.48], [1, 0], {
     ease: [easeInOut],
