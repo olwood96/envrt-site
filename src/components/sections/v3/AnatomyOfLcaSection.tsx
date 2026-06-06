@@ -1,42 +1,48 @@
 "use client";
 
-import { Fragment, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AnimatePresence,
   easeInOut,
   easeOut,
   motion,
-  useMotionTemplate,
+  useMotionValueEvent,
   useScroll,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 
-// "We built the engine" — anatomy of the in-house LCA. The CO₂e equation for
-// Hoodie 0509-1882 builds up term by term as the user scrolls. Six stage
-// cards travel through view in lockstep, exposing the inputs and the
-// factor source behind each segment.
+// "We built the engine" — anatomy of the in-house LCA. Refined horizontal
+// pipeline: thin rail, six nodes, a progress fill that grows along the line
+// as the user scrolls. Below it a single stage detail panel that swaps as
+// each stage activates, with the equation typing itself out character by
+// character. Mobile keeps the horizontal scroll dynamic the user asked for.
 
-// ─── Real Hoodie 0509-1882 stage breakdown ────────────────────────────────
+// ─── Real Hoodie 0509-1882 breakdown ──────────────────────────────────────
 
 type Stage = {
   index: string;
   name: string;
   process: string;
   inputs: string;
-  co2e: number; // kg CO₂e per stage (real envrt_lab values)
+  co2e: number; // kg CO₂e per stage
   equation: string;
-  activation: number; // scroll progress at which this stage activates
+  // Anchor x-position on the SVG pipeline, 0–100
+  cx: number;
+  // Scroll progress where the stage becomes active
+  activation: number;
 };
 
 const STAGES: Stage[] = [
   {
     index: "01",
     name: "Fibre",
-    process: "Spinning-grade fibre, raw material extraction",
+    process: "Raw fibre extraction",
     inputs: "80% Organic cotton · 18% Recycled polyester · 2% Elastane",
     co2e: 0.48,
     equation: "mass × EF_fibre",
+    cx: 8,
     activation: 0.12,
   },
   {
@@ -46,7 +52,8 @@ const STAGES: Stage[] = [
     inputs: "Spinning energy · waste rate · Turkey grid mix",
     co2e: 1.77,
     equation: "mass × EF_spin × grid",
-    activation: 0.24,
+    cx: 26,
+    activation: 0.26,
   },
   {
     index: "03",
@@ -55,7 +62,8 @@ const STAGES: Stage[] = [
     inputs: "Knit structure · loss factor · finishing chemistry",
     co2e: 0.62,
     equation: "mass × EF_fabric × loss",
-    activation: 0.36,
+    cx: 44,
+    activation: 0.40,
   },
   {
     index: "04",
@@ -64,7 +72,8 @@ const STAGES: Stage[] = [
     inputs: "Dye process · water grid · AWARE Turkey factor",
     co2e: 4.18,
     equation: "mass × EF_dye + H₂O × AWARE",
-    activation: 0.48,
+    cx: 62,
+    activation: 0.54,
   },
   {
     index: "05",
@@ -73,7 +82,8 @@ const STAGES: Stage[] = [
     inputs: "Sew energy · trims · Portugal grid mix",
     co2e: 0.33,
     equation: "mass × EF_assy × grid",
-    activation: 0.60,
+    cx: 80,
+    activation: 0.68,
   },
   {
     index: "06",
@@ -82,12 +92,12 @@ const STAGES: Stage[] = [
     inputs: "Turkey → Portugal · 29,500 km · road + sea",
     co2e: 0.07,
     equation: "Σ(d × mode_EF)",
-    activation: 0.72,
+    cx: 95,
+    activation: 0.82,
   },
 ];
 
 const STAGE_TOTAL = STAGES.reduce((sum, s) => sum + s.co2e, 0);
-const FINAL_ACTIVATION = 0.82;
 
 const STATS = [
   { value: "EU PEF", label: "Product Environmental Footprint", since: "Methodology" },
@@ -122,7 +132,7 @@ export function AnatomyOfLcaSection() {
   );
 }
 
-// ─── Shared bits ──────────────────────────────────────────────────────────
+// ─── Shared ───────────────────────────────────────────────────────────────
 
 function Header() {
   return (
@@ -137,8 +147,7 @@ function Header() {
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-5 sm:text-base">
           Built against EU PEF and ISO 14040, with AWARE water scarcity baked
-          in. Below is the live calculation for Hoodie 0509-1882. Watch it
-          build, stage by stage.
+          in. Below is the live calculation for Hoodie 0509-1882.
         </p>
       </FadeUp>
     </div>
@@ -178,206 +187,278 @@ function ClosingTag() {
   );
 }
 
-// ─── Equation builder ─────────────────────────────────────────────────────
+// ─── Typewriter ───────────────────────────────────────────────────────────
+//
+// Renders the supplied text up to floor(active × text.length) characters,
+// with a soft blinking caret. `active` is a 0 → 1 motion value driven by
+// scroll position around a stage's activation window. State is updated via
+// useMotionValueEvent so the component re-renders only when the displayed
+// character count changes.
 
-function EquationBuilder({
-  progress,
-  variant,
+function Typewriter({
+  text,
+  active,
 }: {
-  progress: MotionValue<number>;
-  variant: "desktop" | "mobile";
+  text: string;
+  active: MotionValue<number>;
 }) {
-  const finalOpacity = useTransform(
-    progress,
-    [FINAL_ACTIVATION - 0.05, FINAL_ACTIVATION],
-    [0, 1],
-    { ease: [easeOut] },
-  );
+  const [shown, setShown] = useState("");
+
+  useMotionValueEvent(active, "change", (latest) => {
+    const n = Math.max(0, Math.min(text.length, Math.floor(latest * text.length)));
+    setShown(text.slice(0, n));
+  });
 
   return (
-    <div
-      className={`rounded-2xl border border-envrt-brand-black/12 bg-white/70 backdrop-blur ${
-        variant === "desktop" ? "p-6 lg:p-7" : "p-4 sm:p-5"
-      }`}
-    >
-      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
-        Live calculation
-      </p>
-      <p className="mt-1 font-mono text-[10px] text-envrt-brand-black/55">
-        Hoodie 0509-1882
-      </p>
+    <span>
+      {shown}
+      <span className="ml-[1px] inline-block w-[1ch] animate-pulse text-envrt-brand-ultramarine/70">
+        ▍
+      </span>
+    </span>
+  );
+}
 
-      <div
-        className={`mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-2 font-mono leading-relaxed ${
-          variant === "desktop" ? "text-base lg:text-lg" : "text-[13px] sm:text-sm"
-        }`}
+// ─── Pipeline (refined) ───────────────────────────────────────────────────
+//
+// Thin static rail + progressive ultramarine fill driven by scroll. Six
+// nodes that go from outlined → filled when reached, with a soft pulse on
+// the currently-active node. No travelling dot — the fill's leading edge
+// indicates position, which reads as tidier and less cartoonish.
+
+function Pipeline({
+  progress,
+  activeIndex,
+}: {
+  progress: MotionValue<number>;
+  activeIndex: number;
+}) {
+  // Progress fill: 0 at first stage's activation, 1 at last stage's
+  // activation. strokeDashoffset uses the inverse (1 → 0).
+  const fillPct = useTransform(
+    progress,
+    [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
+    [0, 1],
+    { ease: [easeInOut] },
+  );
+  const dashOffset = useTransform(fillPct, (v) => 1 - v);
+
+  const railStart = STAGES[0].cx;
+  const railEnd = STAGES[STAGES.length - 1].cx;
+  const railSpan = railEnd - railStart;
+
+  return (
+    <div className="relative">
+      <svg
+        viewBox="0 0 100 12"
+        preserveAspectRatio="none"
+        className="h-[60px] w-full sm:h-[72px]"
       >
-        <span className="text-envrt-brand-black">CO₂e</span>
-        <span className="text-envrt-brand-black/40">=</span>
+        {/* Static rail */}
+        <line
+          x1={railStart}
+          x2={railEnd}
+          y1="6"
+          y2="6"
+          stroke="rgb(14 14 14 / 0.14)"
+          strokeWidth="0.4"
+        />
 
-        {STAGES.map((stage, i) => (
-          <EquationTerm
-            key={stage.name}
-            stage={stage}
-            progress={progress}
-            isLast={i === STAGES.length - 1}
+        {/* Progress fill — stroke-dashoffset trick on a normalised path */}
+        <motion.line
+          x1={railStart}
+          x2={railEnd}
+          y1="6"
+          y2="6"
+          stroke="rgb(62 0 255)"
+          strokeWidth="0.55"
+          strokeLinecap="round"
+          pathLength={1}
+          style={{ strokeDasharray: 1, strokeDashoffset: dashOffset }}
+        />
+
+        {/* Nodes */}
+        {STAGES.map((s, i) => (
+          <PipelineNode
+            key={s.index}
+            stage={s}
+            index={i}
+            activeIndex={activeIndex}
+            fillPct={fillPct}
+            railStart={railStart}
+            railSpan={railSpan}
           />
         ))}
+      </svg>
 
-        <span className="text-envrt-brand-black/40">=</span>
-        <motion.span
-          style={{ opacity: finalOpacity }}
-          className="font-display text-2xl font-semibold tracking-[-0.01em] text-envrt-brand-black lg:text-3xl"
-        >
-          {STAGE_TOTAL.toFixed(2)} kg
-        </motion.span>
-      </div>
-
-      {/* Stage labels strip beneath, aligned to the terms above */}
-      <div
-        className={`mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono text-[9px] uppercase tracking-[0.16em] text-envrt-brand-black/40 ${
-          variant === "desktop" ? "lg:text-[10px]" : ""
-        }`}
-      >
-        <span className="opacity-0">CO₂e</span>
-        <span className="opacity-0">=</span>
-        {STAGES.map((stage, i) => (
-          <Fragment key={stage.name}>
-            <span>{stage.name}</span>
-            {i < STAGES.length - 1 && <span className="opacity-0">+</span>}
-          </Fragment>
-        ))}
+      {/* Stage labels under the rail */}
+      <div className="absolute inset-x-0 top-full -mt-2">
+        <div className="relative">
+          {STAGES.map((s, i) => (
+            <div
+              key={s.index}
+              className="absolute -translate-x-1/2 text-center"
+              style={{ left: `${s.cx}%` }}
+            >
+              <p
+                className={`font-mono text-[10px] font-semibold tracking-[0.18em] transition-colors duration-300 ${
+                  i <= activeIndex
+                    ? "text-envrt-brand-ultramarine"
+                    : "text-envrt-brand-black/35"
+                }`}
+              >
+                {s.index}
+              </p>
+              <p
+                className={`mt-0.5 font-display text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 sm:text-base ${
+                  i <= activeIndex
+                    ? "text-envrt-brand-black"
+                    : "text-envrt-brand-black/35"
+                }`}
+              >
+                {s.name}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-function EquationTerm({
+function PipelineNode({
   stage,
-  progress,
-  isLast,
+  index,
+  activeIndex,
+  fillPct,
+  railStart,
+  railSpan,
 }: {
   stage: Stage;
-  progress: MotionValue<number>;
-  isLast: boolean;
+  index: number;
+  activeIndex: number;
+  fillPct: MotionValue<number>;
+  railStart: number;
+  railSpan: number;
 }) {
-  const termOpacity = useTransform(
-    progress,
-    [stage.activation - 0.03, stage.activation],
-    [0, 1],
-    { ease: [easeOut] },
+  // Node "reached" when the fill leading edge has passed its cx position.
+  // We derive the reached state from fillPct directly so it stays in sync.
+  const reached = useTransform(fillPct, (v) => {
+    const localPos = (stage.cx - railStart) / railSpan;
+    return v >= localPos - 0.01 ? 1 : 0;
+  });
+
+  const fill = useTransform(reached, (v) =>
+    v >= 1 ? "rgb(62 0 255)" : "white",
   );
+  const isActive = index === activeIndex;
 
   return (
-    <Fragment>
-      <span className="relative">
-        <span className="text-envrt-brand-black/20">?</span>
-        <motion.span
-          style={{ opacity: termOpacity }}
-          className="absolute inset-0 font-semibold text-envrt-brand-ultramarine"
-        >
-          {stage.co2e.toFixed(2)}
-        </motion.span>
-      </span>
-      {!isLast && <span className="text-envrt-brand-black/40">+</span>}
-    </Fragment>
+    <g>
+      {/* Active node pulse */}
+      {isActive && (
+        <motion.circle
+          cx={stage.cx}
+          cy="6"
+          r="2.4"
+          fill="rgb(62 0 255 / 0.15)"
+          animate={{ r: [2.4, 3.2, 2.4] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      <motion.circle
+        cx={stage.cx}
+        cy="6"
+        r="1.4"
+        style={{ fill }}
+        stroke="rgb(62 0 255)"
+        strokeWidth="0.45"
+      />
+    </g>
   );
 }
 
-// ─── Stage card ───────────────────────────────────────────────────────────
+// ─── Stage detail panel ───────────────────────────────────────────────────
+//
+// Shows the currently active stage's process, inputs, equation (typewriter)
+// and contribution. Crossfades when the active stage changes via
+// AnimatePresence, so the typewriter restarts fresh for each new stage.
 
-function StageCard({
-  stage,
+function StageDetailPanel({
   progress,
-  variant,
+  stage,
 }: {
-  stage: Stage;
   progress: MotionValue<number>;
-  variant: "desktop" | "mobile";
+  stage: Stage;
 }) {
-  const activeAt = stage.activation;
-
-  // active: 0 → 1 → 1 across a small range. Drives colour, opacity, bar fill.
-  const active = useTransform(
+  // Type window — equation types out over the first 0.10 of progress after
+  // the stage activates.
+  const typeActive = useTransform(
     progress,
-    [activeAt - 0.05, activeAt, activeAt + 0.10],
-    [0, 1, 1],
-    { ease: [easeOut, easeInOut] },
-  );
-
-  const cardOpacity = useTransform(active, (v) => 0.4 + 0.6 * v);
-
-  const detailOpacity = useTransform(
-    progress,
-    [activeAt - 0.02, activeAt + 0.04],
+    [stage.activation, stage.activation + 0.10],
     [0, 1],
     { ease: [easeOut] },
   );
 
-  const fillPct = (stage.co2e / STAGE_TOTAL) * 100;
+  const fillPctOfTotal = (stage.co2e / STAGE_TOTAL) * 100;
 
   return (
     <motion.div
-      style={{ opacity: cardOpacity, willChange: "opacity" }}
-      className={`flex h-full flex-col rounded-2xl border border-envrt-brand-black/12 bg-white/70 backdrop-blur ${
-        variant === "desktop" ? "p-5" : "p-4"
-      }`}
+      key={stage.index}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="rounded-2xl border border-envrt-brand-black/12 bg-white/70 p-6 backdrop-blur lg:p-7"
     >
-      {/* Header */}
       <div className="flex items-center gap-3">
         <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
-          {stage.index}
+          Stage {stage.index}
         </span>
         <span className="h-px flex-1 bg-envrt-brand-black/12" />
-        <span className="font-display text-base font-semibold tracking-[-0.01em] text-envrt-brand-black sm:text-lg">
+        <span className="font-display text-lg font-semibold tracking-[-0.01em] text-envrt-brand-black lg:text-xl">
           {stage.name}
         </span>
       </div>
 
-      <p className="mt-2 text-[12px] leading-snug text-envrt-brand-black/55 sm:text-[13px]">
-        {stage.process}
+      <p className="mt-3 text-sm text-envrt-brand-black/55">{stage.process}</p>
+      <p className="mt-3 text-sm leading-relaxed text-envrt-brand-black/70">
+        {stage.inputs}
       </p>
 
-      <motion.p
-        style={{ opacity: detailOpacity }}
-        className="mt-3 text-[12px] leading-relaxed text-envrt-brand-black/70 sm:text-[13px]"
-      >
-        {stage.inputs}
-      </motion.p>
-
-      <motion.div
-        style={{ opacity: detailOpacity }}
-        className="mt-3 overflow-x-auto rounded-lg bg-envrt-brand-vista/80 px-2.5 py-1.5"
-      >
-        <code className="block whitespace-pre font-mono text-[10px] text-envrt-brand-black sm:text-[11px]">
-          {stage.equation}
-        </code>
-      </motion.div>
-
-      <div className="mt-auto pt-4">
-        <div className="flex items-baseline justify-between">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/50">
-            CO₂e
-          </span>
-          <span className="font-display text-lg font-semibold tracking-[-0.01em] text-envrt-brand-black sm:text-xl">
-            {stage.co2e.toFixed(2)} kg
-          </span>
-        </div>
-        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-envrt-brand-black/8">
-          <motion.div
-            style={{ scaleX: active, transformOrigin: "left" }}
-            className="h-full rounded-full bg-envrt-brand-ultramarine"
-          />
-        </div>
-        <p className="mt-1 text-right font-mono text-[9px] uppercase tracking-[0.16em] text-envrt-brand-black/40">
-          {fillPct.toFixed(0)}% of total
+      {/* Equation typewriter */}
+      <div className="mt-5 rounded-lg bg-envrt-brand-vista/80 px-4 py-3">
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine/70">
+          Equation
         </p>
+        <code className="mt-1 block font-mono text-sm text-envrt-brand-black">
+          <Typewriter text={stage.equation} active={typeActive} />
+        </code>
       </div>
+
+      {/* Contribution */}
+      <div className="mt-5 flex items-baseline justify-between">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/55">
+          CO₂e contribution
+        </span>
+        <span className="font-display text-xl font-semibold tracking-[-0.01em] text-envrt-brand-black">
+          {stage.co2e.toFixed(2)} kg
+        </span>
+      </div>
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-envrt-brand-black/8">
+        <div
+          className="h-full rounded-full bg-envrt-brand-ultramarine transition-all duration-500"
+          style={{ width: `${fillPctOfTotal}%` }}
+        />
+      </div>
+      <p className="mt-1 text-right font-mono text-[9px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
+        {fillPctOfTotal.toFixed(0)}% of total
+      </p>
     </motion.div>
   );
 }
 
-// ─── Desktop layout (scroll-pinned, horizontal stage track) ────────────────
+// ─── Desktop ──────────────────────────────────────────────────────────────
 
 function DesktopAnatomy() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -387,49 +468,45 @@ function DesktopAnatomy() {
     offset: ["start start", "end end"],
   });
 
-  // Track slides from 0% to -83% (5/6) so each card centres in turn.
-  const trackX = useTransform(
-    scrollYProgress,
-    [STAGES[0].activation - 0.02, STAGES[STAGES.length - 1].activation + 0.04],
-    ["0%", `-${(100 / 6) * (STAGES.length - 1)}%`],
-    { ease: [easeInOut] },
+  // Determine active stage from progress
+  const activeIndexMv = useTransform(scrollYProgress, (p) => {
+    // Each stage owns the window from its activation to the next stage's
+    // activation. Before the first activates, the first stage is shown.
+    for (let i = STAGES.length - 1; i >= 0; i--) {
+      if (p >= STAGES[i].activation - 0.04) return i;
+    }
+    return 0;
+  });
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(
+    () => activeIndexMv.on("change", (v) => setActiveIndex(v)),
+    [activeIndexMv],
   );
 
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "320vh" }}
+      style={{ height: "280vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
         <div className="mx-auto w-full max-w-[1320px] px-16">
           <Header />
 
-          <div className="mt-10">
-            <EquationBuilder progress={scrollYProgress} variant="desktop" />
+          <div className="mt-14">
+            <Pipeline progress={scrollYProgress} activeIndex={activeIndex} />
           </div>
 
-          {/* Horizontal track of 6 stage cards. 600% width → each card is
-              100% of one viewport-card slot. Track translates left to bring
-              each card into focus. */}
-          <div className="mt-8 overflow-hidden">
-            <motion.div
-              style={{ x: trackX, willChange: "transform" }}
-              className="flex w-[600%] gap-4"
-            >
-              {STAGES.map((stage) => (
-                <div key={stage.index} className="w-[16.6667%]">
-                  <StageCard
-                    stage={stage}
-                    progress={scrollYProgress}
-                    variant="desktop"
-                  />
-                </div>
-              ))}
-            </motion.div>
+          <div className="mx-auto mt-16 max-w-2xl">
+            <AnimatePresence mode="wait">
+              <StageDetailPanel
+                key={STAGES[activeIndex].index}
+                progress={scrollYProgress}
+                stage={STAGES[activeIndex]}
+              />
+            </AnimatePresence>
           </div>
-
-          <ProgressDots progress={scrollYProgress} />
 
           <div className="mt-10">
             <Stats />
@@ -443,7 +520,7 @@ function DesktopAnatomy() {
   );
 }
 
-// ─── Mobile layout (scroll-pinned, horizontal stage track) ────────────────
+// ─── Mobile (horizontal scroll-pinned) ────────────────────────────────────
 
 function MobileAnatomy() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -453,48 +530,59 @@ function MobileAnatomy() {
     offset: ["start start", "end end"],
   });
 
-  // Each card 85vw + 12px gap. Translate left by stride × (count - 1).
+  // Track translates left so each card centres in turn. 85vw cards leave a
+  // peek of the next card on the right edge, signalling more to come.
   const trackX = useTransform(
     scrollYProgress,
-    [STAGES[0].activation - 0.02, STAGES[STAGES.length - 1].activation + 0.04],
+    [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
     ["0vw", `-${85 * (STAGES.length - 1)}vw`],
     { ease: [easeInOut] },
+  );
+
+  const activeIndexMv = useTransform(scrollYProgress, (p) => {
+    for (let i = STAGES.length - 1; i >= 0; i--) {
+      if (p >= STAGES[i].activation - 0.04) return i;
+    }
+    return 0;
+  });
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(
+    () => activeIndexMv.on("change", (v) => setActiveIndex(v)),
+    [activeIndexMv],
   );
 
   return (
     <div
       ref={sectionRef}
       className="relative lg:hidden"
-      style={{ height: "320vh" }}
+      style={{ height: "300vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-10">
         <div className="mx-auto w-full px-5 sm:px-8">
           <Header />
 
-          <div className="mt-8">
-            <EquationBuilder progress={scrollYProgress} variant="mobile" />
+          {/* Compact pipeline above the cards */}
+          <div className="mt-10">
+            <Pipeline progress={scrollYProgress} activeIndex={activeIndex} />
           </div>
 
-          {/* Horizontal track. Each card is 85vw so the next card peeks in
-              from the right edge, signalling there's more to come. */}
-          <div className="mt-6 overflow-hidden">
+          {/* Horizontal card track */}
+          <div className="mt-12 overflow-hidden">
             <motion.div
               style={{ x: trackX, willChange: "transform" }}
               className="flex gap-3"
             >
               {STAGES.map((stage) => (
                 <div key={stage.index} className="w-[85vw] flex-shrink-0">
-                  <StageCard
+                  <MobileStageCard
                     stage={stage}
                     progress={scrollYProgress}
-                    variant="mobile"
                   />
                 </div>
               ))}
             </motion.div>
           </div>
-
-          <ProgressDots progress={scrollYProgress} />
 
           <div className="mt-8">
             <Stats />
@@ -508,41 +596,67 @@ function MobileAnatomy() {
   );
 }
 
-// ─── Progress dots ────────────────────────────────────────────────────────
-
-function ProgressDots({ progress }: { progress: MotionValue<number> }) {
-  return (
-    <div className="mt-5 flex items-center justify-center gap-2">
-      {STAGES.map((stage) => (
-        <ProgressDot key={stage.index} stage={stage} progress={progress} />
-      ))}
-    </div>
-  );
-}
-
-function ProgressDot({
+function MobileStageCard({
   stage,
   progress,
 }: {
   stage: Stage;
   progress: MotionValue<number>;
 }) {
-  const active = useTransform(
+  const typeActive = useTransform(
     progress,
-    [stage.activation - 0.03, stage.activation],
+    [stage.activation, stage.activation + 0.10],
     [0, 1],
     { ease: [easeOut] },
   );
-  const width = useTransform(active, (v) => `${8 + 14 * v}px`);
-  const opacity = useTransform(active, (v) => 0.25 + 0.75 * v);
-  const bgOpacity = useTransform(active, (v) => 0.25 + 0.75 * v);
-  const bg = useMotionTemplate`rgb(62 0 255 / ${bgOpacity})`;
+
+  const fillPctOfTotal = (stage.co2e / STAGE_TOTAL) * 100;
 
   return (
-    <motion.span
-      aria-hidden
-      style={{ width, opacity, background: bg }}
-      className="block h-1 rounded-full"
-    />
+    <div className="rounded-2xl border border-envrt-brand-black/12 bg-white/70 p-5 backdrop-blur">
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
+          {stage.index}
+        </span>
+        <span className="h-px flex-1 bg-envrt-brand-black/12" />
+        <span className="font-display text-base font-semibold tracking-[-0.01em] text-envrt-brand-black">
+          {stage.name}
+        </span>
+      </div>
+
+      <p className="mt-2 text-[13px] text-envrt-brand-black/55">
+        {stage.process}
+      </p>
+      <p className="mt-2 text-[13px] leading-relaxed text-envrt-brand-black/70">
+        {stage.inputs}
+      </p>
+
+      <div className="mt-4 rounded-lg bg-envrt-brand-vista/80 px-3 py-2">
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine/70">
+          Equation
+        </p>
+        <code className="mt-1 block font-mono text-[12px] text-envrt-brand-black">
+          <Typewriter text={stage.equation} active={typeActive} />
+        </code>
+      </div>
+
+      <div className="mt-4 flex items-baseline justify-between">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/55">
+          CO₂e
+        </span>
+        <span className="font-display text-lg font-semibold tracking-[-0.01em] text-envrt-brand-black">
+          {stage.co2e.toFixed(2)} kg
+        </span>
+      </div>
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-envrt-brand-black/8">
+        <div
+          className="h-full rounded-full bg-envrt-brand-ultramarine transition-all duration-500"
+          style={{ width: `${fillPctOfTotal}%` }}
+        />
+      </div>
+      <p className="mt-1 text-right font-mono text-[9px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
+        {fillPctOfTotal.toFixed(0)}% of total
+      </p>
+    </div>
   );
 }

@@ -13,47 +13,47 @@ import {
 import type { MotionValue } from "framer-motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
 
-// Scatter-to-order pain-state section. Cards fly in from far off-screen,
-// fade in via opacity, settle into a scatter, then each card converges to
-// its assigned row position inside the emerging DPP card and transmutes
-// into that row. Real Hoodie 0509-1882 numbers throughout.
+// Scatter-to-order. Cards fly in from far off-screen via continuous motion
+// (easeOut on entry → easeIn on convergence, no hard rest period), settle
+// briefly at scatter, then drift to a tight central stack and dissolve as
+// one unified DPP card emerges with all 8 rows populating top to bottom.
+// Real Hoodie 0509-1882 numbers throughout.
 
-// ─── Real hoodie data ─────────────────────────────────────────────────────
+// ─── Real hoodie ──────────────────────────────────────────────────────────
 
 const HOODIE = {
   name: "Hoodie 0509-1882",
   url: "dpp.envrt.com/…/hoodie-0509-1882",
 };
 
-// ─── Card definitions ─────────────────────────────────────────────────────
+// ─── Cards ────────────────────────────────────────────────────────────────
 
 type Tone = "crimson" | "vibrant" | "ultramarine" | "neutral";
 type Pill = { label: string; tone: "crimson" | "golden" | "ultramarine" } | null;
 
 type ScatterCard = {
-  // Identity
   filename: string;
   icon: AssetIconType;
   typeLabel: string;
   tone: Tone;
   pill: Pill;
-  // Scatter rest position (% of stage)
+  // Scatter waypoint position (% of stage)
   scatterX: number;
   scatterY: number;
   scatterRotate: number;
-  // Off-screen entry origin (% of stage, way outside)
+  // Off-screen entry origin (% of stage, far outside)
   fromX: number;
   fromY: number;
   fromRotate: number;
-  // DPP row destination (% of stage). All rows centred on the DPP column.
-  rowY: number;
+  // Stack offset around centre (50, 50) at convergence end
+  stackDx: number;
+  stackDy: number;
+  z: number;
+  // Matching DPP row info
   rowLabel: string;
   rowValue: string;
-  z: number;
 };
 
-// Cards in the order their rows appear in the DPP, top to bottom.
-// Real Hoodie 0509-1882 numbers from envrt_lab fixtures.
 const CARDS: ScatterCard[] = [
   {
     filename: "audit_report_Q3.xlsx",
@@ -62,11 +62,10 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
     scatterX: 8, scatterY: 6, scatterRotate: -7,
-    fromX: -160, fromY: -40, fromRotate: -30,
-    rowY: 31,
+    fromX: -180, fromY: -40, fromRotate: -30,
+    stackDx: -4, stackDy: -8, z: 7,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
-    z: 7,
   },
   {
     filename: "test_report_SGS.xlsx",
@@ -75,11 +74,10 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
     scatterX: 62, scatterY: 0, scatterRotate: 5,
-    fromX: 80, fromY: -160, fromRotate: 28,
-    rowY: 37,
+    fromX: 80, fromY: -180, fromRotate: 28,
+    stackDx: 2, stackDy: -4, z: 6,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
-    z: 6,
   },
   {
     filename: "BoM_FW24.csv",
@@ -87,12 +85,11 @@ const CARDS: ScatterCard[] = [
     typeLabel: "CSV",
     tone: "vibrant",
     pill: null,
-    scatterX: 88, scatterY: 18, scatterRotate: 8,
-    fromX: 220, fromY: 18, fromRotate: 32,
-    rowY: 43,
+    scatterX: 90, scatterY: 18, scatterRotate: 8,
+    fromX: 240, fromY: 18, fromRotate: 32,
+    stackDx: 5, stackDy: 0, z: 5,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
-    z: 5,
   },
   {
     filename: "Invoice_2024_final_v3.xlsx",
@@ -101,11 +98,10 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
     scatterX: 0, scatterY: 38, scatterRotate: -5,
-    fromX: -180, fromY: 38, fromRotate: -22,
-    rowY: 49,
+    fromX: -200, fromY: 38, fromRotate: -22,
+    stackDx: -6, stackDy: 3, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
-    z: 4,
   },
   {
     filename: "Supplier_Docs_TR/",
@@ -114,11 +110,10 @@ const CARDS: ScatterCard[] = [
     tone: "neutral",
     pill: null,
     scatterX: 35, scatterY: 50, scatterRotate: 3,
-    fromX: 35, fromY: -180, fromRotate: 18,
-    rowY: 55,
+    fromX: 35, fromY: -200, fromRotate: 18,
+    stackDx: 0, stackDy: 0, z: 3,
     rowLabel: "Tier 1 supply",
     rowValue: "Turkey · Aydın",
-    z: 3,
   },
   {
     filename: "CoC_supplier_042.eml",
@@ -127,11 +122,10 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: null,
     scatterX: 90, scatterY: 60, scatterRotate: 7,
-    fromX: 240, fromY: 60, fromRotate: 30,
-    rowY: 61,
+    fromX: 250, fromY: 60, fromRotate: 30,
+    stackDx: 4, stackDy: 5, z: 8,
     rowLabel: "Tier 3 supply",
     rowValue: "Portugal · Viana do Castelo",
-    z: 8,
   },
   {
     filename: "REACH_declaration.pdf",
@@ -140,11 +134,10 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
     scatterX: 5, scatterY: 78, scatterRotate: -6,
-    fromX: -160, fromY: 220, fromRotate: -28,
-    rowY: 67,
+    fromX: -160, fromY: 240, fromRotate: -28,
+    stackDx: -3, stackDy: 6, z: 2,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
-    z: 2,
   },
   {
     filename: "supplier_chat_export.txt",
@@ -153,11 +146,10 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     scatterX: 50, scatterY: 88, scatterRotate: 4,
-    fromX: 50, fromY: 220, fromRotate: 22,
-    rowY: 73,
+    fromX: 50, fromY: 240, fromRotate: 22,
+    stackDx: 1, stackDy: 8, z: 1,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
-    z: 1,
   },
 ];
 
@@ -195,6 +187,10 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
+// Row activation points used by both desktop and mobile rows. Each row fades
+// in over a small window during the 0.58 → 0.78 phase, top to bottom.
+const ROW_ACTIVATIONS = CARDS.map((_, i) => 0.58 + i * 0.025);
+
 // ─── Section ──────────────────────────────────────────────────────────────
 
 export function ScatterToOrderSection() {
@@ -222,7 +218,7 @@ export function ScatterToOrderSection() {
   );
 }
 
-// ─── Desktop: scroll-pinned story ─────────────────────────────────────────
+// ─── Desktop ──────────────────────────────────────────────────────────────
 
 function DesktopScatter() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -232,40 +228,41 @@ function DesktopScatter() {
     offset: ["start start", "end end"],
   });
 
-  // Phase markers:
-  //   0      → 0.06  entry: off-screen → scatter, with opacity fade
-  //   0.06   → 0.28  idle scatter
-  //   0.28   → 0.52  cards converge to row positions
-  //   0.40   → 0.55  decorations (pills + filenames) fade
-  //   0.50   → 0.62  cards fade out; rows fade in (handoff)
-  //   0.48   → 0.66  DPP frame fades in around the rows
-
+  // Step copy progresses with cards. Three beats:
+  //   "Today" (0 → 0.22)
+  //   "The shift" (0.22 → 0.50)
+  //   "The output" (0.55 → 1)
   const step1Opacity = useTransform(scrollYProgress, [0, 0.18, 0.24], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.22, 0.30, 0.48, 0.54],
+    [0.22, 0.30, 0.48, 0.55],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.52, 0.64], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.53, 0.62], [0, 1]);
 
-  const dppFrameOpacity = useTransform(scrollYProgress, [0.48, 0.66], [0, 1]);
-  const dppFrameScale = useTransform(
+  // DPP card emerges as one unit (header + rows + footer) between 0.50 and
+  // 0.68. Scale-up + opacity for a "developing" feel.
+  const dppOpacity = useTransform(scrollYProgress, [0.50, 0.66], [0, 1], {
+    ease: [easeOut],
+  });
+  const dppScale = useTransform(
     scrollYProgress,
-    [0.48, 0.66, 0.85],
-    [0.92, 1.02, 1],
+    [0.50, 0.68, 0.88],
+    [0.86, 1.02, 1],
+    { ease: [easeOut, easeInOut] },
   );
   const flourishOpacity = useTransform(
     scrollYProgress,
-    [0.48, 0.60, 0.80],
+    [0.50, 0.62, 0.82],
     [0, 0.55, 0],
   );
-  const flourishScale = useTransform(scrollYProgress, [0.48, 0.85], [0.6, 1.5]);
+  const flourishScale = useTransform(scrollYProgress, [0.50, 0.88], [0.6, 1.6]);
 
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "280vh" }}
+      style={{ height: "260vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
@@ -286,54 +283,42 @@ function DesktopScatter() {
                 opacity={step2Opacity}
                 eyebrow="The shift"
                 heading="Every input, in the same shape."
-                body="Each document becomes a structured row. Normalised against the same database, dated, versioned, linked back to source."
+                body="Each document normalised against the same database. Dated, versioned, linked back to source."
               />
               <Step
                 opacity={step3Opacity}
                 eyebrow="The output"
                 heading="garment.dpp"
-                body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator. The work you already did, finally in one place."
+                body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator."
               />
             </div>
           </div>
 
-          {/* Right: animated stage. container-type: size makes cqw / cqh
-              container query units resolve against this box, so card
-              positions translate in % of the stage via GPU-accelerated
-              transform3d — no left/top layout thrash. */}
+          {/* Right: animated stage. container-type: size lets cqw / cqh
+              resolve against this box, so card positions translate in % of
+              the stage via GPU-composited transform3d. */}
           <div className="relative">
             <div
               className="relative mx-auto aspect-[5/4] w-full max-w-[560px]"
               style={{ containerType: "size" }}
             >
-              {/* Flourish — subtle ultramarine bloom at centre */}
+              {/* Flourish bloom at centre */}
               <motion.div
                 aria-hidden
                 style={{ opacity: flourishOpacity, scale: flourishScale }}
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/15 blur-3xl"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
               />
 
-              {/* DPP frame fades in around the rows. Sits behind the cards
-                  (z-0) so cards stay visible during convergence. */}
+              {/* DPP card (whole unit) emerges at centre. Below the cards
+                  during convergence, fully revealed after they fade. */}
               <motion.div
-                style={{ opacity: dppFrameOpacity, scale: dppFrameScale }}
-                className="absolute inset-x-[14%] top-[8%] bottom-[6%] z-0"
+                style={{ opacity: dppOpacity, scale: dppScale }}
+                className="absolute left-1/2 top-1/2 z-10 w-[78%] -translate-x-1/2 -translate-y-1/2"
               >
-                <DppFrame />
+                <DppCard progress={scrollYProgress} />
               </motion.div>
 
-              {/* DPP rows fade in at each card's destination. Also behind the
-                  cards (z-10), so cards visually "land" on top of them at
-                  convergence and the card fade-out reveals the row beneath. */}
-              {CARDS.map((card) => (
-                <DppRow
-                  key={`row-${card.filename}`}
-                  card={card}
-                  progress={scrollYProgress}
-                />
-              ))}
-
-              {/* Scatter cards (z-20, above frame and rows) */}
+              {/* Scatter cards */}
               {CARDS.map((card) => (
                 <ScatterCardEl
                   key={card.filename}
@@ -349,7 +334,7 @@ function DesktopScatter() {
   );
 }
 
-// ─── Scroll-driven step copy ──────────────────────────────────────────────
+// ─── Step copy ────────────────────────────────────────────────────────────
 
 function Step({
   opacity,
@@ -377,7 +362,7 @@ function Step({
   );
 }
 
-// ─── Single scatter card ──────────────────────────────────────────────────
+// ─── Scatter card with continuous easeOut → easeIn motion ─────────────────
 
 function ScatterCardEl({
   card,
@@ -386,56 +371,66 @@ function ScatterCardEl({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // Position track. Anchor X is the centre of the DPP column (50%) for row
-  // destination; Y is the card's assigned row.
+  // CONTINUOUS motion through scatter waypoint. No explicit rest period.
+  //   easeOut on entry: cards appear quickly from off-screen, decelerate
+  //     into the scatter waypoint (low velocity there — reads as a soft
+  //     settle, not a hard stop).
+  //   easeIn on convergence: cards drift away from scatter slowly,
+  //     accelerate into the centre stack. Low velocity at the boundary
+  //     matches entry's low end-velocity, so there's no perceived "kick".
+  // Net: one continuous decelerate-then-accelerate arc passing through
+  // scatter, never paused.
+
+  const ease: [typeof easeOut, typeof easeIn] = [easeOut, easeIn];
+
   const x = useTransform(
     progress,
-    [0, 0.06, 0.28, 0.52],
-    [card.fromX, card.scatterX, card.scatterX, 50],
-    { ease: [easeOut, easeInOut, easeInOut] },
+    [0, 0.20, 0.55],
+    [card.fromX, card.scatterX, 50 + card.stackDx],
+    { ease },
   );
   const y = useTransform(
     progress,
-    [0, 0.06, 0.28, 0.52],
-    [card.fromY, card.scatterY, card.scatterY, card.rowY],
-    { ease: [easeOut, easeInOut, easeInOut] },
+    [0, 0.20, 0.55],
+    [card.fromY, card.scatterY, 50 + card.stackDy],
+    { ease },
   );
   const rotate = useTransform(
     progress,
-    [0, 0.06, 0.28, 0.52],
-    [card.fromRotate, card.scatterRotate, card.scatterRotate, 0],
-    { ease: [easeOut, easeInOut, easeInOut] },
+    [0, 0.20, 0.55],
+    [card.fromRotate, card.scatterRotate, 0],
+    { ease },
   );
 
-  // Entry opacity — independently fades 0 → 1 alongside the entry motion.
-  const entryOpacity = useTransform(progress, [0, 0.02, 0.06], [0, 0.4, 1], {
-    ease: [easeOut, easeOut],
-  });
-  // Exit opacity — fades cards out as their row underneath becomes visible.
-  const exitOpacity = useTransform(progress, [0.50, 0.62], [1, 0], {
+  // Opacity fades in alongside entry, fades out as the DPP card emerges.
+  const entryOpacity = useTransform(
+    progress,
+    [0, 0.05, 0.16],
+    [0, 0.5, 1],
+    { ease: [easeOut, easeOut] },
+  );
+  const exitOpacity = useTransform(progress, [0.48, 0.60], [1, 0], {
     ease: [easeInOut],
   });
-  const opacity = useTransform([entryOpacity, exitOpacity], (vals) => {
-    const v = vals as number[];
-    return Math.min(v[0], v[1]);
+  const opacity = useTransform(
+    [entryOpacity, exitOpacity],
+    (vals) => {
+      const a = vals as number[];
+      return Math.min(a[0], a[1]);
+    },
+  );
+
+  // Subtle scale-down as cards approach the stack, so the pile looks tight.
+  const scale = useTransform(progress, [0.30, 0.55], [1, 0.82], {
+    ease: [easeInOut],
   });
 
-  // Cards shrink and flatten as they arrive at their row, giving a hint of
-  // morphing into a row strip before the actual row swap takes over.
-  const scaleX = useTransform(progress, [0.40, 0.55], [1, 0.92], {
-    ease: [easeInOut],
-  });
-  const scaleY = useTransform(progress, [0.40, 0.55], [1, 0.55], {
-    ease: [easeInOut],
-  });
-
-  const decorationOpacity = useTransform(progress, [0.36, 0.50], [1, 0], {
+  // Decorations strip first, ahead of the card itself.
+  const decorationOpacity = useTransform(progress, [0.38, 0.50], [1, 0], {
     ease: [easeIn],
   });
 
-  // Compose all transforms into one motion template so the browser only
-  // applies a single GPU-composited transform per frame.
-  const transform = useMotionTemplate`translate3d(${x}cqw, ${y}cqh, 0) translate(-50%, -50%) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`;
+  const transform = useMotionTemplate`translate3d(${x}cqw, ${y}cqh, 0) translate(-50%, -50%) rotate(${rotate}deg) scale(${scale})`;
 
   return (
     <motion.div
@@ -497,96 +492,112 @@ function CardChrome({
   );
 }
 
-// ─── DPP row (fades in beneath the converging card) ───────────────────────
+// ─── DPP card (single unit, with progressively revealing rows) ────────────
 
-function DppRow({
-  card,
-  progress,
-}: {
-  card: ScatterCard;
-  progress: MotionValue<number>;
-}) {
-  const opacity = useTransform(progress, [0.54, 0.68], [0, 1], {
-    ease: [easeOut],
-  });
-
-  const transform = useMotionTemplate`translate3d(50cqw, ${card.rowY}cqh, 0) translate(-50%, -50%)`;
-
+function DppCard({ progress }: { progress: MotionValue<number> }) {
   return (
-    <motion.div
-      style={{ transform, opacity, zIndex: 10 }}
-      className="absolute left-0 top-0 w-[68%]"
-    >
-      <div className="flex items-center gap-3 px-4 py-2">
-        <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
-          <AssetIcon type={card.icon} size={16} />
-        </span>
-        <span className="flex-shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/60">
-          {card.rowLabel}
-        </span>
-        <span aria-hidden className="flex-1 border-b border-dotted border-envrt-brand-black/15" />
-        <span className="flex-shrink-0 font-display text-xs font-semibold tracking-[-0.01em] text-envrt-brand-black">
-          {card.rowValue}
-        </span>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── DPP frame (header + footer behind the rows) ──────────────────────────
-
-function DppFrame() {
-  return (
-    <div className="relative h-full w-full rounded-3xl border border-envrt-brand-black/12 bg-white shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)]">
+    <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] lg:p-6">
       {/* Header */}
-      <div className="absolute inset-x-0 top-0 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant">
-            <span
-              aria-hidden
-              className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
-            >
-              <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-70" />
-              <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
-            </span>
-            Live · verified
+      <div className="flex items-center justify-between gap-3">
+        <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant lg:text-[11px]">
+          <span
+            aria-hidden
+            className="relative inline-flex h-1.5 w-1.5 items-center justify-center"
+          >
+            <span className="absolute inset-0 animate-ping rounded-full bg-envrt-brand-vibrant opacity-70" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-envrt-brand-vibrant" />
           </span>
-          <span className="font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45">
-            ENVRT/DPP
-          </span>
-        </div>
-        <p className="mt-3 font-mono text-[10px] font-medium text-envrt-brand-black/55">
-          garment.dpp
-        </p>
-        <p className="mt-1 font-display text-lg font-medium tracking-[-0.01em] text-envrt-brand-black">
-          {HOODIE.name}
-        </p>
+          Live · verified
+        </span>
+        <span className="font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45 lg:text-[10px]">
+          ENVRT/DPP
+        </span>
       </div>
 
-      {/* Footer with permanent URL + QR */}
-      <div className="absolute inset-x-0 bottom-0 p-5">
-        <div className="flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-3">
-          <div className="flex items-center gap-2.5">
-            <AssetIcon type="qr" size={26} className="text-envrt-brand-black" />
-            <div>
-              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-                Permanent URL
-              </p>
-              <p className="font-mono text-[10px] text-envrt-brand-black">
-                {HOODIE.url}
-              </p>
-            </div>
+      <p className="mt-3 font-mono text-[10px] font-medium text-envrt-brand-black/55 lg:text-xs">
+        garment.dpp
+      </p>
+      <p className="mt-0.5 font-display text-lg font-medium tracking-[-0.01em] text-envrt-brand-black lg:text-xl">
+        {HOODIE.name}
+      </p>
+
+      {/* Rows */}
+      <div className="mt-4 space-y-1.5 border-t border-envrt-brand-black/10 pt-3 lg:mt-5 lg:space-y-2 lg:pt-4">
+        {CARDS.map((card, i) => (
+          <DppRowItem
+            key={card.filename}
+            card={card}
+            progress={progress}
+            activation={ROW_ACTIVATIONS[i]}
+          />
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-2.5 lg:mt-5 lg:p-3">
+        <div className="flex items-center gap-2.5">
+          <AssetIcon type="qr" size={24} className="text-envrt-brand-black" />
+          <div>
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
+              Permanent URL
+            </p>
+            <p className="font-mono text-[10px] text-envrt-brand-black">
+              {HOODIE.url}
+            </p>
           </div>
-          <span className="font-mono text-[10px] font-medium text-envrt-brand-ultramarine">
-            ↗
-          </span>
         </div>
+        <span className="font-mono text-[10px] font-medium text-envrt-brand-ultramarine">
+          ↗
+        </span>
       </div>
     </div>
   );
 }
 
-// ─── Mobile: static before/after with real hoodie data ────────────────────
+function DppRowItem({
+  card,
+  progress,
+  activation,
+}: {
+  card: ScatterCard;
+  progress: MotionValue<number>;
+  activation: number;
+}) {
+  const opacity = useTransform(
+    progress,
+    [activation - 0.02, activation + 0.02],
+    [0, 1],
+    { ease: [easeOut] },
+  );
+  const xOffset = useTransform(
+    progress,
+    [activation - 0.02, activation + 0.02],
+    [4, 0],
+    { ease: [easeOut] },
+  );
+
+  const transform = useMotionTemplate`translateX(${xOffset}px)`;
+
+  return (
+    <motion.div
+      style={{ opacity, transform }}
+      className="flex items-center gap-2.5"
+    >
+      <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
+        <AssetIcon type={card.icon} size={14} />
+      </span>
+      <span className="flex-shrink-0 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/60 lg:text-[10px]">
+        {card.rowLabel}
+      </span>
+      <span aria-hidden className="flex-1 border-b border-dotted border-envrt-brand-black/15" />
+      <span className="flex-shrink-0 font-display text-[11px] font-semibold tracking-[-0.01em] text-envrt-brand-black lg:text-xs">
+        {card.rowValue}
+      </span>
+    </motion.div>
+  );
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────
 
 function MobileScatter() {
   const mobileCards = [CARDS[0], CARDS[2], CARDS[5], CARDS[7]];
@@ -594,7 +605,6 @@ function MobileScatter() {
   return (
     <div className="lg:hidden">
       <div className="mx-auto max-w-[640px] px-5 py-20 sm:px-8 sm:py-24">
-        {/* Before block */}
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
           Today
         </p>
@@ -639,7 +649,6 @@ function MobileScatter() {
         </p>
 
         <div className="mt-8 rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] sm:p-6">
-          {/* Header */}
           <div className="flex items-center justify-between gap-3">
             <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant">
               <span
@@ -664,10 +673,7 @@ function MobileScatter() {
 
           <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
             {CARDS.map((card) => (
-              <div
-                key={card.filename}
-                className="flex items-center gap-3"
-              >
+              <div key={card.filename} className="flex items-center gap-3">
                 <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
                   <AssetIcon type={card.icon} size={16} />
                 </span>
