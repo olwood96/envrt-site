@@ -178,7 +178,6 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
 // Row activations — rows drop in after the DPP card has finished sliding
 // up into place (~0.68), one per progress step. Last row settled by ~0.86,
 // leaving ~14% of section scroll for full-state dwell.
-const ROW_ACTIVATIONS = CARDS.map((_, i) => 0.68 + i * 0.022);
 
 // ─── Section ──────────────────────────────────────────────────────────────
 
@@ -222,15 +221,13 @@ function DesktopScatter() {
   );
   const step3Opacity = useTransform(scrollYProgress, [0.56, 0.66], [0, 1]);
 
-  // DPP slides up from 500px below the centred position to 0 between
-  // 0.50 → 0.68. Numeric px values so framer interpolates the y prop as
-  // pure translateY pixels — no string-unit ambiguity.
-  const dppY = useTransform(scrollYProgress, [0.50, 0.68], [500, 0], {
-    ease: [easeOut],
-  });
-  const dppOpacity = useTransform(scrollYProgress, [0.50, 0.66], [0, 1], {
-    ease: [easeOut],
-  });
+  // DPP card is rendered STATIC behind the scatter cards (z-0). It's
+  // permanently in the DOM at opacity 1 from the moment the page loads;
+  // we don't gate it on scroll progress. The scatter cards on top
+  // (z-20+) cover it during the animation, and fade out at the end —
+  // which reveals the DPP underneath. No motion-driven entry to debug,
+  // no possibility the DPP is hidden behind a broken transform: it's
+  // just there.
   const flourishOpacity = useTransform(
     scrollYProgress,
     [0.45, 0.58, 0.78],
@@ -280,28 +277,29 @@ function DesktopScatter() {
               in viewport units (vw/vh) so their off-screen origins are
               genuinely off the viewport edges in every direction. */}
           <div className="relative h-[520px]">
-            {/* Flourish bloom at the convergence point */}
+            {/* DPP card — STATIC, always present at z-0. No motion-driven
+                entry, no opacity ramp. Cards (z-20+) sit on top during the
+                animation; when they fade and lift off, the DPP underneath
+                is revealed. Reliability over flair: this is guaranteed to
+                be visible at the end because it's just sitting there. */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center">
+              <div className="w-[88%] max-w-[560px]">
+                <DppCard />
+              </div>
+            </div>
+
+            {/* Flourish bloom — above DPP, below cards. Subtle reveal
+                accent at the moment cards lift off. */}
             <motion.div
               aria-hidden
               style={{ opacity: flourishOpacity, scale: flourishScale }}
-              className="pointer-events-none absolute inset-0 flex items-center justify-center"
+              className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center"
             >
               <div className="h-[340px] w-[340px] rounded-full bg-envrt-brand-ultramarine/18 blur-3xl" />
             </motion.div>
 
-            {/* DPP card — slides up from below the viewport as cards lift
-                upward off-screen. Spatial swap, not opacity crossfade. */}
-            <motion.div
-              style={{ y: dppY, opacity: dppOpacity }}
-              className="absolute inset-0 z-10 flex items-center justify-center"
-            >
-              <div className="w-[88%] max-w-[560px]">
-                <DppCard progress={scrollYProgress} />
-              </div>
-            </motion.div>
-
-            {/* Cards fly in from viewport edges, converge briefly, then
-                lift upward off-screen as the DPP rises into their place. */}
+            {/* Cards fly in, converge, then lift upward off-screen + fade.
+                As they exit, the static DPP behind them is revealed. */}
             {CARDS.map((card) => (
               <ScatterCardEl
                 key={card.filename}
@@ -481,7 +479,7 @@ function CardChrome({
 
 // ─── DPP card — single unit, larger and more prominent ────────────────────
 
-function DppCard({ progress }: { progress: MotionValue<number> }) {
+function DppCard() {
   return (
     <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-6 shadow-[0_40px_80px_-30px_rgba(62,0,255,0.55)] lg:p-7">
       {/* Header */}
@@ -500,13 +498,8 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
       </p>
 
       <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
-        {CARDS.map((card, i) => (
-          <DppRowItem
-            key={card.filename}
-            card={card}
-            progress={progress}
-            activation={ROW_ACTIVATIONS[i]}
-          />
+        {CARDS.map((card) => (
+          <DppRowItem key={card.filename} card={card} />
         ))}
       </div>
 
@@ -531,35 +524,12 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
-function DppRowItem({
-  card,
-  progress,
-  activation,
-}: {
-  card: ScatterCard;
-  progress: MotionValue<number>;
-  activation: number;
-}) {
-  const opacity = useTransform(
-    progress,
-    [activation - 0.025, activation + 0.025],
-    [0, 1],
-    { ease: [easeOut] },
-  );
-  const xOffset = useTransform(
-    progress,
-    [activation - 0.025, activation + 0.025],
-    [6, 0],
-    { ease: [easeOut] },
-  );
-
-  const transform = useMotionTemplate`translateX(${xOffset}px)`;
-
+function DppRowItem({ card }: { card: ScatterCard }) {
+  // No motion. Rows are part of the static DPP card content; they show
+  // up whenever the DPP itself is revealed (when the scatter cards fade
+  // out at the end of the animation).
   return (
-    <motion.div
-      style={{ opacity, transform }}
-      className="flex items-center gap-3"
-    >
+    <div className="flex items-center gap-3">
       <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
         <AssetIcon type={card.icon} size={16} />
       </span>
@@ -570,7 +540,7 @@ function DppRowItem({
       <span className="flex-shrink-0 font-display text-xs font-semibold tracking-[-0.01em] text-envrt-brand-black">
         {card.rowValue}
       </span>
-    </motion.div>
+    </div>
   );
 }
 
