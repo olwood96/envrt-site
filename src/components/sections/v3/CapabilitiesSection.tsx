@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
+import { AssetIcon, type AssetIconType } from "./AssetIcon";
 
 // ─── Data ────────────────────────────────────────────────────────────────
 
@@ -139,10 +140,11 @@ export function CapabilitiesSection() {
         {/* Spec table */}
         <div className="mt-12 sm:mt-16">
           {/* Column header strip — only visible on sm+ as quiet metadata */}
-          <div className="hidden grid-cols-[44px_1fr_180px_24px] items-center gap-6 border-b border-envrt-brand-black/12 pb-3 sm:grid lg:grid-cols-[64px_1fr_180px_24px]">
+          <div className="hidden grid-cols-[44px_44px_1fr_180px_24px] items-center gap-6 border-b border-envrt-brand-black/12 pb-3 sm:grid lg:grid-cols-[64px_56px_1fr_180px_24px]">
             <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45">
               No.
             </span>
+            <span className="sr-only">Icon</span>
             <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45">
               Capability
             </span>
@@ -233,7 +235,8 @@ function CapabilityRow({
         />
 
         {/* Mobile layout */}
-        <div className="relative grid grid-cols-[36px_1fr] items-baseline gap-4 py-5 sm:hidden">
+        <div className="relative grid grid-cols-[28px_36px_1fr] items-baseline gap-3 py-5 sm:hidden">
+          <CapIcon id={cap.id} hovered={hovered} size={22} />
           <span className="font-mono text-xs font-medium leading-none text-envrt-brand-black/40 transition-colors duration-300 group-hover:text-envrt-brand-ultramarine">
             {(index + 1).toString().padStart(2, "0")}
           </span>
@@ -261,11 +264,14 @@ function CapabilityRow({
         </div>
 
         {/* Desktop layout */}
-        <div className="relative hidden grid-cols-[44px_1fr_180px_24px] items-center gap-6 py-6 sm:grid lg:grid-cols-[64px_1fr_180px_24px] lg:py-7">
+        <div className="relative hidden grid-cols-[44px_44px_1fr_180px_24px] items-center gap-6 py-6 sm:grid lg:grid-cols-[64px_56px_1fr_180px_24px] lg:py-7">
           {/* Index */}
           <span className="font-mono text-sm font-medium leading-none text-envrt-brand-black/40 transition-colors duration-300 group-hover:text-envrt-brand-ultramarine">
             {(index + 1).toString().padStart(2, "0")}
           </span>
+
+          {/* Icon */}
+          <CapIcon id={cap.id} hovered={hovered} size={28} />
 
           {/* Name + description */}
           <div className="min-w-0">
@@ -316,5 +322,37 @@ function CapabilityRow({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+// ─── Icon ────────────────────────────────────────────────────────────────
+//
+// Asset glyph for each capability row. Dimmed black by default, lifts to
+// ultramarine on hover with a small scale-up + rotation "stamp" feel — like
+// inking the row.
+
+function CapIcon({
+  id,
+  hovered,
+  size,
+}: {
+  id: Capability["id"];
+  hovered: boolean;
+  size: number;
+}) {
+  return (
+    <motion.span
+      aria-hidden
+      initial={false}
+      animate={{
+        scale: hovered ? 1.08 : 1,
+        rotate: hovered ? -3 : 0,
+        color: hovered ? "rgb(62 0 255)" : "rgb(14 14 14 / 0.55)",
+      }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="inline-flex items-center justify-center"
+    >
+      <AssetIcon type={id as AssetIconType} size={size} />
+    </motion.span>
   );
 }

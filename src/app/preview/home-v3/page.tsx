@@ -16,6 +16,8 @@ import { SceneMark } from "@/components/sections/v3/SceneMark";
 import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { AlignedWithCarouselV3 } from "@/components/sections/v3/AlignedWithCarouselV3";
 import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
+import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSection";
+import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
 
@@ -87,6 +89,7 @@ export default async function HomeV3PreviewPage() {
           }}
         />
         <EsprCountdownSection />
+        <ScatterToOrderSection />
 
         <SceneMark index="02" label="The passport" />
         <ScrollTourSection />
@@ -97,6 +100,7 @@ export default async function HomeV3PreviewPage() {
 
         <SceneMark index="04" label="The proof" dark />
         <NumbersSection />
+        <AnatomyOfLcaSection />
         <HowItWorksV3 />
 
         <SceneMark index="05" label="Deeper" />
