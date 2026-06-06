@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import {
-  easeIn,
   easeInOut,
   easeOut,
   motion,
@@ -13,11 +12,11 @@ import {
 import type { MotionValue } from "framer-motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
 
-// Scatter-to-order. Cards fly in from far off-screen via continuous motion
-// (easeOut on entry → easeIn on convergence, no hard rest period), settle
-// briefly at scatter, then drift to a tight central stack and dissolve as
-// one unified DPP card emerges with all 8 rows populating top to bottom.
-// Real Hoodie 0509-1882 numbers throughout.
+// Scatter-to-order. Cards ride a single linear arc from just off-screen to
+// a tight centre stack — no waypoint, no velocity dip, constant speed
+// throughout. They fade in immediately on entry, sweep into view, then fade
+// out as the DPP card lands prominently at centre with its eight rows
+// populating top to bottom. Real Hoodie 0509-1882 numbers throughout.
 
 // ─── Real hoodie ──────────────────────────────────────────────────────────
 
@@ -37,15 +36,13 @@ type ScatterCard = {
   typeLabel: string;
   tone: Tone;
   pill: Pill;
-  // Scatter waypoint position (% of stage)
-  scatterX: number;
-  scatterY: number;
-  scatterRotate: number;
-  // Off-screen entry origin (% of stage, far outside)
+  // Off-screen entry origin — kept close to viewport edges (just outside)
+  // so cards are visible quickly and the linear motion stays at a readable
+  // pace.
   fromX: number;
   fromY: number;
   fromRotate: number;
-  // Stack offset around centre (50, 50) at convergence end
+  // Final position around centre (small per-card offset for pile texture)
   stackDx: number;
   stackDy: number;
   z: number;
@@ -61,8 +58,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
-    scatterX: 8, scatterY: 6, scatterRotate: -7,
-    fromX: -180, fromY: -40, fromRotate: -30,
+    fromX: -40, fromY: -40, fromRotate: -12,
     stackDx: -4, stackDy: -8, z: 7,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
@@ -73,8 +69,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
-    scatterX: 62, scatterY: 0, scatterRotate: 5,
-    fromX: 80, fromY: -180, fromRotate: 28,
+    fromX: 60, fromY: -45, fromRotate: 14,
     stackDx: 2, stackDy: -4, z: 6,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
@@ -85,8 +80,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "CSV",
     tone: "vibrant",
     pill: null,
-    scatterX: 90, scatterY: 18, scatterRotate: 8,
-    fromX: 240, fromY: 18, fromRotate: 32,
+    fromX: 145, fromY: 12, fromRotate: 16,
     stackDx: 5, stackDy: 0, z: 5,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
@@ -97,8 +91,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "XLSX",
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
-    scatterX: 0, scatterY: 38, scatterRotate: -5,
-    fromX: -200, fromY: 38, fromRotate: -22,
+    fromX: -50, fromY: 32, fromRotate: -10,
     stackDx: -6, stackDy: 3, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
@@ -109,8 +102,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Folder",
     tone: "neutral",
     pill: null,
-    scatterX: 35, scatterY: 50, scatterRotate: 3,
-    fromX: 35, fromY: -200, fromRotate: 18,
+    fromX: 35, fromY: -55, fromRotate: 8,
     stackDx: 0, stackDy: 0, z: 3,
     rowLabel: "Tier 1 supply",
     rowValue: "Turkey · Aydın",
@@ -121,8 +113,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "EML",
     tone: "ultramarine",
     pill: null,
-    scatterX: 90, scatterY: 60, scatterRotate: 7,
-    fromX: 250, fromY: 60, fromRotate: 30,
+    fromX: 150, fromY: 55, fromRotate: 12,
     stackDx: 4, stackDy: 5, z: 8,
     rowLabel: "Tier 3 supply",
     rowValue: "Portugal · Viana do Castelo",
@@ -133,8 +124,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "PDF",
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
-    scatterX: 5, scatterY: 78, scatterRotate: -6,
-    fromX: -160, fromY: 240, fromRotate: -28,
+    fromX: -50, fromY: 75, fromRotate: -14,
     stackDx: -3, stackDy: 6, z: 2,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
@@ -145,8 +135,7 @@ const CARDS: ScatterCard[] = [
     typeLabel: "Chat",
     tone: "vibrant",
     pill: null,
-    scatterX: 50, scatterY: 88, scatterRotate: 4,
-    fromX: 50, fromY: 240, fromRotate: 22,
+    fromX: 50, fromY: 145, fromRotate: 10,
     stackDx: 1, stackDy: 8, z: 1,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
@@ -187,9 +176,9 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
-// Row activation points used by both desktop and mobile rows. Each row fades
-// in over a small window during the 0.58 → 0.78 phase, top to bottom.
-const ROW_ACTIVATIONS = CARDS.map((_, i) => 0.58 + i * 0.025);
+// Row activation points. Each row fades in over a small window during the
+// 0.55 → 0.80 phase, top to bottom.
+const ROW_ACTIVATIONS = CARDS.map((_, i) => 0.55 + i * 0.03);
 
 // ─── Section ──────────────────────────────────────────────────────────────
 
@@ -228,35 +217,35 @@ function DesktopScatter() {
     offset: ["start start", "end end"],
   });
 
-  // Step copy progresses with cards. Three beats:
-  //   "Today" (0 → 0.22)
-  //   "The shift" (0.22 → 0.50)
-  //   "The output" (0.55 → 1)
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.18, 0.24], [1, 1, 0]);
+  // Step copy beats. Three swaps timed with the visual:
+  //   "Today" while cards are flying in (0 → 0.30)
+  //   "The shift" while cards are converging + DPP starts (0.30 → 0.55)
+  //   "The output" while DPP fills (0.55 → end)
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.24, 0.30], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.22, 0.30, 0.48, 0.55],
+    [0.28, 0.34, 0.52, 0.58],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.53, 0.62], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.56, 0.64], [0, 1]);
 
-  // DPP card emerges as one unit (header + rows + footer) between 0.50 and
-  // 0.68. Scale-up + opacity for a "developing" feel.
-  const dppOpacity = useTransform(scrollYProgress, [0.50, 0.66], [0, 1], {
+  // DPP card emerges earlier and lands sooner — overlapping with cards
+  // fading out so there's never an empty centre.
+  const dppOpacity = useTransform(scrollYProgress, [0.40, 0.58], [0, 1], {
     ease: [easeOut],
   });
   const dppScale = useTransform(
     scrollYProgress,
-    [0.50, 0.68, 0.88],
-    [0.86, 1.02, 1],
+    [0.40, 0.58, 0.85],
+    [0.88, 1.03, 1],
     { ease: [easeOut, easeInOut] },
   );
   const flourishOpacity = useTransform(
     scrollYProgress,
-    [0.50, 0.62, 0.82],
+    [0.40, 0.55, 0.80],
     [0, 0.55, 0],
   );
-  const flourishScale = useTransform(scrollYProgress, [0.50, 0.88], [0.6, 1.6]);
+  const flourishScale = useTransform(scrollYProgress, [0.40, 0.85], [0.6, 1.6]);
 
   return (
     <div
@@ -294,31 +283,29 @@ function DesktopScatter() {
             </div>
           </div>
 
-          {/* Right: animated stage. container-type: size lets cqw / cqh
-              resolve against this box, so card positions translate in % of
-              the stage via GPU-composited transform3d. */}
+          {/* Right: animated stage */}
           <div className="relative">
             <div
-              className="relative mx-auto aspect-[5/4] w-full max-w-[560px]"
+              className="relative mx-auto aspect-[5/4] w-full max-w-[620px]"
               style={{ containerType: "size" }}
             >
-              {/* Flourish bloom at centre */}
+              {/* Flourish bloom behind everything */}
               <motion.div
                 aria-hidden
                 style={{ opacity: flourishOpacity, scale: flourishScale }}
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
               />
 
-              {/* DPP card (whole unit) emerges at centre. Below the cards
-                  during convergence, fully revealed after they fade. */}
+              {/* DPP card emerges centred. Larger and earlier so the
+                  resolution actually lands. */}
               <motion.div
                 style={{ opacity: dppOpacity, scale: dppScale }}
-                className="absolute left-1/2 top-1/2 z-10 w-[78%] -translate-x-1/2 -translate-y-1/2"
+                className="absolute left-1/2 top-1/2 z-10 w-[88%] -translate-x-1/2 -translate-y-1/2"
               >
                 <DppCard progress={scrollYProgress} />
               </motion.div>
 
-              {/* Scatter cards */}
+              {/* Scatter cards above the DPP, fade out as DPP emerges */}
               {CARDS.map((card) => (
                 <ScatterCardEl
                   key={card.filename}
@@ -362,7 +349,7 @@ function Step({
   );
 }
 
-// ─── Scatter card with continuous easeOut → easeIn motion ─────────────────
+// ─── Scatter card with constant-speed linear motion ───────────────────────
 
 function ScatterCardEl({
   card,
@@ -371,66 +358,35 @@ function ScatterCardEl({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // CONTINUOUS motion through scatter waypoint. No explicit rest period.
-  //   easeOut on entry: cards appear quickly from off-screen, decelerate
-  //     into the scatter waypoint (low velocity there — reads as a soft
-  //     settle, not a hard stop).
-  //   easeIn on convergence: cards drift away from scatter slowly,
-  //     accelerate into the centre stack. Low velocity at the boundary
-  //     matches entry's low end-velocity, so there's no perceived "kick".
-  // Net: one continuous decelerate-then-accelerate arc passing through
-  // scatter, never paused.
+  // SINGLE linear keyframe range — cards move at CONSTANT speed from
+  // off-screen to centre stack. No waypoint, no velocity dip, no mode
+  // switch. Each card travels its own straight line at its own constant
+  // velocity, but never changes speed mid-flight.
 
-  const ease: [typeof easeOut, typeof easeIn] = [easeOut, easeIn];
+  const x = useTransform(progress, [0, 0.50], [card.fromX, 50 + card.stackDx]);
+  const y = useTransform(progress, [0, 0.50], [card.fromY, 50 + card.stackDy]);
+  const rotate = useTransform(progress, [0, 0.50], [card.fromRotate, 0]);
 
-  const x = useTransform(
-    progress,
-    [0, 0.20, 0.55],
-    [card.fromX, card.scatterX, 50 + card.stackDx],
-    { ease },
-  );
-  const y = useTransform(
-    progress,
-    [0, 0.20, 0.55],
-    [card.fromY, card.scatterY, 50 + card.stackDy],
-    { ease },
-  );
-  const rotate = useTransform(
-    progress,
-    [0, 0.20, 0.55],
-    [card.fromRotate, card.scatterRotate, 0],
-    { ease },
-  );
-
-  // Opacity fades in alongside entry, fades out as the DPP card emerges.
-  const entryOpacity = useTransform(
-    progress,
-    [0, 0.05, 0.16],
-    [0, 0.5, 1],
-    { ease: [easeOut, easeOut] },
-  );
-  const exitOpacity = useTransform(progress, [0.48, 0.60], [1, 0], {
+  // Quick fade-in as cards enter the stage.
+  const entryOpacity = useTransform(progress, [0, 0.05], [0, 1], {
+    ease: [easeOut],
+  });
+  // Cards hand off to the DPP card. Fade overlaps with DPP emergence.
+  const exitOpacity = useTransform(progress, [0.40, 0.52], [1, 0], {
     ease: [easeInOut],
   });
-  const opacity = useTransform(
-    [entryOpacity, exitOpacity],
-    (vals) => {
-      const a = vals as number[];
-      return Math.min(a[0], a[1]);
-    },
-  );
+  const opacity = useTransform([entryOpacity, exitOpacity], (vals) => {
+    const a = vals as number[];
+    return Math.min(a[0], a[1]);
+  });
 
-  // Subtle scale-down as cards approach the stack, so the pile looks tight.
-  const scale = useTransform(progress, [0.30, 0.55], [1, 0.82], {
+  // Decorations strip first — pill + filename strip lose presence as cards
+  // near the centre, drawing the eye to the icon and the impending DPP row.
+  const decorationOpacity = useTransform(progress, [0.30, 0.42], [1, 0], {
     ease: [easeInOut],
   });
 
-  // Decorations strip first, ahead of the card itself.
-  const decorationOpacity = useTransform(progress, [0.38, 0.50], [1, 0], {
-    ease: [easeIn],
-  });
-
-  const transform = useMotionTemplate`translate3d(${x}cqw, ${y}cqh, 0) translate(-50%, -50%) rotate(${rotate}deg) scale(${scale})`;
+  const transform = useMotionTemplate`translate3d(${x}cqw, ${y}cqh, 0) translate(-50%, -50%) rotate(${rotate}deg)`;
 
   return (
     <motion.div
@@ -492,11 +448,11 @@ function CardChrome({
   );
 }
 
-// ─── DPP card (single unit, with progressively revealing rows) ────────────
+// ─── DPP card — single unit, larger and more prominent ────────────────────
 
 function DppCard({ progress }: { progress: MotionValue<number> }) {
   return (
-    <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] lg:p-6">
+    <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-6 shadow-[0_40px_80px_-30px_rgba(62,0,255,0.55)] lg:p-7">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-vibrant lg:text-[11px]">
@@ -514,15 +470,15 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
         </span>
       </div>
 
-      <p className="mt-3 font-mono text-[10px] font-medium text-envrt-brand-black/55 lg:text-xs">
+      <p className="mt-3 font-mono text-xs font-medium text-envrt-brand-black/55">
         garment.dpp
       </p>
-      <p className="mt-0.5 font-display text-lg font-medium tracking-[-0.01em] text-envrt-brand-black lg:text-xl">
+      <p className="mt-1 font-display text-2xl font-medium tracking-[-0.01em] text-envrt-brand-black">
         {HOODIE.name}
       </p>
 
       {/* Rows */}
-      <div className="mt-4 space-y-1.5 border-t border-envrt-brand-black/10 pt-3 lg:mt-5 lg:space-y-2 lg:pt-4">
+      <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
         {CARDS.map((card, i) => (
           <DppRowItem
             key={card.filename}
@@ -534,9 +490,9 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
       </div>
 
       {/* Footer */}
-      <div className="mt-4 flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-2.5 lg:mt-5 lg:p-3">
+      <div className="mt-5 flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-3">
         <div className="flex items-center gap-2.5">
-          <AssetIcon type="qr" size={24} className="text-envrt-brand-black" />
+          <AssetIcon type="qr" size={26} className="text-envrt-brand-black" />
           <div>
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
               Permanent URL
@@ -565,14 +521,14 @@ function DppRowItem({
 }) {
   const opacity = useTransform(
     progress,
-    [activation - 0.02, activation + 0.02],
+    [activation - 0.025, activation + 0.025],
     [0, 1],
     { ease: [easeOut] },
   );
   const xOffset = useTransform(
     progress,
-    [activation - 0.02, activation + 0.02],
-    [4, 0],
+    [activation - 0.025, activation + 0.025],
+    [6, 0],
     { ease: [easeOut] },
   );
 
@@ -581,16 +537,16 @@ function DppRowItem({
   return (
     <motion.div
       style={{ opacity, transform }}
-      className="flex items-center gap-2.5"
+      className="flex items-center gap-3"
     >
       <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
-        <AssetIcon type={card.icon} size={14} />
+        <AssetIcon type={card.icon} size={16} />
       </span>
-      <span className="flex-shrink-0 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/60 lg:text-[10px]">
+      <span className="flex-shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/60">
         {card.rowLabel}
       </span>
       <span aria-hidden className="flex-1 border-b border-dotted border-envrt-brand-black/15" />
-      <span className="flex-shrink-0 font-display text-[11px] font-semibold tracking-[-0.01em] text-envrt-brand-black lg:text-xs">
+      <span className="flex-shrink-0 font-display text-xs font-semibold tracking-[-0.01em] text-envrt-brand-black">
         {card.rowValue}
       </span>
     </motion.div>
