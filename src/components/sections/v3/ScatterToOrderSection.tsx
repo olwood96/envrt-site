@@ -289,7 +289,7 @@ function DesktopScatter() {
                 be visible at the end because it's just sitting there. */}
             <div className="absolute inset-0 z-0 flex items-center justify-center">
               <div className="w-[88%] max-w-[560px]">
-                <DppCard />
+                <DppCard progress={scrollYProgress} />
               </div>
             </div>
 
@@ -466,7 +466,7 @@ function CardChrome({
 
 // ─── DPP card — single unit, larger and more prominent ────────────────────
 
-function DppCard() {
+function DppCard({ progress }: { progress: MotionValue<number> }) {
   return (
     <div className="relative rounded-3xl border border-envrt-brand-black/12 bg-white p-6 shadow-[0_40px_80px_-30px_rgba(62,0,255,0.55)] lg:p-7">
       {/* Header */}
@@ -486,7 +486,7 @@ function DppCard() {
 
       <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
         {CARDS.map((card) => (
-          <DppRowItem key={card.filename} card={card} />
+          <DppRowItem key={card.filename} card={card} progress={progress} />
         ))}
       </div>
 
@@ -511,12 +511,24 @@ function DppCard() {
   );
 }
 
-function DppRowItem({ card }: { card: ScatterCard }) {
-  // No motion. Rows are part of the static DPP card content; they show
-  // up whenever the DPP itself is revealed (when the scatter cards fade
-  // out at the end of the animation).
+function DppRowItem({
+  card,
+  progress,
+}: {
+  card: ScatterCard;
+  progress: MotionValue<number>;
+}) {
+  // Row reveals exactly when its matching card finishes morphing. Card
+  // morph is [arrivalTime, arrivalTime + 0.04]; row fades in 0 → 1 over
+  // [arrivalTime + 0.02, arrivalTime + 0.07], so the strip-shaped card and
+  // the row crossfade together — the card hands off into the row.
+  const at = card.arrivalTime;
+  const opacity = useTransform(progress, [at + 0.02, at + 0.07], [0, 1], {
+    ease: [easeOut],
+  });
+
   return (
-    <div className="flex items-center gap-3">
+    <motion.div style={{ opacity }} className="flex items-center gap-3">
       <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
         <AssetIcon type={card.icon} size={16} />
       </span>
@@ -527,7 +539,7 @@ function DppRowItem({ card }: { card: ScatterCard }) {
       <span className="flex-shrink-0 font-display text-xs font-semibold tracking-[-0.01em] text-envrt-brand-black">
         {card.rowValue}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
