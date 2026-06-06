@@ -283,41 +283,43 @@ function DesktopScatter() {
             </div>
           </div>
 
-          {/* Right: animated stage */}
+          {/* Right: animated stage.
+              Explicit fixed dimensions (no aspect-ratio + container-type
+              combination) so layout is unambiguous and cqw/cqh resolve
+              consistently in every browser. */}
           <div className="relative">
             <div
-              className="relative mx-auto aspect-[5/4] w-full max-w-[620px]"
-              style={{ containerType: "size" }}
+              className="relative mx-auto w-full max-w-[620px]"
+              style={{ height: "520px", containerType: "size" }}
             >
-              {/* Flourish bloom behind everything. Centring done via
-                  framer's x/y so it composes with scale, instead of
-                  Tailwind translate classes which would be overwritten by
-                  the motion-driven transform. */}
-              <motion.div
+              {/* Flourish bloom. Outer wrapper handles -50% centring via a
+                  static CSS transform so it can't be overwritten by the
+                  motion-driven inner transform. Inner motion div animates
+                  opacity + scale only. */}
+              <div
                 aria-hidden
-                style={{
-                  opacity: flourishOpacity,
-                  scale: flourishScale,
-                  x: "-50%",
-                  y: "-50%",
-                }}
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px] rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
-              />
-
-              {/* DPP card emerges centred. Same fix — x/y -50% inside the
-                  motion style, no Tailwind translate classes, so the scale
-                  transform doesn't wipe out the centring translate. */}
-              <motion.div
-                style={{
-                  opacity: dppOpacity,
-                  scale: dppScale,
-                  x: "-50%",
-                  y: "-50%",
-                }}
-                className="absolute left-1/2 top-1/2 z-10 w-[88%]"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px]"
+                style={{ transform: "translate(-50%, -50%)" }}
               >
-                <DppCard progress={scrollYProgress} />
-              </motion.div>
+                <motion.div
+                  style={{ opacity: flourishOpacity, scale: flourishScale }}
+                  className="h-full w-full rounded-full bg-envrt-brand-ultramarine/18 blur-3xl"
+                />
+              </div>
+
+              {/* DPP card. Same wrapper pattern — outer div centres, inner
+                  motion div scales + fades. Transforms on two separate
+                  elements never collide. */}
+              <div
+                className="absolute left-1/2 top-1/2 z-10 w-[88%]"
+                style={{ transform: "translate(-50%, -50%)" }}
+              >
+                <motion.div
+                  style={{ opacity: dppOpacity, scale: dppScale }}
+                >
+                  <DppCard progress={scrollYProgress} />
+                </motion.div>
+              </div>
 
               {/* Scatter cards above the DPP, fade out as DPP emerges */}
               {CARDS.map((card) => (

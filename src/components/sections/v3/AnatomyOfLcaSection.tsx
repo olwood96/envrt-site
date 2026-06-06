@@ -332,19 +332,23 @@ function PipelineLabels({ activeIndex }: { activeIndex: number }) {
 
 function StageCard({
   stage,
+  prevActivation,
   progress,
   size,
 }: {
   stage: Stage;
+  prevActivation: number;
   progress: MotionValue<number>;
   size: "desktop" | "mobile";
 }) {
-  // Typewriter window — short enough that the equation fills in promptly
-  // once a stage activates, so the reader gets the whole snippet without a
-  // long wait.
+  // Typewriter window tied to card POSITION on screen: starts as the card
+  // begins entering from the right (the previous stage's activation point,
+  // when the track starts moving toward this card) and finishes exactly
+  // when the card lands centred (this stage's activation point). So the
+  // equation reads as the card slides into focus.
   const typeActive = useTransform(
     progress,
-    [stage.activation, stage.activation + 0.06],
+    [prevActivation, stage.activation],
     [0, 1],
     { ease: [easeOut] },
   );
@@ -474,10 +478,11 @@ function DesktopAnatomy() {
             style={{ x: trackX, willChange: "transform" }}
             className="flex gap-4 pl-[20vw] pr-[20vw]"
           >
-            {STAGES.map((stage) => (
+            {STAGES.map((stage, i) => (
               <div key={stage.index} className="w-[60vw] flex-shrink-0">
                 <StageCard
                   stage={stage}
+                  prevActivation={i === 0 ? 0 : STAGES[i - 1].activation}
                   progress={scrollYProgress}
                   size="desktop"
                 />
@@ -550,10 +555,11 @@ function MobileAnatomy() {
               style={{ x: trackX, willChange: "transform" }}
               className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
             >
-              {STAGES.map((stage) => (
+              {STAGES.map((stage, i) => (
                 <div key={stage.index} className="w-[85vw] flex-shrink-0">
                   <StageCard
                     stage={stage}
+                    prevActivation={i === 0 ? 0 : STAGES[i - 1].activation}
                     progress={scrollYProgress}
                     size="mobile"
                   />
