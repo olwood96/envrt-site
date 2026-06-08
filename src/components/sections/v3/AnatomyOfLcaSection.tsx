@@ -38,7 +38,7 @@ const STAGES: Stage[] = [
     co2e: 0.48,
     equation: "mass × EF_fibre",
     cx: 8,
-    activation: 0.12,
+    activation: 0.10,
   },
   {
     index: "02",
@@ -48,7 +48,7 @@ const STAGES: Stage[] = [
     co2e: 1.77,
     equation: "mass × EF_spin × grid",
     cx: 26,
-    activation: 0.26,
+    activation: 0.22,
   },
   {
     index: "03",
@@ -58,7 +58,7 @@ const STAGES: Stage[] = [
     co2e: 0.62,
     equation: "mass × EF_fabric × loss",
     cx: 44,
-    activation: 0.40,
+    activation: 0.34,
   },
   {
     index: "04",
@@ -68,7 +68,7 @@ const STAGES: Stage[] = [
     co2e: 4.18,
     equation: "mass × EF_dye + H₂O × AWARE",
     cx: 62,
-    activation: 0.54,
+    activation: 0.46,
   },
   {
     index: "05",
@@ -78,7 +78,7 @@ const STAGES: Stage[] = [
     co2e: 0.33,
     equation: "mass × EF_assy × grid",
     cx: 80,
-    activation: 0.68,
+    activation: 0.58,
   },
   {
     index: "06",
@@ -88,7 +88,7 @@ const STAGES: Stage[] = [
     co2e: 0.07,
     equation: "Σ(d × mode_EF)",
     cx: 94,
-    activation: 0.82,
+    activation: 0.70,
   },
 ];
 

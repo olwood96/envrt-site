@@ -15,31 +15,34 @@ type Stop = {
   range: [number, number];
 };
 
+// Stops compressed to end at progress 0.85, leaving 0.85 → 1.0 of section
+// scroll as dwell time so the final DPP state stays on-screen before the
+// section unpins.
 const stops: Stop[] = [
   {
     title: "The scan moment",
     body: "Customer scans the QR on the care label. They land on a hosted page with the garment's hero image and brand voice.",
-    range: [0.0, 0.18],
+    range: [0.0, 0.15],
   },
   {
     title: "Headline impact",
     body: "CO₂e, water scarcity and data depth, calculated per garment with EU PEF and ISO 14040 methodology.",
-    range: [0.18, 0.36],
+    range: [0.15, 0.31],
   },
   {
     title: "Materials and journey",
     body: "Every fibre, every tier, every country mapped. Customers see provenance, regulators see traceability.",
-    range: [0.36, 0.60],
+    range: [0.31, 0.51],
   },
   {
     title: "Recognised standards",
     body: "French Eco-Score, EU PEF, ISO 14040, AWARE water stress. Certifications listed with issuing bodies and expiry dates.",
-    range: [0.60, 0.80],
+    range: [0.51, 0.68],
   },
   {
     title: "Care and end of life",
     body: "Repair guidance, washing instructions, take-back and recycling options. The story doesn't stop at the till.",
-    range: [0.80, 1.0],
+    range: [0.68, 0.85],
   },
 ];
 
@@ -51,8 +54,11 @@ export function ScrollTourSection() {
     offset: ["start start", "end end"],
   });
 
-  // Pan the iframe top → bottom across the section.
-  const dppY = useTransform(scrollYProgress, [0, 1], ["0%", "-82%"]);
+  // Iframe pan also completes at progress 0.85 — matches the last stop,
+  // and the remaining 0.15 of section scroll holds the iframe at its
+  // final position so the user can read the last DPP screen before the
+  // section unpins.
+  const dppY = useTransform(scrollYProgress, [0, 0.85], ["0%", "-82%"]);
 
   return (
     <section

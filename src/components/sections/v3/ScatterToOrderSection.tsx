@@ -244,7 +244,7 @@ function DesktopScatter() {
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "320vh" }}
+      style={{ height: "400vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
