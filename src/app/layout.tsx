@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { SupplyChainBackground } from "@/components/ui/SupplyChainBackground";
+import { V1Chrome } from "@/components/layout/V1Chrome";
 import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
@@ -110,7 +108,6 @@ export default function RootLayout({
       <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
-        <Navbar />
 
         {/* SVG filter for liquid glass bottom-edge refraction */}
         <svg
@@ -142,12 +139,7 @@ export default function RootLayout({
           </defs>
         </svg>
 
-        <main className="min-h-screen">
-          <SupplyChainBackground>
-              {children}
-          </SupplyChainBackground>
-        </main>
-        <Footer />
+        <V1Chrome>{children}</V1Chrome>
 
         <WebsiteBeacon />
       </body>
