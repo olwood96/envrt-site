@@ -1,0 +1,317 @@
+import type { Metadata } from "next";
+import { PageHero, FaqSnippet, ButtonV3 } from "@/components/v3";
+import {
+  AssetIcon,
+  type AssetIconType,
+} from "@/components/sections/v3/AssetIcon";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+
+export const metadata: Metadata = {
+  title: "Platform — ENVRT v3",
+  description:
+    "Supply chain mapping, in-house LCA, water scarcity, Eco-Score, DPP production and more. The full environmental platform for fashion.",
+  robots: { index: false, follow: false },
+};
+
+type Capability = {
+  index: string;
+  icon: AssetIconType;
+  name: string;
+  tagline: string;
+  body: string;
+  detail: { label: string; value: string }[];
+  cta?: { label: string; href: string };
+};
+
+const CAPABILITIES: Capability[] = [
+  {
+    index: "01",
+    icon: "supply-chain",
+    name: "Supply chain mapping",
+    tagline: "Every tier from fibre to factory, verified at source.",
+    body: "We reconstruct your supply chain across all four tiers. Tier 1 (final assembly), Tier 2 (fabric production), Tier 3 (yarn spinning) and Tier 4 (raw fibre extraction). Each node is geotagged, named and tied to evidence. Supplier follow-up is built into the platform on Growth and Pro, so the data-chasing is not yours alone.",
+    detail: [
+      { label: "Tier coverage", value: "Tier 1 to Tier 4" },
+      { label: "Verification", value: "Document upload + dated" },
+      { label: "Supplier follow-up", value: "Growth + Pro" },
+    ],
+  },
+  {
+    index: "02",
+    icon: "lca",
+    name: "In-house LCA",
+    tagline: "Per-garment lifecycle calculations. EU PEF and ISO 14040.",
+    body: "We built the calculation engine in-house. Not licensed from a third party. Six lifecycle stages from fibre to transport, each driven by per-stage emission factors, country-specific energy grids and AWARE water scarcity weighting. Every passport runs the same engine, with 68,000+ reference cells per garment.",
+    detail: [
+      { label: "Standards", value: "EU PEF, ISO 14040, AWARE" },
+      { label: "Stages modelled", value: "Fibre, yarn, fabric, dye, assembly, transport" },
+      { label: "Reference cells per LCA", value: "68,431" },
+    ],
+    cta: { label: "See the engine anatomy", href: "/preview/v3/lab" },
+  },
+  {
+    index: "03",
+    icon: "eco-score",
+    name: "French Eco-Score",
+    tagline: "Coût Environnemental built in. Government-recognised.",
+    body: "The Coût Environnemental score is calculated for every garment using the official methodology via Ecobalyse. Sixteen data blocks per product, French regulator-recognised, ready to display on the DPP or on your own product pages.",
+    detail: [
+      { label: "Methodology", value: "Coût Environnemental (Ecobalyse)" },
+      { label: "Data blocks per product", value: "16" },
+      { label: "Display", value: "DPP + embeddable widget" },
+    ],
+  },
+  {
+    index: "04",
+    icon: "dpp",
+    name: "DPP production",
+    tagline: "Hosted Digital Product Passports at a permanent URL.",
+    body: "Each garment gets a brand-customisable passport page at a permanent URL. Attach the QR to the care label, hangtag or packaging. Customers scan, regulators audit. EU ESPR-ready, with the legal framework changes tracked for you so the schema stays current.",
+    detail: [
+      { label: "Hosting", value: "envrt.com or own domain" },
+      { label: "URL", value: "Permanent, ESPR-ready" },
+      { label: "Customisation", value: "Brand voice + visuals" },
+    ],
+  },
+  {
+    index: "05",
+    icon: "vault",
+    name: "Evidence vault",
+    tagline: "Supplier certificates, test reports, declarations. Versioned and signed.",
+    body: "Every document attached to your supply chain lives in a versioned, dated, signed vault. Supplier CoCs, REACH declarations, SGS test reports, audit packs. Each one tied to the supplier, the tier and the garment it backs. When the regulator asks for evidence, it is one click away.",
+    detail: [
+      { label: "Supported formats", value: "PDF, CSV, JSON, EML, XLSX" },
+      { label: "Versioning", value: "Every change tracked" },
+      { label: "Signing", value: "Yes, with audit trail" },
+    ],
+  },
+  {
+    index: "06",
+    icon: "audit",
+    name: "Audit-ready reports",
+    tagline: "Export the methodology pack in one click. CSV, JSON, PDF.",
+    body: "Auditors and regulators do not want a slick UI. They want the data. Export the full methodology pack per garment: calculation inputs, factor sources, supplier evidence, signatures. Three formats. One click.",
+    detail: [
+      { label: "Export formats", value: "PDF, CSV, JSON" },
+      { label: "Per-garment pack", value: "Inputs + factors + evidence" },
+      { label: "Audit trail", value: "Included by default" },
+    ],
+  },
+  {
+    index: "07",
+    icon: "compliance",
+    name: "Compliance monitoring",
+    tagline: "Active watch on EU PEF, ISO updates, AGEC and US state acts.",
+    body: "Regulations move. Schemas update. We track the changes for you and apply them to your passports so you do not ship a DPP today that fails an audit in six months. Coverage includes EU PEF updates, ISO revisions, French AGEC and emerging US state-level acts.",
+    detail: [
+      { label: "Coverage", value: "EU PEF, ISO, AGEC, US state acts" },
+      { label: "Update cadence", value: "Live, applied automatically" },
+      { label: "Change log", value: "Per regulation, dated" },
+    ],
+  },
+  {
+    index: "08",
+    icon: "analytics",
+    name: "QR scan analytics",
+    tagline: "Per-SKU and brand-wide dashboards. Scans, country, dwell time.",
+    body: "Every QR scan is logged with geo, time and dwell. See which products get scanned most, where your DPP reach extends, how long customers spend reading. Available on Growth and Pro.",
+    detail: [
+      { label: "Granularity", value: "Per-SKU and brand-wide" },
+      { label: "Metrics", value: "Scans, country, dwell time" },
+      { label: "Tier", value: "Growth and Pro" },
+    ],
+  },
+  {
+    index: "09",
+    icon: "claims",
+    name: "Green-claims audit",
+    tagline: "Every marketing claim tied to source data and methodology.",
+    body: "When you say a garment is responsibly made, the platform ties that claim to the source data backing it. Material composition, supplier verification, calculation outputs. If a claim cannot be evidenced, the platform flags it before you ship.",
+    detail: [
+      { label: "Claims linked to", value: "Source data + methodology" },
+      { label: "Pre-publish check", value: "Yes, with flags" },
+      { label: "Audit pack", value: "Per claim, exportable" },
+    ],
+  },
+];
+
+const platformFaqs = [
+  {
+    question: "Which lifecycle stages does ENVRT cover?",
+    answer:
+      "Six stages: fibre production, yarn production, fabric production, dyeing, assembly and transport. Each stage runs through our in-house calculation engine using EU PEF methodology and AWARE water scarcity weighting.",
+  },
+  {
+    question: "Is ENVRT a DPP-only platform?",
+    answer:
+      "No. The DPP is one output among several. The platform does supply chain mapping across four tiers, in-house lifecycle assessment, French Eco-Score calculation, evidence management and compliance monitoring. The DPP is the publishing surface for that work.",
+  },
+  {
+    question: "Do you build your own LCA engine or use a third party?",
+    answer:
+      "Built in-house. EU PEF and ISO 14040 throughout. AWARE water scarcity model integrated. The engine is the differentiator: competitors like Retraced and TrusTrace rely on partner providers for LCA, where we own the entire stack.",
+  },
+  {
+    question: "Can I export the methodology behind every passport?",
+    answer:
+      "Yes. Three formats (PDF, CSV, JSON) per garment. Each export includes the calculation inputs, factor sources, supplier evidence and audit trail.",
+  },
+];
+
+export default function PlatformV3Page() {
+  return (
+    <main>
+      <PageHero
+        eyebrow="Platform"
+        heading={
+          <>
+            The full environmental platform.{" "}
+            <span className="text-envrt-brand-black/40">
+              Not just the DPP at the end.
+            </span>
+          </>
+        }
+        body="Nine capabilities, one platform. Supplier mapping, in-house lifecycle assessment, water scarcity, Eco-Score, hosted DPPs, evidence vault, audit reports, compliance monitoring and green-claims audit. EU PEF and ISO 14040 throughout."
+        actions={
+          <>
+            <ButtonV3 href="/preview/v3/free-dpp" variant="primary">
+              Try ENVRT on one garment<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="/preview/v3/pricing" variant="ghost">
+              See pricing<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="Platform"
+      />
+
+      <CapabilitiesList />
+
+      <FaqSnippet
+        eyebrow="Platform questions"
+        heading="Common platform questions"
+        items={platformFaqs}
+        ctaHref="/preview/v3/faq"
+        ctaLabel="See all FAQs"
+      />
+
+      <FinalCtaV3 />
+    </main>
+  );
+}
+
+function CapabilitiesList() {
+  return (
+    <section className="relative bg-envrt-brand-vista">
+      {CAPABILITIES.map((cap, i) => (
+        <CapabilityRow
+          key={cap.index}
+          cap={cap}
+          reverse={i % 2 === 1}
+          isLast={i === CAPABILITIES.length - 1}
+        />
+      ))}
+    </section>
+  );
+}
+
+function CapabilityRow({
+  cap,
+  reverse,
+  isLast,
+}: {
+  cap: Capability;
+  reverse: boolean;
+  isLast: boolean;
+}) {
+  return (
+    <div
+      className={`relative ${isLast ? "" : "border-b border-envrt-brand-black/8"}`}
+    >
+      <SectionCorners left={`ENVRT/${cap.index}`} right={cap.name} />
+
+      <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-24 lg:px-16 lg:py-28">
+        <div
+          className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${
+            reverse ? "lg:[&>*:first-child]:order-2" : ""
+          }`}
+        >
+          {/* Text */}
+          <FadeUp>
+            <div>
+              <Eyebrow>
+                {cap.index} · {cap.name}
+              </Eyebrow>
+              <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[2.5rem]">
+                {cap.tagline}
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
+                {cap.body}
+              </p>
+
+              <dl className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+                {cap.detail.map((d) => (
+                  <div key={d.label}>
+                    <dt className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[10px]">
+                      {d.label}
+                    </dt>
+                    <dd className="mt-1 font-display text-sm font-semibold tracking-tight text-envrt-brand-black sm:text-base">
+                      {d.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              {cap.cta && (
+                <div className="mt-8">
+                  <ButtonV3 href={cap.cta.href} variant="ghost">
+                    {cap.cta.label}<span>→</span>
+                  </ButtonV3>
+                </div>
+              )}
+            </div>
+          </FadeUp>
+
+          {/* Visual */}
+          <FadeUp delay={0.12}>
+            <CapabilityVisual cap={cap} />
+          </FadeUp>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CapabilityVisual({ cap }: { cap: Capability }) {
+  return (
+    <div className="relative mx-auto aspect-[5/4] w-full max-w-[520px]">
+      {/* Soft brand-tinted wash behind */}
+      <div
+        aria-hidden
+        className="absolute inset-6 rounded-3xl bg-envrt-brand-ultramarine/5"
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative flex h-32 w-32 items-center justify-center rounded-[2rem] border border-envrt-brand-black/12 bg-white shadow-[0_30px_70px_-30px_rgba(62,0,255,0.35)] sm:h-40 sm:w-40">
+          <AssetIcon
+            type={cap.icon}
+            size={56}
+            className="text-envrt-brand-ultramarine"
+          />
+        </div>
+      </div>
+
+      {/* Index chip */}
+      <span className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65">
+        <span className="text-envrt-brand-ultramarine">{cap.index}</span>
+        <span aria-hidden className="text-envrt-brand-black/20">/</span>
+        <span>Capability</span>
+      </span>
+    </div>
+  );
+}
