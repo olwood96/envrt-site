@@ -106,7 +106,7 @@ const CARDS: ScatterCard[] = [
     pill: null,
     fromX: 95, fromY: 5, fromRotate: 14, // right
     finalY: 2, arrivalTime: 0.26, z: 5,
-    rowLabel: "Tier 1 supply",
+    rowLabel: "Tier 4 · Fibre",
     rowValue: "Turkey · Aydın",
   },
   {
@@ -117,7 +117,7 @@ const CARDS: ScatterCard[] = [
     pill: null,
     fromX: 80, fromY: 85, fromRotate: 26, // bottom-right
     finalY: 6, arrivalTime: 0.30, z: 6,
-    rowLabel: "Tier 3 supply",
+    rowLabel: "Tier 1 · Assembly",
     rowValue: "Portugal · Viana do Castelo",
   },
   {
