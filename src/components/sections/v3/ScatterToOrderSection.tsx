@@ -356,34 +356,29 @@ function ScatterCardEl({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // Per-card staggered timeline:
-  //   0           → arrivalTime    Card flies from off-screen origin
-  //                                 (fromX vw, fromY vh) to its row's Y
-  //                                 position inside the DPP card.
-  //   arrivalTime → arrivalTime+0.04  Morph: card scales vertically into
-  //                                    a thin row-shaped strip at its row.
-  //   arrivalTime+0.04 → arrivalTime+0.10  Fade out, leaving the static
-  //                                         DPP row underneath visible.
+  // Per-card timeline (simpler, smoother):
+  //   0            → arrivalTime         Fly in to row Y position
+  //   arrivalTime  → arrivalTime + 0.08  Shrink (1 → 0.5) + fade (1 → 0).
+  //                                       The row content underneath reveals
+  //                                       over the EXACT same window so the
+  //                                       card and row crossfade in lockstep.
   const at = card.arrivalTime;
 
-  // Translation: off-screen → row position
   const x = useTransform(progress, [0, at], [card.fromX, 0]);
   const y = useTransform(progress, [0, at], [card.fromY, card.finalY]);
   const rotate = useTransform(progress, [0, at], [card.fromRotate, 0]);
 
-  // Morph: shrink Y, widen X to row-strip proportions
-  const scaleY = useTransform(progress, [at, at + 0.04], [1, 0.12], {
-    ease: [easeOut],
-  });
-  const scaleX = useTransform(progress, [at, at + 0.04], [1, 1.9], {
+  // Uniform shrink (one scale value, not stretched on two axes). Reads as
+  // the card gently entering the DPP — no distortion.
+  const scale = useTransform(progress, [at, at + 0.08], [1, 0.5], {
     ease: [easeOut],
   });
 
   // Section-pin gate: invisible before sticky activates
   const pinGate = useTransform(progress, [0, 0.02], [0, 1]);
 
-  // Per-card exit: fade out after morph completes
-  const exitFade = useTransform(progress, [at + 0.04, at + 0.10], [1, 0], {
+  // Fade matches the shrink window exactly
+  const exitFade = useTransform(progress, [at, at + 0.08], [1, 0], {
     ease: [easeOut],
   });
 
@@ -392,7 +387,6 @@ function ScatterCardEl({
     (vals) => (vals as number[])[0] * (vals as number[])[1],
   );
 
-  // Decorations drop just before the card lands
   const decorationOpacity = useTransform(
     progress,
     [at - 0.06, at - 0.01],
@@ -400,7 +394,7 @@ function ScatterCardEl({
     { ease: [easeInOut] },
   );
 
-  const transform = useMotionTemplate`translate(${x}vw, ${y}vh) translate(-50%, -50%) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`;
+  const transform = useMotionTemplate`translate(${x}vw, ${y}vh) translate(-50%, -50%) rotate(${rotate}deg) scale(${scale})`;
 
   return (
     <motion.div
@@ -518,12 +512,14 @@ function DppRowItem({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // Row reveals exactly when its matching card finishes morphing. Card
-  // morph is [arrivalTime, arrivalTime + 0.04]; row fades in 0 → 1 over
-  // [arrivalTime + 0.02, arrivalTime + 0.07], so the strip-shaped card and
-  // the row crossfade together — the card hands off into the row.
+  // Row reveal is locked to the EXACT same window as its matching card's
+  // shrink + fade. Card opacity 1 → 0 and row opacity 0 → 1 over the same
+  // [arrivalTime, arrivalTime + 0.08] window — a perfect crossfade at the
+  // row position. At progress 1.0 useTransform clamps to last value (1)
+  // so every row ends up at opacity 1, regardless of how far the user
+  // scrolled.
   const at = card.arrivalTime;
-  const opacity = useTransform(progress, [at + 0.02, at + 0.07], [0, 1], {
+  const opacity = useTransform(progress, [at, at + 0.08], [0, 1], {
     ease: [easeOut],
   });
 
