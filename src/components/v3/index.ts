@@ -15,3 +15,4 @@ export { ButtonV3 } from "./Button";
 export { FaqSnippet } from "./FaqSnippet";
 export { WizardStepper } from "./WizardStepper";
 export { PageHero } from "./PageHero";
+export { Navbar } from "./Navbar";
