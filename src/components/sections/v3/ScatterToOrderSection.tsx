@@ -512,19 +512,34 @@ function DppRowItem({
   card: ScatterCard;
   progress: MotionValue<number>;
 }) {
-  // Row reveal is locked to the EXACT same window as its matching card's
-  // shrink + fade. Card opacity 1 → 0 and row opacity 0 → 1 over the same
-  // [arrivalTime, arrivalTime + 0.08] window — a perfect crossfade at the
-  // row position. At progress 1.0 useTransform clamps to last value (1)
-  // so every row ends up at opacity 1, regardless of how far the user
-  // scrolled.
+  // Row population window matches the card's shrink-and-fade window
+  // exactly: [arrivalTime, arrivalTime + 0.08]. Each row reveals with
+  // three coordinated transforms so the "this row was just populated"
+  // moment reads clearly:
+  //   • opacity   0 → 1   (becomes visible)
+  //   • scale  0.94 → 1   (subtle settle-in)
+  //   • y         6 → 0   (drops the last 6px into place)
+  // Together they make the row look like it materialises into the DPP at
+  // the same beat the card dissolves. Each row is independently driven by
+  // its own card.arrivalTime, so all eight rows progressively populate
+  // top-to-bottom as their matching cards arrive.
   const at = card.arrivalTime;
+
   const opacity = useTransform(progress, [at, at + 0.08], [0, 1], {
+    ease: [easeOut],
+  });
+  const scale = useTransform(progress, [at, at + 0.08], [0.94, 1], {
+    ease: [easeOut],
+  });
+  const y = useTransform(progress, [at, at + 0.08], [6, 0], {
     ease: [easeOut],
   });
 
   return (
-    <motion.div style={{ opacity }} className="flex items-center gap-3">
+    <motion.div
+      style={{ opacity, scale, y }}
+      className="flex items-center gap-3"
+    >
       <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
         <AssetIcon type={card.icon} size={16} />
       </span>
