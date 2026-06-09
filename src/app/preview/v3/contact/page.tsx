@@ -7,10 +7,10 @@ import {
   ButtonV3,
   Card,
   Input,
-  Select,
   Textarea,
   Label,
 } from "@/components/v3";
+import { DropdownV3 } from "@/components/v3/DropdownV3";
 import {
   Eyebrow,
   SectionCorners,
@@ -139,18 +139,13 @@ export default function ContactV3Page() {
 
                 <FieldRow>
                   <Label htmlFor="interest">What are you interested in?</Label>
-                  <Select
+                  <DropdownV3
                     id="interest"
+                    placeholder="Select an option"
                     value={interest}
-                    onChange={(e) => setInterest(e.target.value)}
-                  >
-                    <option value="">Select an option</option>
-                    {INTEREST_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </Select>
+                    options={INTEREST_OPTIONS}
+                    onChange={setInterest}
+                  />
                 </FieldRow>
 
                 <FieldRow>

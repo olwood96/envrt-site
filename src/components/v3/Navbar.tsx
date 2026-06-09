@@ -169,19 +169,13 @@ export function Navbar() {
               : "border-envrt-brand-black/10"
           }`}
         >
-          {/* Wordmark + cipher */}
+          {/* Wordmark */}
           <Link
             href="/preview/v3"
-            className="flex items-center gap-2.5 pl-5 pr-4 sm:pl-6 sm:pr-5"
+            className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
             aria-label="ENVRT v3"
           >
-            <span
-              aria-hidden
-              className="font-mono text-sm text-envrt-brand-ultramarine"
-            >
-              ▽
-            </span>
-            <EnvrtLogo size="sm" />
+            <EnvrtLogo size="md" />
           </Link>
 
           <Divider />

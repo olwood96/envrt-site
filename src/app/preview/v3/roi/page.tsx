@@ -6,9 +6,9 @@ import {
   FaqSnippet,
   ButtonV3,
   Card,
-  Select,
   Label,
 } from "@/components/v3";
+import { DropdownV3 } from "@/components/v3/DropdownV3";
 import {
   Eyebrow,
   SectionCorners,
@@ -216,45 +216,46 @@ export default function RoiV3Page() {
 
                 <FieldRow>
                   <Label htmlFor="data">Data maturity</Label>
-                  <Select
+                  <DropdownV3
                     id="data"
                     value={dataMaturity}
-                    onChange={(e) =>
-                      setDataMaturity(e.target.value as DataMaturity)
-                    }
-                  >
-                    <option value="not-started">Haven&apos;t started yet</option>
-                    <option value="manual">Manual spreadsheets</option>
-                    <option value="some-systems">Some systems in place</option>
-                    <option value="digitised">Fully digitised</option>
-                  </Select>
+                    onChange={(v) => setDataMaturity(v as DataMaturity)}
+                    options={[
+                      { value: "not-started", label: "Haven't started yet" },
+                      { value: "manual", label: "Manual spreadsheets" },
+                      { value: "some-systems", label: "Some systems in place" },
+                      { value: "digitised", label: "Fully digitised" },
+                    ]}
+                  />
                 </FieldRow>
 
                 <FieldRow>
                   <Label htmlFor="market">Markets you sell into</Label>
-                  <Select
+                  <DropdownV3
                     id="market"
                     value={market}
-                    onChange={(e) => setMarket(e.target.value as Market)}
-                  >
-                    <option value="eu">European Union</option>
-                    <option value="uk">United Kingdom</option>
-                    <option value="both">Both</option>
-                  </Select>
+                    onChange={(v) => setMarket(v as Market)}
+                    options={[
+                      { value: "eu", label: "European Union" },
+                      { value: "uk", label: "United Kingdom" },
+                      { value: "both", label: "Both" },
+                    ]}
+                  />
                 </FieldRow>
 
                 <FieldRow>
                   <Label htmlFor="approach">Current sustainability approach</Label>
-                  <Select
+                  <DropdownV3
                     id="approach"
                     value={approach}
-                    onChange={(e) => setApproach(e.target.value as Approach)}
-                  >
-                    <option value="none">Nothing structured yet</option>
-                    <option value="spreadsheets">Spreadsheets and templates</option>
-                    <option value="consultant">External consultant</option>
-                    <option value="inhouse">In-house sustainability lead</option>
-                  </Select>
+                    onChange={(v) => setApproach(v as Approach)}
+                    options={[
+                      { value: "none", label: "Nothing structured yet" },
+                      { value: "spreadsheets", label: "Spreadsheets and templates" },
+                      { value: "consultant", label: "External consultant" },
+                      { value: "inhouse", label: "In-house sustainability lead" },
+                    ]}
+                  />
                 </FieldRow>
               </div>
             </Card>

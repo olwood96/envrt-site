@@ -7,10 +7,17 @@ import {
   ButtonV3,
   Card,
   Input,
-  Select,
   Label,
   WizardStepper,
 } from "@/components/v3";
+import { DropdownV3 } from "@/components/v3/DropdownV3";
+
+function toOptions(list: readonly string[], placeholder: string) {
+  return [
+    { value: "", label: placeholder },
+    ...list.map((v) => ({ value: v, label: v })),
+  ];
+}
 import {
   Eyebrow,
   SectionCorners,
@@ -278,34 +285,24 @@ function Step0({
 
         <FieldRow>
           <Label htmlFor="garment_type">Garment type</Label>
-          <Select
+          <DropdownV3
             id="garment_type"
+            placeholder="Select type"
             value={form.garment_type}
-            onChange={(e) => update("garment_type", e.target.value)}
-          >
-            <option value="">Select type</option>
-            {GARMENT_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </Select>
+            options={toOptions(GARMENT_TYPES, "Select type")}
+            onChange={(v) => update("garment_type", v)}
+          />
         </FieldRow>
 
         <FieldRow>
           <Label htmlFor="material_1">Main material</Label>
-          <Select
+          <DropdownV3
             id="material_1"
+            placeholder="Select material"
             value={form.material_1}
-            onChange={(e) => update("material_1", e.target.value)}
-          >
-            <option value="">Select material</option>
-            {MATERIALS.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </Select>
+            options={toOptions(MATERIALS, "Select material")}
+            onChange={(v) => update("material_1", v)}
+          />
         </FieldRow>
 
         <FieldRow>
@@ -370,36 +367,26 @@ function Step1({
           <Label htmlFor="country_assembly" optional>
             Country of assembly
           </Label>
-          <Select
+          <DropdownV3
             id="country_assembly"
+            placeholder="Select country"
             value={form.country_assembly}
-            onChange={(e) => update("country_assembly", e.target.value)}
-          >
-            <option value="">Select country</option>
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </Select>
+            options={toOptions(COUNTRIES, "Select country")}
+            onChange={(v) => update("country_assembly", v)}
+          />
         </FieldRow>
 
         <FieldRow>
           <Label htmlFor="business_type" optional>
             Business type
           </Label>
-          <Select
+          <DropdownV3
             id="business_type"
+            placeholder="Select business type"
             value={form.business_type}
-            onChange={(e) => update("business_type", e.target.value)}
-          >
-            <option value="">Select business type</option>
-            {BUSINESS_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </Select>
+            options={toOptions(BUSINESS_TYPES, "Select business type")}
+            onChange={(v) => update("business_type", v)}
+          />
         </FieldRow>
 
         <FieldRow>
