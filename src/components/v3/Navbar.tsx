@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ButtonV3 } from "./Button";
+import { EnvrtLogo } from "./EnvrtLogo";
 
 // v3 navbar. Floating pill centred at the top with three regions:
 // wordmark, mono-caps nav links and the primary CTA. Sliding ultramarine
@@ -87,10 +88,10 @@ export function Navbar() {
               : "border-envrt-brand-black/10"
           }`}
         >
-          {/* Region 1: wordmark / cipher */}
+          {/* Region 1: wordmark + cipher */}
           <Link
             href="/preview/v3"
-            className="flex items-center gap-2 pl-5 pr-4 sm:pl-6 sm:pr-5"
+            className="flex items-center gap-2.5 pl-5 pr-4 sm:pl-6 sm:pr-5"
             aria-label="ENVRT v3"
           >
             <span
@@ -99,9 +100,7 @@ export function Navbar() {
             >
               ▽
             </span>
-            <span className="font-n27 text-base font-bold tracking-[0.08em] text-envrt-brand-black sm:text-lg">
-              ENVRT
-            </span>
+            <EnvrtLogo size="sm" />
           </Link>
 
           {/* Region divider */}
