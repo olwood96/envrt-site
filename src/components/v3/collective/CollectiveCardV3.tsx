@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { DppPopup } from "@/components/collective/DppPopup";
+import { CompositionTag } from "@/components/collective/CompositionTag";
 import { StitchingLoader } from "@/components/ui/StitchingLoader";
 import {
   deriveOrigin,
@@ -128,13 +129,6 @@ export function CollectiveCardV3({
           crossBrandDisabled ? "pointer-events-auto opacity-40 grayscale" : ""
         }`}
       >
-        <span
-          aria-hidden
-          className="pointer-events-none absolute left-4 top-4 z-10 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine"
-        >
-          DPP/{dpp.product_sku.slice(0, 6)}
-        </span>
-
         <a
           href={detailUrl}
           data-testid="dpp-link-image"
@@ -142,6 +136,12 @@ export function CollectiveCardV3({
           className="relative block"
         >
           <div className="relative aspect-[4/3] overflow-hidden bg-envrt-brand-vista/70">
+            <CompositionTag
+              material={material}
+              origin={origin}
+              year={year}
+            />
+
             {productImageUrl ? (
               <div className="absolute inset-4">
                 <div className="relative h-full w-full">
@@ -172,51 +172,31 @@ export function CollectiveCardV3({
               </div>
             )}
 
-            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-end justify-between gap-2">
-              <div className="flex flex-wrap gap-1.5">
-                {material && (
-                  <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/75 backdrop-blur">
-                    {material}
-                  </span>
-                )}
-                {origin && (
-                  <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/75 backdrop-blur">
-                    {origin}
-                  </span>
-                )}
-                {year && (
-                  <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/75 backdrop-blur">
-                    {year}
-                  </span>
-                )}
-              </div>
-
-              {productImageUrl && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setLightboxOpen(true);
-                  }}
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-envrt-brand-black/65 backdrop-blur transition-colors hover:text-envrt-brand-ultramarine sm:opacity-0 sm:group-hover:opacity-100"
-                  aria-label="View full image"
+            {productImageUrl && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setLightboxOpen(true);
+                }}
+                className="absolute bottom-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-envrt-brand-black/65 backdrop-blur transition-colors hover:text-envrt-brand-ultramarine sm:opacity-0 sm:group-hover:opacity-100"
+                aria-label="View full image"
+              >
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
                 >
-                  <svg
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m11.25-5.25v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m11.25-5.25v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </a>
 
@@ -257,18 +237,18 @@ export function CollectiveCardV3({
           )}
 
           {hasJourney && (
-            <div className="mt-5">
+            <div className="mt-5 border-t border-envrt-brand-black/8 pt-5">
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   toggleMap();
                 }}
-                className="flex w-full items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/60 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+                className="flex w-full items-center gap-3 text-left transition-colors duration-200 hover:text-envrt-brand-ultramarine"
                 aria-expanded={mapOpen}
               >
                 <svg
-                  className="h-3 w-3"
+                  className="h-4 w-4 flex-shrink-0 text-envrt-brand-ultramarine"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
@@ -280,17 +260,25 @@ export function CollectiveCardV3({
                     d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"
                   />
                 </svg>
-                Production journey
-                <span
-                  aria-hidden
-                  className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border border-envrt-brand-black/20 text-[10px] transition-transform duration-300 ${
-                    mapOpen
-                      ? "rotate-45 border-envrt-brand-ultramarine text-envrt-brand-ultramarine"
-                      : "text-envrt-brand-black/55"
-                  }`}
-                >
-                  +
+                <span className="flex-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/75 sm:text-[11px]">
+                  Production journey
                 </span>
+                <svg
+                  aria-hidden
+                  className={`h-4 w-4 flex-shrink-0 text-envrt-brand-black/55 transition-transform duration-300 ${
+                    mapOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
               </button>
               {mapOpen && (
                 <div className="mt-3 overflow-hidden rounded-2xl border border-envrt-brand-black/8 bg-envrt-brand-vista/40">
@@ -310,7 +298,7 @@ export function CollectiveCardV3({
 
           <div className="flex-1" />
 
-          <div className="mt-6 flex items-center justify-between border-t border-envrt-brand-black/8 pt-5">
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-envrt-brand-black/8 pt-5">
             <div
               className="group/compare relative"
               onClick={(e) => {
@@ -320,20 +308,23 @@ export function CollectiveCardV3({
               }}
             >
               <label
-                className={`inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px] ${
+                className={`inline-flex items-center gap-2 ${
                   crossBrandDisabled
                     ? "cursor-not-allowed text-envrt-brand-black/35"
-                    : "cursor-pointer text-envrt-brand-black/70"
+                    : "cursor-pointer text-envrt-brand-black/65 hover:text-envrt-brand-ultramarine"
                 }`}
+                aria-label="Add to compare"
               >
                 <input
                   type="checkbox"
                   checked={isSelected}
                   disabled={(compareDisabled && !isSelected) || crossBrandDisabled}
                   onChange={() => onToggleCompare(dpp.id)}
-                  className="h-3.5 w-3.5 rounded border-envrt-brand-black/25 text-envrt-brand-ultramarine focus:ring-envrt-brand-ultramarine/30 disabled:opacity-40"
+                  className="h-4 w-4 rounded border-envrt-brand-black/25 text-envrt-brand-ultramarine focus:ring-envrt-brand-ultramarine/30 disabled:opacity-40"
                 />
-                Compare
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]">
+                  Compare
+                </span>
               </label>
               {crossBrandDisabled && (
                 <span
@@ -351,18 +342,20 @@ export function CollectiveCardV3({
               )}
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {dpp.purchase_url && (
                 <a
                   href={dpp.purchase_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+                  className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
                   data-cta="shop-product"
+                  aria-label="Shop this product"
                 >
                   Shop
                   <svg
+                    aria-hidden
                     className="h-3 w-3"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -381,7 +374,7 @@ export function CollectiveCardV3({
                 href={detailUrl}
                 data-testid="dpp-link-cta"
                 onClick={openPopup}
-                className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black transition-colors duration-200 group-hover:text-envrt-brand-ultramarine sm:text-[11px]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-envrt-brand-ultramarine px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_18px_-10px_rgba(46,21,148,0.7)] transition-all duration-200 hover:translate-y-[-1px] hover:shadow-[0_14px_24px_-12px_rgba(46,21,148,0.7)] sm:text-[11px]"
                 data-cta="view-dpp"
               >
                 View DPP

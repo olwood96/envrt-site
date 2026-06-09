@@ -39,6 +39,7 @@ const NAV: NavTopItem[] = [
   {
     kind: "group",
     label: "Product",
+    columns: 2,
     items: [
       {
         href: "/preview/v3/platform",
@@ -57,6 +58,12 @@ const NAV: NavTopItem[] = [
         label: "Free DPP",
         description: "Try ENVRT on one garment",
         icon: "dpp",
+      },
+      {
+        href: "/preview/v3/collective",
+        label: "The Collective",
+        description: "Featured DPPs from brands using ENVRT",
+        icon: "eco-score",
       },
     ],
   },
