@@ -213,7 +213,13 @@ function ComparisonTable() {
         <FadeUp delay={0.16}>
           <div className="mt-12 overflow-hidden rounded-3xl border border-envrt-brand-black/12 bg-white sm:mt-16">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[640px] table-fixed">
+                <colgroup>
+                  <col className="w-[40%]" />
+                  <col className="w-[20%]" />
+                  <col className="w-[20%]" />
+                  <col className="w-[20%]" />
+                </colgroup>
                 <thead className="sticky top-0 bg-envrt-brand-vista">
                   <tr>
                     <th className="px-4 py-4 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:px-6">
@@ -229,39 +235,37 @@ function ComparisonTable() {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
-                  {pricingComparison.categories.map((cat) => (
-                    <tbody key={cat.name}>
-                      <tr className="bg-envrt-brand-vista/50">
-                        <td
-                          colSpan={4}
-                          className="px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:px-6"
-                        >
-                          {cat.name}
+                {pricingComparison.categories.map((cat) => (
+                  <tbody key={cat.name}>
+                    <tr className="bg-envrt-brand-vista/50">
+                      <td
+                        colSpan={4}
+                        className="px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:px-6"
+                      >
+                        {cat.name}
+                      </td>
+                    </tr>
+                    {cat.features.map((feat) => (
+                      <tr
+                        key={feat.name}
+                        className="border-t border-envrt-brand-black/8"
+                      >
+                        <td className="px-4 py-3 text-sm text-envrt-brand-black/75 sm:px-6">
+                          {feat.name}
+                        </td>
+                        <td className="px-3 py-3 text-center text-sm sm:px-6">
+                          <Cell value={feat.starter} />
+                        </td>
+                        <td className="px-3 py-3 text-center text-sm sm:px-6">
+                          <Cell value={feat.growth} />
+                        </td>
+                        <td className="px-3 py-3 text-center text-sm sm:px-6">
+                          <Cell value={feat.pro} />
                         </td>
                       </tr>
-                      {cat.features.map((feat) => (
-                        <tr
-                          key={feat.name}
-                          className="border-t border-envrt-brand-black/8"
-                        >
-                          <td className="px-4 py-3 text-sm text-envrt-brand-black/75 sm:px-6">
-                            {feat.name}
-                          </td>
-                          <td className="px-3 py-3 text-center text-sm sm:px-6">
-                            <Cell value={feat.starter} />
-                          </td>
-                          <td className="px-3 py-3 text-center text-sm sm:px-6">
-                            <Cell value={feat.growth} />
-                          </td>
-                          <td className="px-3 py-3 text-center text-sm sm:px-6">
-                            <Cell value={feat.pro} />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  ))}
-                </tbody>
+                    ))}
+                  </tbody>
+                ))}
               </table>
             </div>
           </div>
