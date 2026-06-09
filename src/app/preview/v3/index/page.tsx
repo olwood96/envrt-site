@@ -40,11 +40,10 @@ const SHIPPED = [
   { href: "/preview/v3/payment/success", label: "Payment success", note: "Post-checkout confirmation page" },
   { href: "/preview/v3/collective", label: "Collective index", note: "Featured DPPs, filters, compare bar, subscribe" },
   { href: "/preview/v3/collective/envrt", label: "Brand profile", note: "Per-brand stats and product grid (sample slug)" },
+  { href: "/preview/v3/collective/compare", label: "Compare", note: "Side-by-side comparison view (needs ?products= param)" },
 ];
 
-const PENDING = [
-  "/preview/v3/collective/compare",
-];
+const PENDING: string[] = [];
 
 export default function V3IndexPage() {
   return (
@@ -90,19 +89,23 @@ export default function V3IndexPage() {
           ))}
         </ul>
 
-        <h2 className="mt-16 font-display text-2xl font-medium tracking-tight text-envrt-brand-black sm:text-3xl">
-          Pending
-        </h2>
-        <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {PENDING.map((path) => (
-            <li
-              key={path}
-              className="rounded-xl border border-envrt-brand-black/8 bg-envrt-brand-vista/50 px-3 py-2 font-mono text-[11px] text-envrt-brand-black/55"
-            >
-              {path}
-            </li>
-          ))}
-        </ul>
+        {PENDING.length > 0 && (
+          <>
+            <h2 className="mt-16 font-display text-2xl font-medium tracking-tight text-envrt-brand-black sm:text-3xl">
+              Pending
+            </h2>
+            <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {PENDING.map((path) => (
+                <li
+                  key={path}
+                  className="rounded-xl border border-envrt-brand-black/8 bg-envrt-brand-vista/50 px-3 py-2 font-mono text-[11px] text-envrt-brand-black/55"
+                >
+                  {path}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <div className="mt-16 flex flex-col gap-3 sm:flex-row">
           <ButtonV3 href="/preview/v3" variant="primary">
