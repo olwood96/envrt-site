@@ -28,10 +28,11 @@ type NavLeafItem = {
 type NavGroup = {
   label: string;
   items: NavLeafItem[];
+  columns?: 1 | 2;
 };
 
 type NavTopItem =
-  | { kind: "group"; label: string; items: NavGroup["items"] }
+  | { kind: "group"; label: string; items: NavGroup["items"]; columns?: 1 | 2 }
   | { kind: "link"; href: string; label: string };
 
 const NAV: NavTopItem[] = [
@@ -62,12 +63,25 @@ const NAV: NavTopItem[] = [
   {
     kind: "group",
     label: "Resources",
+    columns: 2,
     items: [
+      {
+        href: "/preview/v3/insights",
+        label: "Insights",
+        description: "Guides and articles",
+        icon: "chat",
+      },
       {
         href: "/preview/v3/dpp-timeline",
         label: "DPP timeline",
         description: "Regulatory milestones and countdown",
         icon: "compliance",
+      },
+      {
+        href: "/preview/v3/faq",
+        label: "FAQ",
+        description: "Common questions answered",
+        icon: "claims",
       },
       {
         href: "/preview/v3/assessment",
@@ -76,10 +90,34 @@ const NAV: NavTopItem[] = [
         icon: "audit",
       },
       {
+        href: "/preview/v3/glossary",
+        label: "Glossary",
+        description: "Plain definitions, A to Z",
+        icon: "vault",
+      },
+      {
         href: "/preview/v3/roi",
         label: "ROI calculator",
         description: "Savings vs consultants vs in-house",
         icon: "analytics",
+      },
+    ],
+  },
+  {
+    kind: "group",
+    label: "Company",
+    items: [
+      {
+        href: "/preview/v3/about",
+        label: "About",
+        description: "What we believe and why",
+        icon: "lca",
+      },
+      {
+        href: "/preview/v3/team",
+        label: "Team",
+        description: "Founders and advisors",
+        icon: "supply-chain",
       },
     ],
   },
@@ -257,7 +295,7 @@ function GroupTrigger({
   group,
   pathname,
 }: {
-  group: { label: string; items: NavLeafItem[] };
+  group: { label: string; items: NavLeafItem[]; columns?: 1 | 2 };
   pathname: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -349,7 +387,11 @@ function GroupTrigger({
             transition={{ duration: 0.18, ease: EASE_BRAND }}
             className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3"
           >
-            <DropdownCard items={group.items} pathname={pathname} />
+            <DropdownCard
+              items={group.items}
+              pathname={pathname}
+              columns={group.columns ?? 1}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -360,13 +402,23 @@ function GroupTrigger({
 function DropdownCard({
   items,
   pathname,
+  columns = 1,
 }: {
   items: NavLeafItem[];
   pathname: string;
+  columns?: 1 | 2;
 }) {
   return (
-    <div className="w-[320px] rounded-2xl border border-envrt-brand-black/12 bg-white p-2 shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)]">
-      <ul className="space-y-0.5">
+    <div
+      className={`rounded-2xl border border-envrt-brand-black/12 bg-white p-2 shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)] ${
+        columns === 2 ? "w-[580px]" : "w-[320px]"
+      }`}
+    >
+      <ul
+        className={
+          columns === 2 ? "grid grid-cols-2 gap-x-1 gap-y-0.5" : "space-y-0.5"
+        }
+      >
         {items.map((item) => (
           <li key={item.href}>
             <DropdownItem item={item} active={pathname === item.href} />

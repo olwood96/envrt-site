@@ -327,6 +327,128 @@ For high-impact proof sections (NumbersSection pattern):
 
 ---
 
+## Prose typography
+
+Used in the article template (`/preview/v3/insights/[slug]`) and any other long-form content surface. Different rules from marketing pages: tighter measure, larger leading, and the brand-display heading scale applied to article H2/H3 in body context.
+
+### Article container
+
+```tsx
+<article className="mx-auto max-w-[720px] px-5 sm:px-8">
+  {/* Prose content */}
+</article>
+```
+
+Single-column, 720px measure. Comfortable line length is 60-75 characters, which 720px at body size delivers.
+
+### Body paragraph
+
+```tsx
+<p className="text-base leading-[1.7] text-envrt-brand-black/80 sm:text-lg sm:leading-[1.7]">
+  Body text.
+</p>
+```
+
+Line height jumps to `1.7` for prose. Body opacity `/80` for slightly stronger contrast than marketing body `/70` (long-form needs more readable weight).
+
+### Article H2
+
+```tsx
+<h2 className="mt-14 font-display text-2xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:mt-16 sm:text-3xl">
+  Section heading
+</h2>
+```
+
+H2 marks major article sections. Generous top margin (`mt-14 sm:mt-16`) for breathing room between sections.
+
+### Article H3
+
+```tsx
+<h3 className="mt-10 font-display text-lg font-semibold leading-tight tracking-[-0.01em] text-envrt-brand-black sm:mt-12 sm:text-xl">
+  Sub-heading
+</h3>
+```
+
+H3 within an H2 section. `font-semibold` (not `font-medium`) to balance against the larger H2 above.
+
+### Lead paragraph
+
+```tsx
+<p className="mt-5 text-lg leading-[1.55] text-envrt-brand-black/85 sm:text-xl">
+  Lead sentence in larger type at the top of the article, between the
+  title block and the first H2.
+</p>
+```
+
+Used once per article, immediately under the title metadata. Slightly larger size and tighter leading than body to mark it as introduction.
+
+### Inline emphasis
+
+| Tag | Style | Note |
+|---|---|---|
+| `<strong>` | `font-semibold text-envrt-brand-black` | Increase weight, slightly darker |
+| `<em>` | `italic` | Default italic, no other tweak |
+| `<a>` | `text-envrt-brand-ultramarine underline underline-offset-[3px] decoration-envrt-brand-ultramarine/30 hover:decoration-envrt-brand-ultramarine` | Subtle underline that intensifies on hover |
+| `<code>` | `font-mono text-[0.92em] bg-envrt-brand-vista/80 px-1.5 py-0.5 rounded` | Inline code chip |
+
+### Pullquote
+
+```tsx
+<blockquote className="my-10 border-l-2 border-envrt-brand-ultramarine pl-6 font-display text-xl font-medium leading-[1.4] tracking-[-0.01em] text-envrt-brand-black sm:my-12 sm:text-2xl">
+  Quoted text.
+  <footer className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
+    — Attribution
+  </footer>
+</blockquote>
+```
+
+Used sparingly. Left ultramarine rule + Big Shoulders italic-feeling treatment.
+
+### Unordered + ordered lists
+
+```tsx
+<ul className="mt-5 list-disc space-y-2 pl-6 text-base leading-[1.7] text-envrt-brand-black/80 marker:text-envrt-brand-ultramarine sm:text-lg">
+  <li>List item</li>
+</ul>
+```
+
+Ultramarine bullet markers. Same leading as body paragraphs.
+
+### Code block
+
+```tsx
+<pre className="mt-6 overflow-x-auto rounded-2xl border border-envrt-brand-black/12 bg-envrt-brand-black p-5 font-mono text-sm leading-relaxed text-envrt-brand-vista">
+  <code>{`/* code */`}</code>
+</pre>
+```
+
+Dark code block, vista-tinted text. Reserves the white-card recipe for non-code content.
+
+### Inline figure
+
+```tsx
+<figure className="my-10 sm:my-12">
+  <img src="..." alt="..." className="w-full rounded-2xl" />
+  <figcaption className="mt-3 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
+    Caption text
+  </figcaption>
+</figure>
+```
+
+Full-width within the 720px article container. Caption uses the mono caps treatment.
+
+### Spacing rhythm
+
+| Distance | Tailwind | Use |
+|---|---|---|
+| H2 → first child | `mt-5 sm:mt-6` | Body paragraph immediately under heading |
+| Paragraph → paragraph | `mt-5 sm:mt-6` | Normal prose flow |
+| Paragraph → H2 | Inherited from H2's `mt-14 sm:mt-16` | No need to set on the paragraph |
+| Paragraph → list | `mt-5` on list | List sits closer to its intro line |
+| Paragraph → figure | `my-10 sm:my-12` on figure | Figures get generous breathing room |
+
+---
+
 ## Card patterns
 
 ### Brand card
