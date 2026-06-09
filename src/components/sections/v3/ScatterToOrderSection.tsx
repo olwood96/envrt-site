@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   easeInOut,
   easeOut,
   motion,
   useMotionTemplate,
-  useScroll,
+  useMotionValue,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
@@ -204,13 +204,56 @@ export function ScatterToOrderSection() {
 
 // ─── Desktop ──────────────────────────────────────────────────────────────
 
-function DesktopScatter() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+const ANIMATION_DURATION_MS = 4500;
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
+function DesktopScatter() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Time-driven progress. IntersectionObserver fires once when the section
+  // enters viewport; from then on a requestAnimationFrame loop ramps the
+  // motion value 0 → 1 over ANIMATION_DURATION_MS. Decoupled from scroll
+  // so the animation plays out predictably no matter how fast the user
+  // scrolls, and the section is a normal-height block, not a 400vh sticky
+  // monster.
+  const progress = useMotionValue(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let frameId = 0;
+    let startTime: number | null = null;
+    let started = false;
+
+    const tick = (now: number) => {
+      if (startTime === null) startTime = now;
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / ANIMATION_DURATION_MS);
+      progress.set(t);
+      if (t < 1) frameId = requestAnimationFrame(tick);
+    };
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio >= 0.35 &&
+            !started
+          ) {
+            started = true;
+            frameId = requestAnimationFrame(tick);
+          }
+        }
+      },
+      { threshold: [0.35] },
+    );
+
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, [progress]);
 
   // Step copy beats. Sequential handoffs with no overlap, otherwise the
   // outgoing step's longer body leaks through behind the incoming step.
@@ -219,87 +262,66 @@ function DesktopScatter() {
   //   "The output" 0.66 → 1.0    dwells on the populated DPP
   // Each transition is a clean 4% fade with no crossfade. New beats slide
   // up subtly (y 8 → 0) so the change reads as a chapter heading.
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.08, 0.12], [1, 1, 0]);
+  const step1Opacity = useTransform(progress, [0, 0.08, 0.12], [1, 1, 0]);
   const step2Opacity = useTransform(
-    scrollYProgress,
+    progress,
     [0.12, 0.16, 0.62, 0.66],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.66, 0.70], [0, 1]);
-  const step2Y = useTransform(scrollYProgress, [0.12, 0.18], [8, 0]);
-  const step3Y = useTransform(scrollYProgress, [0.66, 0.72], [8, 0]);
-
-  // DPP card is rendered STATIC behind the scatter cards (z-0). Permanently
-  // in the DOM at opacity 1, no scroll gating. Scatter cards (z-20+) cover
-  // it during the animation; as they fade out the DPP shows through. Rows
-  // populate independently as each card lands (see DppRowItem).
+  const step3Opacity = useTransform(progress, [0.66, 0.70], [0, 1]);
+  const step2Y = useTransform(progress, [0.12, 0.18], [8, 0]);
+  const step3Y = useTransform(progress, [0.66, 0.72], [8, 0]);
 
   return (
     <div
-      ref={sectionRef}
-      className="relative hidden lg:block"
-      style={{ height: "400vh" }}
+      ref={containerRef}
+      className="relative hidden lg:block bg-envrt-brand-vista py-24 sm:py-28 lg:py-32"
     >
-      <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
-          <div className="relative min-h-[320px]">
-            <Eyebrow>The before / after</Eyebrow>
+      <div className="mx-auto grid min-h-[80vh] w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
+        <div className="relative min-h-[320px]">
+          <Eyebrow>The before / after</Eyebrow>
 
-            <div className="relative mt-6 min-h-[280px]">
-              <Step
-                opacity={step1Opacity}
-                eyebrow="Today"
-                heading="Compliance lives in your inbox."
-                body="PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight inboxes serving one regulator, and a deadline that doesn't care which folder it's in."
-              />
-              <Step
-                opacity={step2Opacity}
-                y={step2Y}
-                eyebrow="The shift"
-                heading="Every input, in the same shape."
-                body="Each document normalised against the same database. Dated, versioned, linked back to source."
-              />
-              <Step
-                opacity={step3Opacity}
-                y={step3Y}
-                eyebrow="The output"
-                heading="garment.dpp"
-                body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator."
-              />
+          <div className="relative mt-6 min-h-[280px]">
+            <Step
+              opacity={step1Opacity}
+              eyebrow="Today"
+              heading="Compliance lives in your inbox."
+              body="PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight inboxes serving one regulator, and a deadline that doesn't care which folder it's in."
+            />
+            <Step
+              opacity={step2Opacity}
+              y={step2Y}
+              eyebrow="The shift"
+              heading="Every input, in the same shape."
+              body="Each document normalised against the same database. Dated, versioned, linked back to source."
+            />
+            <Step
+              opacity={step3Opacity}
+              y={step3Y}
+              eyebrow="The output"
+              heading="garment.dpp"
+              body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator."
+            />
+          </div>
+        </div>
+
+        {/* Right pane. Cards and DPP sit absolutely inside, anchored to
+            its centre. Cards animate in viewport units (vw/vh) so their
+            off-screen origins are genuinely off the viewport edges in
+            every direction. */}
+        <div className="relative h-[520px]">
+          {/* DPP card sits static at z-0. Scatter cards (z-20+) cover it
+              during the animation; as they fade out the DPP shows through.
+              Rows populate independently as each card lands. */}
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div className="w-[88%] max-w-[560px]">
+              <DppCard progress={progress} />
             </div>
           </div>
 
-          {/* Right pane.
-              No stage box, no overflow clip, no fixed pixel container —
-              the user explicitly didn't want a visible boundary. This
-              is just a layout anchor: relative for positioning context,
-              520px tall to balance the grid row height. Cards and DPP
-              sit absolutely inside, anchored to its centre. Cards animate
-              in viewport units (vw/vh) so their off-screen origins are
-              genuinely off the viewport edges in every direction. */}
-          <div className="relative h-[520px]">
-            {/* DPP card — STATIC, always present at z-0. No motion-driven
-                entry, no opacity ramp. Cards (z-20+) sit on top during the
-                animation; when they fade and lift off, the DPP underneath
-                is revealed. Reliability over flair: this is guaranteed to
-                be visible at the end because it's just sitting there. */}
-            <div className="absolute inset-0 z-0 flex items-center justify-center">
-              <div className="w-[88%] max-w-[560px]">
-                <DppCard progress={scrollYProgress} />
-              </div>
-            </div>
-
-            {/* Cards fly in, land at their row, shrink and fade. The row
-                underneath fades in over the same window so card-becomes-row
-                reads as one event. */}
-            {CARDS.map((card) => (
-              <ScatterCardEl
-                key={card.filename}
-                card={card}
-                progress={scrollYProgress}
-              />
-            ))}
-          </div>
+          {CARDS.map((card) => (
+            <ScatterCardEl key={card.filename} card={card} progress={progress} />
+          ))}
         </div>
       </div>
     </div>
