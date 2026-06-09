@@ -80,6 +80,8 @@ export function CollectiveCardV3({
   const mapOpen = controlledMapOpen ?? internalMapOpen;
   const toggleMap = onToggleMap ?? (() => setInternalMapOpen((p) => !p));
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [logoBroken, setLogoBroken] = useState(false);
+  const showLogo = !!card.brandLogoUrl && !logoBroken;
 
   useEffect(() => {
     if (!tooltipOpen) return;
@@ -206,14 +208,14 @@ export function CollectiveCardV3({
             onClick={(e) => e.stopPropagation()}
             className="group/brand inline-flex items-center gap-2 self-start font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:text-envrt-brand-black sm:text-[11px]"
           >
-            {card.brandLogoUrl && (
-              <span className="relative inline-flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-envrt-brand-black/10 bg-white">
-                <Image
-                  src={card.brandLogoUrl}
+            {showLogo && (
+              <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-envrt-brand-black/10 bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.brandLogoUrl!}
                   alt=""
-                  fill
-                  sizes="20px"
-                  className="object-contain p-0.5"
+                  onError={() => setLogoBroken(true)}
+                  className="h-full w-full object-contain p-0.5"
                 />
               </span>
             )}
