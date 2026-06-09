@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   easeInOut,
   easeOut,
   motion,
   useMotionTemplate,
-  useMotionValue,
+  useScroll,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
@@ -204,56 +204,17 @@ export function ScatterToOrderSection() {
 
 // ─── Desktop ──────────────────────────────────────────────────────────────
 
-const ANIMATION_DURATION_MS = 4500;
-
 function DesktopScatter() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  // Time-driven progress. IntersectionObserver fires once when the section
-  // enters viewport; from then on a requestAnimationFrame loop ramps the
-  // motion value 0 → 1 over ANIMATION_DURATION_MS. Decoupled from scroll
-  // so the animation plays out predictably no matter how fast the user
-  // scrolls, and the section is a normal-height block, not a 400vh sticky
-  // monster.
-  const progress = useMotionValue(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    let frameId = 0;
-    let startTime: number | null = null;
-    let started = false;
-
-    const tick = (now: number) => {
-      if (startTime === null) startTime = now;
-      const elapsed = now - startTime;
-      const t = Math.min(1, elapsed / ANIMATION_DURATION_MS);
-      progress.set(t);
-      if (t < 1) frameId = requestAnimationFrame(tick);
-    };
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (
-            entry.isIntersecting &&
-            entry.intersectionRatio >= 0.35 &&
-            !started
-          ) {
-            started = true;
-            frameId = requestAnimationFrame(tick);
-          }
-        }
-      },
-      { threshold: [0.35] },
-    );
-
-    obs.observe(el);
-    return () => {
-      obs.disconnect();
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [progress]);
+  // Scroll-driven progress. Section height + sticky window are sized so the
+  // full animation maps to roughly one viewport of scroll, matching the
+  // user's natural per-section scroll rhythm. Reversal is free since
+  // useScroll tracks scroll position both ways.
+  const { scrollYProgress: progress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
 
   // Step copy beats. Sequential handoffs with no overlap, otherwise the
   // outgoing step's longer body leaks through behind the incoming step.
@@ -272,12 +233,17 @@ function DesktopScatter() {
   const step2Y = useTransform(progress, [0.12, 0.18], [8, 0]);
   const step3Y = useTransform(progress, [0.66, 0.72], [8, 0]);
 
+  // 200vh container with a 100vh sticky inner. Sticky window is exactly one
+  // viewport of scroll, so a normal one-swipe traversal of the section
+  // covers progress 0 → 1 and the animation plays out start to finish.
   return (
     <div
-      ref={containerRef}
-      className="relative hidden lg:block bg-envrt-brand-vista py-24 sm:py-28 lg:py-32"
+      ref={sectionRef}
+      className="relative hidden lg:block"
+      style={{ height: "200vh" }}
     >
-      <div className="mx-auto grid min-h-[80vh] w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
+      <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
         <div className="relative min-h-[320px]">
           <Eyebrow>The before / after</Eyebrow>
 
@@ -322,6 +288,7 @@ function DesktopScatter() {
           {CARDS.map((card) => (
             <ScatterCardEl key={card.filename} card={card} progress={progress} />
           ))}
+        </div>
         </div>
       </div>
     </div>
