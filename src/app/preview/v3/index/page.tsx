@@ -39,10 +39,10 @@ const SHIPPED = [
   { href: "/preview/v3/terms", label: "Terms", note: "Terms of service with sectioned chrome" },
   { href: "/preview/v3/payment/success", label: "Payment success", note: "Post-checkout confirmation page" },
   { href: "/preview/v3/collective", label: "Collective index", note: "Featured DPPs, filters, compare bar, subscribe" },
+  { href: "/preview/v3/collective/envrt", label: "Brand profile", note: "Per-brand stats and product grid (sample slug)" },
 ];
 
 const PENDING = [
-  "/preview/v3/collective/[brand]",
   "/preview/v3/collective/compare",
 ];
 
