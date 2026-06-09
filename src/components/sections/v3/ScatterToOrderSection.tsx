@@ -177,14 +177,14 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
-// DPP row population is DECOUPLED from individual card arrivals. As soon
-// as the first card lands (0.12), all eight rows start cascading in fast
-// at a tight stagger so the DPP is visibly populated within ~16% of
-// section progress. Cards continuing to fly in afterwards read as
-// confirmation, not gradual fill.
+// DPP row population: rows fill at a constant rate from when the first
+// card lands (0.12) until the last card lands (0.54). With 8 rows,
+// stagger 0.05 and fade 0.07, the last row settles exactly at 0.54.
+// Cards landing and rows filling complete together — the DPP looks
+// "done" the moment the inputs are all in.
 const FIRST_CARD_TIME = 0.12;
-const ROW_STAGGER = 0.015;
-const ROW_FADE_DURATION = 0.05;
+const ROW_FADE_DURATION = 0.07;
+const ROW_STAGGER = 0.05;
 
 // ─── Section ──────────────────────────────────────────────────────────────
 
@@ -212,22 +212,22 @@ function DesktopScatter() {
     offset: ["start start", "end end"],
   });
 
-  // Step copy beats. Each beat aligns with one phase of the visual:
-  //   "Today"      0    → 0.16   pre-animation, sets the problem
-  //   "The shift"  0.14 → 0.68   runs alongside card arrivals + row fill
+  // Step copy beats. Sequential handoffs with no overlap, otherwise the
+  // outgoing step's longer body leaks through behind the incoming step.
+  //   "Today"      0    → 0.12   gone the moment the first card lands
+  //   "The shift"  0.12 → 0.66   runs alongside card arrivals + row fill
   //   "The output" 0.66 → 1.0    dwells on the populated DPP
-  // 6% crossfades so the swap is felt, not blinked. Each new beat slides
-  // up subtly (y 8 → 0) alongside the opacity ramp so the change reads
-  // as a chapter heading, not a fade.
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.10, 0.16], [1, 1, 0]);
+  // Each transition is a clean 4% fade with no crossfade. New beats slide
+  // up subtly (y 8 → 0) so the change reads as a chapter heading.
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.08, 0.12], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.14, 0.20, 0.62, 0.68],
+    [0.12, 0.16, 0.62, 0.66],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.66, 0.72], [0, 1]);
-  const step2Y = useTransform(scrollYProgress, [0.14, 0.22], [8, 0]);
-  const step3Y = useTransform(scrollYProgress, [0.66, 0.74], [8, 0]);
+  const step3Opacity = useTransform(scrollYProgress, [0.66, 0.70], [0, 1]);
+  const step2Y = useTransform(scrollYProgress, [0.12, 0.18], [8, 0]);
+  const step3Y = useTransform(scrollYProgress, [0.66, 0.72], [8, 0]);
 
   // DPP card is rendered STATIC behind the scatter cards (z-0). Permanently
   // in the DOM at opacity 1, no scroll gating. Scatter cards (z-20+) cover
