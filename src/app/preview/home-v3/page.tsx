@@ -1,105 +1,15 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Big_Shoulders_Text, Karla } from "next/font/google";
-import { HeroV3 } from "@/components/sections/v3/HeroV3";
-import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
-import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
-import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
-import { InTheWildSection } from "@/components/sections/v3/InTheWildSection";
-import { CapabilitiesSection } from "@/components/sections/v3/CapabilitiesSection";
-import { NumbersSection } from "@/components/sections/v3/NumbersSection";
-import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
-import { InsightsTeaseSection } from "@/components/sections/v3/InsightsTeaseSection";
-import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
-import { StickyCta } from "@/components/sections/v3/StickyCta";
-import { ScrollProgressBar } from "@/components/sections/v3/ScrollProgressBar";
-import { SceneMark } from "@/components/sections/v3/SceneMark";
-import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
-import { AlignedWithCarouselV3 } from "@/components/sections/v3/AlignedWithCarouselV3";
-import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
-import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSection";
-import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
-import { getAllPostsMeta } from "@/lib/insights";
-import { fetchPlatformStats } from "@/lib/impact-stats";
 
-const display = Big_Shoulders_Text({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const body = Karla({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
+// The v3 homepage moved to /preview/v3. This route stays as a permanent
+// redirect so any external link that still points at /preview/home-v3
+// lands on the new home.
 
 export const metadata: Metadata = {
-  title: "Homepage v3 preview — ENVRT",
-  description:
-    "v3 redesign of the ENVRT homepage. Internal preview, not for public consumption.",
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: { index: false, follow: false, noimageindex: true },
-  },
-  alternates: { canonical: undefined },
+  title: "Moved to /preview/v3",
+  robots: { index: false, follow: false },
 };
 
-export const revalidate = 3600;
-
-export default async function HomeV3PreviewPage() {
-  const [posts, stats] = await Promise.all([
-    Promise.resolve(
-      getAllPostsMeta()
-        .filter(
-          (post) => !post.draft && !Number.isNaN(new Date(post.date).getTime()),
-        )
-        .slice(0, 3),
-    ),
-    fetchPlatformStats(),
-  ]);
-
-  return (
-    <SmoothScroll>
-      <div
-        className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
-      >
-        <ScrollProgressBar />
-
-        <HeroV3 />
-        <ManifestoSection
-          stats={{
-            dppScans: stats.dppScans,
-            countryCount: stats.countryCount,
-            co2Kg: stats.co2Kg,
-          }}
-        />
-        <EsprCountdownSection />
-        <ScatterToOrderSection />
-
-        <SceneMark index="02" label="The passport" />
-        <ScrollTourSection />
-        <InTheWildSection />
-
-        <SceneMark index="03" label="What we do" />
-        <CapabilitiesSection />
-
-        <SceneMark index="04" label="The proof" dark />
-        <NumbersSection />
-        <AnatomyOfLcaSection />
-        <HowItWorksV3 />
-
-        <SceneMark index="05" label="Deeper" />
-        <AlignedWithCarouselV3 />
-        <InsightsTeaseSection posts={posts} />
-        <FAQSectionV3 />
-
-        <FinalCtaV3 />
-        <StickyCta />
-      </div>
-    </SmoothScroll>
-  );
+export default function HomeV3RedirectPage() {
+  redirect("/preview/v3");
 }
