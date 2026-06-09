@@ -177,10 +177,14 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
-// Row activations are tied to each card's arrivalTime: as a card lands at
-// its destination, its corresponding row fades in over the next 0.08 of
-// progress. With evenly-spaced arrivals (0.12 → 0.54 in 0.06 steps), rows
-// populate at a constant rate from 0.12 → 0.62.
+// DPP row population is DECOUPLED from individual card arrivals. As soon
+// as the first card lands (0.12), all eight rows start cascading in fast
+// at a tight stagger so the DPP is visibly populated within ~16% of
+// section progress. Cards continuing to fly in afterwards read as
+// confirmation, not gradual fill.
+const FIRST_CARD_TIME = 0.12;
+const ROW_STAGGER = 0.015;
+const ROW_FADE_DURATION = 0.05;
 
 // ─── Section ──────────────────────────────────────────────────────────────
 
@@ -464,8 +468,8 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
       </p>
 
       <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
-        {CARDS.map((card) => (
-          <DppRowItem key={card.filename} card={card} progress={progress} />
+        {CARDS.map((card, i) => (
+          <DppRowItem key={card.filename} card={card} index={i} progress={progress} />
         ))}
       </div>
 
@@ -492,33 +496,24 @@ function DppCard({ progress }: { progress: MotionValue<number> }) {
 
 function DppRowItem({
   card,
+  index,
   progress,
 }: {
   card: ScatterCard;
+  index: number;
   progress: MotionValue<number>;
 }) {
-  // Row population window matches the card's shrink-and-fade window
-  // exactly: [arrivalTime, arrivalTime + 0.08]. Each row reveals with
-  // three coordinated transforms so the "this row was just populated"
-  // moment reads clearly:
-  //   • opacity   0 → 1   (becomes visible)
-  //   • scale  0.94 → 1   (subtle settle-in)
-  //   • y         6 → 0   (drops the last 6px into place)
-  // Together they make the row look like it materialises into the DPP at
-  // the same beat the card dissolves. Each row is independently driven by
-  // its own card.arrivalTime, so all eight rows progressively populate
-  // top-to-bottom as their matching cards arrive.
-  const at = card.arrivalTime;
+  // Row reveal: three coordinated transforms (opacity 0→1, scale 0.94→1,
+  // y 6→0) so the row reads as "this just landed". Timing is independent
+  // of any card — rows cascade from FIRST_CARD_TIME with a tight stagger,
+  // so all eight populate within ~16% of progress. Cards continue to fly
+  // in afterwards as confirmation.
+  const start = FIRST_CARD_TIME + index * ROW_STAGGER;
+  const end = start + ROW_FADE_DURATION;
 
-  const opacity = useTransform(progress, [at, at + 0.08], [0, 1], {
-    ease: [easeOut],
-  });
-  const scale = useTransform(progress, [at, at + 0.08], [0.94, 1], {
-    ease: [easeOut],
-  });
-  const y = useTransform(progress, [at, at + 0.08], [6, 0], {
-    ease: [easeOut],
-  });
+  const opacity = useTransform(progress, [start, end], [0, 1], { ease: [easeOut] });
+  const scale = useTransform(progress, [start, end], [0.94, 1], { ease: [easeOut] });
+  const y = useTransform(progress, [start, end], [6, 0], { ease: [easeOut] });
 
   return (
     <motion.div
