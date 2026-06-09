@@ -204,9 +204,20 @@ export function CollectiveCardV3({
           <Link
             href={brandHref}
             onClick={(e) => e.stopPropagation()}
-            className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:text-envrt-brand-black sm:text-[11px]"
+            className="group/brand inline-flex items-center gap-2 self-start font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:text-envrt-brand-black sm:text-[11px]"
           >
-            {brand.name}
+            {card.brandLogoUrl && (
+              <span className="relative inline-flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-envrt-brand-black/10 bg-white">
+                <Image
+                  src={card.brandLogoUrl}
+                  alt=""
+                  fill
+                  sizes="20px"
+                  className="object-contain p-0.5"
+                />
+              </span>
+            )}
+            <span>{brand.name}</span>
           </Link>
 
           <a href={detailUrl} data-testid="dpp-link-name" onClick={openPopup}>
