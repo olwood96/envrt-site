@@ -61,7 +61,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
     fromX: -110, fromY: -90, fromRotate: -22, // top-left
-    finalY: -14, arrivalTime: 0.10, z: 1,
+    finalY: -14, arrivalTime: 0.12, z: 1,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
   },
@@ -72,7 +72,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
     fromX: -10, fromY: -110, fromRotate: 18, // top
-    finalY: -10, arrivalTime: 0.14, z: 2,
+    finalY: -10, arrivalTime: 0.18, z: 2,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
   },
@@ -83,7 +83,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: 85, fromY: -85, fromRotate: 24, // top-right
-    finalY: -6, arrivalTime: 0.18, z: 3,
+    finalY: -6, arrivalTime: 0.24, z: 3,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
   },
@@ -94,7 +94,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
     fromX: -120, fromY: 10, fromRotate: -18, // left
-    finalY: -2, arrivalTime: 0.22, z: 4,
+    finalY: -2, arrivalTime: 0.30, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
   },
@@ -105,7 +105,7 @@ const CARDS: ScatterCard[] = [
     tone: "neutral",
     pill: null,
     fromX: 95, fromY: 5, fromRotate: 14, // right
-    finalY: 2, arrivalTime: 0.26, z: 5,
+    finalY: 2, arrivalTime: 0.36, z: 5,
     rowLabel: "Tier 4 · Fibre",
     rowValue: "Turkey · Aydın",
   },
@@ -116,7 +116,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: null,
     fromX: 80, fromY: 85, fromRotate: 26, // bottom-right
-    finalY: 6, arrivalTime: 0.30, z: 6,
+    finalY: 6, arrivalTime: 0.42, z: 6,
     rowLabel: "Tier 1 · Assembly",
     rowValue: "Portugal · Viana do Castelo",
   },
@@ -127,7 +127,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
     fromX: -100, fromY: 75, fromRotate: -24, // bottom-left
-    finalY: 10, arrivalTime: 0.34, z: 7,
+    finalY: 10, arrivalTime: 0.48, z: 7,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
   },
@@ -138,7 +138,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: -5, fromY: 100, fromRotate: 16, // bottom
-    finalY: 14, arrivalTime: 0.38, z: 8,
+    finalY: 14, arrivalTime: 0.54, z: 8,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
   },
@@ -177,9 +177,10 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
   ultramarine: "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine",
 };
 
-// Row activations — rows drop in after the DPP card has finished sliding
-// up into place (~0.68), one per progress step. Last row settled by ~0.86,
-// leaving ~14% of section scroll for full-state dwell.
+// Row activations are tied to each card's arrivalTime: as a card lands at
+// its destination, its corresponding row fades in over the next 0.08 of
+// progress. With evenly-spaced arrivals (0.12 → 0.54 in 0.06 steps), rows
+// populate at a constant rate from 0.12 → 0.62.
 
 // ─── Section ──────────────────────────────────────────────────────────────
 
@@ -207,38 +208,27 @@ function DesktopScatter() {
     offset: ["start start", "end end"],
   });
 
-  // Step copy beats. Three swaps timed with the visual:
-  //   "Today" while cards are flying in (0 → 0.30)
-  //   "The shift" while cards are converging + DPP starts (0.30 → 0.55)
-  //   "The output" while DPP fills (0.55 → end)
-  // Three-step narrative, compressed to match the new card arrival window
-  // (0.10 → 0.38). All animation completes by progress ~0.46, leaving the
-  // last ~54% of section scroll as dwell at the fully-populated DPP.
-  //   "Today"      while first cards fly in     (0    → 0.10)
-  //   "The shift"  while cards land + morph     (0.08 → 0.42)
-  //   "The output" once the full DPP is shown   (0.44 → end)
-  const step1Opacity = useTransform(scrollYProgress, [0, 0.06, 0.10], [1, 1, 0]);
+  // Step copy beats. Each beat aligns with one phase of the visual:
+  //   "Today"      0    → 0.16   pre-animation, sets the problem
+  //   "The shift"  0.14 → 0.68   runs alongside card arrivals + row fill
+  //   "The output" 0.66 → 1.0    dwells on the populated DPP
+  // 6% crossfades so the swap is felt, not blinked. Each new beat slides
+  // up subtly (y 8 → 0) alongside the opacity ramp so the change reads
+  // as a chapter heading, not a fade.
+  const step1Opacity = useTransform(scrollYProgress, [0, 0.10, 0.16], [1, 1, 0]);
   const step2Opacity = useTransform(
     scrollYProgress,
-    [0.08, 0.14, 0.40, 0.46],
+    [0.14, 0.20, 0.62, 0.68],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(scrollYProgress, [0.44, 0.52], [0, 1]);
+  const step3Opacity = useTransform(scrollYProgress, [0.66, 0.72], [0, 1]);
+  const step2Y = useTransform(scrollYProgress, [0.14, 0.22], [8, 0]);
+  const step3Y = useTransform(scrollYProgress, [0.66, 0.74], [8, 0]);
 
-  // DPP card is rendered STATIC behind the scatter cards (z-0). It's
-  // permanently in the DOM at opacity 1 from the moment the page loads;
-  // we don't gate it on scroll progress. The scatter cards on top
-  // (z-20+) cover it during the animation, and fade out at the end —
-  // which reveals the DPP underneath. No motion-driven entry to debug,
-  // no possibility the DPP is hidden behind a broken transform: it's
-  // just there.
-  // Flourish pulses across the new arrival window 0.10 → 0.46
-  const flourishOpacity = useTransform(
-    scrollYProgress,
-    [0.10, 0.24, 0.46],
-    [0, 0.5, 0],
-  );
-  const flourishScale = useTransform(scrollYProgress, [0.10, 0.46], [0.6, 1.6]);
+  // DPP card is rendered STATIC behind the scatter cards (z-0). Permanently
+  // in the DOM at opacity 1, no scroll gating. Scatter cards (z-20+) cover
+  // it during the animation; as they fade out the DPP shows through. Rows
+  // populate independently as each card lands (see DppRowItem).
 
   return (
     <div
@@ -260,12 +250,14 @@ function DesktopScatter() {
               />
               <Step
                 opacity={step2Opacity}
+                y={step2Y}
                 eyebrow="The shift"
                 heading="Every input, in the same shape."
                 body="Each document normalised against the same database. Dated, versioned, linked back to source."
               />
               <Step
                 opacity={step3Opacity}
+                y={step3Y}
                 eyebrow="The output"
                 heading="garment.dpp"
                 body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator."
@@ -293,18 +285,9 @@ function DesktopScatter() {
               </div>
             </div>
 
-            {/* Flourish bloom — above DPP, below cards. Subtle reveal
-                accent at the moment cards lift off. */}
-            <motion.div
-              aria-hidden
-              style={{ opacity: flourishOpacity, scale: flourishScale }}
-              className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center"
-            >
-              <div className="h-[340px] w-[340px] rounded-full bg-envrt-brand-ultramarine/18 blur-3xl" />
-            </motion.div>
-
-            {/* Cards fly in, converge, then lift upward off-screen + fade.
-                As they exit, the static DPP behind them is revealed. */}
+            {/* Cards fly in, land at their row, shrink and fade. The row
+                underneath fades in over the same window so card-becomes-row
+                reads as one event. */}
             {CARDS.map((card) => (
               <ScatterCardEl
                 key={card.filename}
@@ -323,17 +306,19 @@ function DesktopScatter() {
 
 function Step({
   opacity,
+  y,
   eyebrow,
   heading,
   body,
 }: {
   opacity: MotionValue<number>;
+  y?: MotionValue<number>;
   eyebrow: string;
   heading: string;
   body: string;
 }) {
   return (
-    <motion.div style={{ opacity }} className="absolute inset-0">
+    <motion.div style={y ? { opacity, y } : { opacity }} className="absolute inset-0">
       <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-black/45 sm:text-[11px]">
         {eyebrow}
       </p>
