@@ -35,15 +35,15 @@ const SHIPPED = [
   { href: "/preview/v3/about", label: "About", note: "Manifesto and founding story" },
   { href: "/preview/v3/insights", label: "Insights", note: "Long-form articles index" },
   { href: "/preview/v3/insights/dpp-cost-components-fashion-2027", label: "Insights article", note: "Article template with v3 prose typography" },
+  { href: "/preview/v3/privacy", label: "Privacy", note: "Privacy policy with sectioned chrome" },
+  { href: "/preview/v3/terms", label: "Terms", note: "Terms of service with sectioned chrome" },
+  { href: "/preview/v3/payment/success", label: "Payment success", note: "Post-checkout confirmation page" },
 ];
 
 const PENDING = [
   "/preview/v3/collective",
   "/preview/v3/collective/[brand]",
   "/preview/v3/collective/compare",
-  "/preview/v3/payment/success",
-  "/preview/v3/privacy",
-  "/preview/v3/terms",
 ];
 
 export default function V3IndexPage() {
