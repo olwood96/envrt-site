@@ -7,6 +7,7 @@ import {
   motion,
   useMotionTemplate,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
@@ -208,13 +209,23 @@ export function ScatterToOrderSection() {
 function DesktopScatter() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Scroll-driven progress. Section height + sticky window are sized so the
-  // full animation maps to roughly one viewport of scroll, matching the
-  // user's natural per-section scroll rhythm. Reversal is free since
-  // useScroll tracks scroll position both ways.
-  const { scrollYProgress: progress } = useScroll({
+  // Raw scroll progress: jumps with scroll position, including violent flicks.
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
+  });
+
+  // Spring-smoothed progress. The spring lerps toward the scroll target over
+  // ~500ms regardless of how fast the user scrolls. Fast flicks get a
+  // guaranteed perceptible playthrough; slow deliberate scroll feels nearly
+  // direct because the spring keeps up. Reverse scrolls reverse cleanly.
+  // Mild settings: rest delta loose enough that the spring settles quickly
+  // once at target, not jittery in the resolved state.
+  const progress = useSpring(rawProgress, {
+    stiffness: 60,
+    damping: 22,
+    mass: 0.4,
+    restDelta: 0.001,
   });
 
   // Step copy beats. Sequential handoffs with no overlap, otherwise the
@@ -234,15 +245,16 @@ function DesktopScatter() {
   const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
   const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 400vh container with a 100vh sticky inner. Sticky window is 300vh, so
-  // the user commits a few swipes to traverse. Animation completes by
-  // progress ~0.58, leaving 42% of the section as dwell on the populated
-  // DPP — plenty of time to read the result before the section exits.
+  // 250vh container with 100vh sticky inner — sticky window is 150vh. The
+  // spring above buys the perceptible animation time, so the section itself
+  // does not need to be a 400vh commitment. Even on a fast flick the spring
+  // settles over ~500ms, guaranteeing the full animation plays through to
+  // the resolved state before the user can leave.
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "400vh" }}
+      style={{ height: "250vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
