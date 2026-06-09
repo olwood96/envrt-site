@@ -49,7 +49,7 @@ export function FooterV3() {
   return (
     <footer className="relative bg-envrt-brand-vista">
       <div className="border-t border-envrt-brand-black/8">
-        <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24">
+        <div className="mx-auto max-w-[1320px] px-5 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <BrandBlock />
             <LinkColumns />
@@ -162,7 +162,7 @@ function BottomBar() {
   const year = new Date().getFullYear();
   return (
     <div className="border-t border-envrt-brand-black/8">
-      <div className="mx-auto flex max-w-[1280px] flex-col items-start justify-between gap-3 px-5 py-8 sm:flex-row sm:items-center sm:px-8 lg:px-16">
+      <div className="mx-auto flex max-w-[1320px] flex-col items-start justify-between gap-3 px-5 py-8 sm:flex-row sm:items-center sm:px-8 lg:px-16">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/45 sm:text-[11px]">
           ENVRT/{year}
         </p>

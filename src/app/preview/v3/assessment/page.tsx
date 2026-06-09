@@ -11,10 +11,11 @@ import {
 } from "@/components/sections/v3/_shared";
 import { AssetIcon } from "@/components/sections/v3/AssetIcon";
 import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import AssessmentTool from "@/components/assessment/AssessmentTool";
 
 export const metadata: Metadata = {
-  title: "DPP Readiness Assessment — ENVRT v3",
+  title: "DPP readiness assessment | ENVRT v3",
   description:
     "A free 10-minute readiness assessment across four DPP dimensions: supply chain, product data, regulatory awareness and infrastructure.",
   robots: { index: false, follow: false },
@@ -142,6 +143,8 @@ export default function AssessmentV3Page() {
         ctaHref="/preview/v3/faq"
         ctaLabel="See all FAQs"
       />
+
+      <FinalCtaV3 />
     </main>
   );
 }
@@ -150,7 +153,7 @@ function Dimensions() {
   return (
     <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
       <SectionCorners left="ENVRT/02" right="Dimensions" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           <FadeUp>
             <Eyebrow>What we score</Eyebrow>

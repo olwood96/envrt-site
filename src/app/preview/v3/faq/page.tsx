@@ -145,7 +145,7 @@ function Section({
   return (
     <section
       id={`section-${section.index}`}
-      className={`relative bg-envrt-brand-vista pb-16 sm:pb-20 ${
+      className={`relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32 ${
         isLast ? "" : ""
       }`}
     >

@@ -34,7 +34,7 @@ export function HeroV3() {
       <DotGridBackground opacity={0.04} size={22} />
       <ConstructionMarks />
 
-      <div className="relative mx-auto max-w-[1280px] px-5 pt-24 pb-12 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 pt-24 pb-12 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-16">
         <div className="max-w-xl lg:py-12">
           <FadeUp>
             <Eyebrow>Environmental platform · for fashion</Eyebrow>
@@ -89,7 +89,7 @@ export function HeroV3() {
         </FadeUp>
       </div>
 
-      <div className="relative mx-auto max-w-[1280px] px-5 pb-16 sm:px-8 lg:px-12 lg:pb-24">
+      <div className="relative mx-auto max-w-[1320px] px-5 pb-16 sm:px-8 lg:px-12 lg:pb-24">
         <FadeUp delay={0.3}>
           <CapabilityStrip />
         </FadeUp>

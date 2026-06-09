@@ -184,7 +184,7 @@ export default function RoiV3Page() {
 
       <section className="relative bg-envrt-brand-vista py-16 sm:py-20 lg:py-24">
         <SectionCorners left="ENVRT/02" right="Calculator" />
-        <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-10 lg:px-16">
+        <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-6 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-10 lg:px-16">
           {/* Inputs */}
           <FadeUp>
             <Card>

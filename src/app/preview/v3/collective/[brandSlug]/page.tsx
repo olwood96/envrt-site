@@ -84,7 +84,7 @@ function BrandHero({
       <DotGridBackground opacity={0.04} size={22} />
       <SectionCorners left="ENVRT/01" right={brand.name} />
 
-      <div className="relative mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <Link
             href="/preview/v3/collective"
@@ -227,7 +227,7 @@ function StatsSection({
   return (
     <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24">
       <SectionCorners left="ENVRT/02" right="Aggregate stats" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
           <FadeUp>
             <Eyebrow>02 · Brand at a glance</Eyebrow>
@@ -269,12 +269,12 @@ function ProductsSection({
   brand: CollectiveBrand;
 }) {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners
         left="ENVRT/03"
         right={`${cards.length} ${cards.length === 1 ? "product" : "products"}`}
       />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
           <FadeUp>
             <Eyebrow>03 · Featured products</Eyebrow>

@@ -24,7 +24,7 @@ import { fetchPlatformStats } from "@/lib/impact-stats";
 // only renders the section composition.
 
 export const metadata: Metadata = {
-  title: "ENVRT — v3 preview",
+  title: "ENVRT v3 preview",
   description:
     "v3 redesign of the ENVRT homepage. Internal preview, not for public consumption.",
   robots: {

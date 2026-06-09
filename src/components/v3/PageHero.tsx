@@ -32,7 +32,7 @@ export function PageHero({
       <DotGridBackground opacity={0.04} size={22} />
       {cornerRight && <SectionCorners left={cornerLeft} right={cornerRight} />}
 
-      <div className="relative mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="max-w-3xl">
           <FadeUp>
             <Eyebrow>{eyebrow}</Eyebrow>

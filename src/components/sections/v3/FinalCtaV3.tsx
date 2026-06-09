@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Button } from "@/components/ui/Button";
+import { ButtonV3 } from "@/components/v3";
 import { FadeUp } from "@/components/ui/Motion";
 import { DotGridBackground, Eyebrow, SectionCorners } from "./_shared";
 
@@ -55,24 +55,22 @@ export function FinalCtaV3() {
         </FadeUp>
         <FadeUp delay={0.26}>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row">
-            {/* Brand-aligned primary, matches hero. */}
-            <Button
-              href="/free-dpp"
-              size="md"
-              className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
+            <ButtonV3
+              href="/preview/v3/free-dpp"
+              variant="primary"
+              size="lg"
               data-cta="final-v3-free-dpp"
             >
-              Get a free DPP<span className="ml-2">→</span>
-            </Button>
-            <Button
-              href="/contact"
+              Get a free DPP<span aria-hidden>→</span>
+            </ButtonV3>
+            <ButtonV3
+              href="/preview/v3/contact"
               variant="secondary"
-              size="md"
-              className="w-full sm:w-auto sm:px-10 sm:py-3.5 sm:text-base"
+              size="lg"
               data-cta="final-v3-book-demo"
             >
               Book a demo
-            </Button>
+            </ButtonV3>
           </div>
         </FadeUp>
       </div>

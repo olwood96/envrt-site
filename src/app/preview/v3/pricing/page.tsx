@@ -7,7 +7,7 @@ import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 
 export const metadata: Metadata = {
-  title: "Pricing — ENVRT v3",
+  title: "Pricing | ENVRT v3",
   description: "Three tiers. SME pricing for fashion environmental work.",
   robots: { index: false, follow: false },
 };
@@ -85,7 +85,7 @@ function PricingTiers() {
   return (
     <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
       <SectionCorners left="ENVRT/02" right="Tiers" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           <FadeUp>
             <Eyebrow>Three tiers</Eyebrow>
@@ -198,7 +198,7 @@ function ComparisonTable() {
       style={{ overflowX: "clip" }}
     >
       <SectionCorners left="ENVRT/03" right="Compare" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           <FadeUp>
             <Eyebrow>What is in each tier</Eyebrow>

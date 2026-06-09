@@ -74,7 +74,7 @@ function CompareHero({
       <DotGridBackground opacity={0.04} size={22} />
       <SectionCorners left="ENVRT/01" right="Compare" />
 
-      <div className="relative mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <Link
@@ -115,9 +115,9 @@ function CompareHero({
 
 function ComparisonSection({ cards }: { cards: CollectiveCardData[] }) {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/02" right="Comparison" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
           <FadeUp>
             <Eyebrow>02 · Head to head</Eyebrow>

@@ -65,9 +65,9 @@ function GridSection({
   filters: Awaited<ReturnType<typeof getFeaturedDpps>>["filters"];
 }) {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/02" right="Featured DPPs" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
           <FadeUp>
             <Eyebrow>02 · Browse</Eyebrow>
@@ -112,7 +112,7 @@ function GridSection({
 
 function SubscribeCtaSection() {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/03" right="Newsletter" />
       <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">

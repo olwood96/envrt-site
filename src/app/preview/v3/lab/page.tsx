@@ -15,7 +15,7 @@ import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSectio
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 
 export const metadata: Metadata = {
-  title: "Lab — ENVRT v3",
+  title: "Lab | ENVRT v3",
   description:
     "Inside the ENVRT calculation engine. EU PEF, ISO 14040, AWARE water scarcity. Built in-house, not licensed.",
   robots: { index: false, follow: false },
@@ -149,7 +149,7 @@ function FactorSources() {
   return (
     <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
       <SectionCorners left="ENVRT/03" right="Sources" />
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-16">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           <FadeUp>
             <Eyebrow>Factor sources</Eyebrow>

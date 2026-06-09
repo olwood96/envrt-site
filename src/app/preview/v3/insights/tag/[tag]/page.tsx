@@ -126,7 +126,7 @@ function ResultsSection({
   displayTag: string;
 }) {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/02" right={`${posts.length} results`} />
       <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">

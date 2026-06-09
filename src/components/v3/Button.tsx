@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 // v3 brand button. Three variants:
-//   primary  — ultramarine, white text, ultramarine glow shadow
-//   secondary — white, black border, used as a side-by-side foil to primary
-//   ghost     — no background, hover lifts the ultramarine accent
+//   primary    ultramarine, white text, ultramarine glow shadow
+//   secondary  white, black border, used as a side-by-side foil to primary
+//   ghost      no background, hover lifts the ultramarine accent
 
 type ButtonV3Variant = "primary" | "secondary" | "ghost";
 type ButtonV3Size = "md" | "lg";
@@ -42,8 +42,9 @@ export function ButtonV3({
   const classes = `inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 ${VARIANTS[variant]} ${SIZES[size]} ${className ?? ""}`;
 
   if (href) {
+    // Forward data-* and other HTML attrs (e.g. data-cta) onto the anchor
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} {...(rest as Record<string, unknown>)}>
         {children}
       </Link>
     );

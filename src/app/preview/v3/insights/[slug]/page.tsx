@@ -127,7 +127,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="relative pb-20 sm:pb-28">
+      <section className="relative pb-20 sm:pb-24 lg:pb-32">
         <SectionCorners left="ENVRT/02" right="Article" />
         <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
           <div className="mx-auto max-w-[720px] border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
@@ -166,7 +166,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
       </section>
 
       {related.length > 0 && (
-        <section className="relative bg-envrt-brand-vista pb-20 sm:pb-28">
+        <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
           <SectionCorners left="ENVRT/03" right="Related" />
           <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
             <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">

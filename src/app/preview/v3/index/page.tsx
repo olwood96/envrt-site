@@ -50,7 +50,7 @@ export default function V3IndexPage() {
     <main className="relative bg-envrt-brand-vista">
       <SectionCorners left="ENVRT/v3" right="Preview index" />
 
-      <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-28 lg:px-16 lg:py-32">
+      <div className="mx-auto max-w-[1320px] px-5 py-20 sm:px-8 sm:py-28 lg:px-16 lg:py-32">
         <Eyebrow>v3 preview</Eyebrow>
         <h1 className="mt-5 max-w-3xl font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
           Every page under /preview/v3.

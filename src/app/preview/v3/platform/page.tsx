@@ -12,7 +12,7 @@ import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 
 export const metadata: Metadata = {
-  title: "Platform — ENVRT v3",
+  title: "Platform | ENVRT v3",
   description:
     "Supply chain mapping, in-house LCA, water scarcity, Eco-Score, DPP production and more. The full environmental platform for fashion.",
   robots: { index: false, follow: false },
@@ -236,7 +236,7 @@ function CapabilityRow({
     >
       <SectionCorners left={`ENVRT/${cap.index}`} right={cap.name} />
 
-      <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-24 lg:px-16 lg:py-28">
+      <div className="mx-auto max-w-[1320px] px-5 py-20 sm:px-8 sm:py-24 lg:px-16 lg:py-28">
         <div
           className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${
             reverse ? "lg:[&>*:first-child]:order-2" : ""
