@@ -540,97 +540,87 @@ function DppRowItem({
 // ─── Mobile ───────────────────────────────────────────────────────────────
 
 function MobileScatter() {
-  const mobileCards = [CARDS[0], CARDS[2], CARDS[5], CARDS[7]];
+  const sectionRef = useRef<HTMLDivElement>(null);
 
+  const { scrollYProgress: rawProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Same spring config as desktop. Touch scroll is more momentum-driven on
+  // mobile so the smoothing matters even more here — without it a fast
+  // flick blurs the animation past.
+  const progress = useSpring(rawProgress, {
+    stiffness: 60,
+    damping: 22,
+    mass: 0.4,
+    restDelta: 0.001,
+  });
+
+  const step1Opacity = useTransform(progress, [0, 0.06, 0.10], [1, 1, 0]);
+  const step2Opacity = useTransform(
+    progress,
+    [0.10, 0.14, 0.50, 0.54],
+    [0, 1, 1, 0],
+  );
+  const step3Opacity = useTransform(progress, [0.54, 0.58], [0, 1]);
+  const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
+  const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
+
+  // 220vh container, 100vh sticky inner. Sticky window 120vh. Spring buys
+  // the animation playtime regardless of how violently the user flicks.
   return (
-    <div className="lg:hidden">
-      <div className="mx-auto max-w-[640px] px-5 py-20 sm:px-8 sm:py-24">
-        <Eyebrow>Today</Eyebrow>
-        <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
-          Compliance lives in your inbox.
-        </h2>
-        <p className="mt-4 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
-          PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight
-          inboxes serving one regulator, and a deadline that doesn&apos;t care
-          which folder it&apos;s in.
-        </p>
+    <div
+      ref={sectionRef}
+      className="relative lg:hidden"
+      style={{ height: "220vh" }}
+    >
+      <div className="sticky top-0 flex h-screen flex-col bg-envrt-brand-vista px-5 pt-12 pb-6 sm:px-8 sm:pt-16 sm:pb-8">
+        {/* Text block — pinned top. Step copy crossfades here. */}
+        <div className="flex-shrink-0">
+          <Eyebrow>The before / after</Eyebrow>
 
-        <div className="relative mx-auto mt-10 grid w-full max-w-[420px] grid-cols-2 gap-x-3 gap-y-4">
-          {mobileCards.map((card, i) => (
-            <div
+          <div className="relative mt-4 min-h-[200px] sm:min-h-[220px]">
+            <Step
+              opacity={step1Opacity}
+              eyebrow="Today"
+              heading="Compliance lives in your inbox."
+              body="PDFs, spreadsheets, supplier WhatsApps, expired certificates. Eight inboxes serving one regulator."
+            />
+            <Step
+              opacity={step2Opacity}
+              y={step2Y}
+              eyebrow="The shift"
+              heading="Every input, in the same shape."
+              body="Each document normalised against the same database. Dated, versioned, linked back to source."
+            />
+            <Step
+              opacity={step3Opacity}
+              y={step3Y}
+              eyebrow="The output"
+              heading="garment.dpp"
+              body="One passport. Hosted at a permanent URL, scannable by a customer, exportable to a regulator."
+            />
+          </div>
+        </div>
+
+        {/* Scatter + DPP — fills remaining height. Cards animate in viewport
+            units (vw/vh), so they enter from off the viewport edges, not the
+            container edges. */}
+        <div className="relative mt-4 flex-1">
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div className="w-full">
+              <DppCard progress={progress} />
+            </div>
+          </div>
+
+          {CARDS.map((card) => (
+            <ScatterCardEl
               key={card.filename}
-              style={{ transform: `rotate(${[-4, 3, -2, 4][i]}deg)` }}
-              className="flex justify-self-center"
-            >
-              <CardChrome card={card} />
-            </div>
+              card={card}
+              progress={progress}
+            />
           ))}
-        </div>
-
-        <div className="my-12 flex items-center gap-3 sm:my-14">
-          <span aria-hidden className="h-px flex-1 bg-envrt-brand-black/15" />
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]">
-            ENVRT ↓
-          </span>
-          <span aria-hidden className="h-px flex-1 bg-envrt-brand-black/15" />
-        </div>
-
-        <Eyebrow>The output</Eyebrow>
-        <h2 className="mt-3 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl">
-          garment.dpp
-        </h2>
-        <p className="mt-4 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
-          Eight inputs become eight rows. Hosted at a permanent URL, scannable
-          by a customer, exportable to a regulator.
-        </p>
-
-        <div className="mt-8 rounded-3xl border border-envrt-brand-black/12 bg-white p-5 shadow-[0_30px_70px_-30px_rgba(62,0,255,0.45)] sm:p-6">
-          <div className="flex items-center justify-between gap-3">
-            <LivePill label="Live · verified" />
-            <span className="font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45">
-              ENVRT/DPP
-            </span>
-          </div>
-          <p className="mt-3 font-mono text-[10px] font-medium text-envrt-brand-black/55">
-            garment.dpp
-          </p>
-          <p className="mt-1 font-display text-xl font-medium tracking-[-0.01em] text-envrt-brand-black">
-            {HOODIE.name}
-          </p>
-
-          <div className="mt-5 space-y-2 border-t border-envrt-brand-black/10 pt-4">
-            {CARDS.map((card) => (
-              <div key={card.filename} className="flex items-center gap-3">
-                <span className={`flex-shrink-0 ${TONE_ROW_ACCENT[card.tone]}`}>
-                  <AssetIcon type={card.icon} size={16} />
-                </span>
-                <span className="flex-shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/60">
-                  {card.rowLabel}
-                </span>
-                <span aria-hidden className="flex-1 border-b border-dotted border-envrt-brand-black/15" />
-                <span className="flex-shrink-0 font-display text-xs font-semibold tracking-[-0.01em] text-envrt-brand-black">
-                  {card.rowValue}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 flex items-center justify-between rounded-xl bg-envrt-brand-vista/70 p-3">
-            <div className="flex items-center gap-2.5">
-              <AssetIcon type="qr" size={28} className="text-envrt-brand-black" />
-              <div>
-                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-                  Permanent URL
-                </p>
-                <p className="font-mono text-[10px] text-envrt-brand-black">
-                  {HOODIE.url}
-                </p>
-              </div>
-            </div>
-            <span className="font-mono text-[10px] font-medium text-envrt-brand-ultramarine">
-              ↗
-            </span>
-          </div>
         </div>
       </div>
     </div>
