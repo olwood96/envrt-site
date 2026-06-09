@@ -61,7 +61,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Overdue", tone: "crimson" },
     fromX: -110, fromY: -90, fromRotate: -22, // top-left
-    finalY: -14, arrivalTime: 0.12, z: 1,
+    finalY: -14, arrivalTime: 0.10, z: 1,
     rowLabel: "CO₂e total",
     rowValue: "7.45 kg",
   },
@@ -72,7 +72,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: { label: "Pass", tone: "ultramarine" },
     fromX: -10, fromY: -110, fromRotate: 18, // top
-    finalY: -10, arrivalTime: 0.18, z: 2,
+    finalY: -10, arrivalTime: 0.15, z: 2,
     rowLabel: "Water · AWARE",
     rowValue: "6,477 L",
   },
@@ -83,7 +83,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: 85, fromY: -85, fromRotate: 24, // top-right
-    finalY: -6, arrivalTime: 0.24, z: 3,
+    finalY: -6, arrivalTime: 0.20, z: 3,
     rowLabel: "Composition",
     rowValue: "80% organic cotton",
   },
@@ -94,7 +94,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Expired", tone: "crimson" },
     fromX: -120, fromY: 10, fromRotate: -18, // left
-    finalY: -2, arrivalTime: 0.30, z: 4,
+    finalY: -2, arrivalTime: 0.25, z: 4,
     rowLabel: "Garment mass",
     rowValue: "0.35 kg",
   },
@@ -105,7 +105,7 @@ const CARDS: ScatterCard[] = [
     tone: "neutral",
     pill: null,
     fromX: 95, fromY: 5, fromRotate: 14, // right
-    finalY: 2, arrivalTime: 0.36, z: 5,
+    finalY: 2, arrivalTime: 0.30, z: 5,
     rowLabel: "Tier 4 · Fibre",
     rowValue: "Turkey · Aydın",
   },
@@ -116,7 +116,7 @@ const CARDS: ScatterCard[] = [
     tone: "ultramarine",
     pill: null,
     fromX: 80, fromY: 85, fromRotate: 26, // bottom-right
-    finalY: 6, arrivalTime: 0.42, z: 6,
+    finalY: 6, arrivalTime: 0.35, z: 6,
     rowLabel: "Tier 1 · Assembly",
     rowValue: "Portugal · Viana do Castelo",
   },
@@ -127,7 +127,7 @@ const CARDS: ScatterCard[] = [
     tone: "crimson",
     pill: { label: "Missing", tone: "crimson" },
     fromX: -100, fromY: 75, fromRotate: -24, // bottom-left
-    finalY: 10, arrivalTime: 0.48, z: 7,
+    finalY: 10, arrivalTime: 0.40, z: 7,
     rowLabel: "REACH compliance",
     rowValue: "Verified",
   },
@@ -138,7 +138,7 @@ const CARDS: ScatterCard[] = [
     tone: "vibrant",
     pill: null,
     fromX: -5, fromY: 100, fromRotate: 16, // bottom
-    finalY: 14, arrivalTime: 0.54, z: 8,
+    finalY: 14, arrivalTime: 0.45, z: 8,
     rowLabel: "Standards",
     rowValue: "EU PEF · ISO 14040",
   },
@@ -178,12 +178,13 @@ const PILL_STYLE: Record<NonNullable<Pill>["tone"], string> = {
 };
 
 // DPP row population: rows fill at a constant rate from when the first
-// card lands (0.12) until the last card lands (0.54). With 8 rows,
-// stagger 0.05 and fade 0.07, the last row settles exactly at 0.54.
-// Cards landing and rows filling complete together — the DPP looks
-// "done" the moment the inputs are all in.
-const FIRST_CARD_TIME = 0.12;
-const ROW_FADE_DURATION = 0.07;
+// card lands (0.10) until the last card lands (0.45). With 8 rows,
+// stagger 0.05 and fade 0.06, the last row settles at 0.51 — just after
+// the last card morph completes. Animation is fully resolved by progress
+// 0.58 (when Step 3 finishes fading in), leaving 42% of the section as
+// dwell on the populated DPP.
+const FIRST_CARD_TIME = 0.10;
+const ROW_FADE_DURATION = 0.06;
 const ROW_STAGGER = 0.05;
 
 // ─── Section ──────────────────────────────────────────────────────────────
@@ -218,29 +219,30 @@ function DesktopScatter() {
 
   // Step copy beats. Sequential handoffs with no overlap, otherwise the
   // outgoing step's longer body leaks through behind the incoming step.
-  //   "Today"      0    → 0.12   gone the moment the first card lands
-  //   "The shift"  0.12 → 0.66   runs alongside card arrivals + row fill
-  //   "The output" 0.66 → 1.0    dwells on the populated DPP
+  //   "Today"      0    → 0.10   gone the moment the first card lands
+  //   "The shift"  0.10 → 0.54   runs alongside card arrivals + row fill
+  //   "The output" 0.54 → 1.0    dwells on the populated DPP
   // Each transition is a clean 4% fade with no crossfade. New beats slide
   // up subtly (y 8 → 0) so the change reads as a chapter heading.
-  const step1Opacity = useTransform(progress, [0, 0.08, 0.12], [1, 1, 0]);
+  const step1Opacity = useTransform(progress, [0, 0.06, 0.10], [1, 1, 0]);
   const step2Opacity = useTransform(
     progress,
-    [0.12, 0.16, 0.62, 0.66],
+    [0.10, 0.14, 0.50, 0.54],
     [0, 1, 1, 0],
   );
-  const step3Opacity = useTransform(progress, [0.66, 0.70], [0, 1]);
-  const step2Y = useTransform(progress, [0.12, 0.18], [8, 0]);
-  const step3Y = useTransform(progress, [0.66, 0.72], [8, 0]);
+  const step3Opacity = useTransform(progress, [0.54, 0.58], [0, 1]);
+  const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
+  const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 200vh container with a 100vh sticky inner. Sticky window is exactly one
-  // viewport of scroll, so a normal one-swipe traversal of the section
-  // covers progress 0 → 1 and the animation plays out start to finish.
+  // 400vh container with a 100vh sticky inner. Sticky window is 300vh, so
+  // the user commits a few swipes to traverse. Animation completes by
+  // progress ~0.58, leaving 42% of the section as dwell on the populated
+  // DPP — plenty of time to read the result before the section exits.
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "200vh" }}
+      style={{ height: "400vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
