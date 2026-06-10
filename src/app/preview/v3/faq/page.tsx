@@ -67,7 +67,7 @@ const SECTIONS: FaqSection[] = [
 
 export default function FaqV3Page() {
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="FAQ"

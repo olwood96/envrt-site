@@ -20,7 +20,7 @@ export default function TeamV3Page() {
   const advisors = teamMembers.filter((m) => m.type === "advisor");
 
   return (
-    <main>
+    <main className="theme-lilac">
       <PageHero
         tone="lilac"
         eyebrow="Team"

@@ -34,8 +34,8 @@ export function FinalCtaV3() {
       </motion.div>
 
       <DotGridBackground />
-      <span aria-hidden className="pointer-events-none absolute inset-x-12 top-0 h-px bg-envrt-brand-ultramarine/30" />
-      <span aria-hidden className="pointer-events-none absolute inset-x-12 bottom-0 h-px bg-envrt-brand-ultramarine/30" />
+      <span aria-hidden className="pointer-events-none absolute inset-x-12 top-0 h-px bg-[rgb(var(--accent-rgb)/0.45)]" />
+      <span aria-hidden className="pointer-events-none absolute inset-x-12 bottom-0 h-px bg-[rgb(var(--accent-rgb)/0.45)]" />
       <SectionCorners left="ENVRT/CTA" right="v3" />
 
       <div className="relative mx-auto max-w-[1100px] px-5 text-center sm:px-8 lg:px-16">

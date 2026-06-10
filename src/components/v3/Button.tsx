@@ -2,9 +2,14 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 // v3 brand button. Three variants:
-//   primary    ultramarine, white text, ultramarine glow shadow
+//   primary    accent bg + accent ink, accent glow shadow
 //   secondary  white, black border, used as a side-by-side foil to primary
-//   ghost      no background, hover lifts the ultramarine accent
+//   ghost      no background, hover lifts the accent
+//
+// Colours pull from --accent-rgb / --accent-ink-rgb CSS variables set by
+// the page wrapper's theme-* class. Default fallback is ultramarine (see
+// :root in globals.css), so any page without a theme class still renders
+// ultramarine without prop-drilling.
 
 type ButtonV3Variant = "primary" | "secondary" | "ghost";
 type ButtonV3Size = "md" | "lg";
@@ -18,11 +23,11 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const VARIANTS: Record<ButtonV3Variant, string> = {
   primary:
-    "bg-envrt-brand-ultramarine text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:bg-envrt-brand-ultramarine/90",
+    "bg-[rgb(var(--accent-rgb))] text-[rgb(var(--accent-ink-rgb))] shadow-[0_12px_28px_-14px_rgb(var(--accent-rgb)/0.6)] hover:opacity-90",
   secondary:
     "bg-white text-envrt-brand-black border border-envrt-brand-black/12 hover:border-envrt-brand-black/25",
   ghost:
-    "bg-transparent text-envrt-brand-black hover:text-envrt-brand-ultramarine",
+    "bg-transparent text-envrt-brand-black hover:text-[rgb(var(--accent-rgb))]",
 };
 
 const SIZES: Record<ButtonV3Size, string> = {

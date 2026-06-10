@@ -56,7 +56,7 @@ export default async function InsightsV3TagPage({ params }: PageProps) {
   const otherTags = getAllTags().filter((t) => tagSlug(t) !== tagSlug(tag));
 
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow={`#${displayTag}`}

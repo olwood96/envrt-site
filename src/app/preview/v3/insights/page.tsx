@@ -35,7 +35,7 @@ export default function InsightsV3IndexPage() {
   const rest = featured ? posts.filter((p) => p.slug !== featured.slug) : posts;
 
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="Insights"

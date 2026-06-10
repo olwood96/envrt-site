@@ -54,7 +54,7 @@ export default async function CompareV3Page({ searchParams }: PageProps) {
   const brand = validCards[0].brand;
 
   return (
-    <main>
+    <main className="theme-neon">
       <CompareHero brandName={brand.name} count={validCards.length} />
       <ComparisonSection cards={validCards} />
       <FinalCtaV3 />

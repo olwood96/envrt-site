@@ -127,7 +127,7 @@ export default function DppTimelineV3Page() {
   }, []);
 
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="Regulatory timeline"

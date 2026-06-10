@@ -70,7 +70,9 @@ export type EyebrowTone =
   | "neon"
   | "sunny"
   | "lilac"
-  | "white";
+  | "white"
+  | "ink"; // brand-black text. Use on saturated coloured backgrounds where
+//          the chip variant would blend in (sunny hero, lilac hero, etc).
 
 const EYEBROW_TEXT: Record<EyebrowTone, string> = {
   default: "text-envrt-brand-ultramarine",
@@ -78,6 +80,7 @@ const EYEBROW_TEXT: Record<EyebrowTone, string> = {
   sunny: "text-envrt-brand-sunny",
   lilac: "text-envrt-brand-lilac",
   white: "text-white/85",
+  ink: "text-envrt-brand-black/85",
 };
 
 const EYEBROW_CHIP: Partial<Record<EyebrowTone, string>> = {

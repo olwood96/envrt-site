@@ -22,7 +22,7 @@ export default async function CollectiveV3Page() {
   const { cards, filters } = await getFeaturedDpps();
 
   return (
-    <main>
+    <main className="theme-neon">
       <PageHero
         tone="neon"
         eyebrow="The Collective"

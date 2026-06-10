@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function AboutV3Page() {
   return (
-    <main>
+    <main className="theme-lilac">
       <PageHero
         tone="lilac"
         eyebrow="About"

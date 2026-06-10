@@ -164,7 +164,7 @@ export default function GlossaryV3Page() {
   const presentLetters = new Set(GROUPS.map((g) => g.letter));
 
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="Glossary"

@@ -51,7 +51,7 @@ export default async function BrandProfileV3Page({ params }: PageProps) {
   const engagement = await getBrandEngagement(brand.id);
 
   return (
-    <main>
+    <main className="theme-neon">
       <CollectiveBeacon brandId={brand.id} brandSlug={brandSlug} />
 
       <BrandHero brand={brand} cards={cards} />

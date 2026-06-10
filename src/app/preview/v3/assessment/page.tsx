@@ -83,7 +83,7 @@ const faqs = [
 
 export default function AssessmentV3Page() {
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="Readiness assessment"

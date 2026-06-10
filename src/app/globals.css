@@ -64,6 +64,36 @@
   --envrt-aqua: #67e4d1;
   --envrt-aqua-soft: #97ede0;
   --envrt-mute-cool: #a8b8b5;
+
+  /* Per-area theme accent. Defaults to ultramarine; theme-* classes on
+     the main wrapper of an area's pages override these so ButtonV3,
+     FinalCtaV3, hover states and corner marks all pick up the area
+     colour without prop-drilling. */
+  --accent-rgb: 62 0 255;      /* ultramarine */
+  --accent-ink-rgb: 255 255 255;
+  --accent-soft-rgb: 62 0 255;
+  --accent-soft-alpha: 0.10;
+}
+
+.theme-sunny {
+  --accent-rgb: 255 229 15;
+  --accent-ink-rgb: 26 26 26;
+  --accent-soft-rgb: 255 229 15;
+  --accent-soft-alpha: 0.12;
+}
+
+.theme-lilac {
+  --accent-rgb: 223 95 255;
+  --accent-ink-rgb: 255 255 255;
+  --accent-soft-rgb: 223 95 255;
+  --accent-soft-alpha: 0.10;
+}
+
+.theme-neon {
+  --accent-rgb: 237 255 0;
+  --accent-ink-rgb: 26 26 26;
+  --accent-soft-rgb: 237 255 0;
+  --accent-soft-alpha: 0.18;
 }
 
 * {

@@ -166,7 +166,7 @@ export default function RoiV3Page() {
   const results = calculateROI(skuCount, dataMaturity, market, approach);
 
   return (
-    <main>
+    <main className="theme-sunny">
       <PageHero
         tone="sunny"
         eyebrow="ROI calculator"
