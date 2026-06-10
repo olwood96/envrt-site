@@ -37,6 +37,7 @@ export default function InsightsV3IndexPage() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="Insights"
         heading={
           <>
@@ -164,7 +165,7 @@ function FeaturedSection({ post }: { post: InsightsPostMeta }) {
 
 function PostList({ posts }: { posts: InsightsPostMeta[] }) {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+    <section className="relative bg-white pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/03" right={`${posts.length} more articles`} />
       <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">

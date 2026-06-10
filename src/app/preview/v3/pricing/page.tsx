@@ -16,7 +16,7 @@ const pricingFaqs = [
   {
     question: "How does ENVRT compare on price to other DPP platforms?",
     answer:
-      "Starter is £149 a month, Growth £495 a month. The closest competitor on entry pricing is tex.tracer at around £600 a month, with LCA as an add-on that pushes total cost to 4-10x ours. Carbonfact, Fairly Made and TrusTrace are typically £15-50k per year, often without traceability or DPP included natively.",
+      "Starter is £149 a month, Growth £495 a month. Most competitor DPP platforms price by quote and typically cost several times more once LCA and traceability are combined, often with one of the two priced as an add-on or a partner platform.",
   },
   {
     question: "What is included in the £149 Starter plan?",
@@ -26,7 +26,7 @@ const pricingFaqs = [
   {
     question: "Can I upgrade or downgrade plans mid-cycle?",
     answer:
-      "Yes. Plans switch on demand. Annual billing saves 15% compared to monthly pricing across all tiers.",
+      "Yes. Plans switch on demand. Annual billing saves 15% on Starter and Growth compared to monthly pricing.",
   },
   {
     question: "What happens if I outgrow my SKU allowance?",

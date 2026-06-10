@@ -16,6 +16,7 @@ export default function AboutV3Page() {
   return (
     <main>
       <PageHero
+        tone="lilac"
         eyebrow="About"
         heading={
           <>
@@ -87,7 +88,7 @@ function ProblemSection() {
   const items = [
     {
       title: "Consultants are slow and expensive.",
-      body: "A single LCA report costs £8k to £20k and takes weeks. Brands need product-level data across an entire collection, not one report a year.",
+      body: "A single LCA report from a consultancy is expensive and slow. Brands need product-level data across an entire collection, not one report a year.",
     },
     {
       title: "Most software stops at the dashboard.",
@@ -100,7 +101,7 @@ function ProblemSection() {
   ];
 
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+    <section className="relative bg-white pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/03" right="Problem" />
       <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
@@ -214,7 +215,7 @@ function ApproachSection() {
 
 function StorySection() {
   return (
-    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+    <section className="relative bg-white pb-20 sm:pb-24 lg:pb-32">
       <SectionCorners left="ENVRT/05" right="Founding story" />
       <div className="mx-auto max-w-[900px] px-5 sm:px-8 lg:px-16">
         <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">

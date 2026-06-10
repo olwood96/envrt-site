@@ -154,7 +154,7 @@ const platformFaqs = [
   {
     question: "Do you build your own LCA engine or use a third party?",
     answer:
-      "Built in-house. EU PEF and ISO 14040 throughout. AWARE water scarcity model integrated. The engine is the differentiator: competitors like Retraced and TrusTrace rely on partner providers for LCA, where we own the entire stack.",
+      "Built in-house. EU PEF and ISO 14040 throughout. AWARE water scarcity model integrated. The engine is the differentiator: some platforms in our space rely on partner providers for LCA, where we own the entire stack.",
   },
   {
     question: "Can I export the methodology behind every passport?",

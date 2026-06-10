@@ -8,7 +8,6 @@ import {
   DotGridBackground,
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
-import { ButtonV3 } from "@/components/v3";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { CollectiveBrandGridV3 } from "@/components/v3/collective/CollectiveBrandGridV3";
 import CollectiveBeacon from "@/components/CollectiveBeacon";
@@ -80,15 +79,15 @@ function BrandHero({
     .replace(/\/$/, "");
 
   return (
-    <section className="relative overflow-hidden bg-envrt-brand-vista py-20 sm:py-28 lg:py-32">
-      <DotGridBackground opacity={0.04} size={22} />
-      <SectionCorners left="ENVRT/01" right={brand.name} />
+    <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-28 lg:py-32">
+      <DotGridBackground opacity={0.07} size={22} tone="lilac" />
+      <SectionCorners left="ENVRT/01" right={brand.name} tone="dark" />
 
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <Link
             href="/preview/v3/collective"
-            className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+            className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
           >
             <span aria-hidden>←</span>
             All brands
@@ -98,7 +97,7 @@ function BrandHero({
         <div className="mt-8 grid gap-8 lg:grid-cols-[auto,1fr] lg:items-center lg:gap-12">
           {brandLogoUrl && (
             <FadeUp delay={0.04}>
-              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border border-envrt-brand-black/10 bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] sm:h-28 sm:w-28">
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white p-4 shadow-[0_18px_40px_-22px_rgba(0,0,0,0.4)] sm:h-28 sm:w-28">
                 <div className="relative h-full w-full">
                   <Image
                     src={brandLogoUrl}
@@ -114,18 +113,18 @@ function BrandHero({
 
           <div className="max-w-3xl">
             <FadeUp delay={0.08}>
-              <Eyebrow>{`${cards.length} featured ${
+              <Eyebrow tone="neon">{`${cards.length} featured ${
                 cards.length === 1 ? "product" : "products"
               }`}</Eyebrow>
             </FadeUp>
             <FadeUp delay={0.12}>
-              <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
+              <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-white sm:text-5xl lg:text-[3.5rem]">
                 {brand.name}
               </h1>
             </FadeUp>
             {brand.description && (
               <FadeUp delay={0.2}>
-                <p className="mt-5 max-w-2xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
+                <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
                   {brand.description}
                 </p>
               </FadeUp>
@@ -138,17 +137,17 @@ function BrandHero({
                     href={brand.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-envrt-brand-ultramarine px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] transition-all duration-200 hover:bg-envrt-brand-ultramarine/90 sm:px-6 sm:py-3 sm:text-base"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-envrt-brand-neon px-5 py-2.5 text-sm font-semibold text-envrt-brand-black shadow-[0_12px_28px_-14px_rgba(237,255,0,0.5)] transition-all duration-200 hover:bg-envrt-brand-neon/90 sm:px-6 sm:py-3 sm:text-base"
                   >
                     {cleanWebsite}<span aria-hidden>↗</span>
                   </a>
                 )}
-                <ButtonV3
+                <a
                   href="/preview/v3/collective"
-                  variant="ghost"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white/85 transition-colors duration-200 hover:text-envrt-brand-neon sm:px-6 sm:py-3 sm:text-base"
                 >
                   Browse all brands<span aria-hidden>→</span>
-                </ButtonV3>
+                </a>
               </div>
             </FadeUp>
           </div>

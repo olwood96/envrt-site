@@ -54,7 +54,7 @@ const PROOF_POINTS = [
   "Five sections, 25 questions, around 10 minutes",
   "Scored across four weighted dimensions",
   "Full HTML report emailed within minutes",
-  "Mapped to EU ESPR, UK DMCCA and Green Claims Directive",
+  "Referencing EU ESPR, UK DMCCA and Green Claims Directive",
   "Green-claims risk flag included where exposure is detected",
 ];
 
@@ -85,6 +85,7 @@ export default function AssessmentV3Page() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="Readiness assessment"
         heading={
           <>

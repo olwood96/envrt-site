@@ -244,7 +244,7 @@ function RadarChart({ cards }: { cards: CollectiveCardData[] }) {
 function WinnerBadge() {
   return (
     <span
-      className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-envrt-brand-ultramarine/10 text-envrt-brand-ultramarine"
+      className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-envrt-brand-black text-envrt-brand-neon"
       title="Best in this comparison"
     >
       <svg className="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
@@ -701,7 +701,7 @@ export function CollectiveComparisonViewV3({ cards }: Props) {
                     className="flex items-center justify-center px-2 py-4"
                   >
                     {allowed && pct != null && pct > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-envrt-brand-black px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-neon sm:text-[11px]">
                         ↓ {Math.round(pct)}%
                       </span>
                     ) : (
@@ -729,7 +729,7 @@ export function CollectiveComparisonViewV3({ cards }: Props) {
                     className="flex items-center justify-center px-2 py-4"
                   >
                     {allowed && pct != null && pct > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-envrt-brand-black px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-neon sm:text-[11px]">
                         ↓ {Math.round(pct)}%
                       </span>
                     ) : (

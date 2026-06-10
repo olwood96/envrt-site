@@ -152,7 +152,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
 
             {post.faq && post.faq.length > 0 && (
               <div className="mt-16 border-t border-envrt-brand-black/10 pt-14">
-                <Eyebrow>FAQ</Eyebrow>
+                <Eyebrow tone="sunny">FAQ</Eyebrow>
                 <h2 className="mt-4 font-display text-2xl font-medium leading-[1.1] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl">
                   Frequently asked questions
                 </h2>
@@ -171,7 +171,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
           <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
             <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
               <FadeUp>
-                <Eyebrow>03 · Related reading</Eyebrow>
+                <Eyebrow tone="sunny">03 · Related reading</Eyebrow>
               </FadeUp>
               <FadeUp delay={0.08}>
                 <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">

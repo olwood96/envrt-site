@@ -69,6 +69,7 @@ export default function FaqV3Page() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="FAQ"
         heading={
           <>

@@ -23,12 +23,6 @@ export const metadata: Metadata = {
 
 const FACTOR_SOURCES = [
   {
-    icon: "lca" as const,
-    name: "Ecoinvent",
-    role: "Material and process emission factors",
-    note: "Industry-standard LCI database for the major fibre and processing categories.",
-  },
-  {
     icon: "compliance" as const,
     name: "AWARE",
     role: "Water scarcity weighting",
@@ -79,7 +73,7 @@ const faqs = [
   {
     question: "Why did you build the calculation engine in-house?",
     answer:
-      "Because licensing it from a third party makes the platform less defensible. Carbonfact runs their own engine. Retraced and TrusTrace rely on partners. The depth and methodology become your differentiator only if you own the stack.",
+      "Because licensing it from a third party makes the platform less defensible. Some platforms in our space run their own engine, others rely on partner providers for LCA. The depth and methodology become your differentiator only if you own the stack.",
   },
   {
     question: "Which impact categories do you calculate?",
@@ -89,7 +83,7 @@ const faqs = [
   {
     question: "How accurate is the calculation?",
     answer:
-      "We use industry-standard databases (Ecoinvent, EU PEF 3.1) and named methodologies (ISO 14040, AWARE, Ecobalyse). Accuracy depends on input data quality. The platform flags low-confidence inputs and asks for evidence where it matters.",
+      "We reference the EU PEF 3.1 factor set and apply named methodologies including ISO 14040, AWARE water scarcity and Ecobalyse for the French Coût Environnemental. Accuracy depends on input data quality. The platform flags low-confidence inputs and asks for evidence where it matters.",
   },
   {
     question: "Can I download the methodology pack?",

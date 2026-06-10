@@ -168,6 +168,7 @@ export default function RoiV3Page() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="ROI calculator"
         heading={
           <>

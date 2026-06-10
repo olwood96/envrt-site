@@ -58,6 +58,7 @@ export default async function InsightsV3TagPage({ params }: PageProps) {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow={`#${displayTag}`}
         heading={
           <>

@@ -26,10 +26,10 @@ const SECTIONS: LegalSection[] = [
           sustainability data platform for fashion brands. Our services
           include Digital Product Passports (DPPs), modelled lifecycle
           metrics, transparency visualisations, brand dashboards, collection
-          forms, and evidence uploads.
+          forms and evidence uploads.
         </LegalP>
         <LegalP>
-          This policy explains how we collect, use, and protect personal data
+          This policy explains how we collect, use and protect personal data
           across our websites and services:
         </LegalP>
         <LegalUl>
@@ -71,12 +71,12 @@ const SECTIONS: LegalSection[] = [
           beacon. This includes:
         </LegalP>
         <LegalUl>
-          <LegalLi>Page path, referrer URL, and UTM parameters</LegalLi>
-          <LegalLi>Device type, screen resolution, and browser language</LegalLi>
+          <LegalLi>Page path, referrer URL and UTM parameters</LegalLi>
+          <LegalLi>Device type, screen resolution and browser language</LegalLi>
           <LegalLi>
-            Approximate location (country, region, and city) derived from
+            Approximate location (country, region and city) derived from
             server-side request headers provided by our hosting infrastructure,
-            not from GPS, IP geolocation databases, or device-level location
+            not from GPS, IP geolocation databases or device-level location
             services
           </LegalLi>
           <LegalLi>Scroll depth and time on page</LegalLi>
@@ -132,7 +132,7 @@ const SECTIONS: LegalSection[] = [
         <LegalH3>Report viewers (reports.envrt.com)</LegalH3>
         <LegalP>
           If you access a report via a shared link, we may log basic access
-          information such as browser type, timestamp, and referring URL. If
+          information such as browser type, timestamp and referring URL. If
           you are a logged-in user, your access may be associated with your
           account.
         </LegalP>
@@ -228,8 +228,8 @@ const SECTIONS: LegalSection[] = [
             hosting providers that store and serve our platform and data
           </LegalLi>
           <LegalLi>
-            <LegalStrong>Database, authentication, and storage</LegalStrong>,
-            services that manage user accounts, authentication, and file
+            <LegalStrong>Database, authentication and storage</LegalStrong>,
+            services that manage user accounts, authentication and file
             storage
           </LegalLi>
           <LegalLi>
@@ -320,7 +320,7 @@ const SECTIONS: LegalSection[] = [
       <>
         <LegalP>
           We take reasonable steps to protect personal data from unauthorised
-          access, loss, and misuse. Our measures include:
+          access, loss and misuse. Our measures include:
         </LegalP>
         <LegalUl>
           <LegalLi>Encryption in transit using TLS</LegalLi>
@@ -373,9 +373,9 @@ const SECTIONS: LegalSection[] = [
 
         <LegalH3>Geographic data</LegalH3>
         <LegalP>
-          Approximate geographic location (country, region, and city) is
+          Approximate geographic location (country, region and city) is
           derived from server-side request headers provided by our hosting
-          infrastructure. This is not based on GPS, IP geolocation databases,
+          infrastructure. This is not based on GPS, IP geolocation databases
           or device-level location services. No IP addresses are stored in our
           analytics data.
         </LegalP>
@@ -481,11 +481,11 @@ const SECTIONS: LegalSection[] = [
         </LegalP>
         <LegalP>
           These outputs are intended as decision-support tools. They are based
-          on models, assumptions, and the data available at the time of
+          on models, assumptions and the data available at the time of
           calculation. They should not be treated as verified measurements.
         </LegalP>
         <LegalP>
-          Brands are responsible for any public claims, disclosures, or
+          Brands are responsible for any public claims, disclosures or
           decisions they make based on outputs from the platform.
         </LegalP>
       </>

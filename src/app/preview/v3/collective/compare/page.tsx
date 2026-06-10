@@ -70,16 +70,16 @@ function CompareHero({
   count: number;
 }) {
   return (
-    <section className="relative overflow-hidden bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
-      <DotGridBackground opacity={0.04} size={22} />
-      <SectionCorners left="ENVRT/01" right="Compare" />
+    <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-28">
+      <DotGridBackground opacity={0.07} size={22} tone="lilac" />
+      <SectionCorners left="ENVRT/01" right="Compare" tone="dark" />
 
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <Link
               href="/preview/v3/collective"
-              className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+              className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
             >
               <span aria-hidden>←</span>
               Back to The Collective
@@ -90,18 +90,18 @@ function CompareHero({
 
         <div className="mt-8 max-w-3xl">
           <FadeUp delay={0.04}>
-            <Eyebrow>{brandName}</Eyebrow>
+            <Eyebrow tone="neon">{brandName}</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.25rem]">
+            <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-white sm:text-5xl lg:text-[3.25rem]">
               Side by side.{" "}
-              <span className="text-envrt-brand-black/40">
+              <span className="text-white/45">
                 Same brand, same scale.
               </span>
             </h1>
           </FadeUp>
           <FadeUp delay={0.16}>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
               Comparing {count} products head to head. Lower-is-better metrics
               are marked when one product wins. Hover any metric label for a
               plain explanation of what it covers.

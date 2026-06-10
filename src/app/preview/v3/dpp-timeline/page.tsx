@@ -106,7 +106,7 @@ const faqs = [
   {
     question: "Does France's AGEC count as a DPP?",
     answer:
-      "Not in the strict ESPR sense, but it's the closest live precedent. The French Coût Environnemental framework is operational today and ENVRT supports it natively. Brands already complying with AGEC are well-positioned for ESPR.",
+      "Not in the strict ESPR sense, but it's the closest live precedent. The French Coût Environnemental framework is operational today and ENVRT supports it natively. Brands already running AGEC work have a head start on the product-level data ESPR will require, though the two regimes are not equivalent.",
   },
   {
     question: "How long does it take to be DPP-ready?",
@@ -134,6 +134,7 @@ export default function DppTimelineV3Page() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="Regulatory timeline"
         heading={
           <>
@@ -196,7 +197,7 @@ function Countdown({ days }: { days: number | null }) {
             aria-live="polite"
             className="font-display text-5xl font-semibold leading-none tracking-[-0.03em] tabular-nums text-envrt-brand-crimson sm:text-6xl lg:text-7xl"
           >
-            {days === null ? "—" : days.toLocaleString()}
+            {days === null ? "n/a" : days.toLocaleString()}
           </p>
           <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
             Days until 2027-01-01

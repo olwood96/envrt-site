@@ -56,18 +56,36 @@ export function SectionCorners({
   );
 }
 
-// ─── Eyebrow — the small ultramarine label above headings ─────────────────
+// ─── Eyebrow — the small label above headings. Default ultramarine, with
+//     per-area tones for the colour-scheme experiment.
+
+export type EyebrowTone =
+  | "default"
+  | "neon"
+  | "sunny"
+  | "lilac"
+  | "white";
+
+const EYEBROW_TONE: Record<EyebrowTone, string> = {
+  default: "text-envrt-brand-ultramarine",
+  neon: "text-envrt-brand-neon",
+  sunny: "text-envrt-brand-sunny",
+  lilac: "text-envrt-brand-lilac",
+  white: "text-white/85",
+};
 
 export function Eyebrow({
   children,
   className,
+  tone = "default",
 }: {
   children: ReactNode;
   className?: string;
+  tone?: EyebrowTone;
 }) {
   return (
     <p
-      className={`text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px] ${className ?? ""}`}
+      className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${EYEBROW_TONE[tone]} sm:text-[11px] ${className ?? ""}`}
     >
       {children}
     </p>

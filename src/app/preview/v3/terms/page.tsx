@@ -194,7 +194,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     index: "06",
-    title: "Evidence uploads, confidentiality, and privacy",
+    title: "Evidence uploads, confidentiality and privacy",
     body: (
       <>
         <LegalP>
@@ -206,7 +206,7 @@ const SECTIONS: LegalSection[] = [
           While we take reasonable steps to protect private data, no system is
           completely secure. We do not guarantee absolute security. See our{" "}
           <LegalLink href="/preview/v3/privacy">Privacy policy</LegalLink> for
-          details on how we process, retain, and protect personal data.
+          details on how we process, retain and protect personal data.
         </LegalP>
         <LegalP>
           Enterprise agreements may include additional confidentiality terms
@@ -232,10 +232,10 @@ const SECTIONS: LegalSection[] = [
         <LegalP>
           We collect anonymous view data on public Digital Product Passport
           pages. This includes page path, referrer URL, UTM parameters, device
-          type, screen resolution, browser language, and approximate location
-          (country, region, and city derived from server-side request
+          type, screen resolution, browser language and approximate location
+          (country, region and city derived from server-side request
           headers). We do not store IP addresses, use cookies, use localStorage
-          fingerprinting, or perform any cross-site tracking on DPP pages.
+          fingerprinting or perform any cross-site tracking on DPP pages.
         </LegalP>
 
         <LegalH3>Marketing website</LegalH3>
@@ -339,7 +339,7 @@ const SECTIONS: LegalSection[] = [
         <LegalP>
           You retain ownership of all Content and Evidence you upload to the
           platform. By uploading Content, you grant ENVRT a limited licence to
-          host, process, and display it as necessary to provide the Services.
+          host, process and display it as necessary to provide the Services.
         </LegalP>
 
         <LegalH3>Our platform</LegalH3>

@@ -106,7 +106,7 @@ const faqs = [
   {
     question: "What do I get back?",
     answer:
-      "A fully calculated DPP with CO₂e, water scarcity, French Eco-Score and supply chain reconstruction across the tiers you provide. Hosted at a permanent URL with a QR code. Audit-ready exports in PDF, CSV and JSON.",
+      "A live DPP for one of your garments with CO₂e, water scarcity, French Eco-Score and supply chain reconstruction across the tiers you provide. Hosted at a permanent URL with a QR code. Exports in PDF, CSV and JSON.",
   },
   {
     question: "Do I need a credit card?",

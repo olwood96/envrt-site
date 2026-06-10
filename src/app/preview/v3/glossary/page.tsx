@@ -166,6 +166,7 @@ export default function GlossaryV3Page() {
   return (
     <main>
       <PageHero
+        tone="sunny"
         eyebrow="Glossary"
         heading={
           <>

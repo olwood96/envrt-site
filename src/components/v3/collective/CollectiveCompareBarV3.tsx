@@ -45,11 +45,11 @@ export function CollectiveCompareBarV3({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 24, opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE_BRAND }}
-          className="pointer-events-auto flex w-full max-w-[920px] items-center gap-3 rounded-3xl border border-envrt-brand-black/12 bg-white/95 p-3 shadow-[0_24px_60px_-30px_rgba(14,14,14,0.25)] backdrop-blur sm:gap-4 sm:p-4"
+          className="pointer-events-auto flex w-full max-w-[920px] items-center gap-3 rounded-3xl border border-white/15 bg-envrt-brand-black/90 p-3 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:gap-4 sm:p-4"
         >
           <span
             aria-hidden
-            className="hidden font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:inline sm:text-[11px]"
+            className="hidden font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-neon sm:inline sm:text-[11px]"
           >
             Compare
           </span>
@@ -70,7 +70,7 @@ export function CollectiveCompareBarV3({
             <button
               type="button"
               onClick={onClear}
-              className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-black sm:text-[11px]"
+              className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-white sm:text-[11px]"
             >
               Clear
             </button>
@@ -87,8 +87,8 @@ export function CollectiveCompareBarV3({
               }}
               className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 sm:px-5 sm:text-[11px] ${
                 ready
-                  ? "bg-envrt-brand-ultramarine text-white hover:translate-y-[-1px] hover:shadow-[0_18px_30px_-18px_rgba(46,21,148,0.55)]"
-                  : "bg-envrt-brand-black/8 text-envrt-brand-black/40"
+                  ? "bg-envrt-brand-neon text-envrt-brand-black hover:translate-y-[-1px] hover:shadow-[0_18px_30px_-18px_rgba(237,255,0,0.55)]"
+                  : "bg-white/10 text-white/40"
               }`}
             >
               {ready ? "Compare" : "Pick at least 2"}
@@ -110,7 +110,7 @@ function FilledSlot({
 }) {
   return (
     <div className="relative">
-      <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-envrt-brand-black/10 bg-envrt-brand-vista/40 sm:h-14 sm:w-14">
+      <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-white/15 bg-white/10 sm:h-14 sm:w-14">
         {card.productImageUrl ? (
           <Image
             src={card.productImageUrl}
@@ -120,7 +120,7 @@ function FilledSlot({
             className="object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/45">
+          <div className="flex h-full items-center justify-center font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/55">
             DPP
           </div>
         )}
@@ -129,7 +129,7 @@ function FilledSlot({
         type="button"
         onClick={() => onRemove(card.dpp.id)}
         aria-label={`Remove ${card.dpp.garment_name}`}
-        className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-envrt-brand-black text-[10px] text-white shadow-sm transition-colors hover:bg-envrt-brand-ultramarine"
+        className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] text-envrt-brand-black shadow-sm transition-colors hover:bg-envrt-brand-neon"
       >
         ×
       </button>
@@ -141,7 +141,7 @@ function EmptySlot({ index }: { index: number }) {
   return (
     <div
       aria-hidden
-      className="flex h-12 w-12 items-center justify-center rounded-2xl border border-dashed border-envrt-brand-black/15 bg-transparent font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/35 sm:h-14 sm:w-14 sm:text-[11px]"
+      className="flex h-12 w-12 items-center justify-center rounded-2xl border border-dashed border-white/20 bg-transparent font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35 sm:h-14 sm:w-14 sm:text-[11px]"
     >
       0{index}
     </div>
