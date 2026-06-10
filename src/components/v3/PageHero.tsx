@@ -25,7 +25,7 @@ type Tokens = {
   heading: string;
   headingSpan: string;
   body: string;
-  dotTone: "default" | "lilac";
+  dotTone: "ink" | "lilac";
   dotOpacity: number;
   eyebrowTone: EyebrowTone;
 };
@@ -36,7 +36,7 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     heading: "text-envrt-brand-black",
     headingSpan: "text-envrt-brand-black/40",
     body: "text-envrt-brand-black/70",
-    dotTone: "default",
+    dotTone: "ink",
     dotOpacity: 0.04,
     eyebrowTone: "default",
   },
@@ -54,7 +54,7 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     heading: "text-envrt-brand-black",
     headingSpan: "text-envrt-brand-black/40",
     body: "text-envrt-brand-black/70",
-    dotTone: "default",
+    dotTone: "ink",
     dotOpacity: 0.04,
     eyebrowTone: "sunny",
   },
@@ -63,7 +63,7 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     heading: "text-envrt-brand-black",
     headingSpan: "text-envrt-brand-black/40",
     body: "text-envrt-brand-black/70",
-    dotTone: "default",
+    dotTone: "ink",
     dotOpacity: 0.04,
     eyebrowTone: "lilac",
   },
