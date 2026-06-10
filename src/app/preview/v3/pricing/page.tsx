@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { pricingPlans, pricingComparison } from "@/lib/config";
+import { pricingPlans } from "@/lib/config";
 import { PageHero, FaqSnippet, Card, ButtonV3 } from "@/components/v3";
-import { AssetIcon } from "@/components/sections/v3/AssetIcon";
 import { Eyebrow, SectionCorners } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { ComparisonMatrix } from "@/components/v3/pricing/ComparisonMatrix";
 
 export const metadata: Metadata = {
   title: "Pricing | ENVRT v3",
@@ -211,63 +211,8 @@ function ComparisonTable() {
         </div>
 
         <FadeUp delay={0.16}>
-          <div className="mt-12 overflow-hidden rounded-3xl border border-envrt-brand-black/12 bg-white sm:mt-16">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] table-fixed">
-                <colgroup>
-                  <col className="w-[40%]" />
-                  <col className="w-[20%]" />
-                  <col className="w-[20%]" />
-                  <col className="w-[20%]" />
-                </colgroup>
-                <thead className="sticky top-0 bg-envrt-brand-vista">
-                  <tr>
-                    <th className="px-4 py-4 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:px-6">
-                      Feature
-                    </th>
-                    {pricingPlans.map((plan) => (
-                      <th
-                        key={plan.slug}
-                        className="px-3 py-4 text-center font-display text-sm font-semibold tracking-tight text-envrt-brand-black sm:px-6 sm:text-base"
-                      >
-                        {plan.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                {pricingComparison.categories.map((cat) => (
-                  <tbody key={cat.name}>
-                    <tr className="bg-envrt-brand-vista/50">
-                      <td
-                        colSpan={4}
-                        className="px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:px-6"
-                      >
-                        {cat.name}
-                      </td>
-                    </tr>
-                    {cat.features.map((feat) => (
-                      <tr
-                        key={feat.name}
-                        className="border-t border-envrt-brand-black/8"
-                      >
-                        <td className="px-4 py-3 text-sm text-envrt-brand-black/75 sm:px-6">
-                          {feat.name}
-                        </td>
-                        <td className="px-3 py-3 text-center text-sm sm:px-6">
-                          <Cell value={feat.starter} />
-                        </td>
-                        <td className="px-3 py-3 text-center text-sm sm:px-6">
-                          <Cell value={feat.growth} />
-                        </td>
-                        <td className="px-3 py-3 text-center text-sm sm:px-6">
-                          <Cell value={feat.pro} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                ))}
-              </table>
-            </div>
+          <div className="mt-12 sm:mt-16">
+            <ComparisonMatrix />
           </div>
         </FadeUp>
       </div>
@@ -275,19 +220,3 @@ function ComparisonTable() {
   );
 }
 
-function Cell({ value }: { value: boolean | string }) {
-  if (typeof value === "boolean") {
-    return value ? (
-      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-envrt-brand-ultramarine/10 text-envrt-brand-ultramarine">
-        <AssetIcon type="audit" size={12} />
-      </span>
-    ) : (
-      <span aria-hidden className="text-envrt-brand-black/25">
-        —
-      </span>
-    );
-  }
-  return (
-    <span className="text-xs text-envrt-brand-black/75 sm:text-sm">{value}</span>
-  );
-}
