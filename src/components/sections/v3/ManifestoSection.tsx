@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, LivePill, SectionCorners } from "./_shared";
+import { Eyebrow, LivePill, SECTION_SPRING, SectionCorners } from "./_shared";
 
 type ManifestoStats = {
   dppScans: number;
@@ -20,10 +20,11 @@ function formatCompact(n: number): string {
 
 export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
   const bgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
 
   const safe = {

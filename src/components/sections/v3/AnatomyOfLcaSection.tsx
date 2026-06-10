@@ -6,12 +6,13 @@ import {
   motion,
   useMotionTemplate,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import Link from "next/link";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, SectionCorners } from "./_shared";
+import { Eyebrow, SECTION_SPRING, SectionCorners } from "./_shared";
 
 // Anatomy of the in-house LCA: horizontal pipeline rail + a card track
 // below that slides right-to-left in lockstep. Real Hoodie 0509-1882
@@ -26,6 +27,11 @@ type Stage = {
   co2e: number;
   cx: number; // 0-100, position on the horizontal rail
   activation: number;
+  // Mobile uses a tighter scroll window so the last card lands centred
+  // earlier in the section, leaving plenty of dwell before the sticky pin
+  // releases. Without this card 6 only finishes centring at ~74% of scroll,
+  // which on a 500vh section is right against the pin break.
+  mobileActivation: number;
 };
 
 // Rail nodes are spaced evenly: cx[i] = 8 + i * 17.2, so all six gaps
@@ -40,6 +46,7 @@ const STAGES: Stage[] = [
     co2e: 0.48,
     cx: 8,
     activation: 0.10,
+    mobileActivation: 0.06,
   },
   {
     index: "02",
@@ -49,6 +56,7 @@ const STAGES: Stage[] = [
     co2e: 1.77,
     cx: 25.2,
     activation: 0.22,
+    mobileActivation: 0.16,
   },
   {
     index: "03",
@@ -58,6 +66,7 @@ const STAGES: Stage[] = [
     co2e: 0.62,
     cx: 42.4,
     activation: 0.34,
+    mobileActivation: 0.26,
   },
   {
     index: "04",
@@ -67,6 +76,7 @@ const STAGES: Stage[] = [
     co2e: 4.18,
     cx: 59.6,
     activation: 0.46,
+    mobileActivation: 0.36,
   },
   {
     index: "05",
@@ -76,6 +86,7 @@ const STAGES: Stage[] = [
     co2e: 0.33,
     cx: 76.8,
     activation: 0.58,
+    mobileActivation: 0.46,
   },
   {
     index: "06",
@@ -85,6 +96,7 @@ const STAGES: Stage[] = [
     co2e: 0.07,
     cx: 94,
     activation: 0.70,
+    mobileActivation: 0.56,
   },
 ];
 
@@ -191,14 +203,18 @@ function ClosingTag() {
 function Pipeline({
   progress,
   activeIndex,
+  windowStart,
+  windowEnd,
 }: {
   progress: MotionValue<number>;
   activeIndex: number;
+  windowStart: number;
+  windowEnd: number;
 }) {
   // 0 → 1 fill ratio across the rail span
   const fillRatio = useTransform(
     progress,
-    [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
+    [windowStart, windowEnd],
     [0, 1],
     { ease: [easeInOut] },
   );
@@ -266,7 +282,37 @@ function PipelineNode({
   );
 }
 
-function PipelineLabels({ activeIndex }: { activeIndex: number }) {
+function PipelineLabels({
+  activeIndex,
+  variant = "desktop",
+}: {
+  activeIndex: number;
+  variant?: "desktop" | "mobile";
+}) {
+  // Mobile shows ONLY the index numbers under each dot, no stage names —
+  // names like "Assembly" and "Transport" crash into each other at narrow
+  // widths. The active stage name is shown separately in a centred label
+  // above the cards (see ActiveStageLabel).
+  if (variant === "mobile") {
+    return (
+      <div className="relative mt-3 h-5">
+        {STAGES.map((s, i) => (
+          <p
+            key={s.index}
+            className={`absolute -translate-x-1/2 text-center font-mono text-[10px] font-semibold tracking-[0.18em] transition-colors duration-300 ${
+              i <= activeIndex
+                ? "text-envrt-brand-ultramarine"
+                : "text-envrt-brand-black/35"
+            }`}
+            style={{ left: `${s.cx}%` }}
+          >
+            {s.index}
+          </p>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="relative mt-3 h-10">
       {STAGES.map((s, i) => (
@@ -295,6 +341,26 @@ function PipelineLabels({ activeIndex }: { activeIndex: number }) {
           </p>
         </div>
       ))}
+    </div>
+  );
+}
+
+// Mobile-only: shows the active stage name in a centred row beneath the
+// numbered pipeline. Reads as a clear focal point without the label-crash
+// problem of placing names under every dot.
+function ActiveStageLabel({ activeIndex }: { activeIndex: number }) {
+  const stage = STAGES[activeIndex] ?? STAGES[0];
+  return (
+    <div className="mt-4 flex items-baseline justify-center gap-3">
+      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
+        Stage {stage.index}
+      </span>
+      <span
+        key={stage.index}
+        className="font-display text-lg font-semibold tracking-[-0.01em] text-envrt-brand-black"
+      >
+        {stage.name}
+      </span>
     </div>
   );
 }
@@ -371,10 +437,19 @@ function StageCard({
 function DesktopAnatomy() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
+
+  // Spring-smoothed progress drives every transform in this section.
+  // Same config as Scatter and every other v3 scroll-pinned section, so
+  // the whole site shares one feel: stiff enough to track deliberate
+  // scroll, damped enough to never overshoot, gentle on fast flicks.
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
+
+  const windowStart = STAGES[0].activation - 0.04;
+  const windowEnd = STAGES[STAGES.length - 1].activation + 0.04;
 
   // Active index for label / node colour updates
   const activeIndexMv = useTransform(scrollYProgress, (p) => {
@@ -399,7 +474,7 @@ function DesktopAnatomy() {
   // spans the full viewport, breaking up the rigid central column.
   const trackProgress = useTransform(
     scrollYProgress,
-    [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
+    [windowStart, windowEnd],
     [0, 1],
     { ease: [easeInOut] },
   );
@@ -425,7 +500,12 @@ function DesktopAnatomy() {
           <Header />
 
           <div className="mx-auto mt-14 max-w-[1100px]">
-            <Pipeline progress={scrollYProgress} activeIndex={activeIndex} />
+            <Pipeline
+              progress={scrollYProgress}
+              activeIndex={activeIndex}
+              windowStart={windowStart}
+              windowEnd={windowEnd}
+            />
             <PipelineLabels activeIndex={activeIndex} />
           </div>
         </div>
@@ -463,14 +543,25 @@ function DesktopAnatomy() {
 function MobileAnatomy() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
+  // Spring-smoothed progress. Same config as Scatter so the whole site
+  // shares one smooth-scroll feel.
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
+
+  // Mobile uses a compressed activation window (mobileActivation) so the
+  // final card lands centred at scrollYProgress ≈ 0.6 instead of 0.74,
+  // leaving 40% of the section as dwell on the centred final card before
+  // the sticky pin releases.
+  const windowStart = STAGES[0].mobileActivation - 0.04;
+  const windowEnd = STAGES[STAGES.length - 1].mobileActivation + 0.04;
+
   const activeIndexMv = useTransform(scrollYProgress, (p) => {
     for (let i = STAGES.length - 1; i >= 0; i--) {
-      if (p >= STAGES[i].activation - 0.04) return i;
+      if (p >= STAGES[i].mobileActivation - 0.04) return i;
     }
     return 0;
   });
@@ -481,12 +572,12 @@ function MobileAnatomy() {
     [activeIndexMv],
   );
 
-  // Same approach as DesktopAnatomy — track translates in both vw and px
-  // so the gap-3 (12px) between mobile cards is included in the centring
-  // math, otherwise card 6 lands 60px off centre.
+  // Track translates in both vw and px so the gap-3 (12px) between cards
+  // is included in the centring math, otherwise card 6 lands 60px off
+  // centre.
   const trackProgress = useTransform(
     scrollYProgress,
-    [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
+    [windowStart, windowEnd],
     [0, 1],
     { ease: [easeInOut] },
   );
@@ -511,11 +602,17 @@ function MobileAnatomy() {
           <Header />
 
           <div className="mt-10">
-            <Pipeline progress={scrollYProgress} activeIndex={activeIndex} />
-            <PipelineLabels activeIndex={activeIndex} />
+            <Pipeline
+              progress={scrollYProgress}
+              activeIndex={activeIndex}
+              windowStart={windowStart}
+              windowEnd={windowEnd}
+            />
+            <PipelineLabels activeIndex={activeIndex} variant="mobile" />
+            <ActiveStageLabel activeIndex={activeIndex} />
           </div>
 
-          <div className="mt-8 overflow-hidden">
+          <div className="mt-6 overflow-hidden">
             <motion.div
               style={{ transform: trackTransform, willChange: "transform" }}
               className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"

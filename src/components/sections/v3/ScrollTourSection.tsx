@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, LivePill } from "./_shared";
+import { Eyebrow, LivePill, SECTION_SPRING } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
@@ -54,10 +54,14 @@ export function ScrollTourSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
+
+  // Spring-smoothed scroll — matches the unified mechanic used across v3
+  // scroll-pinned sections.
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
 
   // Iframe pan also completes at progress 0.85 — matches the last stop,
   // and the remaining 0.15 of section scroll holds the iframe at its

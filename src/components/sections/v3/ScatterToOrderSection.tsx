@@ -12,7 +12,7 @@ import {
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
-import { Eyebrow, LivePill, SectionCorners } from "./_shared";
+import { Eyebrow, LivePill, SECTION_SPRING, SectionCorners } from "./_shared";
 
 // Scatter-to-order: eight supplier inputs sweep in from off-screen, fade
 // out as a single DPP card lands at centre. Real Hoodie 0509-1882 data.
@@ -221,12 +221,7 @@ function DesktopScatter() {
   // direct because the spring keeps up. Reverse scrolls reverse cleanly.
   // Mild settings: rest delta loose enough that the spring settles quickly
   // once at target, not jittery in the resolved state.
-  const progress = useSpring(rawProgress, {
-    stiffness: 60,
-    damping: 22,
-    mass: 0.4,
-    restDelta: 0.001,
-  });
+  const progress = useSpring(rawProgress, SECTION_SPRING);
 
   // Step copy beats. Sequential handoffs with no overlap, otherwise the
   // outgoing step's longer body leaks through behind the incoming step.
@@ -550,12 +545,7 @@ function MobileScatter() {
   // Same spring config as desktop. Touch scroll is more momentum-driven on
   // mobile so the smoothing matters even more here — without it a fast
   // flick blurs the animation past.
-  const progress = useSpring(rawProgress, {
-    stiffness: 60,
-    damping: 22,
-    mass: 0.4,
-    restDelta: 0.001,
-  });
+  const progress = useSpring(rawProgress, SECTION_SPRING);
 
   const step1Opacity = useTransform(progress, [0, 0.06, 0.10], [1, 1, 0]);
   const step2Opacity = useTransform(

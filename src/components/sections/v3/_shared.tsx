@@ -12,6 +12,17 @@ import type { ReactNode } from "react";
 // component-driven motion. Expo-out: fast start, soft landing.
 export const EASE_BRAND = [0.16, 1, 0.3, 1] as const;
 
+// Unified smooth-scroll spring config. Apply via useSpring(scrollYProgress, SECTION_SPRING)
+// in any scroll-pinned section so the whole site shares one feel. Mild settings:
+// stiff enough to keep up with deliberate scroll, damped enough to never overshoot,
+// rest delta loose enough to settle without jitter.
+export const SECTION_SPRING = {
+  stiffness: 60,
+  damping: 22,
+  mass: 0.4,
+  restDelta: 0.001,
+} as const;
+
 // ─── Section corners — small mono labels at top-left and top-right ────────
 
 export function SectionCorners({

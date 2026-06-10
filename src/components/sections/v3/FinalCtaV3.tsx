@@ -2,17 +2,23 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ButtonV3 } from "@/components/v3";
 import { FadeUp } from "@/components/ui/Motion";
-import { DotGridBackground, Eyebrow, SectionCorners } from "./_shared";
+import {
+  DotGridBackground,
+  Eyebrow,
+  SECTION_SPRING,
+  SectionCorners,
+} from "./_shared";
 
 export function FinalCtaV3() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
   const bgY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
 
   return (
