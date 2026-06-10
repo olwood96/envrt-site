@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
 import { Eyebrow } from "./_shared";
@@ -99,6 +100,24 @@ export function CapabilitiesSection() {
       className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-32"
       style={{ overflowX: "clip" }}
     >
+      {/* Ambient fabric texture, fixed to the right edge. Reads as a
+          backdrop "swatch" rather than a hero image — too subtle to compete
+          with the 9-row spec table, just enough texture to relieve the
+          flat vista bg. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[35%] overflow-hidden lg:block"
+      >
+        <Image
+          src="/v3-assets/story-fabric.jpg"
+          alt=""
+          fill
+          sizes="35vw"
+          className="object-cover opacity-[0.32]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista via-envrt-brand-vista/85 to-envrt-brand-vista/40" />
+      </div>
+
       {/* Thin left accent rule + corner construction marks (no halos) */}
       <span
         aria-hidden

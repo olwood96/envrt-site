@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FadeUp } from "@/components/ui/Motion";
 import { EcoScoreLabel } from "@/components/sections/v3/EcoScoreLabel";
 import { LivePill } from "./_shared";
@@ -115,6 +116,49 @@ export function InTheWildSection() {
               </a>
             </div>
           </div>
+        </FadeUp>
+
+        {/* More-in-The-Collective card. Editorial product photo + an
+            invitation to the broader gallery of live DPPs. */}
+        <FadeUp delay={0.2}>
+          <Link
+            href="/preview/v3/collective"
+            className="group mt-12 grid overflow-hidden rounded-3xl bg-envrt-brand-vista ring-1 ring-envrt-brand-black/8 transition-shadow duration-300 hover:shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)] sm:mt-16 sm:grid-cols-[1fr_1.4fr]"
+          >
+            <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-auto">
+              <Image
+                src="/v3-assets/folded-clothes.jpg"
+                alt="Folded apparel — more garments with live ENVRT passports"
+                fill
+                sizes="(min-width: 1024px) 420px, 100vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-3 p-6 sm:p-8 lg:p-10">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine sm:text-[11px]">
+                The Collective
+              </p>
+              <h3 className="font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-3xl">
+                More live passports.{" "}
+                <span className="text-envrt-brand-black/40">
+                  From every brand using ENVRT.
+                </span>
+              </h3>
+              <p className="text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
+                A growing gallery of garments with audit-grade DPPs and
+                live customer scans.
+              </p>
+              <span className="mt-3 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-envrt-brand-ultramarine sm:text-base">
+                Browse the Collective
+                <span
+                  aria-hidden
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </span>
+            </div>
+          </Link>
         </FadeUp>
       </div>
     </section>
