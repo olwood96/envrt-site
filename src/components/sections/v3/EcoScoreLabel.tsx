@@ -49,10 +49,9 @@ export function EcoScoreLabel({
         </p>
       </div>
 
-      {/* Per-100g footer. When envrtAccent is on, the verification chip uses
-          the brand-stated pairing "Shamrock green + Sunny yellow" — Sunny
-          Yellow background with Shamrock Green text reads as a certification
-          badge, which is exactly what a "verified by" stamp is. */}
+      {/* Per-100g footer. When envrtAccent is on, the chip uses the brand
+          pairing "Shamrock green + Sunny yellow", with Shamrock Green text
+          on a Sunny Yellow background to mark this as ENVRT-calculated. */}
       <div
         className={`border-t border-black/10 px-3 py-1 ${
           envrtAccent ? "bg-envrt-brand-sunny" : "bg-[#fafaf8]"
@@ -65,7 +64,7 @@ export function EcoScoreLabel({
         >
           {perHundredG} pts/100g
           {envrtAccent && (
-            <span className="ml-2">· verified by ENVRT</span>
+            <span className="ml-2">· calculated by ENVRT</span>
           )}
         </p>
       </div>

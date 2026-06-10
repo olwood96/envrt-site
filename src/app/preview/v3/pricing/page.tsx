@@ -14,11 +14,6 @@ export const metadata: Metadata = {
 
 const pricingFaqs = [
   {
-    question: "How does ENVRT compare on price to other DPP platforms?",
-    answer:
-      "Starter is £149 a month, Growth £495 a month. Most competitor DPP platforms price by quote and typically cost several times more once LCA and traceability are combined, often with one of the two priced as an add-on or a partner platform.",
-  },
-  {
     question: "What is included in the £149 Starter plan?",
     answer:
       "Up to 50 products, regulation-ready DPPs, CO₂e and AWARE water indicators, French Eco-Score, fibre-to-assembly supply chain reconstruction, evidence uploads, transparency score per product and compliance exports. Full breakdown in the comparison table above.",
@@ -26,7 +21,7 @@ const pricingFaqs = [
   {
     question: "Can I upgrade or downgrade plans mid-cycle?",
     answer:
-      "Yes. Plans switch on demand. Annual billing saves 15% on Starter and Growth compared to monthly pricing.",
+      "Yes, you can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle. Annual billing saves 15% on Starter and Growth compared to monthly pricing.",
   },
   {
     question: "What happens if I outgrow my SKU allowance?",

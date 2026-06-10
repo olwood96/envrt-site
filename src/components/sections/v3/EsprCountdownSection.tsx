@@ -57,7 +57,7 @@ export function EsprCountdownSection() {
                   aria-live="polite"
                   className="font-display text-5xl font-semibold leading-none tracking-[-0.03em] text-envrt-brand-crimson tabular-nums sm:text-6xl lg:text-7xl"
                 >
-                  {days === null ? "—" : days.toLocaleString()}
+                  {days === null ? "n/a" : days.toLocaleString()}
                 </p>
                 <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
                   Days until 2027-01-01

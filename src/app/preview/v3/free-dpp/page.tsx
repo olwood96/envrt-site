@@ -106,7 +106,7 @@ const faqs = [
   {
     question: "What do I get back?",
     answer:
-      "A live DPP for one of your garments with CO₂e, water scarcity, French Eco-Score and supply chain reconstruction across the tiers you provide. Hosted at a permanent URL with a QR code. Exports in PDF, CSV and JSON.",
+      "A live eco-score DPP for one of your garments, based on the official French environmental labelling methodology. Hosted at a permanent URL with a QR code.",
   },
   {
     question: "Do I need a credit card?",
@@ -116,12 +116,12 @@ const faqs = [
   {
     question: "How long does it take?",
     answer:
-      "We aim to return your DPP within 1 working day. If you submit more detail in Step 2, the DPP is richer.",
+      "We will email you a link to your live eco-score DPP within 24 hours of submitting.",
   },
   {
-    question: "What happens after I receive it?",
+    question: "What if I want full DPPs for my whole collection?",
     answer:
-      "Use the DPP however you like. If you want more garments calculated, you can move to a paid plan from £149 a month. No sales pressure.",
+      "Get in touch after receiving your trial DPP. We offer full lifecycle DPPs with supply chain mapping, emissions data and water impact. Paid plans start from £149 a month.",
   },
 ];
 

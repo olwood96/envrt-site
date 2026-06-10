@@ -23,7 +23,7 @@ const CAPABILITIES: Capability[] = [
   { icon: "supply-chain", label: "Supply chain",  stat: "4 tiers, fibre to factory" },
   { icon: "lca",          label: "In-house LCA",  stat: "EU PEF · ISO 14040" },
   { icon: "compliance",   label: "Water · AWARE", stat: "UN water scarcity model" },
-  { icon: "eco-score",    label: "Eco-Score",     stat: "FR regulator-aligned" },
+  { icon: "eco-score",    label: "Eco-Score",     stat: "FR Coût Environnemental method" },
   { icon: "dpp",          label: "Hosted DPP",    stat: "Permanent URL + QR" },
   { icon: "vault",        label: "Evidence vault", stat: "Versioned and signed" },
 ];

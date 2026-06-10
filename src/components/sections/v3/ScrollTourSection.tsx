@@ -36,7 +36,7 @@ const stops: Stop[] = [
   },
   {
     title: "Recognised standards",
-    body: "French Eco-Score, EU PEF, ISO 14040, AWARE water stress. Certifications listed with issuing bodies and expiry dates.",
+    body: "French Eco-Score, EU PEF, ISO 14040, AWARE water stress. Standards referenced with their issuing bodies on every passport.",
     range: [0.51, 0.68],
   },
   {

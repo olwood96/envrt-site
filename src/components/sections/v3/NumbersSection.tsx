@@ -34,7 +34,7 @@ const stats: Stat[] = [
     prefix: "£",
     unit: "/mo",
     label: "Starter plan",
-    body: "Per-garment DPPs with lifecycle metrics and analytics. Most competitor tooling starts in the tens of thousands per year.",
+    body: "Per-garment DPPs with lifecycle metrics and analytics. Most competitor tooling is priced by quote and tends to be significantly higher.",
   },
 ];
 

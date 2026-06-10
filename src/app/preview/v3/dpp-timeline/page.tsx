@@ -104,11 +104,6 @@ const faqs = [
       "You face two overlapping regimes. ESPR (EU) sets the DPP requirement. DMCCA (UK) tightens scrutiny on environmental claims. Both demand defensible underlying data, which is the same baseline ENVRT calculates per garment.",
   },
   {
-    question: "Does France's AGEC count as a DPP?",
-    answer:
-      "Not in the strict ESPR sense, but it's the closest live precedent. The French Coût Environnemental framework is operational today and ENVRT supports it natively. Brands already running AGEC work have a head start on the product-level data ESPR will require, though the two regimes are not equivalent.",
-  },
-  {
     question: "How long does it take to be DPP-ready?",
     answer:
       "Data infrastructure, supplier onboarding and process change typically take more than a year. Brands starting now will be comfortable by enforcement. Brands starting in 2026 will be scrambling.",

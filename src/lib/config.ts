@@ -47,7 +47,7 @@ export const whyNowCards = [
     icon: "🌍",
     title: "Consumers demand transparency",
     description:
-      "Consumers say they will pay an average of 9.7% more for sustainably produced or sourced goods. Give them clear, evidence-backed product information.",
+      "Consumers increasingly say they are willing to pay more for sustainably produced or sourced goods. Give them clear, evidence-backed product information.",
   },
   {
     icon: "⚡",
@@ -357,7 +357,7 @@ export const pricingFaqItems = [
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes 1 team seat, DPP creation, QR-ready passport pages, transparency scores, CO\u2082e and AWARE water indicators, French Eco-Score ratings and regulatory compliance exports. Growth adds 5 team seats, expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, product comparisons, DPP scan and engagement analytics, and metrics and analytics exports. Pro includes unlimited team seats, complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
+      "Starter includes 1 team seat, DPP creation, QR-ready passport pages, transparency scores, CO\u2082e and AWARE water indicators, French Eco-Score ratings and compliance exports. Growth adds 5 team seats, expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, product comparisons, DPP scan and engagement analytics and metrics exports. Pro includes unlimited team seats, complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",
@@ -372,12 +372,12 @@ export const pricingFaqItems = [
   {
     question: "Do you offer annual billing?",
     answer:
-      "Yes, annual billing saves you 15% compared to monthly pricing across all plans.",
+      "Yes, annual billing saves 15% on Starter and Growth compared to monthly pricing.",
   },
   {
     question: "Do you support the French Eco-Score (affichage environnemental)?",
     answer:
-      "Yes. All plans include French Eco-Score ratings calculated using the official co\u00fbt environnemental methodology via Ecobalyse. You can calculate scores for your garments and display them on your DPPs.",
+      "Yes. All plans include French Eco-Score ratings calculated following the official co\u00fbt environnemental methodology. You can calculate scores for your garments and display them on your DPPs.",
   },
 ];
 
@@ -385,27 +385,22 @@ export const roiFaqItems = [
   {
     question: "How much does DPP compliance cost?",
     answer:
-      "The cost depends on your approach. Hiring a sustainability consultant typically costs £30,000 or more per year. Building an in-house team starts at around £80,000 annually. ENVRT provides DPP creation, lifecycle metrics, and sustainability analytics from just £149 per month.",
+      "The cost depends on your approach. Hiring a sustainability consultant typically starts from £30,000 per year. Building an in-house team starts from £80,000 annually. ENVRT provides DPP creation, lifecycle metrics and sustainability analytics from £149 per month.",
   },
   {
     question: "How long does it take to see ROI with ENVRT?",
     answer:
-      "Most brands see value within the first month. ENVRT's guided data entry and automated calculations mean you can generate your first DPP in minutes rather than weeks, dramatically reducing the cost and time of compliance.",
-  },
-  {
-    question: "What's the cost of non-compliance with DPP regulations?",
-    answer:
-      "Non-compliance with the EU Ecodesign for Sustainable Products Regulation (ESPR) could mean loss of EU market access, financial penalties, and reputational damage. Preparing now avoids last-minute costs and positions your brand as a transparency leader.",
+      "Most brands see value quickly. ENVRT's guided data entry and automated calculations mean you can generate your first DPP in minutes, reducing the cost and time of compliance.",
   },
   {
     question: "Can ENVRT replace a sustainability consultant?",
     answer:
-      "For DPP creation, lifecycle assessment metrics, and supply chain transparency, yes. The Pro plan includes a dedicated account specialist, supplier follow-up assistance, and eco-design strategy support, covering much of what an external consultant would provide.",
+      "For DPP creation, lifecycle assessment metrics and supply chain transparency, ENVRT covers what most brands would otherwise pay a consultant for. The Pro plan includes a dedicated account specialist, supplier follow-up assistance and eco-design strategy support.",
   },
   {
     question: "How does the ROI calculator work?",
     answer:
-      "Input your current team size, product volume, and approach to sustainability reporting. The calculator instantly compares your costs against ENVRT's plans and shows your potential savings over 12 months.",
+      "Input your current team size, product volume and approach to sustainability reporting. The calculator instantly compares your costs against ENVRT's plans and shows your potential savings over 12 months.",
   },
 ];
 
@@ -428,7 +423,7 @@ export const freeDppFaqItems = [
   {
     question: "What does the eco-score show?",
     answer:
-      "A standardised environmental impact score based on your product's materials and manufacturing. It uses the official French environmental labelling methodology.",
+      "A standardised environmental impact score based on your product's materials and manufacturing, following the official French environmental labelling methodology.",
   },
   {
     question: "What if I want full DPPs for my whole collection?",
