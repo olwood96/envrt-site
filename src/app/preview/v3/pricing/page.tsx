@@ -21,7 +21,7 @@ const pricingFaqs = [
   {
     question: "Can I upgrade or downgrade plans mid-cycle?",
     answer:
-      "Yes, you can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle. Annual billing saves 15% on Starter and Growth compared to monthly pricing.",
+      "Yes, you can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle.",
   },
   {
     question: "What happens if I outgrow my SKU allowance?",
@@ -99,6 +99,12 @@ function PricingTiers() {
             </FadeUp>
           ))}
         </div>
+
+        <FadeUp delay={0.4}>
+          <p className="mt-10 text-center text-xs text-envrt-brand-black/55 sm:text-sm">
+            All plans run on a 6-month minimum term, then continue month-to-month. Annual billing saves 15% on Starter and Growth.
+          </p>
+        </FadeUp>
       </div>
     </section>
   );

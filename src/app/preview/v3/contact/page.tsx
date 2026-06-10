@@ -46,7 +46,7 @@ const faqs = [
   {
     question: "Can I just email instead?",
     answer:
-      "Yes. Send anything to hello@envrt.com. Same team replies.",
+      "Yes. Send anything to info@envrt.com. Same team replies.",
   },
 ];
 

@@ -37,7 +37,7 @@ export function HeroV3() {
       <div className="relative mx-auto max-w-[1320px] px-5 pt-24 pb-12 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-16">
         <div className="max-w-xl lg:py-12">
           <FadeUp>
-            <Eyebrow>Environmental platform · for fashion</Eyebrow>
+            <Eyebrow>Your GARMENTS · Their IMPACT · One PLATFORM</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
             <h1 className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
@@ -49,12 +49,17 @@ export function HeroV3() {
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
-              Supplier mapping, in-house lifecycle assessment, water scarcity,
-              Eco-Score and ESPR-ready Digital Product Passports. One platform.
-              EU PEF and ISO 14040 throughout. From £149 a month.
+              Create regulation-ready Digital Product Passports. Calculate
+              emissions, water scarcity and Eco-Score. Share it all with your
+              customers.
             </p>
           </FadeUp>
-          <FadeUp delay={0.24}>
+          <FadeUp delay={0.22}>
+            <p className="mt-3 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45 sm:text-[11px]">
+              Built for fashion and apparel brands selling into the EU
+            </p>
+          </FadeUp>
+          <FadeUp delay={0.28}>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 href="/free-dpp"
@@ -65,13 +70,13 @@ export function HeroV3() {
                 Try ENVRT on one garment<span className="ml-2">→</span>
               </Button>
               <Button
-                href="/pricing"
+                href="/contact"
                 variant="ghost"
                 size="md"
                 className="w-full sm:w-auto sm:px-3 sm:py-3 sm:text-base"
-                data-cta="hero-v3-see-pricing"
+                data-cta="hero-v3-book-demo"
               >
-                See pricing<span className="ml-1.5">→</span>
+                Book a demo<span className="ml-1.5">→</span>
               </Button>
             </div>
           </FadeUp>
