@@ -28,6 +28,9 @@ type Stage = {
   activation: number;
 };
 
+// Rail nodes are spaced evenly: cx[i] = 8 + i * 17.2, so all six gaps
+// across the 86% rail span are identical. Don't hand-tune individual cx
+// values, the eye picks up even the slightest unevenness.
 const STAGES: Stage[] = [
   {
     index: "01",
@@ -44,7 +47,7 @@ const STAGES: Stage[] = [
     process: "Spinning, twist, hank prep",
     inputs: "Spun in Turkey",
     co2e: 1.77,
-    cx: 26,
+    cx: 25.2,
     activation: 0.22,
   },
   {
@@ -53,7 +56,7 @@ const STAGES: Stage[] = [
     process: "Knit, weave, finishing",
     inputs: "Knit and finish",
     co2e: 0.62,
-    cx: 44,
+    cx: 42.4,
     activation: 0.34,
   },
   {
@@ -62,7 +65,7 @@ const STAGES: Stage[] = [
     process: "Reactive dye, water heating",
     inputs: "Water-heavy stage",
     co2e: 4.18,
-    cx: 62,
+    cx: 59.6,
     activation: 0.46,
   },
   {
@@ -71,7 +74,7 @@ const STAGES: Stage[] = [
     process: "Cut, sew, trims",
     inputs: "Sewn in Portugal",
     co2e: 0.33,
-    cx: 80,
+    cx: 76.8,
     activation: 0.58,
   },
   {
@@ -121,13 +124,15 @@ function Header() {
       <FadeUp>
         <Eyebrow>Our USP</Eyebrow>
         <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
-          LCA built in.{" "}
-          <span className="text-envrt-brand-black/40">Not bolted on.</span>
+          We wrote the engine.{" "}
+          <span className="text-envrt-brand-black/40">
+            Line by line, stage by stage.
+          </span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-5 sm:text-base">
-          Every DPP runs on our own engine, stage by stage, built against EU
-          PEF and ISO 14040. The breakdown below is real, from Hoodie
-          0509-1882.
+          EU PEF, ISO 14040 and AWARE water scarcity, all in code we own.
+          No third-party APIs, no black boxes. The breakdown below is live,
+          from Hoodie 0509-1882.
         </p>
       </FadeUp>
     </div>
