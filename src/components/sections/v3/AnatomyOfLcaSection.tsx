@@ -3,20 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import {
   easeInOut,
-  easeOut,
   motion,
   useMotionTemplate,
-  useMotionValueEvent,
   useScroll,
   useTransform,
 } from "framer-motion";
+import Link from "next/link";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
 import { Eyebrow, SectionCorners } from "./_shared";
 
 // Anatomy of the in-house LCA: horizontal pipeline rail + a card track
-// below that slides right-to-left in lockstep, each card typing out its
-// equation as it lands centred. Real Hoodie 0509-1882 stage breakdown.
+// below that slides right-to-left in lockstep. Real Hoodie 0509-1882
+// stage breakdown. Equation column intentionally omitted on the homepage
+// (full methodology lives on the dedicated Lab page).
 
 type Stage = {
   index: string;
@@ -24,7 +24,6 @@ type Stage = {
   process: string;
   inputs: string;
   co2e: number;
-  equation: string;
   cx: number; // 0-100, position on the horizontal rail
   activation: number;
 };
@@ -34,9 +33,8 @@ const STAGES: Stage[] = [
     index: "01",
     name: "Fibre",
     process: "Raw fibre extraction",
-    inputs: "80% Organic cotton · 18% Recycled polyester · 2% Elastane",
+    inputs: "Organic cotton blend",
     co2e: 0.48,
-    equation: "mass × EF_fibre",
     cx: 8,
     activation: 0.10,
   },
@@ -44,9 +42,8 @@ const STAGES: Stage[] = [
     index: "02",
     name: "Yarn",
     process: "Spinning, twist, hank prep",
-    inputs: "Spinning energy · waste rate · Turkey grid mix",
+    inputs: "Spun in Turkey",
     co2e: 1.77,
-    equation: "mass × EF_spin × grid",
     cx: 26,
     activation: 0.22,
   },
@@ -54,39 +51,35 @@ const STAGES: Stage[] = [
     index: "03",
     name: "Fabric",
     process: "Knit, weave, finishing",
-    inputs: "Knit structure · loss factor · finishing chemistry",
+    inputs: "Knit and finish",
     co2e: 0.62,
-    equation: "mass × EF_fabric × loss",
     cx: 44,
     activation: 0.34,
   },
   {
     index: "04",
     name: "Dyeing",
-    process: "Reactive dye bath, water heating, fixing",
-    inputs: "Dye process · water grid · AWARE Turkey factor",
+    process: "Reactive dye, water heating",
+    inputs: "Water-heavy stage",
     co2e: 4.18,
-    equation: "mass × EF_dye + H₂O × AWARE",
     cx: 62,
     activation: 0.46,
   },
   {
     index: "05",
     name: "Assembly",
-    process: "Cut, sew, trims, finishing",
-    inputs: "Sew energy · trims · Portugal grid mix",
+    process: "Cut, sew, trims",
+    inputs: "Sewn in Portugal",
     co2e: 0.33,
-    equation: "mass × EF_assy × grid",
     cx: 80,
     activation: 0.58,
   },
   {
     index: "06",
     name: "Transport",
-    process: "Tier-by-tier distance, mode-weighted",
-    inputs: "Turkey → Portugal · 29,500 km · road + sea",
+    process: "Tier-by-tier, mode-weighted",
+    inputs: "Turkey → Portugal, 29,500 km",
     co2e: 0.07,
-    equation: "Σ(d × mode_EF)",
     cx: 94,
     activation: 0.70,
   },
@@ -128,12 +121,13 @@ function Header() {
       <FadeUp>
         <Eyebrow>Our USP</Eyebrow>
         <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
-          We built the engine.{" "}
-          <span className="text-envrt-brand-black/40">Not licensed it.</span>
+          LCA built in.{" "}
+          <span className="text-envrt-brand-black/40">Not bolted on.</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-5 sm:text-base">
-          Built against EU PEF and ISO 14040, with AWARE water scarcity baked
-          in. Below is the live calculation for Hoodie 0509-1882.
+          Every DPP runs on our own engine, stage by stage, built against EU
+          PEF and ISO 14040. The breakdown below is real, from Hoodie
+          0509-1882.
         </p>
       </FadeUp>
     </div>
@@ -167,44 +161,23 @@ function Stats() {
 
 function ClosingTag() {
   return (
-    <p className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-envrt-brand-black/45 sm:text-[11px]">
-      ENVRT/LAB · proprietary calculation engine, not a third-party API
-    </p>
-  );
-}
-
-// ─── Typewriter ───────────────────────────────────────────────────────────
-
-function Typewriter({
-  text,
-  active,
-}: {
-  text: string;
-  active: MotionValue<number>;
-}) {
-  // Direct DOM mutation via a ref. Avoids re-rendering the React tree at
-  // ~60fps just to slice a string — the caret span never changes, so React
-  // never touches it, and the text node updates without reconciliation.
-  const ref = useRef<HTMLSpanElement>(null);
-  const last = useRef(-1);
-
-  useMotionValueEvent(active, "change", (latest) => {
-    const n = Math.max(
-      0,
-      Math.min(text.length, Math.floor(latest * text.length)),
-    );
-    if (n === last.current) return;
-    last.current = n;
-    if (ref.current) ref.current.textContent = text.slice(0, n);
-  });
-
-  return (
-    <span>
-      <span ref={ref} />
-      <span className="ml-[1px] inline-block w-[1ch] animate-pulse text-envrt-brand-ultramarine/70">
-        ▍
-      </span>
-    </span>
+    <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center sm:gap-5">
+      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-envrt-brand-black/45 sm:text-[11px]">
+        ENVRT/LAB · our own calculation engine
+      </p>
+      <Link
+        href="/preview/v3/lab"
+        className="group inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]"
+      >
+        See the methodology
+        <span
+          aria-hidden
+          className="transition-transform duration-200 group-hover:translate-x-0.5"
+        >
+          →
+        </span>
+      </Link>
+    </div>
   );
 }
 
@@ -325,34 +298,17 @@ function PipelineLabels({ activeIndex }: { activeIndex: number }) {
 
 function StageCard({
   stage,
-  prevActivation,
-  progress,
   size,
 }: {
   stage: Stage;
-  prevActivation: number;
-  progress: MotionValue<number>;
   size: "desktop" | "mobile";
 }) {
-  // Typewriter window tied to card POSITION on screen: starts as the card
-  // begins entering from the right (the previous stage's activation point,
-  // when the track starts moving toward this card) and finishes exactly
-  // when the card lands centred (this stage's activation point). So the
-  // equation reads as the card slides into focus.
-  const typeActive = useTransform(
-    progress,
-    [prevActivation, stage.activation],
-    [0, 1],
-    { ease: [easeOut] },
-  );
-
   const fillPctOfTotal = (stage.co2e / STAGE_TOTAL) * 100;
 
   const pad = size === "desktop" ? "p-7 lg:p-8" : "p-5";
   const headingSize = size === "desktop" ? "text-xl lg:text-2xl" : "text-base";
   const processSize = size === "desktop" ? "text-sm lg:text-base" : "text-[13px]";
-  const inputsSize = size === "desktop" ? "text-sm lg:text-base" : "text-[13px]";
-  const equationSize = size === "desktop" ? "text-sm lg:text-base" : "text-[12px]";
+  const inputsSize = size === "desktop" ? "text-base lg:text-lg" : "text-sm";
   const valueSize = size === "desktop" ? "text-2xl lg:text-3xl" : "text-lg";
 
   return (
@@ -374,20 +330,13 @@ function StageCard({
       <p className={`mt-3 text-envrt-brand-black/55 ${processSize}`}>
         {stage.process}
       </p>
-      <p className={`mt-3 leading-relaxed text-envrt-brand-black/70 ${inputsSize}`}>
+      <p
+        className={`mt-3 font-display font-medium leading-snug tracking-[-0.01em] text-envrt-brand-black ${inputsSize}`}
+      >
         {stage.inputs}
       </p>
 
-      <div className="mt-5 rounded-lg bg-envrt-brand-vista/80 px-4 py-3">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine/70 lg:text-[10px]">
-          Equation
-        </p>
-        <code className={`mt-1 block font-mono text-envrt-brand-black ${equationSize}`}>
-          <Typewriter text={stage.equation} active={typeActive} />
-        </code>
-      </div>
-
-      <div className="mt-auto pt-5">
+      <div className="mt-auto pt-6">
         <div className="flex items-baseline justify-between">
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/55 lg:text-[11px]">
             CO₂e contribution
@@ -471,14 +420,9 @@ function DesktopAnatomy() {
             style={{ x: trackX, willChange: "transform" }}
             className="flex gap-4 pl-[20vw] pr-[20vw]"
           >
-            {STAGES.map((stage, i) => (
+            {STAGES.map((stage) => (
               <div key={stage.index} className="w-[60vw] flex-shrink-0">
-                <StageCard
-                  stage={stage}
-                  prevActivation={i === 0 ? 0 : STAGES[i - 1].activation}
-                  progress={scrollYProgress}
-                  size="desktop"
-                />
+                <StageCard stage={stage} size="desktop" />
               </div>
             ))}
           </motion.div>
@@ -548,14 +492,9 @@ function MobileAnatomy() {
               style={{ x: trackX, willChange: "transform" }}
               className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
             >
-              {STAGES.map((stage, i) => (
+              {STAGES.map((stage) => (
                 <div key={stage.index} className="w-[85vw] flex-shrink-0">
-                  <StageCard
-                    stage={stage}
-                    prevActivation={i === 0 ? 0 : STAGES[i - 1].activation}
-                    progress={scrollYProgress}
-                    size="mobile"
-                  />
+                  <StageCard stage={stage} size="mobile" />
                 </div>
               ))}
             </motion.div>

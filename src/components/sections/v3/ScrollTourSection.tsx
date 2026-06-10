@@ -8,6 +8,10 @@ import { Eyebrow, LivePill } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
+// Tall enough to cover the full DPP content at the -82% pan max. Trim
+// later once we can confirm the real DPP height in the live preview.
+const IFRAME_HEIGHT = 4700;
+
 type Stop = {
   title: string;
   body: string;
@@ -48,6 +52,7 @@ const stops: Stop[] = [
 
 export function ScrollTourSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -106,6 +111,11 @@ export function ScrollTourSection() {
                   correctly), then scaled down per breakpoint to fit the
                   phone frame. */}
               <div className="relative h-[260px] overflow-hidden bg-white sm:h-[360px] lg:h-[580px]">
+                {/* Skeleton placeholder. Renders behind the iframe so the
+                    phone never shows a blank white screen during the iframe
+                    fetch. Hidden once the iframe finishes loading. */}
+                <DppSkeleton hidden={iframeLoaded} />
+
                 {/* Scale wrapper: explicit width matching iframe's natural
                     width. Scale factor = inner phone width / 414, where
                     inner width = phone outer width - (2 * border width).
@@ -113,16 +123,19 @@ export function ScrollTourSection() {
                     sm:     (180 - 14) / 414 = 0.401
                     lg:     (310 - 20) / 414 = 0.700 */}
                 <div
-                  className="origin-top-left scale-[0.309] sm:scale-[0.401] lg:scale-[0.700]"
+                  className="origin-top-left scale-[0.309] will-change-transform sm:scale-[0.401] lg:scale-[0.700]"
                   style={{ width: "414px" }}
                 >
-                  <motion.div style={{ y: dppY }}>
+                  <motion.div style={{ y: dppY, willChange: "transform" }}>
                     <iframe
                       src={DPP_URL}
                       title="Live ENVRT Digital Product Passport"
-                      style={{ width: "414px", height: "4700px" }}
-                      className="pointer-events-none block border-0"
-                      loading="lazy"
+                      style={{ width: "414px", height: `${IFRAME_HEIGHT}px` }}
+                      className={`pointer-events-none block border-0 transition-opacity duration-500 ${
+                        iframeLoaded ? "opacity-100" : "opacity-0"
+                      }`}
+                      loading="eager"
+                      onLoad={() => setIframeLoaded(true)}
                     />
                   </motion.div>
                 </div>
@@ -243,5 +256,34 @@ function ActiveNumber({
     >
       {String(index + 1).padStart(2, "0")}
     </p>
+  );
+}
+
+// ─── DPP skeleton ─────────────────────────────────────────────────────────
+
+// Plausible DPP layout silhouette (hero block, headline metrics, list rows).
+// Sits behind the iframe at full phone-screen size so the phone never
+// shows white during the cross-origin iframe fetch.
+function DppSkeleton({ hidden }: { hidden: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className={`absolute inset-0 bg-white transition-opacity duration-500 ${
+        hidden ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
+    >
+      <div className="flex h-full flex-col gap-3 p-3 sm:p-4 lg:gap-4 lg:p-6">
+        <div className="h-[40%] animate-pulse rounded-lg bg-envrt-brand-black/8" />
+        <div className="flex gap-2 lg:gap-3">
+          <div className="h-10 flex-1 animate-pulse rounded-md bg-envrt-brand-black/6 lg:h-14" />
+          <div className="h-10 flex-1 animate-pulse rounded-md bg-envrt-brand-black/6 lg:h-14" />
+        </div>
+        <div className="space-y-2 lg:space-y-3">
+          <div className="h-3 w-3/4 animate-pulse rounded bg-envrt-brand-black/6 lg:h-4" />
+          <div className="h-3 w-1/2 animate-pulse rounded bg-envrt-brand-black/6 lg:h-4" />
+          <div className="h-3 w-2/3 animate-pulse rounded bg-envrt-brand-black/6 lg:h-4" />
+        </div>
+      </div>
+    </div>
   );
 }
