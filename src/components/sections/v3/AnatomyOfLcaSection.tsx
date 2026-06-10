@@ -9,7 +9,6 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
@@ -154,42 +153,25 @@ function Header() {
 
 function Stats() {
   return (
-    <div className="grid gap-4 sm:grid-cols-[1fr_2fr] sm:items-stretch sm:gap-5">
-      {/* Visual anchor — loom thread close-up grounds the methodology talk
-          in real manufacturing. Hidden on the smallest mobile sizes so the
-          sticky inner doesn't overflow viewport height. */}
-      <div className="relative hidden aspect-[4/5] overflow-hidden rounded-xl ring-1 ring-envrt-brand-black/10 sm:block">
-        <Image
-          src="/v3-assets/provenance-loom.jpg"
-          alt="Coloured loom threads, raw yarn production"
-          fill
-          sizes="(min-width: 1024px) 300px, 33vw"
-          className="object-cover"
-        />
-        <span className="absolute bottom-2 left-2 rounded-md bg-envrt-brand-black/65 px-2 py-1 font-mono text-[8.5px] font-semibold uppercase tracking-[0.18em] text-white">
-          Tier 4 · Yarn
-        </span>
-      </div>
-      <div className="grid grid-cols-1 gap-3 sm:gap-4">
-        {STATS.map((s) => (
-          <div
-            key={s.value}
-            className="flex items-center justify-between rounded-xl border border-envrt-brand-black/12 bg-white/60 px-4 py-3.5 backdrop-blur sm:flex-1 sm:px-5 sm:py-4"
-          >
-            <div>
-              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine sm:text-[10px]">
-                {s.since}
-              </p>
-              <p className="mt-1 font-display text-base font-semibold leading-none tracking-[-0.01em] text-envrt-brand-black sm:text-lg">
-                {s.value}
-              </p>
-            </div>
-            <span className="ml-3 text-right text-[11px] leading-snug text-envrt-brand-black/55 sm:text-xs">
-              {s.label}
-            </span>
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+      {STATS.map((s) => (
+        <div
+          key={s.value}
+          className="flex items-center justify-between rounded-xl border border-envrt-brand-black/12 bg-white/60 px-4 py-3.5 backdrop-blur sm:px-5 sm:py-4"
+        >
+          <div>
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine sm:text-[10px]">
+              {s.since}
+            </p>
+            <p className="mt-1 font-display text-base font-semibold leading-none tracking-[-0.01em] text-envrt-brand-black sm:text-lg">
+              {s.value}
+            </p>
           </div>
-        ))}
-      </div>
+          <span className="ml-3 text-right text-[11px] leading-snug text-envrt-brand-black/55 sm:text-xs">
+            {s.label}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
