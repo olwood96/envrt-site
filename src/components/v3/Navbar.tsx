@@ -386,7 +386,7 @@ function GroupTrigger({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.18, ease: EASE_BRAND }}
-            className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3"
+            className="absolute left-0 top-full z-50 pt-3"
           >
             <DropdownCard
               items={group.items}
