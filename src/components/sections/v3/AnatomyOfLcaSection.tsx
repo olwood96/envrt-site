@@ -180,7 +180,7 @@ function ClosingTag() {
   return (
     <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center sm:gap-5">
       <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-envrt-brand-black/45 sm:text-[11px]">
-        ENVRT/LAB · our own calculation engine
+        Our own calculation engine
       </p>
       <Link
         href="/preview/v3/lab"

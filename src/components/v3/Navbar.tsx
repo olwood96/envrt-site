@@ -153,14 +153,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* Corner construction mark, page-level fingerprint */}
-      <span
-        aria-hidden
-        className="pointer-events-none fixed left-4 top-4 z-40 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:left-6 sm:top-6"
-      >
-        ENVRT/NAV
-      </span>
-
       <header className="fixed inset-x-0 top-0 z-50 flex justify-center pt-4 sm:pt-6">
         <motion.div
           initial={false}

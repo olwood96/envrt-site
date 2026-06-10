@@ -20,7 +20,7 @@ const stats: Stat[] = [
     display: "30",
     unit: "min",
     label: "to first DPP",
-    body: "Most brands onboard in around 30 minutes. Upload your collection, generate your first passport the same day.",
+    body: "A 30-minute onboarding call walks your team through the platform. Once your data is in, your first passport is generated the same day.",
   },
   {
     number: 68431,
@@ -168,13 +168,7 @@ export function NumbersSection() {
   return (
     <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
       <DotGridBackground tone="lilac" opacity={0.06} size={26} />
-      <SectionCorners
-        tone="dark"
-        left="04x"
-        right="ENVRT/04"
-        bottomLeft="BY THE NUMBERS"
-        bottomRight="N/03"
-      />
+      <SectionCorners tone="dark" left="ENVRT/04" right="By the numbers" />
 
       <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>

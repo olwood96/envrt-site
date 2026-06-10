@@ -6,13 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { FadeUp } from "@/components/ui/Motion";
 import { faqItems } from "@/lib/config";
-import { Eyebrow, SectionCorners } from "./_shared";
+import { Eyebrow } from "./_shared";
 
 export function FAQSectionV3() {
   return (
     <section id="faq" className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
-      <SectionCorners left="ENVRT/FAQ" right="Q" />
-
       <Container>
         <div className="mx-auto max-w-2xl">
           <FadeUp>
