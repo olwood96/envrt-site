@@ -88,7 +88,7 @@ const faqs = [
   {
     question: "Can I download the methodology pack?",
     answer:
-      "Yes. Per garment, you can export the full methodology pack in PDF, CSV or JSON. Includes inputs, factor sources, calculation steps, supplier evidence and the audit trail. One click.",
+      "Yes. Per garment, you can export an audit-ready proof pack in PDF and JSON. Includes calculation inputs, factor sources, methodology versioning and the full audit trail. One click. CSV export and supplier evidence bundling are on the roadmap.",
   },
 ];
 

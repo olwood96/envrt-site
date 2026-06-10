@@ -58,8 +58,8 @@ const CAPABILITIES: Capability[] = [
   {
     id: "audit",
     name: "Audit-ready reports",
-    desc: "Export the methodology pack in one click. CSV, JSON, PDF.",
-    stat: { value: "3", label: "export formats" },
+    desc: "Export the proof pack in one click. PDF and JSON.",
+    stat: { value: "2", label: "export formats" },
     theme: "comply",
   },
   {
