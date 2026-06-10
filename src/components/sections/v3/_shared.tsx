@@ -56,8 +56,10 @@ export function SectionCorners({
   );
 }
 
-// ─── Eyebrow — the small label above headings. Default ultramarine, with
-//     per-area tones for the colour-scheme experiment.
+// ─── Eyebrow — the small label above headings. Default and neon and white
+//     render as text in their respective colour; sunny and lilac render as
+//     filled chips because the bare-text version on a vista background is
+//     too low-contrast to register as an area signature.
 
 export type EyebrowTone =
   | "default"
@@ -66,12 +68,18 @@ export type EyebrowTone =
   | "lilac"
   | "white";
 
-const EYEBROW_TONE: Record<EyebrowTone, string> = {
+const EYEBROW_TEXT: Record<EyebrowTone, string> = {
   default: "text-envrt-brand-ultramarine",
   neon: "text-envrt-brand-neon",
   sunny: "text-envrt-brand-sunny",
   lilac: "text-envrt-brand-lilac",
   white: "text-white/85",
+};
+
+const EYEBROW_CHIP: Partial<Record<EyebrowTone, string>> = {
+  sunny:
+    "inline-block bg-envrt-brand-sunny text-envrt-brand-black px-2.5 py-1 rounded-full",
+  lilac: "inline-block bg-envrt-brand-lilac text-white px-2.5 py-1 rounded-full",
 };
 
 export function Eyebrow({
@@ -83,9 +91,12 @@ export function Eyebrow({
   className?: string;
   tone?: EyebrowTone;
 }) {
+  const chip = EYEBROW_CHIP[tone];
+  const base = chip ?? EYEBROW_TEXT[tone];
+
   return (
     <p
-      className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${EYEBROW_TONE[tone]} sm:text-[11px] ${className ?? ""}`}
+      className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${base} sm:text-[11px] ${className ?? ""}`}
     >
       {children}
     </p>

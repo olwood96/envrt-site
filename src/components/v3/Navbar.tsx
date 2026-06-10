@@ -166,14 +166,14 @@ export function Navbar() {
           initial={false}
           animate={{
             boxShadow: scrolled
-              ? "0 24px 50px -22px rgba(14,14,14,0.22), 0 0 0 1px rgba(14,14,14,0.04) inset"
-              : "0 12px 30px -18px rgba(14,14,14,0.10), 0 0 0 1px rgba(255,255,255,0.40) inset",
+              ? "0 18px 40px -22px rgba(14,14,14,0.18)"
+              : "0 8px 24px -18px rgba(14,14,14,0.06)",
           }}
           transition={{ duration: 0.3 }}
-          className={`relative flex items-stretch rounded-full border bg-white/55 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300 ${
+          className={`relative flex items-stretch rounded-full border bg-white/95 backdrop-blur transition-colors duration-300 ${
             scrolled
-              ? "border-white/40 supports-[backdrop-filter]:bg-white/45"
-              : "border-white/55 supports-[backdrop-filter]:bg-white/55"
+              ? "border-envrt-brand-black/15"
+              : "border-envrt-brand-black/10"
           }`}
         >
           {/* Wordmark */}
@@ -411,7 +411,7 @@ function DropdownCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-envrt-brand-black/12 bg-white p-2 shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)] ${
+      className={`rounded-2xl border border-white/60 bg-white/55 p-2 shadow-[0_24px_50px_-22px_rgba(14,14,14,0.22),inset_0_0_0_1px_rgba(255,255,255,0.55)] backdrop-blur-2xl backdrop-saturate-150 ${
         columns === 2 ? "w-[580px]" : "w-[320px]"
       }`}
     >
