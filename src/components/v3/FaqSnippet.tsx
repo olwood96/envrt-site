@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eyebrow } from "@/components/sections/v3/_shared";
+import { Eyebrow, type EyebrowTone } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 
 // FAQ snippet block. 3-4 questions placed near the bottom of dedicated
@@ -20,19 +20,21 @@ export function FaqSnippet({
   items,
   ctaHref,
   ctaLabel = "See all FAQs",
+  tone = "default",
 }: {
   eyebrow?: string;
   heading?: string;
   items: FaqItem[];
   ctaHref?: string;
   ctaLabel?: string;
+  tone?: EyebrowTone;
 }) {
   return (
     <section className="relative bg-envrt-brand-vista py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-2xl px-5 sm:px-8 lg:px-16">
         <FadeUp>
-          <div className="text-center">
-            <Eyebrow>{eyebrow}</Eyebrow>
+          <div className="flex flex-col items-center text-center">
+            <Eyebrow tone={tone}>{eyebrow}</Eyebrow>
             {heading && (
               <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-4xl">
                 {heading}

@@ -25,12 +25,16 @@ export function SectionCorners({
   right: string;
   bottomLeft?: string;
   bottomRight?: string;
-  tone?: "light" | "dark";
+  tone?: "light" | "dark" | "sunny" | "lilac";
 }) {
   const text =
     tone === "dark"
       ? "text-envrt-brand-lilac/45"
-      : "text-envrt-brand-black/25";
+      : tone === "sunny"
+        ? "text-envrt-brand-sunny"
+        : tone === "lilac"
+          ? "text-envrt-brand-lilac"
+          : "text-envrt-brand-black/25";
 
   const cls = `pointer-events-none absolute z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] ${text}`;
 

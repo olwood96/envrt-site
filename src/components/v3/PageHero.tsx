@@ -28,6 +28,9 @@ type Tokens = {
   dotTone: "ink" | "lilac";
   dotOpacity: number;
   eyebrowTone: EyebrowTone;
+  topStripe?: string;
+  cornerTone: "light" | "dark" | "sunny" | "lilac";
+  underline?: string;
 };
 
 const TOKENS: Record<PageHeroTone, Tokens> = {
@@ -39,6 +42,7 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     dotTone: "ink",
     dotOpacity: 0.04,
     eyebrowTone: "default",
+    cornerTone: "light",
   },
   neon: {
     section: "bg-envrt-brand-black",
@@ -48,24 +52,35 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     dotTone: "lilac",
     dotOpacity: 0.07,
     eyebrowTone: "neon",
+    topStripe: "bg-envrt-brand-neon",
+    cornerTone: "dark",
+    underline: "bg-envrt-brand-neon",
   },
   sunny: {
-    section: "bg-envrt-brand-vista",
+    section:
+      "bg-[linear-gradient(180deg,rgba(255,229,15,0.18)_0%,rgba(255,229,15,0.06)_55%,rgba(252,249,240,1)_100%)]",
     heading: "text-envrt-brand-black",
     headingSpan: "text-envrt-brand-black/40",
     body: "text-envrt-brand-black/70",
     dotTone: "ink",
-    dotOpacity: 0.04,
+    dotOpacity: 0.06,
     eyebrowTone: "sunny",
+    topStripe: "bg-envrt-brand-sunny",
+    cornerTone: "sunny",
+    underline: "bg-envrt-brand-sunny",
   },
   lilac: {
-    section: "bg-envrt-brand-vista",
+    section:
+      "bg-[linear-gradient(180deg,rgba(223,95,255,0.16)_0%,rgba(223,95,255,0.05)_55%,rgba(252,249,240,1)_100%)]",
     heading: "text-envrt-brand-black",
     headingSpan: "text-envrt-brand-black/40",
     body: "text-envrt-brand-black/70",
     dotTone: "ink",
-    dotOpacity: 0.04,
+    dotOpacity: 0.06,
     eyebrowTone: "lilac",
+    topStripe: "bg-envrt-brand-lilac",
+    cornerTone: "lilac",
+    underline: "bg-envrt-brand-lilac",
   },
 };
 
@@ -95,12 +110,18 @@ export function PageHero({
       className={`relative overflow-hidden py-20 sm:py-28 lg:py-32 ${t.section}`}
       data-hero-tone={tone}
     >
+      {t.topStripe && (
+        <span
+          aria-hidden
+          className={`absolute inset-x-0 top-0 h-1.5 ${t.topStripe}`}
+        />
+      )}
       <DotGridBackground opacity={t.dotOpacity} size={22} tone={t.dotTone} />
       {cornerRight && (
         <SectionCorners
           left={cornerLeft}
           right={cornerRight}
-          tone={tone === "neon" ? "dark" : "light"}
+          tone={t.cornerTone}
         />
       )}
 
@@ -116,6 +137,14 @@ export function PageHero({
               {heading}
             </h1>
           </FadeUp>
+          {t.underline && (
+            <FadeUp delay={0.12}>
+              <span
+                aria-hidden
+                className={`mt-6 block h-1 w-24 rounded-full ${t.underline}`}
+              />
+            </FadeUp>
+          )}
           {body && (
             <FadeUp delay={0.16}>
               <p

@@ -316,6 +316,7 @@ export default function RoiV3Page() {
       </section>
 
       <FaqSnippet
+        tone="sunny"
         eyebrow="Common questions"
         heading="About the ROI calculator"
         items={faqs}

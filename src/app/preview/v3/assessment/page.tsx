@@ -138,6 +138,7 @@ export default function AssessmentV3Page() {
       </section>
 
       <FaqSnippet
+        tone="sunny"
         eyebrow="Common questions"
         heading="About the readiness assessment"
         items={faqs}

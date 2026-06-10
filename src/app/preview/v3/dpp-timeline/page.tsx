@@ -159,6 +159,7 @@ export default function DppTimelineV3Page() {
       <Timeline />
 
       <FaqSnippet
+        tone="sunny"
         eyebrow="Common questions"
         heading="About the DPP timeline"
         items={faqs}
