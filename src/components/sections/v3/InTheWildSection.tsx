@@ -14,7 +14,7 @@ export function InTheWildSection() {
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <LivePill label="Live · in the wild" />
-          <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
+          <h2 className="mt-5 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
             Real garments.<br />
             <span className="text-envrt-brand-black/35">Real passports.</span>
           </h2>

@@ -68,7 +68,7 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           <Eyebrow>Why ENVRT</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <p className="mt-6 font-display text-[1.75rem] font-medium leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
+          <p className="mt-6 font-display text-[1.45rem] font-medium leading-[1.12] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
             Compliance is the floor. The ceiling is a passport a customer
             actually wants to scan.
           </p>

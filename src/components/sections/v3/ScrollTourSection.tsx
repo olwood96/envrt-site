@@ -76,7 +76,7 @@ export function ScrollTourSection() {
           <div className="relative min-w-0">
             <FadeUp>
               <Eyebrow>Tour · the passport</Eyebrow>
-              <h2 className="mt-3 max-w-xl font-display text-[1.35rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-3xl lg:text-[2.5rem]">
+              <h2 className="mt-3 max-w-xl font-display text-[1.05rem] font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl lg:text-[2.5rem]">
                 Scroll through a live passport.
               </h2>
               <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">

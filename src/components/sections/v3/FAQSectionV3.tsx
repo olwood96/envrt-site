@@ -18,7 +18,7 @@ export function FAQSectionV3() {
           <FadeUp>
             <div className="text-center">
               <Eyebrow>FAQ</Eyebrow>
-              <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-4xl">
+              <h2 className="mt-4 font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-4xl">
                 Common questions.
               </h2>
             </div>

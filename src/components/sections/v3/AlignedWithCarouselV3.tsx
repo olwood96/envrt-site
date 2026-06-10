@@ -29,7 +29,7 @@ export function AlignedWithCarouselV3() {
           <Eyebrow className="text-center">Aligned with</Eyebrow>
           <h2
             id="aligned-with-v3-heading"
-            className="mx-auto mt-4 max-w-2xl text-center font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-3xl lg:text-[2.25rem]"
+            className="mx-auto mt-4 max-w-2xl text-center font-display text-xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-3xl lg:text-[2.25rem]"
           >
             Methodology that survives a regulator&apos;s PDF.
           </h2>

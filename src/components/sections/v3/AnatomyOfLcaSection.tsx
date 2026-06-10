@@ -392,21 +392,32 @@ function DesktopAnatomy() {
 
   // Horizontal track — translates left as scroll progresses. Cards 60% of
   // VIEWPORT width with 20vw padding-left so the first card starts centred,
-  // and translateX goes from 0 to -(N-1)*60vw to bring each card in turn.
+  // and translateX goes from 0 to -(N-1)*60vw + the px gap between them to
+  // bring each card in turn. The gap-4 = 16px between cards must be added
+  // to the translate, otherwise the final card lands 80px off centre.
   // Track is intentionally pulled outside the max-w-1320px container so it
   // spans the full viewport, breaking up the rigid central column.
-  const trackX = useTransform(
+  const trackProgress = useTransform(
     scrollYProgress,
     [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
-    ["0vw", `-${60 * (STAGES.length - 1)}vw`],
+    [0, 1],
     { ease: [easeInOut] },
   );
+  const trackXVw = useTransform(
+    trackProgress,
+    (p) => -60 * (STAGES.length - 1) * p,
+  );
+  const trackXPx = useTransform(
+    trackProgress,
+    (p) => -16 * (STAGES.length - 1) * p,
+  );
+  const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
 
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "400vh" }}
+      style={{ height: "540vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
         {/* Header + pipeline inside the constrained max-w container */}
@@ -422,7 +433,7 @@ function DesktopAnatomy() {
         {/* Card track — full viewport width, breaks out of the container */}
         <div className="mt-10 overflow-hidden">
           <motion.div
-            style={{ x: trackX, willChange: "transform" }}
+            style={{ transform: trackTransform, willChange: "transform" }}
             className="flex gap-4 pl-[20vw] pr-[20vw]"
           >
             {STAGES.map((stage) => (
@@ -470,18 +481,30 @@ function MobileAnatomy() {
     [activeIndexMv],
   );
 
-  const trackX = useTransform(
+  // Same approach as DesktopAnatomy — track translates in both vw and px
+  // so the gap-3 (12px) between mobile cards is included in the centring
+  // math, otherwise card 6 lands 60px off centre.
+  const trackProgress = useTransform(
     scrollYProgress,
     [STAGES[0].activation - 0.04, STAGES[STAGES.length - 1].activation + 0.04],
-    ["0vw", `-${85 * (STAGES.length - 1)}vw`],
+    [0, 1],
     { ease: [easeInOut] },
   );
+  const trackXVw = useTransform(
+    trackProgress,
+    (p) => -85 * (STAGES.length - 1) * p,
+  );
+  const trackXPx = useTransform(
+    trackProgress,
+    (p) => -12 * (STAGES.length - 1) * p,
+  );
+  const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
 
   return (
     <div
       ref={sectionRef}
       className="relative lg:hidden"
-      style={{ height: "380vh" }}
+      style={{ height: "500vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-10">
         <div className="mx-auto w-full px-5 sm:px-8">
@@ -494,7 +517,7 @@ function MobileAnatomy() {
 
           <div className="mt-8 overflow-hidden">
             <motion.div
-              style={{ x: trackX, willChange: "transform" }}
+              style={{ transform: trackTransform, willChange: "transform" }}
               className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
             >
               {STAGES.map((stage) => (

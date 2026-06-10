@@ -43,7 +43,7 @@ export function FinalCtaV3() {
           <Eyebrow>One last thing</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.85rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.55rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
             Try ENVRT on one garment. See if it earns the QR.
           </h2>
         </FadeUp>

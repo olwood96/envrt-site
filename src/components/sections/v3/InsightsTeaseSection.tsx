@@ -23,7 +23,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end sm:gap-6">
             <div>
               <Eyebrow>Insights</Eyebrow>
-              <h2 className="mt-4 max-w-2xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-5 sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-5 sm:text-4xl lg:text-[2.75rem]">
                 Notes from inside the DPP build.
               </h2>
             </div>

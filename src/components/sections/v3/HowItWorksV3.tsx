@@ -52,7 +52,7 @@ export function HowItWorksV3() {
       <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
           <Eyebrow>How it works</Eyebrow>
-          <h2 className="mt-5 max-w-3xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 max-w-3xl font-display text-2xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
             Three steps. Half a day. One passport per garment.
           </h2>
         </FadeUp>

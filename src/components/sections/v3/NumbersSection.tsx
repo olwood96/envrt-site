@@ -55,7 +55,9 @@ function CountUp({
   prefix?: string;
 }) {
   const ref = useRef<HTMLSpanElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  // once: false so the count re-fires every time the section enters view
+  // (e.g. scrolling back up and down again).
+  const inView = useInView(ref, { once: false, amount: 0.2 });
   const motionVal = useMotionValue(0);
   const formatted = useTransform(motionVal, (v) => {
     const rounded = Math.round(v);
@@ -64,14 +66,20 @@ function CountUp({
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (!inView) return;
-    const controls = animate(motionVal, to, {
-      duration: 1.8,
-      // Expo ease-out — fast start, soft landing
-      ease: [0.16, 1, 0.3, 1],
-      onComplete: () => setDone(true),
-    });
-    return controls.stop;
+    if (inView) {
+      setDone(false);
+      motionVal.set(0);
+      const controls = animate(motionVal, to, {
+        duration: 1.8,
+        // Expo ease-out — fast start, soft landing
+        ease: [0.16, 1, 0.3, 1],
+        onComplete: () => setDone(true),
+      });
+      return controls.stop;
+    }
+    // Out of view: reset so the next entry starts from zero
+    setDone(false);
+    motionVal.set(0);
   }, [inView, to, motionVal]);
 
   // Once done, swap to the pre-formatted display so it can carry commas,
@@ -87,17 +95,19 @@ function CountUp({
 
 function StatColumn({ stat, index }: { stat: Stat; index: number }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
+  // once: false so the column slides back down + fades out when scrolled
+  // out, then re-animates in on the next entry.
+  const inView = useInView(ref, { once: false, amount: 0.3 });
 
   return (
     <div ref={ref} className="sm:px-8 sm:first:pl-0 sm:last:pr-0">
       {/* Big numeral with translateY entrance */}
       <motion.p
         initial={{ y: 32, opacity: 0 }}
-        animate={inView ? { y: 0, opacity: 1 } : {}}
+        animate={inView ? { y: 0, opacity: 1 } : { y: 32, opacity: 0 }}
         transition={{
           duration: 0.9,
-          delay: index * 0.08,
+          delay: inView ? index * 0.08 : 0,
           ease: [0.16, 1, 0.3, 1],
         }}
         // Big stat numerals use N27 — the brand's wordmark font. Its blocky
@@ -110,10 +120,10 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
         {stat.unit && (
           <motion.span
             initial={{ opacity: 0, y: 8 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
+            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             transition={{
               duration: 0.6,
-              delay: 1.4 + index * 0.08,
+              delay: inView ? 1.4 + index * 0.08 : 0,
               ease: "easeOut",
             }}
             className="ml-1 inline-block align-top text-2xl font-medium tracking-normal text-white/45 sm:text-3xl"
@@ -126,8 +136,12 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
       {/* Aqua label */}
       <motion.p
         initial={{ opacity: 0, y: 8 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.6 + index * 0.08, ease: "easeOut" }}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+        transition={{
+          duration: 0.5,
+          delay: inView ? 0.6 + index * 0.08 : 0,
+          ease: "easeOut",
+        }}
         className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-envrt-brand-lilac"
       >
         {stat.label}
@@ -136,8 +150,12 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
       {/* Body */}
       <motion.p
         initial={{ opacity: 0, y: 8 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.75 + index * 0.08, ease: "easeOut" }}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+        transition={{
+          duration: 0.5,
+          delay: inView ? 0.75 + index * 0.08 : 0,
+          ease: "easeOut",
+        }}
         className="mt-3 max-w-sm text-sm leading-relaxed text-white/65"
       >
         {stat.body}

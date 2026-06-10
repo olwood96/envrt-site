@@ -245,16 +245,16 @@ function DesktopScatter() {
   const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
   const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 250vh container with 100vh sticky inner — sticky window is 150vh. The
-  // spring above buys the perceptible animation time, so the section itself
-  // does not need to be a 400vh commitment. Even on a fast flick the spring
-  // settles over ~500ms, guaranteeing the full animation plays through to
-  // the resolved state before the user can leave.
+  // 360vh container with 100vh sticky inner — sticky window 260vh. Bumped
+  // from 250vh to give each animation beat more scroll real estate, so the
+  // "Today → Shift → Output" copy lands more deliberately and the card-fly
+  // chapter doesn't feel rushed past on a normal-speed scroll. Spring above
+  // still guarantees fast flicks see the full sequence.
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "250vh" }}
+      style={{ height: "360vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
@@ -567,13 +567,15 @@ function MobileScatter() {
   const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
   const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 220vh container, 100vh sticky inner. Sticky window 120vh. Spring buys
-  // the animation playtime regardless of how violently the user flicks.
+  // 320vh container, 100vh sticky inner. Sticky window 220vh. Bumped from
+  // 220vh to match the desktop slowdown — touch-scroll on mobile can flick
+  // through too fast; the larger window gives the eyes time to register
+  // each step + card landing.
   return (
     <div
       ref={sectionRef}
       className="relative lg:hidden"
-      style={{ height: "220vh" }}
+      style={{ height: "320vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col bg-envrt-brand-vista px-5 pt-12 pb-6 sm:px-8 sm:pt-16 sm:pb-8">
         {/* Text block — pinned top. Step copy crossfades here. */}

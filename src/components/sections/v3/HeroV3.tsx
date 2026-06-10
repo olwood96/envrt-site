@@ -40,7 +40,7 @@ export function HeroV3() {
             <Eyebrow>Environmental platform · for fashion</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h1 className="mt-5 font-display text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
               Built for fashion&apos;s environmental work.{" "}
               <span className="text-envrt-brand-black/45">
                 Not just the receipt at the end.
