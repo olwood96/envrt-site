@@ -57,37 +57,32 @@ const TOKENS: Record<PageHeroTone, Tokens> = {
     underline: "bg-envrt-brand-neon",
   },
   sunny: {
-    // Saturated sunny band, fades to vista at the very bottom so the section
-    // below it doesn't slam into a hard edge. Reads as a real coloured panel,
-    // not a gentle tint. Eyebrow renders as ink (brand-black text) so it
-    // doesn't blend into the yellow.
-    section:
-      "bg-[linear-gradient(180deg,rgba(255,229,15,0.55)_0%,rgba(255,229,15,0.45)_70%,rgba(252,249,240,1)_100%)]",
+    // Match the homepage hero pattern: vista bg. Area presence comes from
+    // chip eyebrow, top stripe, heading underline, area-coloured corner
+    // marks, and the primary button (auto-themed via ButtonV3 CSS vars).
+    // No gradient panels — the previous saturated band looked generic.
+    section: "bg-envrt-brand-vista",
     heading: "text-envrt-brand-black",
-    headingSpan: "text-envrt-brand-black/55",
-    body: "text-envrt-brand-black/80",
+    headingSpan: "text-envrt-brand-black/40",
+    body: "text-envrt-brand-black/70",
     dotTone: "ink",
-    dotOpacity: 0.05,
-    eyebrowTone: "ink",
+    dotOpacity: 0.04,
+    eyebrowTone: "sunny",
     topStripe: "bg-envrt-brand-sunny",
     cornerTone: "sunny",
-    underline: "bg-envrt-brand-black",
+    underline: "bg-envrt-brand-sunny",
   },
   lilac: {
-    // Saturated lilac band. White ink for headings because lilac is dark
-    // enough that black ink reads muddy against it. Eyebrow renders as
-    // plain white text since the lilac chip would blend into the panel.
-    section:
-      "bg-[linear-gradient(180deg,rgba(223,95,255,0.85)_0%,rgba(223,95,255,0.75)_70%,rgba(252,249,240,1)_100%)]",
-    heading: "text-white",
-    headingSpan: "text-white/60",
-    body: "text-white/85",
+    section: "bg-envrt-brand-vista",
+    heading: "text-envrt-brand-black",
+    headingSpan: "text-envrt-brand-black/40",
+    body: "text-envrt-brand-black/70",
     dotTone: "ink",
-    dotOpacity: 0.05,
-    eyebrowTone: "white",
+    dotOpacity: 0.04,
+    eyebrowTone: "lilac",
     topStripe: "bg-envrt-brand-lilac",
     cornerTone: "lilac",
-    underline: "bg-white",
+    underline: "bg-envrt-brand-lilac",
   },
 };
 
