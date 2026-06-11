@@ -4,9 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { FadeUp } from "@/components/ui/Motion";
 import { EcoScoreLabel } from "@/components/sections/v3/EcoScoreLabel";
+import type { CollectiveCardData } from "@/lib/collective/types";
 import { LivePill } from "./_shared";
 
-export function InTheWildSection() {
+export function InTheWildSection({
+  collectiveCards = [],
+}: {
+  collectiveCards?: CollectiveCardData[];
+}) {
   return (
     <section
       className="relative bg-white py-20 sm:py-24 lg:py-32"
@@ -118,22 +123,17 @@ export function InTheWildSection() {
           </div>
         </FadeUp>
 
-        {/* More-in-The-Collective card. Editorial product photo + an
-            invitation to the broader gallery of live DPPs. */}
+        {/* More-in-The-Collective card. Real product photos from live
+            DPPs arranged as a 2x2 mosaic; the static fallback kicks in
+            when the DB returns no cards. Every tile is a fixed aspect
+            box with object-cover so the source image's native ratio
+            stops mattering. */}
         <FadeUp delay={0.2}>
           <Link
             href="/preview/v3/collective"
             className="group mt-12 grid overflow-hidden rounded-3xl bg-envrt-brand-vista ring-1 ring-envrt-brand-black/8 transition-shadow duration-300 hover:shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)] sm:mt-16 sm:grid-cols-[1fr_1.4fr]"
           >
-            <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-auto">
-              <Image
-                src="/v3-assets/folded-clothes.jpg"
-                alt="Folded apparel — more garments with live ENVRT passports"
-                fill
-                sizes="(min-width: 1024px) 420px, 100vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
+            <CollectiveMosaic cards={collectiveCards} />
             <div className="flex flex-col justify-center gap-3 p-6 sm:p-8 lg:p-10">
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine sm:text-[11px]">
                 The Collective
@@ -162,5 +162,52 @@ export function InTheWildSection() {
         </FadeUp>
       </div>
     </section>
+  );
+}
+
+// Mosaic on the left of the "More in The Collective" card. Uses the
+// first four featured products with images, each cropped to an identical
+// box so source-aspect-ratio differences don't bleed into the layout.
+// Falls back to the editorial folded-clothes photo if no cards are
+// available (e.g. DB fetch failed at build time).
+function CollectiveMosaic({ cards }: { cards: CollectiveCardData[] }) {
+  const withImages = cards.filter((c) => c.productImageUrl).slice(0, 4);
+
+  if (withImages.length < 4) {
+    return (
+      <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-auto">
+        <Image
+          src="/v3-assets/folded-clothes.jpg"
+          alt="Folded apparel, more garments with live ENVRT passports"
+          fill
+          sizes="(min-width: 1024px) 420px, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative grid aspect-[4/5] w-full grid-cols-2 grid-rows-2 gap-1 overflow-hidden bg-envrt-brand-black/5 p-1 sm:aspect-auto">
+      {withImages.map((card) => (
+        <div
+          key={card.dpp.id}
+          className="relative overflow-hidden bg-envrt-brand-vista"
+        >
+          <Image
+            src={card.productImageUrl!}
+            alt={card.dpp.garment_name}
+            fill
+            sizes="(min-width: 1024px) 210px, 50vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+          {/* Bottom-left brand chip on each tile so the strip still reads
+              as "real brands" at a glance. */}
+          <span className="pointer-events-none absolute bottom-1.5 left-1.5 max-w-[88%] truncate rounded-md bg-envrt-brand-black/65 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.16em] text-white sm:text-[9px]">
+            {card.brand.name}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }

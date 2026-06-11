@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PageHero, ButtonV3 } from "@/components/v3";
 import {
   Eyebrow,
@@ -112,52 +113,67 @@ function AdvisorsSection({ advisors }: { advisors: Member[] }) {
 }
 
 function MemberCard({ member, accent = false }: { member: Member; accent?: boolean }) {
+  const photoPath = "photoPath" in member ? member.photoPath : undefined;
+
   return (
     <div
-      className={`flex h-full flex-col rounded-3xl border bg-white p-7 transition-colors duration-300 sm:p-9 ${
+      className={`flex h-full flex-col overflow-hidden rounded-3xl border bg-white transition-colors duration-300 ${
         accent
           ? "border-envrt-brand-black/12 hover:border-envrt-brand-ultramarine/30"
           : "border-envrt-brand-black/10 hover:border-envrt-brand-ultramarine/25"
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-[1.625rem]">
-            {member.name}
-          </h3>
-          <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
-            {member.role}
-          </p>
+      {photoPath && (
+        <div className="relative aspect-[5/4] w-full overflow-hidden bg-envrt-brand-vista">
+          <Image
+            src={photoPath}
+            alt={member.name}
+            fill
+            sizes="(min-width: 1024px) 520px, (min-width: 640px) 50vw, 100vw"
+            className="object-cover object-center grayscale-[0.6] transition-[filter] duration-300 hover:grayscale-0"
+          />
         </div>
-        <span
-          aria-hidden
-          className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/35 sm:text-[11px]"
-        >
-          {member.type === "founder" ? "F/01" : "A/01"}
-        </span>
-      </div>
-
-      <ul className="mt-6 flex-1 space-y-3">
-        {member.bullets.map((b) => (
-          <li
-            key={b}
-            className="flex items-start gap-2.5 text-sm leading-relaxed text-envrt-brand-black/70 sm:text-[15px]"
-          >
-            <span className="mt-2 h-1 w-1 flex-shrink-0 rounded-full bg-envrt-brand-ultramarine/60" />
-            {b}
-          </li>
-        ))}
-      </ul>
-
-      {member.email && (
-        <a
-          href={`mailto:${member.email}`}
-          className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:text-envrt-brand-ultramarine"
-        >
-          <span>{member.email}</span>
-          <span aria-hidden>→</span>
-        </a>
       )}
+      <div className="flex flex-1 flex-col p-7 sm:p-9">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-[1.625rem]">
+              {member.name}
+            </h3>
+            <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+              {member.role}
+            </p>
+          </div>
+          <span
+            aria-hidden
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/35 sm:text-[11px]"
+          >
+            {member.type === "founder" ? "F/01" : "A/01"}
+          </span>
+        </div>
+
+        <ul className="mt-6 flex-1 space-y-3">
+          {member.bullets.map((b) => (
+            <li
+              key={b}
+              className="flex items-start gap-2.5 text-sm leading-relaxed text-envrt-brand-black/70 sm:text-[15px]"
+            >
+              <span className="mt-2 h-1 w-1 flex-shrink-0 rounded-full bg-envrt-brand-ultramarine/60" />
+              {b}
+            </li>
+          ))}
+        </ul>
+
+        {member.email && (
+          <a
+            href={`mailto:${member.email}`}
+            className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:text-envrt-brand-ultramarine"
+          >
+            <span>{member.email}</span>
+            <span aria-hidden>→</span>
+          </a>
+        )}
+      </div>
     </div>
   );
 }

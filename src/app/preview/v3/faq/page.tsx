@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageHero, ButtonV3 } from "@/components/v3";
 import {
@@ -45,7 +46,7 @@ const METHODOLOGY_FAQS: FaqItem[] = [
   {
     question: "Which lifecycle stages are modelled?",
     answer:
-      "Fibre extraction, yarn spinning, fabric production, dyeing and finishing, assembly, and tier-by-tier transport. Each stage has its own factor source, its own loss assumption and its own location-aware grid mix.",
+      "Fibre extraction, yarn spinning, fabric production, dyeing and finishing, assembly and tier-by-tier transport. Each stage has its own factor source, its own loss assumption and its own location-aware grid mix.",
   },
   {
     question: "What standards does the calculation engine follow?",
@@ -188,13 +189,49 @@ function SectionNav() {
   );
 }
 
+// Pool of thin photographic dividers cycled between FAQ sections. Adds
+// an editorial rhythm without committing to "every section needs a hero
+// photo". Wide horizontal crops only — these are bands, not banners.
+const DIVIDER_BANDS = [
+  "/v3-assets/provenance-loom.jpg",
+  "/v3-assets/story-fabric.jpg",
+  "/v3-assets/platform-thread-spools.jpg",
+  "/v3-assets/folded-clothes.jpg",
+  "/v3-assets/cta-texture.jpg",
+];
+
 function SectionsBody() {
   return (
     <>
       {SECTIONS.map((s, i) => (
-        <Section key={s.index} section={s} isLast={i === SECTIONS.length - 1} />
+        <div key={s.index}>
+          <Section section={s} isLast={i === SECTIONS.length - 1} />
+          {i < SECTIONS.length - 1 && (
+            <PhotoDivider src={DIVIDER_BANDS[i % DIVIDER_BANDS.length]} />
+          )}
+        </div>
       ))}
     </>
+  );
+}
+
+function PhotoDivider({ src }: { src: string }) {
+  return (
+    <div
+      aria-hidden
+      className="relative h-12 w-full overflow-hidden bg-envrt-brand-black/5 sm:h-16 lg:h-20"
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
+      />
+      {/* Slight darken at the edges so the divider doesn't fight nearby
+          section type. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista/30 via-transparent to-envrt-brand-vista/30" />
+    </div>
   );
 }
 

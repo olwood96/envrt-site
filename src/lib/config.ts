@@ -474,6 +474,7 @@ export const teamMembers = [
     role: "Founder & CEO",
     type: "founder" as const,
     email: "charlie@envrt.com",
+    photoPath: "/v3-assets/team/charlie.jpg",
     bullets: [
       "Environmental systems specialist with experience leading sustainability strategy across large-scale infrastructure",
       "Former Environmental Lead for large-scale, multidisciplinary developments across Europe",
@@ -486,6 +487,7 @@ export const teamMembers = [
     role: "Founder & CTO",
     type: "founder" as const,
     email: "oliver@envrt.com",
+    photoPath: "/v3-assets/team/oliver.jpg",
     bullets: [
       "Astrophysicist and published researcher with over a decade of programming experience",
       "Specialist in building advanced data pipelines and extracting insights from complex datasets",

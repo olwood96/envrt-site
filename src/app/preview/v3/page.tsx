@@ -18,6 +18,7 @@ import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSe
 import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
+import { getFeaturedDpps } from "@/lib/collective/fetch";
 
 // Root of /preview/v3, the full v3 homepage. Fonts, SmoothScroll, and
 // the v3 navbar are mounted by /preview/v3/layout.tsx, so this file
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function V3HomePage() {
-  const [posts, stats] = await Promise.all([
+  const [posts, stats, collective] = await Promise.all([
     Promise.resolve(
       getAllPostsMeta()
         .filter(
@@ -48,6 +49,10 @@ export default async function V3HomePage() {
         .slice(0, 3),
     ),
     fetchPlatformStats(),
+    // Featured DPP product images feed the "More in The Collective"
+    // mosaic in InTheWildSection. Failure-safe: empty array falls
+    // through to the static folded-clothes image.
+    getFeaturedDpps().catch(() => ({ cards: [] })),
   ]);
 
   return (
@@ -67,7 +72,7 @@ export default async function V3HomePage() {
 
       <SceneMark index="02" label="The passport" />
       <ScrollTourSection />
-      <InTheWildSection />
+      <InTheWildSection collectiveCards={collective.cards.slice(0, 6)} />
 
       <SceneMark index="03" label="What we do" />
       <CapabilitiesSection />
