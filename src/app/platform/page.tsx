@@ -79,7 +79,7 @@ const CAPABILITIES: Capability[] = [
     tagline: "Hosted Digital Product Passports at a permanent URL.",
     body: "Each garment gets a brand-customisable passport page at a permanent URL. Attach the QR to the care label, hangtag or packaging. Customers scan, regulators audit. EU ESPR-ready, with the legal framework changes tracked for you so the schema stays current.",
     detail: [
-      { label: "Hosting", value: "envrt.com or own domain" },
+      { label: "Hosting", value: "envrt.com, brand-customisable" },
       { label: "URL", value: "Permanent, ESPR-ready" },
       { label: "Customisation", value: "Brand voice + visuals" },
     ],

@@ -141,7 +141,7 @@ export function PolaroidStackSection() {
     >
       <SectionCorners left="ENVRT/LAB" right="Hoodie 0509-1882" />
 
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-5 py-6 sm:px-8 lg:px-16 lg:py-8">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-start px-5 pt-16 pb-6 sm:px-8 sm:justify-center sm:pt-8 lg:px-16 lg:py-8">
         <div className="mx-auto w-full max-w-[1200px]">
           <div className="mx-auto max-w-2xl text-center">
             <FadeUp>
@@ -168,7 +168,7 @@ export function PolaroidStackSection() {
               mobile + tablet with the ticker dropping below the polaroids. */}
           <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
             {/* Stack stage */}
-            <div className="relative mx-auto h-[360px] w-full max-w-[520px] sm:h-[420px]">
+            <div className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]">
               {POLAROIDS.map((p, i) => (
                 <PolaroidCard
                   key={p.index}

@@ -27,7 +27,7 @@ const steps: Step[] = [
     index: "03",
     title: "Ship the QR.",
     body: "Each garment gets a hosted passport at a permanent URL. Attach the QR to care label, hangtag or packaging.",
-    caption: "Hosted on envrt.com or your own domain",
+    caption: "Hosted on envrt.com, brand-customisable",
   },
 ];
 

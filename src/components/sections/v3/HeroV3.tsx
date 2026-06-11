@@ -144,8 +144,6 @@ function ConstructionMarks() {
     "absolute font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25";
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
-      <span className={`${cls} left-4 top-20 sm:left-6 sm:top-24`}>04x</span>
-      <span className={`${cls} right-4 top-20 sm:right-6 sm:top-24`}>08x</span>
       <span className={`${cls} bottom-4 left-4 sm:bottom-6 sm:left-6`}>
         ENVRT/01
       </span>
