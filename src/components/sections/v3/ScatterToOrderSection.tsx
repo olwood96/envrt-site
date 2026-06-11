@@ -240,16 +240,16 @@ function DesktopScatter() {
   const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
   const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 360vh container with 100vh sticky inner — sticky window 260vh. Bumped
-  // from 250vh to give each animation beat more scroll real estate, so the
-  // "Today → Shift → Output" copy lands more deliberately and the card-fly
-  // chapter doesn't feel rushed past on a normal-speed scroll. Spring above
-  // still guarantees fast flicks see the full sequence.
+  // 480vh container with 100vh sticky inner — sticky window 380vh. Bumped
+  // from 360vh to slow each card's arrival further. "Today → Shift →
+  // Output" beats now land deliberately and the eight cards' fly-in
+  // staggers don't blur together. Spring smoothing on the scroll still
+  // guarantees fast flicks see the full sequence.
   return (
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "360vh" }}
+      style={{ height: "480vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
         <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_1.15fr] items-center gap-16 px-16">
@@ -557,15 +557,15 @@ function MobileScatter() {
   const step2Y = useTransform(progress, [0.10, 0.16], [8, 0]);
   const step3Y = useTransform(progress, [0.54, 0.60], [8, 0]);
 
-  // 320vh container, 100vh sticky inner. Sticky window 220vh. Bumped from
-  // 220vh to match the desktop slowdown — touch-scroll on mobile can flick
-  // through too fast; the larger window gives the eyes time to register
-  // each step + card landing.
+  // 440vh container, 100vh sticky inner. Sticky window 340vh. Touch
+  // scroll on mobile can flick through too fast; this larger window
+  // gives the eye time to register each beat and each card landing
+  // without the section feeling like a flick-blur.
   return (
     <div
       ref={sectionRef}
       className="relative lg:hidden"
-      style={{ height: "320vh" }}
+      style={{ height: "440vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col bg-envrt-brand-vista px-5 pt-12 pb-6 sm:px-8 sm:pt-16 sm:pb-8">
         {/* Text block — pinned top. Step copy crossfades here. */}

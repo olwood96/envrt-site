@@ -56,7 +56,7 @@ const STAGES: Stage[] = [
     co2e: 1.77,
     cx: 25.2,
     activation: 0.22,
-    mobileActivation: 0.16,
+    mobileActivation: 0.20,
   },
   {
     index: "03",
@@ -66,7 +66,7 @@ const STAGES: Stage[] = [
     co2e: 0.62,
     cx: 42.4,
     activation: 0.34,
-    mobileActivation: 0.26,
+    mobileActivation: 0.34,
   },
   {
     index: "04",
@@ -76,7 +76,7 @@ const STAGES: Stage[] = [
     co2e: 4.18,
     cx: 59.6,
     activation: 0.46,
-    mobileActivation: 0.36,
+    mobileActivation: 0.48,
   },
   {
     index: "05",
@@ -86,7 +86,7 @@ const STAGES: Stage[] = [
     co2e: 0.33,
     cx: 76.8,
     activation: 0.58,
-    mobileActivation: 0.46,
+    mobileActivation: 0.62,
   },
   {
     index: "06",
@@ -96,7 +96,7 @@ const STAGES: Stage[] = [
     co2e: 0.07,
     cx: 94,
     activation: 0.70,
-    mobileActivation: 0.56,
+    mobileActivation: 0.76,
   },
 ];
 
@@ -500,7 +500,7 @@ function DesktopAnatomy() {
     <div
       ref={sectionRef}
       className="relative hidden lg:block"
-      style={{ height: "540vh" }}
+      style={{ height: "640vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
         {/* Header + pipeline inside the constrained max-w container */}
@@ -599,22 +599,27 @@ function MobileAnatomy() {
   );
   const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
 
-  // Mobile section height: 360vh down from 500vh. With mobileActivation
-  // ending at 0.56 and our +0.04 window endpoint, card 6 settles at
-  // scrollYProgress ≈ 0.6 — i.e. 60% of the section's 260vh of mappable
-  // scroll = ~156vh. The remaining 104vh of dwell lets the user see card
-  // 6 centred for a full screen and a half before the sticky pin
-  // releases, which was the original goal. The previous 500vh made the
-  // section feel like it never ended after the animation finished.
+  // Mobile section height: 480vh. mobileActivation now stretches the six
+  // stages across 0.06 → 0.76 of scroll (vs the old 0.06 → 0.56), so
+  // card 6 settles at ~80% of the section's mappable scroll instead of
+  // 60%. The remaining 20% of scroll (~76vh) is "dwell on the centred
+  // final card" — enough to read it, not so much that the section feels
+  // like it never ends. The bigger container (480vh up from 360vh) also
+  // slows each card's individual transit, so the animation reads
+  // deliberately rather than rapid-fire.
   //
-  // Stats + closing tag intentionally live OUTSIDE the sticky ref'd
-  // container so they render as a normal flow band after the sticky
-  // pin releases. Putting them inside the sticky inner pushed total
-  // content past 100vh on phones, breaking visual containment.
+  // Stats + closing tag live OUTSIDE the sticky ref'd container so they
+  // render as a normal flow band after the sticky pin releases.
+  //
+  // Card track wrapper lives OUTSIDE the padded inner container so it
+  // spans full viewport width — otherwise cards centred at 50vw end up
+  // ~20px right of where they should be (the container's px-5 padding
+  // shifts the track's left edge inward while cards use viewport units).
   return (
     <div className="relative border-b border-envrt-brand-black/8 lg:hidden">
-      <div ref={sectionRef} style={{ height: "360vh" }}>
+      <div ref={sectionRef} style={{ height: "480vh" }}>
         <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-6">
+          {/* Padded inner container — text only */}
           <div className="mx-auto w-full px-5 sm:px-8">
             <Header compact />
 
@@ -628,19 +633,21 @@ function MobileAnatomy() {
               <PipelineLabels activeIndex={activeIndex} variant="mobile" />
               <ActiveStageLabel activeIndex={activeIndex} />
             </div>
+          </div>
 
-            <div className="mt-5 overflow-hidden">
-              <motion.div
-                style={{ transform: trackTransform, willChange: "transform" }}
-                className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
-              >
-                {STAGES.map((stage) => (
-                  <div key={stage.index} className="w-[85vw] flex-shrink-0">
-                    <StageCard stage={stage} size="mobile" />
-                  </div>
-                ))}
-              </motion.div>
-            </div>
+          {/* Card track — full viewport, outside the padded container so
+              the centring math (cards at viewport-centre 50vw) lines up. */}
+          <div className="mt-5 overflow-hidden">
+            <motion.div
+              style={{ transform: trackTransform, willChange: "transform" }}
+              className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
+            >
+              {STAGES.map((stage) => (
+                <div key={stage.index} className="w-[85vw] flex-shrink-0">
+                  <StageCard stage={stage} size="mobile" />
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </div>
