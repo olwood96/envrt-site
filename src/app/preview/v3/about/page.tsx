@@ -104,7 +104,7 @@ function ManifestoSection() {
             <FadeUp delay={0.24}>
               <div className="relative hidden aspect-[4/5] w-full overflow-hidden rounded-xl ring-1 ring-envrt-brand-black/12 shadow-[0_18px_36px_-22px_rgba(14,14,14,0.35)] lg:block">
                 <video
-                  src="/v3-assets/videos/loom-loom.mp4"
+                  src="/v3-assets/videos/loom-loop.mp4"
                   autoPlay
                   loop
                   muted

@@ -13,7 +13,6 @@ import { AssetIcon } from "@/components/sections/v3/AssetIcon";
 import { FadeUp } from "@/components/ui/Motion";
 import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
-import { PolaroidStackSection } from "./PolaroidStackSection";
 
 export const metadata: Metadata = {
   title: "Lab | ENVRT v3",
@@ -121,11 +120,8 @@ export default function LabV3Page() {
         cornerRight="Lab"
       />
 
-      {/* Process documentary — polaroid stack establishes the methodology
-          mood before the technical pipeline. */}
-      <PolaroidStackSection />
-
-      {/* Live calculation anatomy — reused from homepage */}
+      {/* Live calculation anatomy — the technical breakdown lives here
+          now that the homepage uses the polaroid stack. */}
       <AnatomyOfLcaSection />
 
       <FactorSources />

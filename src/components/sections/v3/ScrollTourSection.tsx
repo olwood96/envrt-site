@@ -107,14 +107,17 @@ export function ScrollTourSection() {
             {/* Halo removed. Phone shell carries enough visual weight on its
                 own; the previous radial wash read as accent noise. */}
 
-            {/* Phone shell */}
-            <div className="relative overflow-hidden rounded-[1.6rem] border-[6px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[2rem] sm:border-[7px] lg:rounded-[2.6rem] lg:border-[10px]">
+            {/* Phone shell — borders slimmed so the screen content reads
+                bigger inside the same outer phone footprint. Rounded
+                corners also tightened slightly to match the thinner
+                bezel. */}
+            <div className="relative overflow-hidden rounded-[1.4rem] border-[4px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[1.8rem] sm:border-[5px] lg:rounded-[2.4rem] lg:border-[6px]">
               {/* Screen window — fixed visible height, overflow clipped.
                   The iframe inside is rendered at IFRAME_W (414px, a real
                   mobile viewport width so the DPP's responsive layout reads
                   correctly), then scaled down per breakpoint to fit the
                   phone frame. */}
-              <div className="relative h-[260px] overflow-hidden bg-white sm:h-[360px] lg:h-[580px]">
+              <div className="relative h-[268px] overflow-hidden bg-white sm:h-[370px] lg:h-[600px]">
                 {/* Skeleton placeholder. Renders behind the iframe so the
                     phone never shows a blank white screen during the iframe
                     fetch. Hidden once the iframe finishes loading. */}
@@ -123,11 +126,11 @@ export function ScrollTourSection() {
                 {/* Scale wrapper: explicit width matching iframe's natural
                     width. Scale factor = inner phone width / 414, where
                     inner width = phone outer width - (2 * border width).
-                    Mobile: (140 - 12) / 414 = 0.309
-                    sm:     (180 - 14) / 414 = 0.401
-                    lg:     (310 - 20) / 414 = 0.700 */}
+                    Mobile: (140 - 8) / 414 = 0.319
+                    sm:     (180 - 10) / 414 = 0.411
+                    lg:     (310 - 12) / 414 = 0.720 */}
                 <div
-                  className="origin-top-left scale-[0.309] will-change-transform sm:scale-[0.401] lg:scale-[0.700]"
+                  className="origin-top-left scale-[0.319] will-change-transform sm:scale-[0.411] lg:scale-[0.720]"
                   style={{ width: "414px" }}
                 >
                   <motion.div style={{ y: dppY, willChange: "transform" }}>

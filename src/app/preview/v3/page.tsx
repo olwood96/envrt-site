@@ -15,7 +15,7 @@ import { SceneMark } from "@/components/sections/v3/SceneMark";
 import { AlignedWithCarouselV3 } from "@/components/sections/v3/AlignedWithCarouselV3";
 import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
 import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSection";
-import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
+import { PolaroidStackSection } from "@/components/sections/v3/PolaroidStackSection";
 import { getAllPostsMeta } from "@/lib/insights";
 import { fetchPlatformStats } from "@/lib/impact-stats";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
@@ -79,7 +79,7 @@ export default async function V3HomePage() {
 
       <SceneMark index="04" label="The proof" dark />
       <NumbersSection />
-      <AnatomyOfLcaSection />
+      <PolaroidStackSection />
       <HowItWorksV3 />
 
       <SceneMark index="05" label="Deeper" />
