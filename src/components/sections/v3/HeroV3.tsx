@@ -20,8 +20,8 @@ export function HeroV3() {
       <DotGridBackground opacity={0.04} size={22} />
       <ConstructionMarks />
 
-      <div className="relative mx-auto max-w-[1320px] px-5 pt-24 pb-12 sm:px-8 sm:pt-28 lg:px-12 lg:grid lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-32 lg:pb-16">
-        <div className="max-w-xl lg:py-12">
+      <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-8 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-10">
+        <div className="max-w-xl lg:py-8">
           <FadeUp>
             <Eyebrow>Your GARMENTS · Their IMPACT · One PLATFORM</Eyebrow>
           </FadeUp>
@@ -75,7 +75,7 @@ export function HeroV3() {
         </FadeUp>
       </div>
 
-      <div className="relative mx-auto max-w-[1320px] px-5 pb-12 sm:px-8 lg:px-12 lg:pb-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 pb-10 sm:px-8 lg:px-12 lg:pb-14">
         <FadeUp delay={0.3}>
           <BrandStripV3 />
         </FadeUp>
@@ -92,7 +92,7 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
   const isDesktop = variant === "desktop";
   return (
     <div
-      className={`relative mx-auto w-full ${isDesktop ? "max-w-[560px]" : "max-w-[440px]"}`}
+      className={`relative mx-auto w-full ${isDesktop ? "max-w-[460px]" : "max-w-[380px]"}`}
     >
       <div className="relative aspect-[4/5] w-full">
         <div

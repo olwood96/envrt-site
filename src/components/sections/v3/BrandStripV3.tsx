@@ -41,12 +41,37 @@ function BrandRotator() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative flex h-10 w-full items-center justify-center sm:h-12">
+      {/* All logos eagerly preloaded into the browser cache off-screen so
+          rotating into them is instant. Without this, each new logo
+          briefly renders in colour before the grayscale filter applies. */}
+      <div aria-hidden className="hidden">
+        {BRANDS.map((b) => (
+          <Image
+            key={b.logo}
+            src={b.logo}
+            alt=""
+            width={1}
+            height={1}
+            priority
+          />
+        ))}
+      </div>
+
+      <div
+        className="relative flex h-10 w-full items-center justify-center sm:h-12"
+        style={{
+          // Apply the grayscale + multiply blend on the parent so the
+          // filter is present in initial HTML paint, before children
+          // render. Avoids the brief colour flash on rotation.
+          filter: "grayscale(100%)",
+          mixBlendMode: "multiply",
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={current.name}
             initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 0.55, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.5, ease: EASE_BRAND }}
             className="absolute inset-0 flex items-center justify-center"
@@ -56,8 +81,8 @@ function BrandRotator() {
               alt={current.name}
               width={160}
               height={48}
-              className="max-h-full w-auto object-contain opacity-55 mix-blend-multiply grayscale transition-opacity duration-300 hover:opacity-90"
-              priority={index === 0}
+              className="max-h-full w-auto object-contain"
+              priority
             />
           </motion.div>
         </AnimatePresence>
