@@ -41,13 +41,13 @@ export function InTheWildSection({
                 {/* Official French Coût Environnemental label (Ecobalyse portal SVG).
                     Policy: the label may not be redrawn or restyled. Anchored as an
                     inside corner overlay so it reads as part of the photo. */}
-                <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+                <div className="absolute bottom-4 right-4 rounded-md bg-white p-2 shadow-[0_4px_14px_-6px_rgba(0,0,0,0.18)] sm:bottom-6 sm:right-6 sm:p-2.5">
                   <Image
                     src="/v3-assets/angry-pablo-ecoscore.svg"
                     alt="Coût environnemental : 1573 points d'impact, 449 pour 100g"
                     width={154}
                     height={77}
-                    className="h-auto w-[140px] rounded-md bg-white shadow-[0_4px_14px_-6px_rgba(0,0,0,0.18)] sm:w-[170px]"
+                    className="block h-auto w-[140px] sm:w-[170px]"
                     unoptimized
                   />
                 </div>
