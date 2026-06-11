@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { pricingPlans, pricingComparison } from "@/lib/config";
 import { AssetIcon } from "@/components/sections/v3/AssetIcon";
+import {
+  formatPrice,
+  planPrice,
+  usePricing,
+} from "@/components/v3/pricing/PricingContext";
 
 // Two-layout pricing comparison.
 //   < sm: a plan-picker (Starter / Growth / Pro tabs) with a single-column
@@ -40,6 +45,7 @@ function PlanTabs({
   activePlan: PlanSlug;
   onChange: (slug: PlanSlug) => void;
 }) {
+  const { currency, billing } = usePricing();
   return (
     <div
       role="tablist"
@@ -48,6 +54,7 @@ function PlanTabs({
     >
       {pricingPlans.map((plan) => {
         const active = activePlan === plan.slug;
+        const price = planPrice(plan, currency, billing);
         return (
           <button
             key={plan.slug}
@@ -69,7 +76,9 @@ function PlanTabs({
                 active ? "text-white/75" : "text-envrt-brand-black/45"
               }`}
             >
-              {plan.customPricing ? "Custom" : `£${plan.priceGBP}/mo`}
+              {plan.customPricing || price === null
+                ? "Custom"
+                : `${formatPrice(price, currency)}/mo`}
             </span>
           </button>
         );

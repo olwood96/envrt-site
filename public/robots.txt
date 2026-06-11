@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /payment/
+Disallow: /preview/
+
+# Host
+Host: https://envrt.com
+
+# Sitemaps
+Sitemap: https://envrt.com/sitemap.xml

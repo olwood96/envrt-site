@@ -152,10 +152,24 @@ export const outcomeCards = [
 
 export type PlanSlug = "starter" | "growth" | "pro";
 
+export type Currency = "EUR" | "GBP" | "USD";
+export type BillingPeriod = "monthly" | "annual";
+
+// Per-currency monthly and "annual billing \u2014 per month equivalent"
+// prices. Annual = 15% off monthly. EUR set as authored values rather
+// than auto-converted so the marketing tiers stay clean numbers.
+export type PriceMatrix = Record<
+  Currency,
+  { monthly: number; annual: number }
+>;
+
 export interface PricingPlan {
   slug: PlanSlug;
   name: string;
   subheading: string;
+  prices?: PriceMatrix;
+  /** Deprecated. Kept for v1 surfaces that still read priceGBP; v3 reads
+   *  prices[currency][billing] via the PricingContext. */
   priceGBP?: number;
   customPricing?: boolean;
   customSubline?: string;
@@ -164,11 +178,32 @@ export interface PricingPlan {
   highlighted: boolean;
 }
 
+export const CURRENCY_SYMBOL: Record<Currency, string> = {
+  EUR: "\u20ac",
+  GBP: "\u00a3",
+  USD: "$",
+};
+
+// Default currency for new visitors. EUR \u2014 the largest target market
+// for ENVRT post-2027 ESPR.
+export const DEFAULT_CURRENCY: Currency = "EUR";
+export const DEFAULT_BILLING: BillingPeriod = "monthly";
+
+// Approximate exchange rates this set was authored around. Useful as a
+// reference for marketing when refreshing the price matrix.
+//   1 GBP \u2248 1.17 EUR \u2248 1.27 USD
+// Prices below are rounded for clean marketing display, not strict
+// conversions.
 export const pricingPlans: PricingPlan[] = [
   {
     slug: "starter",
     name: "Starter",
     subheading: "Your DPP Hub",
+    prices: {
+      EUR: { monthly: 175, annual: 149 },
+      GBP: { monthly: 149, annual: 127 },
+      USD: { monthly: 189, annual: 161 },
+    },
     priceGBP: 149,
     description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
@@ -190,6 +225,11 @@ export const pricingPlans: PricingPlan[] = [
     slug: "growth",
     name: "Growth",
     subheading: "Your Impact Analyst",
+    prices: {
+      EUR: { monthly: 579, annual: 492 },
+      GBP: { monthly: 495, annual: 421 },
+      USD: { monthly: 629, annual: 535 },
+    },
     priceGBP: 495,
     description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [

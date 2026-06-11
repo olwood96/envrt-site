@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { pricingPlans, pricingFaqItems } from "@/lib/config";
-import { PageHero, FaqSnippet, Card, ButtonV3 } from "@/components/v3";
+import { pricingFaqItems } from "@/lib/config";
+import { PageHero, FaqSnippet, ButtonV3 } from "@/components/v3";
 import { Eyebrow, SectionCorners } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { ComparisonMatrix } from "@/components/v3/pricing/ComparisonMatrix";
+import { PricingTiersV3 } from "@/components/v3/pricing/PricingTiersV3";
 
 export const metadata: Metadata = {
   title: "Pricing | ENVRT v3",
@@ -26,7 +27,7 @@ export default function PricingV3Page() {
             </span>
           </>
         }
-        body="From £149 a month. Per-garment lifecycle assessment, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier."
+        body="Per-garment lifecycle assessment, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier. Switch currency or billing period below."
         actions={
           <>
             <ButtonV3 href="/preview/v3/free-dpp" variant="primary">
@@ -83,112 +84,9 @@ function PricingTiers() {
       </div>
 
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
-        <div className="mx-auto max-w-2xl text-center">
-          <FadeUp>
-            <Eyebrow>Three tiers</Eyebrow>
-          </FadeUp>
-          <FadeUp delay={0.08}>
-            <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl">
-              Pick the tier that matches your SKU count and depth needs.
-            </h2>
-          </FadeUp>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:mt-16 lg:grid-cols-3 lg:gap-6">
-          {pricingPlans.map((plan, i) => (
-            <FadeUp key={plan.slug} delay={0.08 + i * 0.06}>
-              <TierCard plan={plan} />
-            </FadeUp>
-          ))}
-        </div>
-
-        <FadeUp delay={0.4}>
-          <p className="mt-10 text-center text-xs text-envrt-brand-black/55 sm:text-sm">
-            All plans run on a 6-month minimum term, then continue month-to-month. Annual billing saves 15% on Starter and Growth.
-          </p>
-        </FadeUp>
+        <PricingTiersV3 />
       </div>
     </section>
-  );
-}
-
-function TierCard({ plan }: { plan: (typeof pricingPlans)[number] }) {
-  const isHighlighted = plan.highlighted;
-
-  return (
-    <Card
-      variant={isHighlighted ? "cta" : "default"}
-      className={`flex h-full flex-col ${
-        isHighlighted
-          ? "ring-1 ring-envrt-brand-ultramarine/20"
-          : ""
-      }`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-display text-xl font-semibold tracking-[-0.01em] text-envrt-brand-black sm:text-2xl">
-          {plan.name}
-        </span>
-        {isHighlighted && (
-          <span className="rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
-            Most popular
-          </span>
-        )}
-      </div>
-
-      <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
-        {plan.subheading}
-      </p>
-
-      <div className="mt-6 flex items-baseline gap-1.5">
-        {plan.customPricing ? (
-          <span className="font-display text-3xl font-semibold tracking-tight text-envrt-brand-black sm:text-4xl">
-            Custom
-          </span>
-        ) : (
-          <>
-            <span className="font-display text-4xl font-semibold tracking-tight text-envrt-brand-black sm:text-5xl">
-              £{plan.priceGBP}
-            </span>
-            <span className="text-sm text-envrt-brand-black/55">/month</span>
-          </>
-        )}
-      </div>
-      {plan.customSubline && (
-        <p className="mt-2 text-xs leading-relaxed text-envrt-brand-black/55">
-          {plan.customSubline}
-        </p>
-      )}
-
-      <p className="mt-5 text-sm leading-relaxed text-envrt-brand-black/70">
-        {plan.description}
-      </p>
-
-      <ul className="mt-6 space-y-2.5 border-t border-envrt-brand-black/10 pt-6">
-        {plan.features.map((feature) => (
-          <li
-            key={feature}
-            className="flex items-start gap-2.5 text-sm leading-snug text-envrt-brand-black/75"
-          >
-            <span
-              aria-hidden
-              className="mt-1 inline-block h-1 w-1 flex-shrink-0 rounded-full bg-envrt-brand-ultramarine"
-            />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-8 pt-2">
-        <ButtonV3
-          href={plan.customPricing ? "/contact" : "/preview/v3/free-dpp"}
-          variant={isHighlighted ? "primary" : "secondary"}
-          className="w-full"
-        >
-          {plan.customPricing ? "Contact sales" : "Start with " + plan.name}
-          <span>→</span>
-        </ButtonV3>
-      </div>
-    </Card>
   );
 }
 

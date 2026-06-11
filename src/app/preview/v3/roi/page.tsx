@@ -16,6 +16,10 @@ import {
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import {
+  formatFromGBP,
+  usePricing,
+} from "@/components/v3/pricing/PricingContext";
 
 // /preview/v3/roi — ROI calculator. SKU count + data maturity + market +
 // current approach determines the savings vs consultants and vs an
@@ -132,9 +136,6 @@ function calculateROI(
   };
 }
 
-const formatGBP = (n: number) =>
-  `£${n.toLocaleString("en-GB", { maximumFractionDigits: 0 })}`;
-
 const faqs = [
   {
     question: "How does the calculator decide which ENVRT plan I need?",
@@ -176,6 +177,12 @@ export default function RoiV3Page() {
   const [emailError, setEmailError] = useState<string | null>(null);
 
   const results = calculateROI(skuCount, dataMaturity, market, approach);
+
+  // Currency view — calculator numbers stay in GBP under the hood and
+  // are converted at display time, so a currency toggle anywhere in the
+  // site flows through here without recalculating.
+  const { currency } = usePricing();
+  const display = (gbp: number) => formatFromGBP(gbp, currency);
 
   async function handleEmailResults(e: React.FormEvent) {
     e.preventDefault();
@@ -315,20 +322,24 @@ export default function RoiV3Page() {
                 <ResultRow
                   tone="brand"
                   label="ENVRT"
-                  sub={`${results.envrtPlan} plan, ${results.envrtPlanPrice}`}
-                  value={formatGBP(results.envrtCost)}
+                  sub={`${results.envrtPlan} plan, ${
+                    results.envrtPlan === "Pro"
+                      ? "custom-priced"
+                      : `${display(results.envrtCost / 12)}/mo`
+                  }`}
+                  value={display(results.envrtCost)}
                 />
                 <ResultRow
                   tone="muted"
                   label="External consultant"
                   sub="Same work, day-rate billing"
-                  value={formatGBP(results.consultantCost)}
+                  value={display(results.consultantCost)}
                 />
                 <ResultRow
                   tone="muted"
                   label="In-house hire"
                   sub="Sustainability analyst, with overhead"
-                  value={formatGBP(results.inhouseCost)}
+                  value={display(results.inhouseCost)}
                 />
               </div>
 
@@ -337,7 +348,7 @@ export default function RoiV3Page() {
                   Maximum annual saving
                 </p>
                 <p className="mt-2 font-display text-4xl font-semibold tracking-tight text-envrt-brand-ultramarine sm:text-5xl">
-                  {formatGBP(results.maxSaving)}
+                  {display(results.maxSaving)}
                 </p>
                 <p className="mt-3 text-sm text-envrt-brand-black/70">
                   Plus {results.daysSaved.toLocaleString()} working days back

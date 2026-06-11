@@ -3,6 +3,7 @@ import { Big_Shoulders_Text, Karla } from "next/font/google";
 import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { Navbar } from "@/components/v3";
 import { FooterV3 } from "@/components/v3/FooterV3";
+import { PricingProvider } from "@/components/v3/pricing/PricingContext";
 
 // Shared layout for every page under /preview/v3/. Loads the brand fonts
 // once, mounts the v3 navbar and footer, wraps content in Lenis smooth
@@ -25,14 +26,16 @@ const body = Karla({
 
 export default function V3Layout({ children }: { children: ReactNode }) {
   return (
-    <SmoothScroll>
-      <div
-        className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
-      >
-        <Navbar />
-        {children}
-        <FooterV3 />
-      </div>
-    </SmoothScroll>
+    <PricingProvider>
+      <SmoothScroll>
+        <div
+          className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+        >
+          <Navbar />
+          {children}
+          <FooterV3 />
+        </div>
+      </SmoothScroll>
+    </PricingProvider>
   );
 }

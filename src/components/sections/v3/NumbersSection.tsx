@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
+import {
+  CURRENCY_SYMBOL,
+  pricingPlans,
+} from "@/lib/config";
+import { usePricing } from "@/components/v3/pricing/PricingContext";
 import { DotGridBackground, SectionCorners } from "./_shared";
 
 type Stat = {
@@ -14,29 +19,39 @@ type Stat = {
   body: string;
 };
 
-const stats: Stat[] = [
-  {
-    number: 30,
-    display: "30",
-    unit: "min",
-    label: "to first DPP",
-    body: "A 30-minute onboarding call walks your team through the platform. Once your data is in, your first passport is generated the same day.",
-  },
-  {
-    number: 68431,
-    display: "68,431",
-    label: "reference cells per LCA",
-    body: "Materials, processes, dyeing, energy grids, transport, AWARE water scarcity, trims. Every passport pulls the same full database.",
-  },
-  {
-    number: 149,
-    display: "£149",
-    prefix: "£",
-    unit: "/mo",
-    label: "Starter plan",
-    body: "Per-garment DPPs with lifecycle metrics and analytics. Most competitor tooling is priced by quote and tends to be significantly higher.",
-  },
-];
+// Starter pricing stat reads from the same source as the pricing page,
+// so a currency / billing switch propagates here without a navigation.
+const STARTER_PLAN = pricingPlans.find((p) => p.slug === "starter");
+
+function useStats(): Stat[] {
+  const { currency, billing } = usePricing();
+  const starterPrice = STARTER_PLAN?.prices?.[currency][billing] ?? 149;
+  const sym = CURRENCY_SYMBOL[currency];
+
+  return [
+    {
+      number: 30,
+      display: "30",
+      unit: "min",
+      label: "to first DPP",
+      body: "A 30-minute onboarding call walks your team through the platform. Once your data is in, your first passport is generated the same day.",
+    },
+    {
+      number: 68431,
+      display: "68,431",
+      label: "reference cells per LCA",
+      body: "Materials, processes, dyeing, energy grids, transport, AWARE water scarcity, trims. Every passport pulls the same full database.",
+    },
+    {
+      number: starterPrice,
+      display: `${sym}${starterPrice}`,
+      prefix: sym,
+      unit: billing === "annual" ? "/mo, annual" : "/mo",
+      label: "Starter plan",
+      body: "Per-garment DPPs with lifecycle metrics and analytics. Most competitor tooling is priced by quote and tends to be significantly higher.",
+    },
+  ];
+}
 
 // ─── Smooth count-up using framer-motion's animate() ──────────────────────
 // Drives a motion value from 0 to the target with an expo ease-out so the
@@ -165,6 +180,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
 }
 
 export function NumbersSection() {
+  const stats = useStats();
   return (
     <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
       <DotGridBackground tone="lilac" opacity={0.06} size={26} />
