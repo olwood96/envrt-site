@@ -130,22 +130,30 @@ export function AnatomyOfLcaSection() {
 
 // ─── Shared ───────────────────────────────────────────────────────────────
 
-function Header() {
+function Header({ compact = false }: { compact?: boolean }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <FadeUp>
         <Eyebrow>Our USP</Eyebrow>
-        <h2 className="mt-4 font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
+        <h2
+          className={`mt-3 font-display font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black ${
+            compact
+              ? "text-2xl sm:text-3xl"
+              : "text-3xl sm:text-4xl lg:text-[3rem]"
+          } ${compact ? "" : "mt-4"}`}
+        >
           We wrote the engine.{" "}
           <span className="text-envrt-brand-black/40">
             Line by line, stage by stage.
           </span>
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-5 sm:text-base">
-          EU PEF, ISO 14040 and AWARE water scarcity, all in code we own.
-          No third-party APIs, no black boxes. The breakdown below is live,
-          from Hoodie 0509-1882.
-        </p>
+        {!compact && (
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-5 sm:text-base">
+            EU PEF, ISO 14040 and AWARE water scarcity, all in code we own.
+            No third-party APIs, no black boxes. The breakdown below is
+            live, from Hoodie 0509-1882.
+          </p>
+        )}
       </FadeUp>
     </div>
   );
@@ -591,46 +599,58 @@ function MobileAnatomy() {
   );
   const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
 
+  // Mobile section height: 360vh down from 500vh. With mobileActivation
+  // ending at 0.56 and our +0.04 window endpoint, card 6 settles at
+  // scrollYProgress ≈ 0.6 — i.e. 60% of the section's 260vh of mappable
+  // scroll = ~156vh. The remaining 104vh of dwell lets the user see card
+  // 6 centred for a full screen and a half before the sticky pin
+  // releases, which was the original goal. The previous 500vh made the
+  // section feel like it never ended after the animation finished.
+  //
+  // Stats + closing tag intentionally live OUTSIDE the sticky ref'd
+  // container so they render as a normal flow band after the sticky
+  // pin releases. Putting them inside the sticky inner pushed total
+  // content past 100vh on phones, breaking visual containment.
   return (
-    <div
-      ref={sectionRef}
-      className="relative lg:hidden"
-      style={{ height: "500vh" }}
-    >
-      <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-10">
-        <div className="mx-auto w-full px-5 sm:px-8">
-          <Header />
+    <div className="relative border-b border-envrt-brand-black/8 lg:hidden">
+      <div ref={sectionRef} style={{ height: "360vh" }}>
+        <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-6">
+          <div className="mx-auto w-full px-5 sm:px-8">
+            <Header compact />
 
-          <div className="mt-10">
-            <Pipeline
-              progress={scrollYProgress}
-              activeIndex={activeIndex}
-              windowStart={windowStart}
-              windowEnd={windowEnd}
-            />
-            <PipelineLabels activeIndex={activeIndex} variant="mobile" />
-            <ActiveStageLabel activeIndex={activeIndex} />
-          </div>
+            <div className="mt-6">
+              <Pipeline
+                progress={scrollYProgress}
+                activeIndex={activeIndex}
+                windowStart={windowStart}
+                windowEnd={windowEnd}
+              />
+              <PipelineLabels activeIndex={activeIndex} variant="mobile" />
+              <ActiveStageLabel activeIndex={activeIndex} />
+            </div>
 
-          <div className="mt-6 overflow-hidden">
-            <motion.div
-              style={{ transform: trackTransform, willChange: "transform" }}
-              className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
-            >
-              {STAGES.map((stage) => (
-                <div key={stage.index} className="w-[85vw] flex-shrink-0">
-                  <StageCard stage={stage} size="mobile" />
-                </div>
-              ))}
-            </motion.div>
+            <div className="mt-5 overflow-hidden">
+              <motion.div
+                style={{ transform: trackTransform, willChange: "transform" }}
+                className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
+              >
+                {STAGES.map((stage) => (
+                  <div key={stage.index} className="w-[85vw] flex-shrink-0">
+                    <StageCard stage={stage} size="mobile" />
+                  </div>
+                ))}
+              </motion.div>
+            </div>
           </div>
+        </div>
+      </div>
 
-          <div className="mt-8">
-            <Stats />
-          </div>
-          <div className="mt-6">
-            <ClosingTag />
-          </div>
+      {/* Static aftermath — appears after the sticky pin releases.
+          Anchors the section's end so it doesn't blur into HowItWorks. */}
+      <div className="relative bg-envrt-brand-vista px-5 pb-12 pt-4 sm:px-8 sm:pb-16">
+        <Stats />
+        <div className="mt-6">
+          <ClosingTag />
         </div>
       </div>
     </div>
