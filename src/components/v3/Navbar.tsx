@@ -42,25 +42,25 @@ const NAV: NavTopItem[] = [
     columns: 2,
     items: [
       {
-        href: "/preview/v3/platform",
+        href: "//platform",
         label: "Platform",
         description: "Nine capabilities, one platform",
         icon: "supply-chain",
       },
       {
-        href: "/preview/v3/lab",
+        href: "//lab",
         label: "Lab",
         description: "Inside the calculation engine",
         icon: "lca",
       },
       {
-        href: "/preview/v3/free-dpp",
+        href: "//free-dpp",
         label: "Free DPP",
         description: "Try ENVRT on one garment",
         icon: "dpp",
       },
       {
-        href: "/preview/v3/collective",
+        href: "//collective",
         label: "The Collective",
         description: "Featured DPPs from brands using ENVRT",
         icon: "eco-score",
@@ -73,37 +73,37 @@ const NAV: NavTopItem[] = [
     columns: 2,
     items: [
       {
-        href: "/preview/v3/insights",
+        href: "//insights",
         label: "Insights",
         description: "Guides and articles",
         icon: "chat",
       },
       {
-        href: "/preview/v3/dpp-timeline",
+        href: "//dpp-timeline",
         label: "DPP timeline",
         description: "Regulatory milestones and countdown",
         icon: "compliance",
       },
       {
-        href: "/preview/v3/faq",
+        href: "//faq",
         label: "FAQ",
         description: "Common questions answered",
         icon: "claims",
       },
       {
-        href: "/preview/v3/assessment",
+        href: "//assessment",
         label: "Readiness assessment",
         description: "10-minute DPP readiness quiz",
         icon: "audit",
       },
       {
-        href: "/preview/v3/glossary",
+        href: "//glossary",
         label: "Glossary",
         description: "Plain definitions, A to Z",
         icon: "vault",
       },
       {
-        href: "/preview/v3/roi",
+        href: "//roi",
         label: "ROI calculator",
         description: "Savings vs consultants vs in-house",
         icon: "analytics",
@@ -115,21 +115,21 @@ const NAV: NavTopItem[] = [
     label: "Company",
     items: [
       {
-        href: "/preview/v3/about",
+        href: "//about",
         label: "About",
         description: "What we believe and why",
         icon: "lca",
       },
       {
-        href: "/preview/v3/team",
+        href: "//team",
         label: "Team",
         description: "Founders and advisors",
         icon: "supply-chain",
       },
     ],
   },
-  { kind: "link", href: "/preview/v3/pricing", label: "Pricing" },
-  { kind: "link", href: "/preview/v3/contact", label: "Contact" },
+  { kind: "link", href: "//pricing", label: "Pricing" },
+  { kind: "link", href: "//contact", label: "Contact" },
 ];
 
 const HOVER_OPEN_DELAY = 80;
@@ -170,7 +170,7 @@ export function Navbar() {
         >
           {/* Wordmark */}
           <Link
-            href="/preview/v3"
+            href="/"
             className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
             aria-label="ENVRT v3"
           >
@@ -202,7 +202,7 @@ export function Navbar() {
           {/* Primary CTA */}
           <div className="hidden items-center pl-2 pr-2 lg:flex">
             <ButtonV3
-              href="/preview/v3/free-dpp"
+              href="//free-dpp"
               variant="primary"
               size="md"
               className="!rounded-full !px-5 !py-2 !text-xs sm:!text-sm"
@@ -557,7 +557,7 @@ function MobileDrawer({
 
             <div className="border-t border-envrt-brand-black/8 pt-4">
               <ButtonV3
-                href="/preview/v3/free-dpp"
+                href="//free-dpp"
                 variant="primary"
                 className="w-full !rounded-2xl"
               >

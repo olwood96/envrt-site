@@ -1,20 +1,33 @@
-import { Container } from "@/components/ui/Container";
-import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
-import { GlossaryJsonLd } from "@/components/seo/GlossaryJsonLd";
 import type { Metadata } from "next";
+import { PageHero, ButtonV3 } from "@/components/v3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { GlossaryJsonLd } from "@/components/seo/GlossaryJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
-// ─── Glossary terms ────────────────────────────────────────────────────────────
+export const metadata: Metadata = {
+  title: "Glossary | DPP, LCA and fashion sustainability terms",
+  description:
+    "Plain-English definitions for Digital Product Passports, lifecycle assessment, supply chain transparency, EU PEF, AWARE, ESPR and the rest of the language fashion brands now have to speak.",
+  alternates: { canonical: "/glossary" },
+};
 
-const glossaryTerms = [
+type Term = { term: string; definition: string };
+
+const TERMS: Term[] = [
   {
     term: "AWARE Method",
     definition:
-      "Available WAter REmaining. The recommended water scarcity characterisation method under the EU Product Environmental Footprint (PEF) framework. AWARE weights water consumption against regional scarcity factors, producing a figure in cubic metres of world-equivalent water (m\u00b3 world-eq) that reflects actual environmental stress rather than volume alone.",
+      "Available WAter REmaining. The recommended water scarcity characterisation method under the EU Product Environmental Footprint (PEF) framework. AWARE weights water consumption against regional scarcity factors, producing a figure in cubic metres of world-equivalent water (m³ world-eq) that reflects actual environmental stress rather than volume alone.",
   },
   {
     term: "Carbon Footprint",
     definition:
-      "The sum of greenhouse gas emissions and removals associated with a product, expressed in kilograms of carbon dioxide equivalent (kg CO\u2082e). For garments, this is calculated using Life Cycle Assessment across the product\u2019s supply chain stages.",
+      "The sum of greenhouse gas emissions and removals associated with a product, expressed in kilograms of carbon dioxide equivalent (kg CO₂e). For garments, this is calculated using Life Cycle Assessment across the product's supply chain stages.",
   },
   {
     term: "Cradle-to-Gate",
@@ -29,7 +42,7 @@ const glossaryTerms = [
   {
     term: "CSRD",
     definition:
-      "Corporate Sustainability Reporting Directive. EU legislation requiring structured environmental and social disclosures from companies meeting defined size thresholds. Includes value chain (Scope 3) emissions reporting. Non-EU companies with more than \u20ac150 million in EU net turnover come into scope from 2028.",
+      "Corporate Sustainability Reporting Directive. EU legislation requiring structured environmental and social disclosures from companies meeting defined size thresholds. Includes value chain (Scope 3) emissions reporting. Non-EU companies with more than €150 million in EU net turnover come into scope from 2028.",
   },
   {
     term: "Delegated Act",
@@ -44,7 +57,7 @@ const glossaryTerms = [
   {
     term: "Environmental Footprint",
     definition:
-      "A quantified assessment of a product\u2019s environmental impacts across its life cycle, covering multiple impact categories. Under the EU PEF method, this includes 16 categories such as climate change, water use, acidification and resource depletion. Not limited to carbon alone.",
+      "A quantified assessment of a product's environmental impacts across its life cycle, covering multiple impact categories. Under the EU PEF method, this includes 16 categories such as climate change, water use, acidification and resource depletion. Not limited to carbon alone.",
   },
   {
     term: "ESPR",
@@ -54,7 +67,7 @@ const glossaryTerms = [
   {
     term: "Green Claims Directive",
     definition:
-      "Proposed EU legislation that will require brands to substantiate environmental marketing claims with a recognised methodology before publication. Claims such as \u201ceco-friendly\u201d or \u201csustainable\u201d will need to be backed by verified, product-level performance data.",
+      "Proposed EU legislation that will require brands to substantiate environmental marketing claims with a recognised methodology before publication. Claims such as “eco-friendly” or “sustainable” will need to be backed by verified, product-level performance data.",
   },
   {
     term: "Greenwashing",
@@ -104,7 +117,7 @@ const glossaryTerms = [
   {
     term: "Scope 3 Emissions",
     definition:
-      "All other indirect emissions occurring in a company\u2019s value chain, both upstream (supply chain) and downstream (product use and end of life). For fashion brands, Scope 3 typically accounts for over 90% of total greenhouse gas emissions because most brands do not own their factories or grow their raw materials.",
+      "All other indirect emissions occurring in a company's value chain, both upstream (supply chain) and downstream (product use and end of life). For fashion brands, Scope 3 typically accounts for over 90% of total greenhouse gas emissions because most brands do not own their factories or grow their raw materials.",
   },
   {
     term: "Substances of Concern",
@@ -114,7 +127,7 @@ const glossaryTerms = [
   {
     term: "Transparency Score",
     definition:
-      "A proprietary ENVRT metric reflecting the quality and completeness of the data underpinning a product\u2019s environmental assessment. Higher scores indicate more specific, supplier-verified data inputs rather than database defaults or industry averages.",
+      "A proprietary ENVRT metric reflecting the quality and completeness of the data underpinning a product's environmental assessment. Higher scores indicate more specific, supplier-verified data inputs rather than database defaults or industry averages.",
   },
   {
     term: "Water Scarcity Impact",
@@ -128,78 +141,160 @@ const glossaryTerms = [
   },
 ];
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+function slugify(term: string) {
+  return term
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
-export const metadata: Metadata = {
-  title: "Glossary - Fashion Sustainability Terms | ENVRT",
-  description:
-    "Definitions of key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment, environmental regulation and supply chain transparency.",
-  keywords: [
-    "sustainability glossary fashion",
-    "digital product passport glossary",
-    "LCA terminology",
-    "fashion sustainability definitions",
-    "ESPR glossary",
-    "PEF glossary",
-    "AWARE method definition",
-    "scope 3 emissions definition",
-  ],
-  openGraph: {
-    title: "Glossary - Fashion Sustainability Terms | ENVRT",
-    description:
-      "Definitions of key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment, environmental regulation and supply chain transparency.",
-    url: "https://envrt.com/glossary",
-    type: "website",
-  },
-  alternates: {
-    canonical: "https://envrt.com/glossary",
-  },
-};
+type Group = { letter: string; items: Term[] };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const GROUPS: Group[] = (() => {
+  const map = new Map<string, Term[]>();
+  for (const t of TERMS) {
+    const letter = t.term[0].toUpperCase();
+    if (!map.has(letter)) map.set(letter, []);
+    map.get(letter)!.push(t);
+  }
+  return Array.from(map.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([letter, items]) => ({ letter, items }));
+})();
 
-export default function GlossaryPage() {
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+export default function GlossaryV3Page() {
+  const presentLetters = new Set(GROUPS.map((g) => g.letter));
+
   return (
-    <div className="pt-28 pb-16">
-      <GlossaryJsonLd terms={glossaryTerms} />
+    <main className="theme-sunny">
+      <GlossaryJsonLd terms={TERMS} />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "https://envrt.com" },
           { name: "Glossary", url: "https://envrt.com/glossary" },
         ]}
       />
+      <PageHero
+        tone="sunny"
+        eyebrow="Glossary"
+        heading={
+          <>
+            The vocabulary.{" "}
+            <span className="text-envrt-brand-black/40">
+              Without the textbook.
+            </span>
+          </>
+        }
+        body="Key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment and environmental regulation. Plain definitions, no marketing gloss."
+        actions={
+          <>
+            <ButtonV3 href="//free-dpp" variant="primary">
+              Try ENVRT on one garment<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="//faq" variant="ghost">
+              Read the FAQ<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="Glossary"
+      />
 
-      <Container>
-        <div className="mx-auto max-w-2xl">
-          <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-            Glossary
-          </h1>
-          <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-            Key terms in fashion sustainability, Digital Product Passports and
-            environmental regulation.
-          </p>
+      <AlphabetNav presentLetters={presentLetters} />
+      <Groups />
 
-          <div className="mt-12 space-y-8">
-            {glossaryTerms.map((item) => (
-              <div
-                key={item.term}
-                id={item.term
-                  .toLowerCase()
-                  .replace(/[^a-z0-9]+/g, "-")
-                  .replace(/(^-|-$)/g, "")}
-                className="scroll-mt-24"
-              >
-                <h2 className="text-lg font-semibold text-envrt-charcoal">
-                  {item.term}
-                </h2>
-                <p className="mt-1.5 text-sm leading-relaxed text-envrt-muted sm:text-base">
-                  {item.definition}
-                </p>
-              </div>
+      <FinalCtaV3 />
+    </main>
+  );
+}
+
+function AlphabetNav({ presentLetters }: { presentLetters: Set<string> }) {
+  return (
+    <section className="relative bg-envrt-brand-vista py-10 sm:py-14">
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <FadeUp>
+          <ul className="flex flex-wrap gap-1.5 sm:gap-2">
+            {ALPHABET.map((letter) => {
+              const present = presentLetters.has(letter);
+              if (!present) {
+                return (
+                  <li key={letter}>
+                    <span
+                      aria-disabled
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-envrt-brand-black/8 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/25 sm:h-10 sm:w-10"
+                    >
+                      {letter}
+                    </span>
+                  </li>
+                );
+              }
+              return (
+                <li key={letter}>
+                  <a
+                    href={`#letter-${letter}`}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-envrt-brand-black/12 bg-white font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:border-envrt-brand-ultramarine/40 hover:text-envrt-brand-ultramarine sm:h-10 sm:w-10"
+                  >
+                    {letter}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </FadeUp>
+      </div>
+    </section>
+  );
+}
+
+function Groups() {
+  return (
+    <>
+      {GROUPS.map((g, i) => (
+        <LetterSection key={g.letter} group={g} isLast={i === GROUPS.length - 1} />
+      ))}
+    </>
+  );
+}
+
+function LetterSection({ group, isLast }: { group: Group; isLast: boolean }) {
+  return (
+    <section
+      id={`letter-${group.letter}`}
+      className={`relative bg-envrt-brand-vista pb-14 sm:pb-16 ${isLast ? "" : ""}`}
+    >
+      <SectionCorners left={`ENVRT/${group.letter}`} right={`${group.items.length} terms`} />
+      <div className="mx-auto max-w-[900px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-14">
+          <FadeUp>
+            <div className="flex items-baseline gap-4">
+              <span className="font-display text-5xl font-medium leading-none tracking-[-0.025em] text-envrt-brand-ultramarine sm:text-6xl">
+                {group.letter}
+              </span>
+              <Eyebrow>{`${group.items.length} terms`}</Eyebrow>
+            </div>
+          </FadeUp>
+
+          <div className="mt-8 space-y-8 sm:mt-10">
+            {group.items.map((item, idx) => (
+              <FadeUp key={item.term} delay={Math.min(idx * 0.04, 0.2)}>
+                <div
+                  id={slugify(item.term)}
+                  className="scroll-mt-28 border-b border-envrt-brand-black/10 pb-7 last:border-0 last:pb-0"
+                >
+                  <h2 className="font-display text-xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-2xl">
+                    {item.term}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
+                    {item.definition}
+                  </p>
+                </div>
+              </FadeUp>
             ))}
           </div>
         </div>
-      </Container>
-    </div>
+      </div>
+    </section>
   );
 }

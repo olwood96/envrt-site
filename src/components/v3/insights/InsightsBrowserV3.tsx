@@ -27,7 +27,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 
 interface Props {
   posts: InsightsPostMeta[];
-  /** Path prefix for article links and URL rewrites, e.g. "/preview/v3/insights" */
+  /** Path prefix for article links and URL rewrites, e.g. "//insights" */
   basePath: string;
 }
 

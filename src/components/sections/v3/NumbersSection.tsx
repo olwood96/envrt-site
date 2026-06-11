@@ -23,7 +23,7 @@ type Stat = {
 // so a currency / billing switch propagates here without a navigation.
 const STARTER_PLAN = pricingPlans.find((p) => p.slug === "starter");
 
-function useStats(): Stat[] {
+function useStats(dataPointsServed: number): Stat[] {
   const { currency, billing } = usePricing();
   const starterPrice = STARTER_PLAN?.prices?.[currency][billing] ?? 149;
   const sym = CURRENCY_SYMBOL[currency];
@@ -41,6 +41,12 @@ function useStats(): Stat[] {
       display: "68,431",
       label: "reference cells per LCA",
       body: "Materials, processes, dyeing, energy grids, transport, AWARE water scarcity, trims. Every passport pulls the same full database.",
+    },
+    {
+      number: dataPointsServed,
+      display: dataPointsServed.toLocaleString(),
+      label: "data points served via DPPs",
+      body: "Cumulative reference cells delivered to consumers across every DPP scan. Each scan opens the full 68,431-cell calculation behind that garment.",
     },
     {
       number: starterPrice,
@@ -115,7 +121,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
   const inView = useInView(ref, { once: false, amount: 0.3 });
 
   return (
-    <div ref={ref} className="sm:px-8 sm:first:pl-0 sm:last:pr-0">
+    <div ref={ref} className="lg:px-6 lg:first:pl-0 lg:last:pr-0">
       {/* Big numeral with translateY entrance */}
       <motion.p
         initial={{ y: 32, opacity: 0 }}
@@ -129,7 +135,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
         // letterforms read as "ENVRT-stamped" at display sizes and give the
         // page's most visible numbers their own voice (vs the generic display
         // font everywhere else).
-        className="font-n27 text-[4.5rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
+        className="font-n27 text-[4rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[4.5rem] lg:text-[4.75rem] xl:text-[5.25rem]"
       >
         <CountUp to={stat.number} display={stat.display} prefix={stat.prefix} />
         {stat.unit && (
@@ -179,8 +185,12 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
   );
 }
 
-export function NumbersSection() {
-  const stats = useStats();
+export function NumbersSection({
+  dataPointsServed,
+}: {
+  dataPointsServed: number;
+}) {
+  const stats = useStats(dataPointsServed);
   return (
     <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-32">
       <DotGridBackground tone="lilac" opacity={0.06} size={26} />
@@ -196,7 +206,7 @@ export function NumbersSection() {
           </h2>
         </FadeUp>
 
-        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-white/12 pt-12 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-white/12">
+        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-white/12 pt-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0 lg:divide-x lg:divide-white/12">
           {stats.map((s, i) => (
             <StatColumn key={s.label} stat={s} index={i} />
           ))}

@@ -10,37 +10,37 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
   {
     heading: "Product",
     links: [
-      { label: "Platform", href: "/preview/v3/platform" },
-      { label: "Lab", href: "/preview/v3/lab" },
-      { label: "Free DPP", href: "/preview/v3/free-dpp" },
-      { label: "Pricing", href: "/preview/v3/pricing" },
-      { label: "The Collective", href: "/preview/v3/collective" },
+      { label: "Platform", href: "//platform" },
+      { label: "Lab", href: "//lab" },
+      { label: "Free DPP", href: "//free-dpp" },
+      { label: "Pricing", href: "//pricing" },
+      { label: "The Collective", href: "//collective" },
     ],
   },
   {
     heading: "Resources",
     links: [
-      { label: "Insights", href: "/preview/v3/insights" },
-      { label: "DPP timeline", href: "/preview/v3/dpp-timeline" },
-      { label: "FAQ", href: "/preview/v3/faq" },
-      { label: "Glossary", href: "/preview/v3/glossary" },
-      { label: "Readiness assessment", href: "/preview/v3/assessment" },
-      { label: "ROI calculator", href: "/preview/v3/roi" },
+      { label: "Insights", href: "//insights" },
+      { label: "DPP timeline", href: "//dpp-timeline" },
+      { label: "FAQ", href: "//faq" },
+      { label: "Glossary", href: "//glossary" },
+      { label: "Readiness assessment", href: "//assessment" },
+      { label: "ROI calculator", href: "//roi" },
     ],
   },
   {
     heading: "Company",
     links: [
-      { label: "About", href: "/preview/v3/about" },
-      { label: "Team", href: "/preview/v3/team" },
-      { label: "Contact", href: "/preview/v3/contact" },
+      { label: "About", href: "//about" },
+      { label: "Team", href: "//team" },
+      { label: "Contact", href: "//contact" },
     ],
   },
   {
     heading: "Legal",
     links: [
-      { label: "Privacy policy", href: "/preview/v3/privacy" },
-      { label: "Terms of service", href: "/preview/v3/terms" },
+      { label: "Privacy policy", href: "//privacy" },
+      { label: "Terms of service", href: "//terms" },
     ],
   },
 ];
@@ -66,7 +66,7 @@ function BrandBlock() {
   return (
     <div className="max-w-sm">
       <Link
-        href="/preview/v3"
+        href="/"
         aria-label={`${siteConfig.name} home`}
         className="inline-flex items-center"
       >

@@ -1,77 +1,205 @@
-"use client";
-
-import { Container } from "@/components/ui/Container";
-import { FadeUp, StaggerChildren, StaggerItem } from "@/components/ui/Motion";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { PageHero, ButtonV3 } from "@/components/v3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { teamMembers } from "@/lib/config";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 
-function MemberCard({ member }: { member: (typeof teamMembers)[number] }) {
-  return (
-    <div className="flex h-full flex-col rounded-2xl border border-envrt-charcoal/5 bg-white p-6 sm:p-8 transition-all duration-300 hover:border-envrt-teal/20 hover:shadow-lg">
-      <div>
-        <h3 className="text-xl font-bold text-envrt-charcoal">{member.name}</h3>
-        <p className="mt-1 text-sm font-semibold text-envrt-teal">{member.role}</p>
-      </div>
+export const metadata: Metadata = {
+  title: "Team | ENVRT",
+  description:
+    "Two founders running the product. Two advisors shaping the methodology. Environmental engineering, data science and applied AI behind the ENVRT platform.",
+  alternates: { canonical: "/team" },
+};
 
-      <ul className="mt-5 flex-1 space-y-3">
-        {member.bullets.map((b) => (
-          <li key={b} className="flex items-start gap-2.5 text-sm leading-relaxed text-envrt-muted">
-            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-envrt-teal/50" />
-            {b}
-          </li>
-        ))}
-      </ul>
+type Member = (typeof teamMembers)[number];
 
-      {member.email && (
-        <a
-          href={`mailto:${member.email}`}
-          className="mt-6 inline-block text-sm font-medium text-envrt-charcoal underline decoration-envrt-teal/40 underline-offset-4 transition-colors hover:text-envrt-teal"
-        >
-          {member.email}
-        </a>
-      )}
-    </div>
-  );
-}
-
-export default function TeamPage() {
+export default function TeamV3Page() {
   const founders = teamMembers.filter((m) => m.type === "founder");
   const advisors = teamMembers.filter((m) => m.type === "advisor");
 
+  const peopleJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": teamMembers.map((m) => ({
+      "@type": "Person",
+      name: m.name,
+      jobTitle: m.role,
+      worksFor: { "@type": "Organization", name: "ENVRT" },
+      description: m.bullets[0],
+    })),
+  };
+
   return (
-    <div className="pt-28 pb-16">
-      <Container>
-        <FadeUp>
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-              Our team
-            </h1>
-            <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-              A small team with deep expertise in sustainability, AI, and fashion technology.
+    <main className="theme-lilac">
+      <OrganizationJsonLd />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Team", url: "https://envrt.com/team" },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(peopleJsonLd) }}
+      />
+      <PageHero
+        tone="lilac"
+        eyebrow="Team"
+        heading={
+          <>
+            The people behind ENVRT.{" "}
+            <span className="text-envrt-brand-black/40">
+              Small team, deep stack.
+            </span>
+          </>
+        }
+        body="Two founders running the product. Two advisors shaping the methodology. Environmental engineering, data science, applied AI."
+        actions={
+          <>
+            <ButtonV3 href="//contact" variant="primary">
+              Talk to us<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="//about" variant="ghost">
+              Read the founding story<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="Team"
+      />
+
+      <FoundersSection founders={founders} />
+      <AdvisorsSection advisors={advisors} />
+
+      <FinalCtaV3 />
+    </main>
+  );
+}
+
+function FoundersSection({ founders }: { founders: Member[] }) {
+  return (
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+      <SectionCorners left="ENVRT/02" right="Founders" />
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>02 · Founders</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              The two people who own the product end to end.
+            </h2>
+          </FadeUp>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 sm:gap-8">
+            {founders.map((member, i) => (
+              <FadeUp key={member.name} delay={0.16 + i * 0.06}>
+                <MemberCard member={member} accent />
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AdvisorsSection({ advisors }: { advisors: Member[] }) {
+  return (
+    <section className="relative bg-[rgba(223,95,255,0.08)] pb-20 sm:pb-24 lg:pb-32">
+      <SectionCorners left="ENVRT/03" right="Advisors" />
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>03 · Advisors</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              The methodology gets pressure-tested here.
+            </h2>
+          </FadeUp>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 sm:gap-8">
+            {advisors.map((member, i) => (
+              <FadeUp key={member.name} delay={0.16 + i * 0.06}>
+                <MemberCard member={member} />
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MemberCard({ member, accent = false }: { member: Member; accent?: boolean }) {
+  const photoPath = "photoPath" in member ? member.photoPath : undefined;
+
+  return (
+    <div
+      className={`flex h-full flex-col overflow-hidden rounded-3xl border bg-white transition-colors duration-300 ${
+        accent
+          ? "border-envrt-brand-black/12 hover:border-envrt-brand-ultramarine/30"
+          : "border-envrt-brand-black/10 hover:border-envrt-brand-ultramarine/25"
+      }`}
+    >
+      {photoPath && (
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-envrt-brand-vista">
+          <Image
+            src={photoPath}
+            alt={member.name}
+            fill
+            sizes="(min-width: 1024px) 520px, (min-width: 640px) 50vw, 100vw"
+            className="object-cover object-top grayscale-[0.6] transition-[filter] duration-300 hover:grayscale-0"
+          />
+        </div>
+      )}
+      <div className="flex flex-1 flex-col p-7 sm:p-9">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-display text-2xl font-medium leading-tight tracking-tight text-envrt-brand-black sm:text-[1.625rem]">
+              {member.name}
+            </h3>
+            <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+              {member.role}
             </p>
           </div>
-        </FadeUp>
+          <span
+            aria-hidden
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/35 sm:text-[11px]"
+          >
+            {member.type === "founder" ? "F/01" : "A/01"}
+          </span>
+        </div>
 
-        <StaggerChildren className="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-2">
-          {founders.map((member) => (
-            <StaggerItem key={member.name}>
-              <MemberCard member={member} />
-            </StaggerItem>
+        <ul className="mt-6 flex-1 space-y-3">
+          {member.bullets.map((b) => (
+            <li
+              key={b}
+              className="flex items-start gap-2.5 text-sm leading-relaxed text-envrt-brand-black/70 sm:text-[15px]"
+            >
+              <span className="mt-2 h-1 w-1 flex-shrink-0 rounded-full bg-envrt-brand-ultramarine/60" />
+              {b}
+            </li>
           ))}
-        </StaggerChildren>
+        </ul>
 
-        <FadeUp delay={0.15}>
-          <p className="mx-auto mt-16 max-w-4xl text-xs font-medium uppercase tracking-widest text-envrt-teal">
-            Advisors
-          </p>
-        </FadeUp>
-        <StaggerChildren className="mx-auto mt-4 grid max-w-4xl gap-6 sm:grid-cols-2">
-          {advisors.map((member) => (
-            <StaggerItem key={member.name}>
-              <MemberCard member={member} />
-            </StaggerItem>
-          ))}
-        </StaggerChildren>
-      </Container>
+        {member.email && (
+          <a
+            href={`mailto:${member.email}`}
+            className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:text-envrt-brand-ultramarine"
+          >
+            <span>{member.email}</span>
+            <span aria-hidden>→</span>
+          </a>
+        )}
+      </div>
     </div>
   );
 }

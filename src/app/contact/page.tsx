@@ -1,284 +1,261 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Container } from "@/components/ui/Container";
-import { SectionCard } from "@/components/ui/SectionCard";
-import { Button } from "@/components/ui/Button";
+import { useState } from "react";
+import {
+  PageHero,
+  FaqSnippet,
+  ButtonV3,
+  Card,
+  Input,
+  Textarea,
+  Label,
+} from "@/components/v3";
+import { DropdownV3 } from "@/components/v3/DropdownV3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
-import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
-import { ContactSuccessConfirmation } from "@/components/ContactSuccessConfirmation";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
-/* ── Custom Dropdown ──────────────────────────────────────────────────── */
+// //contact — demo booking form. Three fields plus a product
+// interest dropdown. Done state replaces the form on submit.
 
-interface DropdownOption {
-  value: string;
-  label: string;
-  description: string;
-}
-
-const interestOptions: DropdownOption[] = [
-  { value: "dpp-hub", label: "Your DPP Hub", description: "Regulation-ready passports" },
-  { value: "impact-analyst", label: "Your Impact Analyst", description: "Lifecycle metrics and insights" },
-  { value: "sustainability-team", label: "Your Sustainability Team", description: "Full sustainability operations" },
-  { value: "not-sure", label: "Not sure yet", description: "I'd like to explore my options" },
+const INTEREST_OPTIONS = [
+  { value: "dpp-hub", label: "Starter · Regulation-ready passports" },
+  { value: "impact-analyst", label: "Growth · Lifecycle metrics and insights" },
+  { value: "sustainability-team", label: "Pro · Full sustainability operations" },
+  { value: "not-sure", label: "Not sure yet, I want to explore options" },
 ];
 
-function InterestDropdown({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (val: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const faqs = [
+  {
+    question: "What happens after I book a demo?",
+    answer:
+      "We email you a calendar link within one working day. The first call is 30 minutes. We walk through the platform on one of your real garments and answer pricing or scope questions.",
+  },
+  {
+    question: "Do I need to prepare anything?",
+    answer:
+      "No. Helpful but optional: a sample SKU sheet or garment composition data so we can run a quick LCA in the demo.",
+  },
+  {
+    question: "What is the difference between Starter, Growth and Pro?",
+    answer:
+      "Starter at £149 a month covers up to 50 SKUs with regulation-ready DPPs. Growth at £495 a month adds lifecycle metrics, hotspot detection and analytics, up to 250 SKUs. Pro is custom-priced for high SKU counts and dedicated support.",
+  },
+  {
+    question: "Can I just email instead?",
+    answer:
+      "Yes. Send anything to info@envrt.com. Same team replies.",
+  },
+];
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const selected = interestOptions.find((o) => o.value === value);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`flex w-full items-center justify-between rounded-xl border bg-white px-4 py-3 text-left text-sm outline-none transition-all ${
-          open
-            ? "border-envrt-teal/40 ring-1 ring-envrt-teal/20"
-            : "border-envrt-charcoal/10 hover:border-envrt-charcoal/20"
-        }`}
-      >
-        {selected ? (
-          <span className="flex items-baseline gap-2">
-            <span className="font-medium text-envrt-charcoal">{selected.label}</span>
-            <span className="text-xs text-envrt-muted">{selected.description}</span>
-          </span>
-        ) : (
-          <span className="text-envrt-muted">Select an option</span>
-        )}
-        <svg
-          className={`h-4 w-4 flex-shrink-0 text-envrt-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-        </svg>
-      </button>
-
-      {/* Hidden native input for form submission */}
-      <input type="hidden" name="interest" value={value} />
-
-      {open && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1.5 overflow-hidden rounded-xl border border-envrt-charcoal/10 bg-white shadow-lg shadow-envrt-charcoal/8">
-          {interestOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                setOpen(false);
-              }}
-              className={`flex w-full flex-col px-4 py-3 text-left transition-colors ${
-                value === option.value
-                  ? "bg-envrt-teal/[0.05]"
-                  : "hover:bg-envrt-charcoal/[0.02]"
-              }`}
-            >
-              <span className={`text-sm font-medium ${value === option.value ? "text-envrt-teal" : "text-envrt-charcoal"}`}>
-                {option.label}
-              </span>
-              <span className="text-xs text-envrt-muted">{option.description}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Page ──────────────────────────────────────────────────────────────── */
-
-export default function ContactPage() {
-  const [submitted, setSubmitted] = useState<{
-    firstName: string;
-    email: string;
-  } | null>(null);
-  const [error, setError] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
+export default function ContactV3Page() {
+  const [name, setName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [email, setEmail] = useState("");
   const [interest, setInterest] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const canSubmit = name && brandName && email && interest;
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!canSubmit) return;
     setSubmitting(true);
-    setError(false);
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const firstName = String(formData.get("first-name") || "");
-    const email = String(formData.get("email") || "");
-
+    setError(null);
     try {
+      // Split the single name field into first/last to match the v1
+      // API shape. /api/contact persists to Supabase + sends the
+      // confirmation email; brandName lands in the company column.
+      const [firstName, ...rest] = name.trim().split(/\s+/);
+      const lastName = rest.join(" ");
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName,
-          lastName: formData.get("last-name") || "",
+          lastName,
           email,
-          company: formData.get("company") || "",
-          interest: formData.get("interest") || "",
-          message: formData.get("message") || "",
-          "bot-field": formData.get("bot-field") || "",
-          turnstileToken,
+          company: brandName,
+          interest,
+          message,
         }),
       });
-      if (res.ok) {
-        setSubmitted({ firstName, email });
-      } else {
-        setError(true);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Submission failed");
       }
-    } catch {
-      setError(true);
-    } finally {
-      setSubmitting(false);
+      setDone(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Submission failed");
     }
-  };
+    setSubmitting(false);
+  }
+
+  if (done) {
+    return <DoneState />;
+  }
 
   return (
-    <div className="pt-28 pb-16">
-      <Container>
-        <FadeUp>
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-              Book a demo
-            </h1>
-            <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-              See how ENVRT can help your brand create compliant Digital Product
-              Passports and communicate your sustainability story.
-            </p>
-          </div>
-        </FadeUp>
+    <main>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Contact", url: "https://envrt.com/contact" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
+      <PageHero
+        eyebrow="Contact"
+        heading={
+          <>
+            Book a demo.{" "}
+            <span className="text-envrt-brand-black/40">
+              Or just send us a question.
+            </span>
+          </>
+        }
+        body="Thirty-minute call. We walk through the platform on one of your real garments and answer pricing or scope questions. No sales theatre."
+        cornerLeft="ENVRT/01"
+        cornerRight="Contact"
+      />
 
-        <FadeUp delay={0.1}>
-          <SectionCard className="mx-auto mt-12 max-w-xl">
-            <div className="p-8 sm:p-10">
-              {submitted ? (
-                <ContactSuccessConfirmation
-                  firstName={submitted.firstName}
-                  email={submitted.email}
-                />
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <p className="hidden">
-                    <label>
-                      Don&apos;t fill this out: <input name="bot-field" />
-                    </label>
+      <section className="relative bg-envrt-brand-vista py-16 sm:py-20 lg:py-24">
+        <SectionCorners left="ENVRT/02" right="Form" />
+        <div className="mx-auto max-w-[640px] px-5 sm:px-8">
+          <FadeUp>
+            <Card>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <Eyebrow>Demo request</Eyebrow>
+
+                <FieldRow>
+                  <Label htmlFor="name">Your name</Label>
+                  <Input
+                    id="name"
+                    placeholder="Jane Roberts"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="brand">Brand name</Label>
+                  <Input
+                    id="brand"
+                    placeholder="Angry Pablo"
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="email">Work email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="jane@angrypablo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="interest">What are you interested in?</Label>
+                  <DropdownV3
+                    id="interest"
+                    placeholder="Select an option"
+                    value={interest}
+                    options={INTEREST_OPTIONS}
+                    onChange={setInterest}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="message" optional>
+                    Anything else we should know?
+                  </Label>
+                  <Textarea
+                    id="message"
+                    placeholder="SKU count, sustainability priorities, regulatory deadlines, anything that helps"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  />
+                </FieldRow>
+
+                {error && (
+                  <p className="rounded-xl bg-envrt-brand-crimson/10 px-4 py-3 text-sm text-envrt-brand-crimson">
+                    {error}
                   </p>
+                )}
 
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                        First name
-                      </label>
-                      <input
-                        type="text"
-                        name="first-name"
-                        required
-                        className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                        placeholder="Jane"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                        Last name
-                      </label>
-                      <input
-                        type="text"
-                        name="last-name"
-                        required
-                        className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                        placeholder="Smith"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                      Work email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      placeholder="jane@yourbrand.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                      Company
-                    </label>
-                    <input
-                      type="text"
-                      name="company"
-                      required
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      placeholder="Your brand name"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                      What are you looking for?
-                    </label>
-                    <InterestDropdown value={interest} onChange={setInterest} />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                      Message{" "}
-                      <span className="text-envrt-muted font-normal">(optional)</span>
-                    </label>
-                    <textarea
-                      name="message"
-                      rows={3}
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20 resize-none"
-                      placeholder="Tell us about your sustainability goals..."
-                    />
-                  </div>
-
-                  <HiddenTurnstile onToken={setTurnstileToken} className="justify-center" />
-
-                  {error && (
-                    <p className="text-center text-sm text-red-600">
-                      Something went wrong. Please try again or email us directly at info@envrt.com.
-                    </p>
-                  )}
-
-                  <Button
+                <div className="pt-2">
+                  <ButtonV3
                     type="submit"
-                    data-cta="contact-form-submit"
-                    className={`w-full ${submitting ? "pointer-events-none opacity-60" : ""}`}
-                    size="lg"
+                    variant="primary"
+                    disabled={!canSubmit || submitting}
+                    className={`w-full ${!canSubmit || submitting ? "opacity-60" : ""}`}
                   >
-                    {submitting ? "Sending..." : "Book a demo"}
-                    {!submitting && <span className="ml-2">→</span>}
-                  </Button>
-                  <p className="text-center text-xs text-envrt-muted">
-                    No commitment. We&apos;ll walk you through the platform with your data.
+                    {submitting ? "Sending…" : "Book my demo"}
+                    <span>{submitting ? "" : "→"}</span>
+                  </ButtonV3>
+                  <p className="mt-3 text-center text-xs text-envrt-brand-black/55">
+                    We reply within one working day. No marketing list.
                   </p>
-                </form>
-              )}
-            </div>
-          </SectionCard>
-        </FadeUp>
-      </Container>
-    </div>
+                </div>
+              </form>
+            </Card>
+          </FadeUp>
+        </div>
+      </section>
+
+      <FaqSnippet
+        eyebrow="Common questions"
+        heading="About booking a demo"
+        items={faqs}
+        ctaHref="//faq"
+        ctaLabel="See all FAQs"
+      />
+    </main>
+  );
+}
+
+function FieldRow({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-2">{children}</div>;
+}
+
+function DoneState() {
+  return (
+    <main>
+      <PageHero
+        eyebrow="Contact"
+        heading={
+          <>
+            Got it.{" "}
+            <span className="text-envrt-brand-black/40">
+              We will reply within one working day.
+            </span>
+          </>
+        }
+        body="Thanks for reaching out. The same person who answers replies. No marketing chain emails."
+        actions={
+          <>
+            <ButtonV3 href="//platform" variant="primary">
+              See the full platform<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="//pricing" variant="ghost">
+              See pricing<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="Done"
+      />
+    </main>
   );
 }

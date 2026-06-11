@@ -1,164 +1,148 @@
-import { Container } from "@/components/ui/Container";
-import { Accordion } from "@/components/ui/Accordion";
-import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { PageHero, ButtonV3 } from "@/components/v3";
+import {
+  Eyebrow,
+  SectionCorners,
+  EASE_BRAND,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import {
+  faqItems,
+  pricingFaqItems,
+  roiFaqItems,
+  freeDppFaqItems,
+  readinessAssessmentFaqItems,
+} from "@/lib/config";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
-import Link from "next/link";
-import type { Metadata } from "next";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
-// ─── FAQ data (unique to this page — process, onboarding, practical questions) ─
+// //faq — full FAQ page. Five accordion sections grouped by
+// topic. Each section's questions come from the existing config exports
+// used by individual page FAQ snippets, so the dedicated page and the
+// in-page snippets stay in lockstep.
 
-const faqSections = [
+type FaqItem = { question: string; answer: string };
+
+type FaqSection = {
+  index: string;
+  label: string;
+  description: string;
+  items: FaqItem[];
+};
+
+// Methodology + regulatory FAQ groups. Live inline rather than in
+// /lib/config because they cover engine-level + regulator-facing detail
+// rather than buyer onboarding content.
+
+const METHODOLOGY_FAQS: FaqItem[] = [
   {
-    heading: "Getting started",
-    items: [
-      {
-        question: "How long does it take to onboard with ENVRT?",
-        answer:
-          "Most brands onboard in around 30 minutes. You upload your collection data through the ENVRT Dashboard and can generate your first Digital Product Passport the same day.",
-      },
-      {
-        question: "What data do I need to provide to get started?",
-        answer:
-          "At minimum, your garment's material composition (fibre types and percentages), garment weight and country of manufacture. The more supply chain detail you can provide, such as fibre origin, dyeing process and assembly location, the richer your assessment will be.",
-      },
-      {
-        question: "Do I need to have complete supply chain data before starting?",
-        answer:
-          "No. ENVRT reconstructs your supply chain from the data you provide, filling in missing data points automatically using our materials database. You can start with what you have and improve data quality over time as supplier information becomes available.",
-      },
-      {
-        question: "Can I try ENVRT before committing to a plan?",
-        answer:
-          "Yes. You can request a free eco-score DPP for one product with no account required, or book a demo and we will walk you through the platform with your own product data. No commitment needed.",
-      },
-    ],
+    question: "How does ENVRT calculate the environmental impact of a garment?",
+    answer:
+      "Per garment, stage by stage. Six lifecycle stages (fibre, yarn, fabric, dyeing, assembly, transport) each run against per-stage emission factors, country-specific energy grids and the AWARE water scarcity weighting. Every passport runs the same engine, with 68,000+ reference cells per garment.",
   },
   {
-    heading: "How it works",
-    items: [
-      {
-        question: "How does ENVRT calculate the environmental impact of a garment?",
-        answer:
-          "ENVRT uses Life Cycle Assessment aligned with ISO 14040/14044 on a cradle-to-gate basis, aligned with the PEFCR for apparel and footwear. Each garment is individually assessed to produce climate impact (CO\u2082e) and water scarcity impact (AWARE method), attributed across six life cycle stages: fibre production, yarn production, fabric production, dyeing and finishing, assembly and transport.",
-      },
-      {
-        question: "What is the AWARE method for water scarcity?",
-        answer:
-          "AWARE (Available WAter REmaining) is the recommended water scarcity method under the EU Product Environmental Footprint (PEF) framework. It weights water consumption against regional scarcity factors to produce a figure that reflects actual environmental stress, not just volume consumed. ENVRT uses the AWARE method for every product assessed.",
-      },
-      {
-        question: "What is the difference between ENVRT and a traditional LCA consultancy?",
-        answer:
-          "Traditional consultancies charge per study, take weeks to months and deliver PDF reports. ENVRT delivers product-level LCA across entire collections in days through an automated platform. The methodology is the same (ISO 14040, PEFCR), but the delivery is faster, more scalable and significantly less expensive.",
-      },
-      {
-        question: "Does ENVRT only measure carbon?",
-        answer:
-          "No. ENVRT generates both climate impact (CO\u2082e) and water scarcity impact using the AWARE method for every product assessed. The EU PEF framework identifies water use as one of the most relevant impact categories for apparel, so measuring carbon alone does not satisfy multi-indicator regulatory requirements.",
-      },
-    ],
+    question: "Which lifecycle stages are modelled?",
+    answer:
+      "Fibre extraction, yarn spinning, fabric production, dyeing and finishing, assembly and tier-by-tier transport. Each stage has its own factor source, its own loss assumption and its own location-aware grid mix.",
   },
   {
-    heading: "Digital Product Passports",
-    items: [
-      {
-        question: "What is included in an ENVRT Digital Product Passport?",
-        answer:
-          "Each DPP contains the garment's environmental footprint (CO\u2082e and water scarcity), material composition, a transparency score, brand and product information, and supply chain details where available. It is linked to the physical garment via QR code.",
-      },
-      {
-        question: "Can I embed DPPs on my own website?",
-        answer:
-          "Yes. On Growth and Pro plans, you get embeddable widgets that display sustainability metrics directly on your product pages, styled to match your brand.",
-      },
-      {
-        question: "Are ENVRT DPPs compliant with EU regulations?",
-        answer:
-          "ENVRT DPPs are built against the ESPR framework and use the same ISO 14040 and PEFCR methodology that the EU\u2019s DPP data specification methodology references. The exact textile DPP requirements will be defined in the delegated act expected in 2027. Brands building product-level data now using these methods are preparing with the right foundation.",
-      },
-    ],
+    question: "What standards does the calculation engine follow?",
+    answer:
+      "EU PEF 3.1 for the Product Environmental Footprint method, ISO 14040 for lifecycle assessment principles, AWARE for water scarcity weighting and Ecobalyse for the French Coût Environnemental score. Every calculation traces back to a named standard with a published reference.",
   },
   {
-    heading: "Pricing and plans",
-    items: [
-      {
-        question: "How much does ENVRT cost?",
-        answer:
-          "ENVRT offers three plans: Starter at \u00a3149/month for up to 50 products with 1 team seat, Growth at \u00a3495/month for up to 250 products with 5 team seats and full LCA metrics, and Pro on custom pricing with unlimited team seats for brands needing more than 250 SKUs, advanced PEF-aligned metrics or dedicated support. Annual billing saves 15% on Starter and Growth. Contact sales for a Pro quote.",
-      },
-      {
-        question: "Can I switch plans?",
-        answer:
-          "Yes, you can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle.",
-      },
-      {
-        question: "What is included in each plan?",
-        answer:
-          "Starter includes DPP creation, QR-ready passport pages, transparency scores, CO\u2082e indicators, French Eco-Score ratings and scan analytics. Growth adds full LCA metrics, AI-powered data ingestion, hotspot detection and product comparisons. Pro includes complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
-      },
-    ],
-  },
-  {
-    heading: "Compliance and regulation",
-    items: [
-      {
-        question: "When will the EU Digital Product Passport be required for textiles?",
-        answer:
-          "The textile-specific delegated act is expected in 2027, with practical implementation likely from 2028 onward. The preparatory study is already active. Brands building product-level environmental data now are preparing ahead of the requirement.",
-      },
-      {
-        question: "Does ENVRT support French Eco-Score ratings?",
-        answer:
-          "Yes. All plans include French Eco-Score ratings calculated using the official environmental labelling methodology. You can calculate scores for your garments and display them on your DPPs.",
-      },
-      {
-        question: "Can ENVRT data be used for CSRD Scope 3 reporting?",
-        answer:
-          "Yes. The product-level emissions data ENVRT generates provides the building blocks for corporate Scope 3 reporting. The same dataset that supports DPP disclosure also feeds corporate emissions calculations, following the \u201cmeasure once, report everywhere\u201d principle.",
-      },
-      {
-        question: "Can ENVRT help substantiate green claims?",
-        answer:
-          "Yes. ENVRT provides per-garment environmental data assessed using ISO 14040 and PEFCR methodology. This gives brands documented, product-specific evidence to back up sustainability marketing claims, aligned with the methodologies that the EU Green Claims Directive and UK CMA Green Claims Code reference.",
-      },
-    ],
+    question: "Where does the factor data come from?",
+    answer:
+      "Public emission factor databases for fibre, yarn and fabric stages, IEA grid mix data per country for energy, AWARE for water scarcity and Ecobalyse for the French Eco-Score factors. The lab page lists every source by name.",
   },
 ];
 
-// Flatten for schema
-const allFaqItems = faqSections.flatMap((s) => s.items);
-
-// ─── Metadata ─────────────────────────────────────────────────────────────────
-
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions | ENVRT",
-  description:
-    "Answers to common questions about ENVRT, Digital Product Passports, product-level LCA, pricing, onboarding and EU textile compliance.",
-  keywords: [
-    "ENVRT FAQ",
-    "digital product passport FAQ",
-    "fashion LCA questions",
-    "DPP compliance questions",
-    "ENVRT pricing",
-    "sustainability data FAQ",
-  ],
-  openGraph: {
-    title: "Frequently Asked Questions | ENVRT",
-    description:
-      "Answers to common questions about ENVRT, Digital Product Passports, product-level LCA, pricing, onboarding and EU textile compliance.",
-    url: "https://envrt.com/faq",
-    type: "website",
+const COMPLIANCE_FAQS: FaqItem[] = [
+  {
+    question: "Which DPP regulations does ENVRT cover?",
+    answer:
+      "EU ESPR for textile Digital Product Passports, the French Coût Environnemental labelling framework, UK DMCCA-aligned green-claims hygiene and the EU Green Claims Directive once enforcement begins. The DPP timeline page tracks the dates.",
   },
-  alternates: {
-    canonical: "https://envrt.com/faq",
+  {
+    question: "When will the EU Digital Product Passport be required for textiles?",
+    answer:
+      "Mandatory passports phase in from 2027. The textile delegated act, which defines what a passport must contain and how it must be published, is expected mid-2026. Building now means you have a working passport well before the enforcement clock starts.",
   },
-};
+  {
+    question: "Is the methodology aligned with the French Eco-Score?",
+    answer:
+      "Yes. The Coût Environnemental score is calculated for every garment using the official Ecobalyse methodology. Sixteen data blocks per product, French regulator-recognised, ready to display on the DPP or your own product pages.",
+  },
+  {
+    question: "What evidence does ENVRT need to support a regulator audit?",
+    answer:
+      "Every input ties back to a versioned, dated source document in the evidence vault. Supplier declarations, test reports, audit certificates, geo-tagged photos. The DPP shows the customer-facing view; the underlying chain of evidence is available for export when a regulator asks.",
+  },
+];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const SECTIONS: FaqSection[] = [
+  {
+    index: "01",
+    label: "Getting started",
+    description: "How ENVRT works and what you need to begin.",
+    items: faqItems as FaqItem[],
+  },
+  {
+    index: "02",
+    label: "Methodology",
+    description: "How the calculation engine works, stage by stage.",
+    items: METHODOLOGY_FAQS,
+  },
+  {
+    index: "03",
+    label: "Compliance and regulation",
+    description: "EU ESPR, French Eco-Score, evidence for audits.",
+    items: COMPLIANCE_FAQS,
+  },
+  {
+    index: "04",
+    label: "Pricing",
+    description: "Plans, tiers, billing.",
+    items: pricingFaqItems as FaqItem[],
+  },
+  {
+    index: "05",
+    label: "ROI and savings",
+    description: "Cost compared to consultants and in-house teams.",
+    items: roiFaqItems as FaqItem[],
+  },
+  {
+    index: "06",
+    label: "Free DPP",
+    description: "What the free trial covers, what you get back.",
+    items: freeDppFaqItems as FaqItem[],
+  },
+  {
+    index: "07",
+    label: "Readiness assessment",
+    description: "How the 10-minute quiz scores your brand.",
+    items: readinessAssessmentFaqItems as FaqItem[],
+  },
+];
 
-export default function FAQPage() {
+export default function FaqV3Page() {
+  const allFaqItems = [
+    ...faqItems,
+    ...pricingFaqItems,
+    ...roiFaqItems,
+    ...freeDppFaqItems,
+    ...readinessAssessmentFaqItems,
+    ...METHODOLOGY_FAQS,
+    ...COMPLIANCE_FAQS,
+  ];
+
   return (
-    <div className="pt-28 pb-16">
+    <main className="theme-sunny">
       <FAQJsonLd items={allFaqItems} />
       <BreadcrumbJsonLd
         items={[
@@ -166,45 +150,199 @@ export default function FAQPage() {
           { name: "FAQ", url: "https://envrt.com/faq" },
         ]}
       />
+      <PageHero
+        tone="sunny"
+        eyebrow="FAQ"
+        heading={
+          <>
+            Common questions.{" "}
+            <span className="text-envrt-brand-black/40">
+              Straight answers.
+            </span>
+          </>
+        }
+        body="Everything we are asked most often, grouped by topic. If something is missing, message us and we will add it."
+        actions={
+          <>
+            <ButtonV3 href="//free-dpp" variant="primary">
+              Try ENVRT on one garment<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="//contact" variant="ghost">
+              Ask a question<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="FAQ"
+      />
 
-      <Container>
-        <div className="mx-auto max-w-2xl">
-          <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-            Frequently asked questions
-          </h1>
-          <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-            Everything you need to know about ENVRT, Digital Product Passports
-            and product-level sustainability data.
-          </p>
+      <SectionNav />
+      <SectionsBody />
 
-          {faqSections.map((section) => (
-            <div key={section.heading} className="mt-12">
-              <h2 className="text-xl font-semibold text-envrt-charcoal">
-                {section.heading}
-              </h2>
-              <div className="mt-4">
-                <Accordion items={section.items} />
-              </div>
-            </div>
-          ))}
+      <FinalCtaV3 />
+    </main>
+  );
+}
 
-          {/* CTA */}
-          <div className="mt-16 rounded-2xl border border-envrt-teal/10 bg-envrt-teal/5 p-6 text-center sm:p-8">
-            <p className="text-lg font-semibold text-envrt-charcoal">
-              Still have questions?
-            </p>
-            <p className="mt-2 text-sm text-envrt-muted">
-              Get in touch and we will walk you through the platform.
-            </p>
-            <Link
-              href="/contact"
-              className="mt-4 inline-block rounded-full bg-envrt-teal px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-envrt-teal/90"
-            >
-              Contact us
-            </Link>
-          </div>
+function SectionNav() {
+  return (
+    <section className="relative bg-envrt-brand-vista py-10 sm:py-14">
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <FadeUp>
+          <ul className="flex flex-wrap gap-2 sm:gap-3">
+            {SECTIONS.map((s) => (
+              <li key={s.index}>
+                <a
+                  href={`#section-${s.index}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:border-envrt-brand-ultramarine/30 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+                >
+                  <span className="text-envrt-brand-ultramarine">{s.index}</span>
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </FadeUp>
+      </div>
+    </section>
+  );
+}
+
+// Pool of thin photographic dividers cycled between FAQ sections. Adds
+// an editorial rhythm without committing to "every section needs a hero
+// photo". Wide horizontal crops only — these are bands, not banners.
+const DIVIDER_BANDS = [
+  "/v3-assets/provenance-loom.jpg",
+  "/v3-assets/story-fabric.jpg",
+  "/v3-assets/platform-thread-spools.jpg",
+  "/v3-assets/folded-clothes.jpg",
+  "/v3-assets/cta-texture.jpg",
+];
+
+function SectionsBody() {
+  return (
+    <>
+      {SECTIONS.map((s, i) => (
+        <div key={s.index}>
+          <Section section={s} isLast={i === SECTIONS.length - 1} />
+          {i < SECTIONS.length - 1 && (
+            <PhotoDivider src={DIVIDER_BANDS[i % DIVIDER_BANDS.length]} />
+          )}
         </div>
-      </Container>
+      ))}
+    </>
+  );
+}
+
+function PhotoDivider({ src }: { src: string }) {
+  return (
+    <div
+      aria-hidden
+      className="relative h-12 w-full overflow-hidden bg-envrt-brand-black/5 sm:h-16 lg:h-20"
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
+      />
+      {/* Slight darken at the edges so the divider doesn't fight nearby
+          section type. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista/30 via-transparent to-envrt-brand-vista/30" />
+    </div>
+  );
+}
+
+function Section({
+  section,
+  isLast,
+}: {
+  section: FaqSection;
+  isLast: boolean;
+}) {
+  return (
+    <section
+      id={`section-${section.index}`}
+      className={`relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32 ${
+        isLast ? "" : ""
+      }`}
+    >
+      <SectionCorners
+        left={`ENVRT/${section.index}`}
+        right={section.label}
+      />
+      <div className="mx-auto max-w-[900px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>{`${section.index} · ${section.label}`}</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              {section.description}
+            </h2>
+          </FadeUp>
+
+          <FadeUp delay={0.16}>
+            <div className="mt-10">
+              <FaqList items={section.items} />
+            </div>
+          </FadeUp>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqList({ items }: { items: FaqItem[] }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div>
+      {items.map((item, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div
+            key={item.question}
+            className="border-b border-envrt-brand-black/12 last:border-0"
+          >
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              className="group flex w-full items-center justify-between gap-4 py-5 text-left"
+              aria-expanded={isOpen}
+            >
+              <span className="font-display text-base font-medium leading-tight tracking-tight text-envrt-brand-black transition-colors duration-200 group-hover:text-envrt-brand-ultramarine sm:text-lg">
+                {item.question}
+              </span>
+              <span
+                aria-hidden
+                className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-envrt-brand-black/25 text-sm font-medium transition-transform duration-300 ${
+                  isOpen
+                    ? "rotate-45 border-envrt-brand-ultramarine text-envrt-brand-ultramarine"
+                    : "text-envrt-brand-black/65"
+                }`}
+              >
+                +
+              </span>
+            </button>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: EASE_BRAND }}
+                  className="overflow-hidden"
+                >
+                  <p className="pb-5 text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
+                    {item.answer}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
     </div>
   );
 }

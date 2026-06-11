@@ -61,10 +61,17 @@ Onboarding takes under 30 minutes. First DPPs can be generated the same day.
 ## Website
 
 - Homepage: https://envrt.com
+- Platform (nine capabilities, fibre to DPP): https://envrt.com/platform
+- ENVRT Lab (in-house LCA engine, EU PEF + ISO 14040 + AWARE): https://envrt.com/lab
+- DPP timeline (live regulatory tracker, EU ESPR + UK DMCCA + French AGEC): https://envrt.com/dpp-timeline
+- About: https://envrt.com/about
+- Team: https://envrt.com/team
 - Pricing: https://envrt.com/pricing
 - Contact: https://envrt.com/contact
 - Insights (blog): https://envrt.com/insights
+- Insights RSS feed: https://envrt.com/insights/rss.xml
 - Glossary: https://envrt.com/glossary
+- FAQ: https://envrt.com/faq
 - Collective (live DPPs): https://envrt.com/collective
 - ROI calculator: https://envrt.com/roi
 - DPP Readiness Assessment (free 10-minute tool): https://envrt.com/assessment

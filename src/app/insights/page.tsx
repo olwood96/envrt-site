@@ -1,123 +1,196 @@
-import { Container } from "@/components/ui/Container";
-import { InsightsCard } from "@/components/insights/InsightCard";
-import { Accordion } from "@/components/ui/Accordion";
-import { NewsletterSubscribe } from "@/components/insights/NewsletterSubscribe";
-import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
-import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
-import { getAllPostsMeta } from "@/lib/insights";
 import type { Metadata } from "next";
-
-// ─── Insights-specific FAQs (broad topic questions, not ENVRT-specific) ──────
-
-const insightsFaqItems = [
-  {
-    question: "Do I need a Digital Product Passport for my fashion brand?",
-    answer:
-      "If you sell apparel or textiles into the EU market, the Digital Product Passport will apply to your products under the ESPR framework. Textiles are a priority product group with a delegated act expected in 2027. The requirement applies regardless of where your brand is based.",
-  },
-  {
-    question: "What environmental data will the EU require for textiles?",
-    answer:
-      "The exact data fields will be defined in the textile delegated act. Based on the JRC\u2019s published DPP data specification methodology, the categories will include environmental footprint (climate and water impact), material composition, substances of concern, durability and repairability information and end-of-life guidance.",
-  },
-  {
-    question: "What is the difference between a carbon footprint and an environmental footprint?",
-    answer:
-      "A carbon footprint measures greenhouse gas emissions only, expressed in kg CO\u2082e. An environmental footprint covers multiple impact categories including climate change, water use, acidification, resource depletion and others. The EU PEF method defines 16 impact categories. Regulatory frameworks are increasingly requiring multi-indicator assessment, not carbon alone.",
-  },
-  {
-    question: "Why does water scarcity matter for fashion brands?",
-    answer:
-      "Cotton cultivation and wet processing (dyeing, finishing) are water-intensive. The environmental impact depends on where the water is consumed. Water used in a severely stressed basin like Pakistan\u2019s Punjab province has a fundamentally different impact from the same volume used in a rain-fed region. The AWARE method captures this difference and is the recommended approach under the EU PEF framework.",
-  },
-  {
-    question: "How can fashion brands substantiate green claims?",
-    answer:
-      "Green claims need to be specific, measurable and supported by product-level evidence using a recognised methodology such as ISO 14040 LCA. The EU Green Claims Directive and UK CMA Green Claims Code both require this. Generic terms like \u201csustainable\u201d or \u201ceco-friendly\u201d need to be backed by verified performance data at the product level.",
-  },
-  {
-    question: "What is Scope 3 and why does it dominate in fashion?",
-    answer:
-      "Scope 3 covers indirect emissions across a company\u2019s value chain. For fashion brands, Scope 3 typically accounts for over 90% of total greenhouse gas emissions because most brands do not own their factories, grow their raw materials or operate their logistics networks. Product-level LCA data is what makes Scope 3 reporting actionable.",
-  },
-];
+import Link from "next/link";
+import { PageHero, ButtonV3 } from "@/components/v3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { InsightsBrowserV3 } from "@/components/v3/insights/InsightsBrowserV3";
+import {
+  getAllPostsMeta,
+  type InsightsPostMeta,
+} from "@/lib/insights";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "Insights - DPP Guides & Sustainability Articles | ENVRT",
+  title: "Insights | DPP, LCA and fashion environmental data",
   description:
-    "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency. Expert insights from the ENVRT team.",
-  keywords: [
-    "fashion sustainability insights",
-    "digital product passport guide",
-    "fashion LCA articles",
-    "sustainability data fashion",
-    "DPP compliance guide",
-    "green claims fashion",
-  ],
-  openGraph: {
-    title: "Insights - DPP Guides & Sustainability Articles | ENVRT",
-    description:
-      "Guides and articles on Digital Product Passports, sustainability data, supply chain transparency, and fashion transparency.",
-    url: "https://envrt.com/insights",
-    type: "website",
-  },
+    "Guides on Digital Product Passports, lifecycle assessment and fashion environmental data. Built from work with brands, not from press releases.",
   alternates: {
-    canonical: "https://envrt.com/insights",
+    canonical: "/insights",
+    types: {
+      "application/rss+xml": [
+        { url: "/insights/rss.xml", title: "ENVRT Insights" },
+      ],
+    },
   },
 };
 
-export default function InsightsIndexPage() {
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export default function InsightsV3IndexPage() {
   const posts = getAllPostsMeta();
 
+  const featured = posts.find((p) => p.featured) ?? posts[0];
+  const rest = featured ? posts.filter((p) => p.slug !== featured.slug) : posts;
+
   return (
-    <div className="pt-28 pb-16">
+    <main className="theme-sunny">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "https://envrt.com" },
           { name: "Insights", url: "https://envrt.com/insights" },
         ]}
       />
-      <FAQJsonLd items={insightsFaqItems} />
-      <Container>
-        <div className="mx-auto max-w-3xl">
-          <h1 className="text-4xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-            Insights
-          </h1>
-          <p className="mt-4 text-base text-envrt-muted sm:text-lg">
-            Insights on sustainability, transparency, and the future of fashion
-            transparency.
-          </p>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            name: "ENVRT Insights",
+            url: "https://envrt.com/insights",
+            description:
+              "Insights on Digital Product Passports, lifecycle assessment, supply chain transparency and the regulatory landscape facing fashion brands.",
+            publisher: {
+              "@type": "Organization",
+              name: "ENVRT",
+              url: "https://envrt.com",
+            },
+            blogPost: posts.slice(0, 10).map((p) => ({
+              "@type": "BlogPosting",
+              headline: p.title,
+              url: `https://envrt.com/insights/${p.slug}`,
+              datePublished: p.date,
+              author: { "@type": "Organization", name: p.author },
+            })),
+          }),
+        }}
+      />
+      <PageHero
+        tone="sunny"
+        eyebrow="Insights"
+        heading={
+          <>
+            What we have learned.{" "}
+            <span className="text-envrt-brand-black/40">
+              Written down honestly.
+            </span>
+          </>
+        }
+        body="Guides on Digital Product Passports, Life Cycle Assessment and fashion environmental data. Built from work with brands, not from press releases."
+        actions={
+          <>
+            <ButtonV3 href="//free-dpp" variant="primary">
+              Try ENVRT on one garment<span>→</span>
+            </ButtonV3>
+            <ButtonV3 href="//glossary" variant="ghost">
+              Glossary of terms<span>→</span>
+            </ButtonV3>
+          </>
+        }
+        cornerLeft="ENVRT/01"
+        cornerRight="Insights"
+      />
 
-          {posts.length === 0 ? (
-            <p className="mt-16 text-center text-envrt-muted">
-              No posts yet. Check back soon.
-            </p>
-          ) : (
-            <div className="mt-12 space-y-6">
-              {posts.map((post) => (
-                <InsightsCard key={post.slug} post={post} />
-              ))}
-            </div>
-          )}
+      {featured && <FeaturedSection post={featured} />}
+      {posts.length > 0 ? (
+        <InsightsBrowserV3
+          posts={rest}
+          basePath="//insights"
+        />
+      ) : (
+        <EmptyState />
+      )}
 
-          {/* Newsletter signup */}
-          <NewsletterSubscribe variant="card" />
+      <FinalCtaV3 />
+    </main>
+  );
+}
 
-          {/* Topic FAQs */}
-          <div className="mt-20">
-            <h2 className="text-2xl font-bold tracking-tight text-envrt-charcoal">
-              Common questions
-            </h2>
-            <p className="mt-2 text-sm text-envrt-muted">
-              Quick answers to the questions fashion brands ask most about DPPs,
-              LCA and sustainability data.
-            </p>
-            <div className="mt-6">
-              <Accordion items={insightsFaqItems} />
-            </div>
-          </div>
+function FeaturedSection({ post }: { post: InsightsPostMeta }) {
+  return (
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+      <SectionCorners left="ENVRT/02" right="Featured" />
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>02 · Featured</Eyebrow>
+          </FadeUp>
+
+          <FadeUp delay={0.08}>
+            <Link
+              href={`//insights/${post.slug}`}
+              className="group mt-8 block rounded-3xl border border-envrt-brand-black/10 bg-white p-7 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30 sm:p-10"
+            >
+              <div className="grid gap-10 sm:grid-cols-[1fr,auto] sm:items-end">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3 text-envrt-brand-black/55">
+                    <time
+                      dateTime={post.date}
+                      className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]"
+                    >
+                      {formatDate(post.date)}
+                    </time>
+                    <span aria-hidden className="text-envrt-brand-black/20">·</span>
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]">
+                      {post.readingTime} min read
+                    </span>
+                  </div>
+
+                  <h2 className="mt-5 font-display text-2xl font-medium leading-[1.1] tracking-[-0.025em] text-envrt-brand-black transition-colors duration-200 group-hover:text-envrt-brand-ultramarine sm:text-3xl lg:text-4xl">
+                    {post.title}
+                  </h2>
+
+                  <p className="mt-4 max-w-2xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
+                    {post.description}
+                  </p>
+
+                  {post.tags.length > 0 && (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {post.tags.slice(0, 4).map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <span
+                  aria-hidden
+                  className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-envrt-brand-black/15 text-base text-envrt-brand-black/65 transition-all duration-200 group-hover:border-envrt-brand-ultramarine group-hover:text-envrt-brand-ultramarine sm:h-14 sm:w-14 sm:text-lg"
+                >
+                  →
+                </span>
+              </div>
+            </Link>
+          </FadeUp>
         </div>
-      </Container>
-    </div>
+      </div>
+    </section>
+  );
+}
+
+function EmptyState() {
+  return (
+    <section className="relative bg-envrt-brand-vista py-20">
+      <div className="mx-auto max-w-[900px] px-5 text-center sm:px-8">
+        <p className="text-base text-envrt-brand-black/60 sm:text-lg">
+          No posts yet. Check back soon.
+        </p>
+      </div>
+    </section>
   );
 }

@@ -1,10 +1,31 @@
 import type { Metadata } from "next";
-import { V1Chrome } from "@/components/layout/V1Chrome";
+import { Big_Shoulders_Text, Karla } from "next/font/google";
 import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
+import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
+import { Navbar } from "@/components/v3";
+import { FooterV3 } from "@/components/v3/FooterV3";
+import { PricingProvider } from "@/components/v3/pricing/PricingContext";
+import { ConsentProvider } from "@/components/v3/ConsentContext";
+import { CookieBanner } from "@/components/v3/CookieBanner";
+import { GA4 } from "@/components/v3/GA4";
 import "./globals.css";
+
+const display = Big_Shoulders_Text({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const body = Karla({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} | ${siteConfig.tagline}`,
@@ -67,38 +88,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        {/* ── Google Analytics (GA4) ── */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-NN09SER129" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-NN09SER129');
-            `,
-          }}
-        />
-
-        {/* ── Critical font preloads ── */}
         <link rel="preload" href="/fonts/n27/n27-regular-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/n27/n27-bold-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
 
-        {/* ── Connection hints ── */}
-        {/* Establish TCP+TLS to the DPP subdomain before the iframe even mounts */}
+        {/* Establish TCP+TLS to the DPP subdomain before the iframe even mounts. */}
         <link rel="preconnect" href="https://dashboard.envrt.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://dashboard.envrt.com" />
 
-        {/* If the DPP page pulls assets from dpp.envrt.com or a CDN, add those too, e.g.: */}
-        {/* <link rel="preconnect" href="https://dpp.envrt.com" crossOrigin="anonymous" /> */}
-
-        {/* ── Prefetch the DPP page itself ── */}
-        {/*
-          This tells the browser to fetch the DPP HTML in the background
-          during idle time, so by the time the iframe requests it the
-          response may already be in the HTTP cache.
-          Use "prefetch" (low priority, cross-origin) not "preload" here.
-        */}
         <link
           rel="prefetch"
           href={siteConfig.dppDemoUrl}
@@ -139,7 +135,21 @@ export default function RootLayout({
           </defs>
         </svg>
 
-        <V1Chrome>{children}</V1Chrome>
+        <ConsentProvider>
+          <PricingProvider>
+            <SmoothScroll>
+              <div
+                className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+              >
+                <Navbar />
+                {children}
+                <FooterV3 />
+              </div>
+            </SmoothScroll>
+            <CookieBanner />
+            <GA4 />
+          </PricingProvider>
+        </ConsentProvider>
 
         <WebsiteBeacon />
       </body>

@@ -1,24 +1,30 @@
 import { notFound } from "next/navigation";
-import { Container } from "@/components/ui/Container";
-import { getAllSlugs, getPostBySlug, tagSlug } from "@/lib/insights";
+import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
+import {
+  getAllSlugs,
+  getPostBySlug,
+  getAllPostsMeta,
+  tagSlug,
+} from "@/lib/insights";
 import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
-import { TableOfContents } from "@/components/insights/TableOfContents";
-import { MdxContent } from "@/components/insights/MdxContent";
-import { RelatedPosts } from "@/components/insights/RelatedPosts";
-import { NewsletterSubscribe } from "@/components/insights/NewsletterSubscribe";
-import { Accordion } from "@/components/ui/Accordion";
-import Link from "next/link";
-import type { Metadata } from "next";
-
-// ─── Static generation ───────────────────────────────────────────────────────
+import { MdxContentV3 } from "@/components/insights/MdxContentV3";
+import { TableOfContentsV3 } from "@/components/insights/TableOfContentsV3";
+import { ArticleFaqAccordionV3 } from "@/components/insights/ArticleFaqAccordionV3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { ButtonV3 } from "@/components/v3";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
-
-// ─── Dynamic metadata ────────────────────────────────────────────────────────
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -29,37 +35,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const post = getPostBySlug(slug);
   if (!post) return {};
 
-  const url = `https://envrt.com/insights/${post.slug}`;
-
   return {
     title: `${post.title} | ENVRT Insights`,
     description: post.description,
-    keywords: post.keywords,
-    authors: [{ name: post.author }],
+    alternates: { canonical: `/insights/${slug}` },
     openGraph: {
       title: post.title,
       description: post.description,
-      url,
       type: "article",
       publishedTime: post.date,
-      ...(post.updated && { modifiedTime: post.updated }),
-      ...(post.ogImage && { images: [{ url: post.ogImage }] }),
-      tags: post.tags,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.description,
-    },
-    alternates: {
-      canonical: url,
+      ...(post.updated ? { modifiedTime: post.updated } : {}),
+      authors: [post.author],
+      ...(post.ogImage ? { images: [{ url: post.ogImage }] } : {}),
     },
   };
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -67,139 +59,203 @@ function formatDate(dateStr: string): string {
   });
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
-
-export default async function InsightsPostPage({ params }: PageProps) {
+export default async function InsightsV3PostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const url = `https://envrt.com/insights/${post.slug}`;
+  const allMeta = getAllPostsMeta();
+  const related = allMeta
+    .filter(
+      (p) =>
+        p.slug !== post.slug && p.tags.some((t) => post.tags.includes(t))
+    )
+    .slice(0, 3);
+
+  const articleUrl = `https://envrt.com/insights/${post.slug}`;
 
   return (
-    <div className="pt-28 pb-16">
-      <ArticleJsonLd post={post} url={url} />
+    <main className="bg-envrt-brand-vista">
+      <ArticleJsonLd post={post} url={articleUrl} />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "https://envrt.com" },
           { name: "Insights", url: "https://envrt.com/insights" },
-          { name: post.title, url },
+          { name: post.title, url: articleUrl },
         ]}
       />
+      {post.faq && post.faq.length > 0 && <FAQJsonLd items={post.faq} />}
+      <section className="relative overflow-hidden bg-envrt-brand-vista pt-24 pb-14 sm:pt-32 sm:pb-20">
+        <SectionCorners left="ENVRT/01" right="Insights" />
+        <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[720px]">
+            <FadeUp>
+              <Link
+                href="//insights"
+                className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
+              >
+                <span aria-hidden>←</span>
+                All insights
+              </Link>
+            </FadeUp>
 
-      <Container>
-        <article className="mx-auto max-w-2xl">
-          {/* Back link */}
-          <Link
-            href="/insights"
-            className="inline-flex items-center gap-1.5 text-sm text-envrt-muted transition-colors hover:text-envrt-teal"
-          >
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            All insights
-          </Link>
-
-          {/* Header */}
-          <header className="mt-6">
             {post.tags.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/insights/tag/${tagSlug(tag)}`}
-                    className="rounded-full bg-envrt-teal/5 px-2.5 py-0.5 text-xs font-medium text-envrt-teal transition-colors hover:bg-envrt-teal/10"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
+              <FadeUp delay={0.04}>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`//insights/tag/${tagSlug(tag)}`}
+                      className="rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:bg-envrt-brand-ultramarine/15 sm:text-[11px]"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              </FadeUp>
             )}
 
-            <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-              {post.title}
-            </h1>
+            <FadeUp delay={0.08}>
+              <h1 className="mt-6 font-display text-[2.25rem] font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.25rem]">
+                {post.title}
+              </h1>
+            </FadeUp>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-envrt-muted">
-              <span>{post.author}</span>
-              <span className="text-envrt-charcoal/20">·</span>
-              <time dateTime={post.date}>{formatDate(post.date)}</time>
-              <span className="text-envrt-charcoal/20">·</span>
-              <span>{post.readingTime} min read</span>
-              {post.updated && (
-                <>
-                  <span className="text-envrt-charcoal/20">·</span>
-                  <span>Updated {formatDate(post.updated)}</span>
-                </>
-              )}
-            </div>
-          </header>
+            <FadeUp delay={0.16}>
+              <div className="mt-6 flex flex-wrap items-center gap-3 text-envrt-brand-black/55">
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]">
+                  {post.author}
+                </span>
+                <span aria-hidden className="text-envrt-brand-black/20">·</span>
+                <time
+                  dateTime={post.date}
+                  className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]"
+                >
+                  {formatDate(post.date)}
+                </time>
+                <span aria-hidden className="text-envrt-brand-black/20">·</span>
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]">
+                  {post.readingTime} min read
+                </span>
+                {post.updated && (
+                  <>
+                    <span aria-hidden className="text-envrt-brand-black/20">·</span>
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] sm:text-[11px]">
+                      Updated {formatDate(post.updated)}
+                    </span>
+                  </>
+                )}
+              </div>
+            </FadeUp>
 
-          {/* TL;DR summary */}
-          {post.description && (
-            <div className="mt-8 rounded-xl border border-envrt-teal/10 bg-envrt-teal/[0.03] px-5 py-4">
-              <p className="mb-1.5 text-xs font-bold uppercase tracking-widest text-envrt-teal">
-                TL;DR
-              </p>
-              <p className="text-sm leading-relaxed text-envrt-charcoal/80">
-                {post.description}
-              </p>
-            </div>
-          )}
-
-          {/* Table of contents */}
-          <TableOfContents content={post.content} />
-
-          {/* Body */}
-          <div className="mt-8">
-            <MdxContent content={post.content} />
+            {/* Cover image. Opt-in per article via `ogImage` in the
+                MDX frontmatter — same field as the social share image,
+                so writers only set it once. */}
+            {post.ogImage && (
+              <FadeUp delay={0.24}>
+                <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10 sm:mt-12">
+                  <Image
+                    src={post.ogImage}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width: 1024px) 720px, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              </FadeUp>
+            )}
           </div>
+        </div>
+      </section>
 
-          {/* Per-article FAQ */}
-          {post.faq && post.faq.length > 0 && (
-            <>
-              <FAQJsonLd items={post.faq} />
-              <div className="mt-16">
-                <h2 className="text-xl font-semibold text-envrt-charcoal">
+      <section className="relative pb-20 sm:pb-24 lg:pb-32">
+        <SectionCorners left="ENVRT/02" right="Article" />
+        <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[720px] border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
+            {post.description && (
+              <FadeUp>
+                <div className="mb-10 rounded-2xl border border-envrt-brand-ultramarine/15 bg-envrt-brand-ultramarine/[0.04] p-6 sm:p-7">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                    TL;DR
+                  </p>
+                  <p className="mt-3 text-[15px] leading-relaxed text-envrt-brand-black/80 sm:text-base">
+                    {post.description}
+                  </p>
+                </div>
+              </FadeUp>
+            )}
+
+            <TableOfContentsV3 content={post.content} />
+
+            <article className="mt-10">
+              <MdxContentV3 content={post.content} />
+            </article>
+
+            {post.faq && post.faq.length > 0 && (
+              <div className="mt-16 border-t border-envrt-brand-black/10 pt-14">
+                <Eyebrow tone="sunny">FAQ</Eyebrow>
+                <h2 className="mt-4 font-display text-2xl font-medium leading-[1.1] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl">
                   Frequently asked questions
                 </h2>
-                <div className="mt-4">
-                  <Accordion items={post.faq} />
+                <div className="mt-8">
+                  <ArticleFaqAccordionV3 items={post.faq} />
                 </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
+        </div>
+      </section>
 
-          {/* Newsletter signup */}
-          <NewsletterSubscribe variant="inline" />
+      {related.length > 0 && (
+        <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+          <SectionCorners left="ENVRT/03" right="Related" />
+          <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+            <div className="border-t border-envrt-brand-black/8 pt-14 sm:pt-16">
+              <FadeUp>
+                <Eyebrow tone="sunny">03 · Related reading</Eyebrow>
+              </FadeUp>
+              <FadeUp delay={0.08}>
+                <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+                  Keep digging on the same topics.
+                </h2>
+              </FadeUp>
 
-          {/* Related posts */}
-          <RelatedPosts currentSlug={post.slug} tags={post.tags} />
+              <div className="mt-12 grid gap-5 sm:grid-cols-3 sm:gap-6">
+                {related.map((p, i) => (
+                  <FadeUp key={p.slug} delay={0.12 + i * 0.05}>
+                    <Link
+                      href={`//insights/${p.slug}`}
+                      className="group flex h-full flex-col rounded-2xl border border-envrt-brand-black/10 bg-white p-6 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30"
+                    >
+                      <time
+                        dateTime={p.date}
+                        className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]"
+                      >
+                        {formatDate(p.date)}
+                      </time>
+                      <h3 className="mt-3 font-display text-lg font-medium leading-tight tracking-tight text-envrt-brand-black transition-colors duration-200 group-hover:text-envrt-brand-ultramarine">
+                        {p.title}
+                      </h3>
+                      <p className="mt-2 flex-1 text-sm leading-relaxed text-envrt-brand-black/70">
+                        {p.description}
+                      </p>
+                    </Link>
+                  </FadeUp>
+                ))}
+              </div>
 
-          {/* Footer CTA */}
-          <footer className="mt-16 rounded-2xl border border-envrt-teal/10 bg-envrt-teal/5 p-6 text-center sm:p-8">
-            <p className="text-lg font-semibold text-envrt-charcoal">
-              Ready to build transparency into your supply chain?
-            </p>
-            <p className="mt-2 text-sm text-envrt-muted">
-              See how ENVRT helps fashion brands track, measure, and communicate
-              sustainability.
-            </p>
-            <Link
-              href="/contact"
-              className="mt-4 inline-block rounded-full bg-envrt-teal px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-envrt-teal/90"
-            >
-              Get in touch
-            </Link>
-          </footer>
-        </article>
-      </Container>
-    </div>
+              <div className="mt-12">
+                <ButtonV3 href="//insights" variant="ghost">
+                  All insights<span>→</span>
+                </ButtonV3>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <FinalCtaV3 />
+    </main>
   );
 }

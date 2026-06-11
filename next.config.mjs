@@ -22,6 +22,29 @@ const nextConfig = {
 
   async redirects() {
     return [
+      // 301 anything that points at the old /preview/v3/* preview area
+      // to the live root path. Catches old internal bookmarks, scattered
+      // share links and anything we missed in the search/replace sweep.
+      {
+        source: "/preview/v3/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/preview/v3",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/preview/home-v2",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/preview/home-v3",
+        destination: "/",
+        permanent: true,
+      },
       {
         source: "/how-it-works",
         destination: "/#how-it-works",

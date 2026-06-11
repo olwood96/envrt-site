@@ -2,11 +2,23 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
-import { getFeaturedDppsByBrand, getBrandEngagement } from "@/lib/collective/fetch";
-import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
-import { CollectiveBrandGrid } from "@/components/collective/CollectiveBrandGrid";
+import {
+  Eyebrow,
+  SectionCorners,
+  DotGridBackground,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { CollectiveBrandGridV3 } from "@/components/v3/collective/CollectiveBrandGridV3";
 import CollectiveBeacon from "@/components/CollectiveBeacon";
+import {
+  getFeaturedDppsByBrand,
+  getBrandEngagement,
+} from "@/lib/collective/fetch";
+import type {
+  CollectiveBrand,
+  CollectiveCardData,
+} from "@/lib/collective/types";
 
 export const revalidate = 300;
 
@@ -19,187 +31,265 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { brandSlug } = params;
   const result = await getFeaturedDppsByBrand(brandSlug);
-
-  if (!result) return { title: "Brand Not Found | ENVRT" };
-
-  const title = `${result.brand.name} | ENVRT Collective`;
-  const description = `Explore ${result.cards.length} Digital Product Passport${result.cards.length !== 1 ? "s" : ""} from ${result.brand.name} on ENVRT.`;
+  if (!result) return { title: "Brand not found | v3 preview" };
 
   return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url: `https://envrt.com/collective/${brandSlug}`,
-      type: "website",
-    },
-    alternates: {
-      canonical: `https://envrt.com/collective/${brandSlug}`,
-    },
+    title: `${result.brand.name} | Collective v3 preview`,
+    description: `${result.cards.length} Digital Product Passport${
+      result.cards.length !== 1 ? "s" : ""
+    } from ${result.brand.name}.`,
   };
 }
 
-export default async function BrandProfilePage({ params }: PageProps) {
+export default async function BrandProfileV3Page({ params }: PageProps) {
   const { brandSlug } = params;
   const result = await getFeaturedDppsByBrand(brandSlug);
-
   if (!result) notFound();
 
   const { cards, brand } = result;
+  const engagement = await getBrandEngagement(brand.id);
+
+  return (
+    <main className="theme-neon">
+      <CollectiveBeacon brandId={brand.id} brandSlug={brandSlug} />
+
+      <BrandHero brand={brand} cards={cards} />
+      <StatsSection
+        cards={cards}
+        engagement={engagement}
+      />
+      <ProductsSection cards={cards} brand={brand} />
+
+      <FinalCtaV3 />
+    </main>
+  );
+}
+
+function BrandHero({
+  brand,
+  cards,
+}: {
+  brand: CollectiveBrand;
+  cards: CollectiveCardData[];
+}) {
   const brandLogoUrl = cards[0]?.brandLogoUrl;
+  const cleanWebsite = brand.website_url
+    ?.replace(/^https?:\/\//, "")
+    .replace(/\/$/, "");
 
-  const [engagement] = await Promise.all([
-    getBrandEngagement(brand.id),
-  ]);
+  return (
+    <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-28 lg:py-32">
+      <DotGridBackground opacity={0.07} size={22} tone="lilac" />
+      <SectionCorners left="ENVRT/01" right={brand.name} tone="dark" />
 
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <FadeUp>
+          <Link
+            href="//collective"
+            className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
+          >
+            <span aria-hidden>←</span>
+            All brands
+          </Link>
+        </FadeUp>
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[auto,1fr] lg:items-center lg:gap-12">
+          {brandLogoUrl && (
+            <FadeUp delay={0.04}>
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-white p-4 shadow-[0_18px_40px_-22px_rgba(0,0,0,0.4)] sm:h-28 sm:w-28">
+                <div className="relative h-full w-full">
+                  <Image
+                    src={brandLogoUrl}
+                    alt={brand.name}
+                    fill
+                    sizes="112px"
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </FadeUp>
+          )}
+
+          <div className="max-w-3xl">
+            <FadeUp delay={0.08}>
+              <Eyebrow tone="neon">{`${cards.length} featured ${
+                cards.length === 1 ? "product" : "products"
+              }`}</Eyebrow>
+            </FadeUp>
+            <FadeUp delay={0.12}>
+              <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-white sm:text-5xl lg:text-[3.5rem]">
+                {brand.name}
+              </h1>
+            </FadeUp>
+            {brand.description && (
+              <FadeUp delay={0.2}>
+                <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+                  {brand.description}
+                </p>
+              </FadeUp>
+            )}
+
+            <FadeUp delay={0.28}>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                {cleanWebsite && brand.website_url && (
+                  <a
+                    href={brand.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-envrt-brand-neon px-5 py-2.5 text-sm font-semibold text-envrt-brand-black shadow-[0_12px_28px_-14px_rgba(237,255,0,0.5)] transition-all duration-200 hover:bg-envrt-brand-neon/90 sm:px-6 sm:py-3 sm:text-base"
+                  >
+                    {cleanWebsite}<span aria-hidden>↗</span>
+                  </a>
+                )}
+                <a
+                  href="//collective"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white/85 transition-colors duration-200 hover:text-envrt-brand-neon sm:px-6 sm:py-3 sm:text-base"
+                >
+                  Browse all brands<span aria-hidden>→</span>
+                </a>
+              </div>
+            </FadeUp>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatsSection({
+  cards,
+  engagement,
+}: {
+  cards: CollectiveCardData[];
+  engagement: { totalViews: number; monthlyViews: number };
+}) {
   const withEmissions = cards.filter((c) => c.dpp.total_emissions != null);
   const withWater = cards.filter((c) => c.dpp.total_water != null);
   const withTrace = cards.filter((c) => c.dpp.transparency_score != null);
 
+  const stats: { label: string; value: string; hint: string }[] = [];
+
+  if (withEmissions.length > 0) {
+    const avg =
+      withEmissions.reduce((sum, c) => sum + c.dpp.total_emissions!, 0) /
+      withEmissions.length;
+    stats.push({
+      label: "Avg CO₂e",
+      value: `${avg.toFixed(1)} kg`,
+      hint: `${withEmissions.length} ${
+        withEmissions.length === 1 ? "product" : "products"
+      } measured`,
+    });
+  }
+  if (withWater.length > 0) {
+    const avg =
+      withWater.reduce((sum, c) => sum + c.dpp.total_water!, 0) /
+      withWater.length;
+    stats.push({
+      label: "Avg water",
+      value: `${avg.toFixed(1)} L`,
+      hint: `${withWater.length} ${
+        withWater.length === 1 ? "product" : "products"
+      } measured`,
+    });
+  }
+  if (withTrace.length > 0) {
+    const avg =
+      withTrace.reduce((sum, c) => sum + c.dpp.transparency_score!, 0) /
+      withTrace.length;
+    stats.push({
+      label: "Avg traceable",
+      value: `${Math.round(avg)}%`,
+      hint: `${withTrace.length} ${
+        withTrace.length === 1 ? "product" : "products"
+      } scored`,
+    });
+  }
+  if (engagement.totalViews > 0) {
+    stats.push({
+      label: "Total DPP views",
+      value: engagement.totalViews.toLocaleString(),
+      hint: "All time",
+    });
+  }
+  if (engagement.monthlyViews > 0) {
+    stats.push({
+      label: "This month",
+      value: engagement.monthlyViews.toLocaleString(),
+      hint: "DPP views",
+    });
+  }
+
+  if (stats.length === 0) return null;
+
   return (
-    <>
-    <CollectiveBeacon brandId={brand.id} brandSlug={brandSlug} />
-    <BreadcrumbJsonLd
-      items={[
-        { name: "Home", url: "https://envrt.com" },
-        { name: "The Collective", url: "https://envrt.com/collective" },
-        { name: brand.name, url: `https://envrt.com/collective/${brandSlug}` },
-      ]}
-    />
-    <div className="pt-28 pb-16">
-      <Container>
-        <Link
-          href="/collective"
-          className="inline-flex items-center gap-1 text-sm text-envrt-muted transition-colors hover:text-envrt-charcoal"
-        >
-          <span>&larr;</span>
-          Back to The Collective
-        </Link>
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24">
+      <SectionCorners left="ENVRT/02" right="Aggregate stats" />
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>02 · Brand at a glance</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              The numbers across every featured product.
+            </h2>
+          </FadeUp>
 
-        {/* Brand header */}
-        <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
-          {brandLogoUrl && (
-            <Image
-              src={brandLogoUrl}
-              alt={brand.name}
-              width={80}
-              height={80}
-              className="h-16 w-auto max-w-[120px] shrink-0 object-contain sm:h-20 sm:max-w-[160px]"
-            />
-          )}
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-                {brand.name}
-              </h1>
-            </div>
-            <p className="mt-1 text-sm text-envrt-muted">
-              {cards.length} featured product{cards.length !== 1 ? "s" : ""} on ENVRT
-            </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {stats.map((stat, i) => (
+              <FadeUp key={stat.label} delay={Math.min(0.16 + i * 0.05, 0.4)}>
+                <div className="flex h-full flex-col rounded-2xl border border-envrt-brand-black/10 bg-white p-5 sm:p-6">
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                    {stat.label}
+                  </p>
+                  <p className="mt-3 font-display text-2xl font-medium leading-none tracking-tight text-envrt-brand-black sm:text-3xl">
+                    {stat.value}
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-envrt-brand-black/55">
+                    {stat.hint}
+                  </p>
+                </div>
+              </FadeUp>
+            ))}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Brand description + website */}
-        {(brand.description || brand.website_url) && (
-          <div className="mt-4">
-            {brand.description && (
-              <p className="max-w-2xl text-sm leading-relaxed text-envrt-muted">
-                {brand.description}
-              </p>
-            )}
-            {brand.website_url && (
-              <a
-                href={brand.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-envrt-teal transition-colors hover:text-envrt-green"
-              >
-                {brand.website_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                </svg>
-              </a>
-            )}
-          </div>
-        )}
+function ProductsSection({
+  cards,
+  brand,
+}: {
+  cards: CollectiveCardData[];
+  brand: CollectiveBrand;
+}) {
+  return (
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+      <SectionCorners
+        left="ENVRT/03"
+        right={`${cards.length} ${cards.length === 1 ? "product" : "products"}`}
+      />
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>03 · Featured products</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              {`Every ${brand.name} DPP, in one place.`}
+            </h2>
+          </FadeUp>
 
-        {/* Aggregate stats + engagement */}
-        <div className="mt-6 flex flex-wrap gap-3">
-          {withEmissions.length > 0 && (
-            <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                Avg CO₂e
-              </p>
-              <p className="mt-1 text-lg font-semibold text-envrt-green">
-                {(
-                  withEmissions.reduce(
-                    (sum, c) => sum + c.dpp.total_emissions!,
-                    0
-                  ) / withEmissions.length
-                ).toFixed(1)}{" "}
-                kg
-              </p>
+          <FadeUp delay={0.16}>
+            <div className="mt-10">
+              <CollectiveBrandGridV3 cards={cards} />
             </div>
-          )}
-          {withWater.length > 0 && (
-            <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                Avg Water
-              </p>
-              <p className="mt-1 text-lg font-semibold text-blue-700">
-                {(
-                  withWater.reduce((sum, c) => sum + c.dpp.total_water!, 0) /
-                  withWater.length
-                ).toFixed(1)}{" "}
-                L
-              </p>
-            </div>
-          )}
-          {withTrace.length > 0 && (
-            <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                Avg Transparency
-              </p>
-              <p className="mt-1 text-lg font-semibold text-envrt-teal">
-                {Math.round(
-                  withTrace.reduce(
-                    (sum, c) => sum + c.dpp.transparency_score!,
-                    0
-                  ) / withTrace.length
-                )}
-                %
-              </p>
-            </div>
-          )}
-          {engagement.totalViews > 0 && (
-            <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                DPP Views
-              </p>
-              <p className="mt-1 text-lg font-semibold text-envrt-charcoal">
-                {engagement.totalViews.toLocaleString()}
-              </p>
-            </div>
-          )}
-          {engagement.monthlyViews > 0 && (
-            <div className="rounded-xl border border-envrt-charcoal/5 bg-white px-4 py-3">
-              <p className="text-[10px] font-medium uppercase tracking-widest text-envrt-muted">
-                This Month
-              </p>
-              <p className="mt-1 text-lg font-semibold text-envrt-charcoal">
-                {engagement.monthlyViews.toLocaleString()}
-              </p>
-            </div>
-          )}
+          </FadeUp>
         </div>
-
-        {/* Product grid — reuses the same CollectiveCard from the main page */}
-        <div className="mt-10">
-          <CollectiveBrandGrid cards={cards} />
-        </div>
-      </Container>
-    </div>
-    </>
+      </div>
+    </section>
   );
 }

@@ -3,10 +3,11 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /payment/
-Disallow: /preview/
+Disallow: /monitoring
 
 # Host
 Host: https://envrt.com
 
 # Sitemaps
 Sitemap: https://envrt.com/sitemap.xml
+Sitemap: https://envrt.com/insights/rss.xml

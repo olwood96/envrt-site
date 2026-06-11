@@ -1,34 +1,16 @@
-import { Metadata } from "next";
-import { ReactNode } from "react";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free Eco-Score DPP | ENVRT",
+  title: "Free DPP | Try ENVRT on one garment",
   description:
-    "Get a free eco-score Digital Product Passport for one of your products. See your environmental impact score in under 2 minutes.",
-  keywords: [
-    "free DPP",
-    "eco-score fashion",
-    "digital product passport free",
-    "ESPR compliance",
-    "environmental score clothing",
-    "sustainable fashion score",
-  ],
-  openGraph: {
-    title: "Free Eco-Score DPP | ENVRT",
-    description:
-      "Get a free eco-score Digital Product Passport for one of your products. See your environmental impact score in under 2 minutes.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Free Eco-Score DPP | ENVRT",
-    description:
-      "Free eco-score DPP for fashion brands. 2 minutes, no account needed.",
-  },
-  alternates: {
-    canonical: "https://envrt.com/free-dpp",
-  },
+    "Submit one garment in three steps. Get a regulation-ready Digital Product Passport back within a day. No card, no commitment.",
+  alternates: { canonical: "/free-dpp" },
 };
 
-export default function FreeDppLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+export default function FreeDppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
 }

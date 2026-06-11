@@ -1,97 +1,150 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
+import {
+  Eyebrow,
+  SectionCorners,
+  DotGridBackground,
+} from "@/components/sections/v3/_shared";
+import { FadeUp } from "@/components/ui/Motion";
+import { ButtonV3 } from "@/components/v3";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import {
+  CollectiveComparisonViewV3,
+  ComparisonShareButtonV3,
+} from "@/components/v3/collective/CollectiveComparisonViewV3";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
-import { CollectiveComparisonView, ComparisonShareButton } from "@/components/collective/CollectiveComparisonView";
 import type { CollectiveCardData } from "@/lib/collective/types";
-import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "Compare Products | ENVRT Collective",
-  description:
-    "Compare sustainability metrics across products side-by-side.",
+  title: "Compare v3 preview",
 };
 
 interface PageProps {
   searchParams: { products?: string };
 }
 
-export default async function ComparePage({ searchParams }: PageProps) {
+export default async function CompareV3Page({ searchParams }: PageProps) {
   const { products } = searchParams;
-
   if (!products) notFound();
 
-  // Parse: brand/collection/sku,brand/collection/sku,...
   const entries = products.split(",").filter(Boolean);
   if (entries.length < 2 || entries.length > 3) notFound();
 
-  // Fetch all DPPs in parallel
   const cards: (CollectiveCardData | null)[] = await Promise.all(
     entries.map(async (entry) => {
       const parts = entry.split("/");
       if (parts.length < 3) return null;
       const brandSlug = parts[0];
-      // The product SKU is the last part, collection is everything in between
       const productSku = decodeURIComponent(parts[parts.length - 1]);
       const brandSlugDecoded = decodeURIComponent(brandSlug);
-
-      // We search by brandSlug + productSku (collection is in the URL for cosmetics)
       return getFeaturedDpp(brandSlugDecoded, productSku);
-    })
+    }),
   );
 
   const validCards = cards.filter(
-    (c): c is CollectiveCardData => c != null
+    (c): c is CollectiveCardData => c != null,
   );
-
   if (validCards.length < 2) notFound();
 
-  // Enforce same brand
   const brandIds = new Set(validCards.map((c) => c.brand.id));
   if (brandIds.size > 1) notFound();
 
-  const brandName = validCards[0].brand.name;
+  const brand = validCards[0].brand;
 
   return (
-    <>
-    <BreadcrumbJsonLd
-      items={[
-        { name: "Home", url: "https://envrt.com" },
-        { name: "The Collective", url: "https://envrt.com/collective" },
-        { name: "Compare", url: "https://envrt.com/collective/compare" },
-      ]}
-    />
-    <div className="pt-28 pb-16">
-      <Container>
-        <div className="flex items-center justify-between">
-          <Link
-            href="/collective"
-            className="inline-flex items-center gap-1 text-sm text-envrt-muted transition-colors hover:text-envrt-charcoal"
-          >
-            <span>←</span>
-            Back to The Collective
-          </Link>
-          <ComparisonShareButton />
-        </div>
+    <main className="theme-neon">
+      <CompareHero brandName={brand.name} count={validCards.length} />
+      <ComparisonSection cards={validCards} />
+      <FinalCtaV3 />
+    </main>
+  );
+}
 
-        <div className="mt-6">
-          <p className="text-xs font-medium uppercase tracking-widest text-envrt-teal">
-            {brandName}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-4xl">
-            Product comparison
-          </h1>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-envrt-muted">
-            Comparing {validCards.length} products side by side.
-          </p>
-        </div>
+function CompareHero({
+  brandName,
+  count,
+}: {
+  brandName: string;
+  count: number;
+}) {
+  return (
+    <section className="relative overflow-hidden bg-envrt-brand-black py-20 sm:py-24 lg:py-28">
+      <DotGridBackground opacity={0.07} size={22} tone="lilac" />
+      <SectionCorners left="ENVRT/01" right="Compare" tone="dark" />
 
-        <div className="mt-6">
-          <CollectiveComparisonView cards={validCards} />
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <FadeUp>
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <Link
+              href="//collective"
+              className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
+            >
+              <span aria-hidden>←</span>
+              Back to The Collective
+            </Link>
+            <ComparisonShareButtonV3 />
+          </div>
+        </FadeUp>
+
+        <div className="mt-8 max-w-3xl">
+          <FadeUp delay={0.04}>
+            <Eyebrow tone="neon">{brandName}</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-white sm:text-5xl lg:text-[3.25rem]">
+              Side by side.{" "}
+              <span className="text-white/45">
+                Same brand, same scale.
+              </span>
+            </h1>
+          </FadeUp>
+          <FadeUp delay={0.16}>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+              Comparing {count} products head to head. Lower-is-better metrics
+              are marked when one product wins. Hover any metric label for a
+              plain explanation of what it covers.
+            </p>
+          </FadeUp>
         </div>
-      </Container>
-    </div>
-    </>
+      </div>
+    </section>
+  );
+}
+
+function ComparisonSection({ cards }: { cards: CollectiveCardData[] }) {
+  return (
+    <section className="relative bg-envrt-brand-vista pb-20 sm:pb-24 lg:pb-32">
+      <SectionCorners left="ENVRT/02" right="Comparison" />
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <div className="border-t border-envrt-brand-black/8 pt-12 sm:pt-16">
+          <FadeUp>
+            <Eyebrow>02 · Head to head</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 max-w-2xl font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-4xl">
+              {`Same metrics, same scope, no spin.`}
+            </h2>
+          </FadeUp>
+
+          <FadeUp delay={0.16}>
+            <div className="mt-10">
+              <CollectiveComparisonViewV3 cards={cards} />
+            </div>
+          </FadeUp>
+
+          <FadeUp delay={0.24}>
+            <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <ButtonV3 href="//collective" variant="primary">
+                Browse the Collective<span aria-hidden>→</span>
+              </ButtonV3>
+              <ButtonV3 href="//free-dpp" variant="ghost">
+                Get your brand featured<span aria-hidden>→</span>
+              </ButtonV3>
+            </div>
+          </FadeUp>
+        </div>
+      </div>
+    </section>
   );
 }

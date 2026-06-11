@@ -1,32 +1,58 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { SectionCard } from "@/components/ui/SectionCard";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { useState } from "react";
+import {
+  PageHero,
+  FaqSnippet,
+  ButtonV3,
+  Card,
+  Input,
+  Label,
+} from "@/components/v3";
+import { DropdownV3 } from "@/components/v3/DropdownV3";
+import {
+  Eyebrow,
+  SectionCorners,
+} from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
-import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
-import { RoiResultsReceipt } from "@/components/RoiResultsReceipt";
+import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import {
+  formatFromGBP,
+  usePricing,
+} from "@/components/v3/pricing/PricingContext";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
-/* ================================================================
-   TYPES
-   ================================================================ */
+// //roi — ROI calculator. SKU count + data maturity + market +
+// current approach determines the savings vs consultants and vs an
+// in-house hire. Calculation logic ported verbatim from the v1 page.
 
-type Screen = "hero" | "calculator" | "email" | "results";
 type Market = "eu" | "uk" | "both";
 type Approach = "none" | "spreadsheets" | "consultant" | "inhouse";
 type DataMaturity = "not-started" | "manual" | "some-systems" | "digitised";
 
-interface CalcInputs {
-  skuCount: number;
-  dataMaturity: DataMaturity;
-  market: Market;
-  approach: Approach;
-}
+const DATA_MATURITY_MULTIPLIER: Record<DataMaturity, number> = {
+  "not-started": 1.4,
+  manual: 1.0,
+  "some-systems": 0.75,
+  digitised: 0.5,
+};
 
-interface CalcResults {
+const APPROACH_WEIGHT: Record<Approach, { consultant: number; inhouse: number }> = {
+  none: { consultant: 1.0, inhouse: 1.0 },
+  spreadsheets: { consultant: 1.0, inhouse: 1.0 },
+  consultant: { consultant: 1.0, inhouse: 0.7 },
+  inhouse: { consultant: 0.7, inhouse: 1.0 },
+};
+
+const DATA_MATURITY_HOURS: Record<DataMaturity, number> = {
+  "not-started": 8,
+  manual: 6,
+  "some-systems": 4,
+  digitised: 2,
+};
+
+type CalcResults = {
   envrtCost: number;
   envrtPlan: string;
   envrtPlanPrice: string;
@@ -38,55 +64,38 @@ interface CalcResults {
   hoursPerProduct: number;
   hoursSaved: number;
   daysSaved: number;
-}
-
-/* ================================================================
-   CALCULATION LOGIC
-   ================================================================ */
-
-// Data maturity affects how much work consultants/in-house need per product
-const DATA_MATURITY_MULTIPLIER: Record<DataMaturity, number> = {
-  "not-started": 1.4,
-  manual: 1.0,
-  "some-systems": 0.75,
-  digitised: 0.5,
 };
 
-// Current approach affects which comparison is most relevant
-const APPROACH_WEIGHT: Record<Approach, { consultant: number; inhouse: number }> = {
-  none: { consultant: 1.0, inhouse: 1.0 },
-  spreadsheets: { consultant: 1.0, inhouse: 1.0 },
-  consultant: { consultant: 1.0, inhouse: 0.7 },
-  inhouse: { consultant: 0.7, inhouse: 1.0 },
-};
-
-function calculateROI(inputs: CalcInputs): CalcResults {
-  // ENVRT cost: auto-select plan by SKU count
+function calculateROI(
+  skuCount: number,
+  dataMaturity: DataMaturity,
+  market: Market,
+  approach: Approach,
+): CalcResults {
   let envrtMonthly: number;
   let envrtPlan: string;
   let envrtPlanPrice: string;
-  if (inputs.skuCount <= 50) {
+  if (skuCount <= 50) {
     envrtMonthly = 149;
     envrtPlan = "Starter";
     envrtPlanPrice = "£149/mo";
-  } else if (inputs.skuCount <= 250) {
+  } else if (skuCount <= 250) {
     envrtMonthly = 495;
     envrtPlan = "Growth";
     envrtPlanPrice = "£495/mo";
   } else {
-    envrtMonthly = 1295; // indicative only, Pro is custom-priced
+    envrtMonthly = 1295;
     envrtPlan = "Pro";
     envrtPlanPrice = "Custom";
   }
   const envrtCost = envrtMonthly * 12;
 
-  // Derive day rate and salary from SKU count (proxy for brand scale)
   let consultantDayRate: number;
   let inhouseSalary: number;
-  if (inputs.skuCount <= 50) {
+  if (skuCount <= 50) {
     consultantDayRate = 500;
     inhouseSalary = 43000;
-  } else if (inputs.skuCount <= 250) {
+  } else if (skuCount <= 250) {
     consultantDayRate = 650;
     inhouseSalary = 55000;
   } else {
@@ -94,33 +103,24 @@ function calculateROI(inputs: CalcInputs): CalcResults {
     inhouseSalary = 67000;
   }
 
-  // Consultant cost — diminishing returns at scale (batching, template reuse)
-  const marketMultiplier = inputs.market === "both" ? 1.3 : 1.0;
-  const maturityMultiplier = DATA_MATURITY_MULTIPLIER[inputs.dataMaturity];
-  const approachWeight = APPROACH_WEIGHT[inputs.approach];
-  const effectiveDaysPerProduct = 1.5 * maturityMultiplier / (1 + inputs.skuCount / 120);
-  const consultantDays = 5 + inputs.skuCount * effectiveDaysPerProduct;
+  const marketMultiplier = market === "both" ? 1.3 : 1.0;
+  const maturityMultiplier = DATA_MATURITY_MULTIPLIER[dataMaturity];
+  const approachWeight = APPROACH_WEIGHT[approach];
+  const effectiveDaysPerProduct = (1.5 * maturityMultiplier) / (1 + skuCount / 120);
+  const consultantDays = 5 + skuCount * effectiveDaysPerProduct;
   const consultantCost =
     consultantDays * consultantDayRate * marketMultiplier * approachWeight.consultant;
 
-  // In-house cost (salary + overhead, adjusted by data maturity and approach)
-  const inhouseMaturityBonus = inputs.dataMaturity === "digitised" ? 0.85 : inputs.dataMaturity === "some-systems" ? 0.9 : 1.0;
+  const inhouseMaturityBonus =
+    dataMaturity === "digitised" ? 0.85 : dataMaturity === "some-systems" ? 0.9 : 1.0;
   const inhouseCost = Math.round(inhouseSalary * inhouseMaturityBonus * approachWeight.inhouse);
 
-  // Savings
   const savingVsConsultant = Math.max(0, consultantCost - envrtCost);
   const savingVsInhouse = Math.max(0, inhouseCost - envrtCost);
   const maxSaving = Math.max(savingVsConsultant, savingVsInhouse);
 
-  // Time savings: estimated hours per product without ENVRT vs with
-  const DATA_MATURITY_HOURS: Record<DataMaturity, number> = {
-    "not-started": 8,
-    manual: 6,
-    "some-systems": 4,
-    digitised: 2,
-  };
-  const hoursPerProduct = DATA_MATURITY_HOURS[inputs.dataMaturity];
-  const hoursSaved = Math.max(0, (hoursPerProduct - 1) * inputs.skuCount);
+  const hoursPerProduct = DATA_MATURITY_HOURS[dataMaturity];
+  const hoursSaved = Math.max(0, (hoursPerProduct - 1) * skuCount);
   const daysSaved = Math.round(hoursSaved / 8);
 
   return {
@@ -138,681 +138,388 @@ function calculateROI(inputs: CalcInputs): CalcResults {
   };
 }
 
-/* ================================================================
-   SUB-COMPONENTS
-   ================================================================ */
+const faqs = [
+  {
+    question: "How does the calculator decide which ENVRT plan I need?",
+    answer:
+      "By your SKU count. Up to 50 SKUs is Starter (£149 a month). Up to 250 is Growth (£495 a month). Above that is Pro, which is custom-priced. The annual cost shown is monthly fee times twelve.",
+  },
+  {
+    question: "Are the consultant and in-house figures realistic?",
+    answer:
+      "They are estimates calibrated to typical sustainability consultancy day rates in Europe and to sustainability-analyst salaries by brand size. Your real numbers depend on supplier quality, data maturity and market coverage. The calculator gives directional savings.",
+  },
+  {
+    question: "What if I already have a sustainability team?",
+    answer:
+      "We work alongside in-house teams. Many brands use ENVRT to give their team faster turnaround on DPP generation and to consolidate evidence. The comparison shown is the cost of doing the same work in-house from scratch, not the cost of an existing team.",
+  },
+  {
+    question: "Will my data stay private?",
+    answer:
+      "Yes. The calculator runs locally in your browser. Nothing is sent to ENVRT unless you opt in to email yourself a copy of the results, book a demo, or submit the free DPP form.",
+  },
+];
 
-function RangeSlider({
-  label,
-  min,
-  max,
-  step,
-  value,
-  onChange,
-  format,
-}: {
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  value: number;
-  onChange: (v: number) => void;
-  format?: (v: number) => string;
-}) {
-  const display = format ? format(value) : String(value);
-  const pct = ((value - min) / (max - min)) * 100;
+export default function RoiV3Page() {
+  const [skuCount, setSkuCount] = useState(60);
+  const [dataMaturity, setDataMaturity] = useState<DataMaturity>("manual");
+  const [market, setMarket] = useState<Market>("eu");
+  const [approach, setApproach] = useState<Approach>("spreadsheets");
+
+  // Optional lead capture — emails the results, posts to /api/roi-lead.
+  // Keeps the calculator instant + private by default; the form opens
+  // on demand so buyers can ask for a written copy without forcing it.
+  const [firstName, setFirstName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [email, setEmail] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const results = calculateROI(skuCount, dataMaturity, market, approach);
+
+  // Currency view — calculator numbers stay in GBP under the hood and
+  // are converted at display time, so a currency toggle anywhere in the
+  // site flows through here without recalculating.
+  const { currency } = usePricing();
+  const display = (gbp: number) => formatFromGBP(gbp, currency);
+
+  async function handleEmailResults(e: React.FormEvent) {
+    e.preventDefault();
+    if (!firstName || !brandName || !email) return;
+    setEmailSending(true);
+    setEmailError(null);
+    try {
+      const res = await fetch("/api/roi-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          brandName,
+          email,
+          marketingConsent,
+          skuCount,
+          dataMaturity,
+          market,
+          approach,
+          ...results,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Submission failed");
+      }
+      setEmailSent(true);
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : "Submission failed");
+    }
+    setEmailSending(false);
+  }
 
   return (
-    <div>
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-envrt-charcoal">{label}</span>
-        <span className="text-lg font-bold text-envrt-teal">{display}</span>
+    <main className="theme-sunny">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "ROI calculator", url: "https://envrt.com/roi" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
+      <PageHero
+        tone="sunny"
+        eyebrow="ROI calculator"
+        heading={
+          <>
+            See what ENVRT saves you.{" "}
+            <span className="text-envrt-brand-black/40">
+              Against consultants. Against in-house.
+            </span>
+          </>
+        }
+        body="Plug in your SKU count, data maturity and current approach. The calculator shows your annual ENVRT cost, the consultant equivalent and the in-house equivalent. Email yourself a copy if useful, otherwise nothing leaves your browser."
+        cornerLeft="ENVRT/01"
+        cornerRight="ROI"
+      />
+
+      <section className="relative bg-envrt-brand-vista py-16 sm:py-20 lg:py-24">
+        <SectionCorners left="ENVRT/02" right="Calculator" />
+        <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-6 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-10 lg:px-16">
+          {/* Inputs */}
+          <FadeUp>
+            <Card>
+              <Eyebrow>Your inputs</Eyebrow>
+              <div className="mt-6 space-y-6">
+                <FieldRow>
+                  <Label htmlFor="sku">SKU count in your collection</Label>
+                  <div className="space-y-2">
+                    <input
+                      id="sku"
+                      type="range"
+                      min={10}
+                      max={500}
+                      step={10}
+                      value={skuCount}
+                      onChange={(e) => setSkuCount(parseInt(e.target.value))}
+                      className="w-full accent-envrt-brand-ultramarine"
+                    />
+                    <div className="flex items-baseline justify-between">
+                      <span className="font-display text-3xl font-semibold tracking-tight text-envrt-brand-black">
+                        {skuCount}
+                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-envrt-brand-black/55">
+                        products / SKUs
+                      </span>
+                    </div>
+                  </div>
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="data">Data maturity</Label>
+                  <DropdownV3
+                    id="data"
+                    value={dataMaturity}
+                    onChange={(v) => setDataMaturity(v as DataMaturity)}
+                    options={[
+                      { value: "not-started", label: "Haven't started yet" },
+                      { value: "manual", label: "Manual spreadsheets" },
+                      { value: "some-systems", label: "Some systems in place" },
+                      { value: "digitised", label: "Fully digitised" },
+                    ]}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="market">Markets you sell into</Label>
+                  <DropdownV3
+                    id="market"
+                    value={market}
+                    onChange={(v) => setMarket(v as Market)}
+                    options={[
+                      { value: "eu", label: "European Union" },
+                      { value: "uk", label: "United Kingdom" },
+                      { value: "both", label: "Both" },
+                    ]}
+                  />
+                </FieldRow>
+
+                <FieldRow>
+                  <Label htmlFor="approach">Current sustainability approach</Label>
+                  <DropdownV3
+                    id="approach"
+                    value={approach}
+                    onChange={(v) => setApproach(v as Approach)}
+                    options={[
+                      { value: "none", label: "Nothing structured yet" },
+                      { value: "spreadsheets", label: "Spreadsheets and templates" },
+                      { value: "consultant", label: "External consultant" },
+                      { value: "inhouse", label: "In-house sustainability lead" },
+                    ]}
+                  />
+                </FieldRow>
+              </div>
+            </Card>
+          </FadeUp>
+
+          {/* Results */}
+          <FadeUp delay={0.08}>
+            <Card variant="cta">
+              <Eyebrow>Annual cost</Eyebrow>
+
+              <div className="mt-6 grid grid-cols-1 gap-4">
+                <ResultRow
+                  tone="brand"
+                  label="ENVRT"
+                  sub={`${results.envrtPlan} plan, ${
+                    results.envrtPlan === "Pro"
+                      ? "custom-priced"
+                      : `${display(results.envrtCost / 12)}/mo`
+                  }`}
+                  value={display(results.envrtCost)}
+                />
+                <ResultRow
+                  tone="muted"
+                  label="External consultant"
+                  sub="Same work, day-rate billing"
+                  value={display(results.consultantCost)}
+                />
+                <ResultRow
+                  tone="muted"
+                  label="In-house hire"
+                  sub="Sustainability analyst, with overhead"
+                  value={display(results.inhouseCost)}
+                />
+              </div>
+
+              <div className="mt-8 rounded-2xl bg-envrt-brand-ultramarine/8 p-5">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
+                  Maximum annual saving
+                </p>
+                <p className="mt-2 font-display text-4xl font-semibold tracking-tight text-envrt-brand-ultramarine sm:text-5xl">
+                  {display(results.maxSaving)}
+                </p>
+                <p className="mt-3 text-sm text-envrt-brand-black/70">
+                  Plus {results.daysSaved.toLocaleString()} working days back
+                  for your team across the year.
+                </p>
+              </div>
+
+              {/* Optional email-the-results form. Posts to /api/roi-lead
+                  with the calculator state + results so sales gets the
+                  whole picture in their inbox. */}
+              <div className="mt-6 rounded-2xl border border-envrt-brand-black/12 bg-white p-5 sm:p-6">
+                {emailSent ? (
+                  <p className="text-sm text-envrt-brand-black/75 sm:text-base">
+                    Thanks {firstName}. We have sent the breakdown to{" "}
+                    <span className="font-semibold text-envrt-brand-black">
+                      {email}
+                    </span>
+                    . If it does not arrive within five minutes, check spam.
+                  </p>
+                ) : (
+                  <form className="space-y-4" onSubmit={handleEmailResults}>
+                    <div>
+                      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                        Optional
+                      </p>
+                      <p className="mt-1.5 font-display text-base font-medium tracking-tight text-envrt-brand-black sm:text-lg">
+                        Email me a copy of these numbers
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-envrt-brand-black/60 sm:text-sm">
+                        We send a one-page summary you can forward to your
+                        CFO. No further outreach unless you tick consent.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <Label htmlFor="roi-first-name">First name</Label>
+                        <Input
+                          id="roi-first-name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Your first name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="roi-brand-name">Brand name</Label>
+                        <Input
+                          id="roi-brand-name"
+                          value={brandName}
+                          onChange={(e) => setBrandName(e.target.value)}
+                          placeholder="Your brand"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="roi-email">Email</Label>
+                      <Input
+                        id="roi-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@brand.com"
+                        required
+                      />
+                    </div>
+                    <label className="flex items-start gap-2 text-xs leading-relaxed text-envrt-brand-black/70 sm:text-sm">
+                      <input
+                        type="checkbox"
+                        checked={marketingConsent}
+                        onChange={(e) => setMarketingConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-envrt-brand-black/30 text-envrt-brand-ultramarine focus:ring-envrt-brand-ultramarine"
+                      />
+                      <span>
+                        Send me occasional ENVRT updates. Unsubscribe any
+                        time.
+                      </span>
+                    </label>
+                    {emailError && (
+                      <p className="text-xs text-envrt-brand-crimson sm:text-sm">
+                        {emailError}
+                      </p>
+                    )}
+                    <ButtonV3
+                      type="submit"
+                      variant="primary"
+                      className="w-full"
+                      disabled={emailSending}
+                    >
+                      {emailSending ? "Sending..." : "Email me the breakdown"}
+                      <span>→</span>
+                    </ButtonV3>
+                  </form>
+                )}
+              </div>
+
+              <div className="mt-6">
+                <ButtonV3
+                  href="//free-dpp"
+                  variant="primary"
+                  className="w-full"
+                >
+                  Try ENVRT on one garment<span>→</span>
+                </ButtonV3>
+              </div>
+            </Card>
+          </FadeUp>
+        </div>
+      </section>
+
+      <FaqSnippet
+        tone="sunny"
+        eyebrow="Common questions"
+        heading="About the ROI calculator"
+        items={faqs}
+        ctaHref="//faq"
+        ctaLabel="See all FAQs"
+      />
+
+      <FinalCtaV3 />
+    </main>
+  );
+}
+
+function FieldRow({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-2.5">{children}</div>;
+}
+
+function ResultRow({
+  tone,
+  label,
+  sub,
+  value,
+}: {
+  tone: "brand" | "muted";
+  label: string;
+  sub: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between border-b border-envrt-brand-black/8 pb-4 last:border-0 last:pb-0">
+      <div>
+        <p
+          className={`font-mono text-[10px] font-semibold uppercase tracking-[0.18em] ${
+            tone === "brand"
+              ? "text-envrt-brand-ultramarine"
+              : "text-envrt-brand-black/55"
+          }`}
+        >
+          {label}
+        </p>
+        <p className="mt-1 text-xs text-envrt-brand-black/60">{sub}</p>
       </div>
-      <div className="relative">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="roi-slider w-full"
-        />
-        {/* Filled track */}
-        <div
-          className="pointer-events-none absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-envrt-teal"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="mt-1 flex justify-between text-xs text-envrt-muted/60">
-        <span>{format ? format(min) : min}</span>
-        <span>{format ? format(max) : max}</span>
-      </div>
+      <p
+        className={`font-display text-xl font-semibold tracking-tight sm:text-2xl ${
+          tone === "brand"
+            ? "text-envrt-brand-ultramarine"
+            : "text-envrt-brand-black"
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }
-
-function OptionTile<T extends string>({
-  label,
-  value,
-  selected,
-  onSelect,
-}: {
-  label: string;
-  value: T;
-  selected: boolean;
-  onSelect: (v: T) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(value)}
-      className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ${
-        selected
-          ? "border-envrt-teal bg-envrt-teal/5 text-envrt-teal shadow-sm"
-          : "border-envrt-charcoal/10 text-envrt-charcoal/70 hover:border-envrt-charcoal/30 hover:bg-envrt-cream/50"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-/* ================================================================
-   MAIN PAGE
-   ================================================================ */
-
-export default function ROICalculatorPage() {
-  const [screen, setScreen] = useState<Screen>("hero");
-  const [emailSending, setEmailSending] = useState(false);
-  const [assumptionsOpen, setAssumptionsOpen] = useState(false);
-
-  // Calculator inputs
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [skuCount, setSkuCount] = useState(50);
-  const [dataMaturity, setDataMaturity] = useState<DataMaturity>("manual");
-  const [market, setMarket] = useState<Market>("both");
-  const [approach, setApproach] = useState<Approach>("spreadsheets");
-
-  // Results
-  const [results, setResults] = useState<CalcResults | null>(null);
-
-  // Stored form data for email
-  const formDataRef = useRef<{
-    firstName: string;
-    brandName: string;
-    email: string;
-    marketingConsent: boolean;
-  } | null>(null);
-
-  const calculate = useCallback(() => {
-    const inputs: CalcInputs = {
-      skuCount,
-      dataMaturity,
-      market,
-      approach,
-    };
-    const r = calculateROI(inputs);
-    setResults(r);
-    setScreen("email");
-    window.scrollTo(0, 0);
-  }, [skuCount, dataMaturity, market, approach]);
-
-  const showResults = useCallback(() => {
-    setScreen("results");
-    window.scrollTo(0, 0);
-  }, []);
-
-  const recalculate = useCallback(() => {
-    setScreen("calculator");
-    setResults(null);
-    window.scrollTo(0, 0);
-  }, []);
-
-  return (
-    <>
-      {/* ---- HERO ---- */}
-      {screen === "hero" && (
-        <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-5 py-20 text-center">
-          <FadeUp>
-            <div className="mx-auto max-w-2xl">
-              <Badge className="mb-6">ROI Calculator</Badge>
-              <h1 className="text-3xl font-bold tracking-tight text-envrt-charcoal sm:text-5xl">
-                What does DPP compliance actually cost?
-              </h1>
-              <p className="mx-auto mt-5 max-w-xl text-base text-envrt-muted sm:text-lg">
-                Compare the cost of ENVRT against hiring a consultant or
-                building an in-house sustainability team. Get your personalised
-                savings estimate in under 3 minutes.
-              </p>
-
-              <div className="mt-8 inline-flex flex-col gap-2.5 text-left">
-                {[
-                  "Free, no account required",
-                  "Personalised cost comparison in under 3 minutes",
-                  "ENVRT vs consultant vs in-house hire",
-                ].map((text) => (
-                  <div
-                    key={text}
-                    className="flex items-center gap-2.5 text-sm text-envrt-muted"
-                  >
-                    <svg
-                      className="h-4 w-4 flex-shrink-0 text-envrt-teal"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <circle cx="8" cy="8" r="6.5" />
-                      <path d="M5.5 8.5l2 2 3.5-4" />
-                    </svg>
-                    {text}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-10">
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    setScreen("calculator");
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  Calculate your savings <span className="ml-2">&rarr;</span>
-                </Button>
-              </div>
-            </div>
-          </FadeUp>
-        </div>
-      )}
-
-      {/* ---- CALCULATOR ---- */}
-      {screen === "calculator" && (
-        <div className="pb-20 pt-28 sm:pt-32">
-          <Container className="max-w-[640px]">
-            <FadeUp>
-              <div className="mb-10 text-center">
-                <h2 className="text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-3xl">
-                  Tell us about your brand
-                </h2>
-                <p className="mt-3 text-sm text-envrt-muted">
-                  Adjust the inputs below. We will calculate your costs
-                  instantly.
-                </p>
-              </div>
-            </FadeUp>
-
-            <FadeUp delay={0.1}>
-              <SectionCard>
-                <div className="space-y-8 p-6 sm:p-8">
-                  {/* SKU count slider */}
-                  <RangeSlider
-                    label="Number of product styles"
-                    min={1}
-                    max={500}
-                    step={1}
-                    value={skuCount}
-                    onChange={setSkuCount}
-                  />
-
-                  {/* Data maturity */}
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-envrt-charcoal">
-                      How do you currently manage product sustainability data?
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {(
-                        [
-                          { value: "not-started", label: "We haven't started yet" },
-                          { value: "manual", label: "Spreadsheets and emails" },
-                          { value: "some-systems", label: "Some systems in place" },
-                          { value: "digitised", label: "Fully digitised" },
-                        ] as const
-                      ).map((opt) => (
-                        <OptionTile
-                          key={opt.value}
-                          label={opt.label}
-                          value={opt.value}
-                          selected={dataMaturity === opt.value}
-                          onSelect={setDataMaturity}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Markets */}
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-envrt-charcoal">
-                      Target markets
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {(
-                        [
-                          { value: "eu", label: "EU only" },
-                          { value: "uk", label: "UK only" },
-                          { value: "both", label: "EU and UK" },
-                        ] as const
-                      ).map((opt) => (
-                        <OptionTile
-                          key={opt.value}
-                          label={opt.label}
-                          value={opt.value}
-                          selected={market === opt.value}
-                          onSelect={setMarket}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Current approach */}
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-envrt-charcoal">
-                      Current approach to sustainability data
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {(
-                        [
-                          { value: "none", label: "Nothing yet" },
-                          { value: "spreadsheets", label: "Spreadsheets" },
-                          { value: "consultant", label: "Consultant" },
-                          { value: "inhouse", label: "In-house team" },
-                        ] as const
-                      ).map((opt) => (
-                        <OptionTile
-                          key={opt.value}
-                          label={opt.label}
-                          value={opt.value}
-                          selected={approach === opt.value}
-                          onSelect={setApproach}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Calculate button */}
-                  <Button
-                    size="lg"
-                    className="w-full"
-                    onClick={calculate}
-                  >
-                    See my savings
-                    <span className="ml-2">&rarr;</span>
-                  </Button>
-                </div>
-              </SectionCard>
-            </FadeUp>
-          </Container>
-        </div>
-      )}
-
-      {/* ---- EMAIL CAPTURE ---- */}
-      {screen === "email" && (
-        <div className="pb-20 pt-28 sm:pt-32">
-          <Container className="max-w-[480px]">
-            <FadeUp>
-              <SectionCard>
-                <div className="space-y-5 p-6 sm:p-8">
-                  <div className="text-center">
-                    <h2 className="text-xl font-bold tracking-tight text-envrt-charcoal sm:text-2xl">
-                      Your savings report is ready
-                    </h2>
-                    <p className="mt-2 text-sm text-envrt-muted">
-                      Enter your details to view your results and receive a
-                      copy by email.
-                    </p>
-                  </div>
-
-                  <form
-                    className="space-y-4"
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setEmailSending(true);
-                      const fd = new FormData(e.currentTarget);
-                      const firstName = fd.get("firstName") as string;
-                      const brandName = fd.get("brandName") as string;
-                      const email = fd.get("email") as string;
-                      const marketingConsent = !!fd.get("marketingConsent");
-
-                      formDataRef.current = {
-                        firstName,
-                        brandName,
-                        email,
-                        marketingConsent,
-                      };
-
-                      if (results) {
-                        try {
-                          await fetch("/api/roi-lead", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              firstName,
-                              brandName,
-                              email,
-                              marketingConsent,
-                              turnstileToken,
-                              skuCount,
-                              dataMaturity,
-                              market,
-                              approach,
-                              ...results,
-                            }),
-                          });
-                        } catch {
-                          // Email failed silently - still show results
-                        }
-                      }
-                      setEmailSending(false);
-                      showResults();
-                    }}
-                  >
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                        First name
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        required
-                        placeholder="Your first name"
-                        className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                        Brand name
-                      </label>
-                      <input
-                        type="text"
-                        name="brandName"
-                        required
-                        placeholder="Your brand name"
-                        className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
-                        Email address
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        placeholder="you@brand.com"
-                        className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
-                      />
-                    </div>
-                    <label className="flex items-start gap-2.5 pt-1">
-                      <input
-                        type="checkbox"
-                        name="marketingConsent"
-                        className="mt-0.5 h-4 w-4 rounded border-envrt-charcoal/20 text-envrt-teal accent-envrt-teal"
-                      />
-                      <span className="text-xs leading-relaxed text-envrt-muted">
-                        I am happy to receive follow-up communications from
-                        ENVRT about DPP compliance and product updates.
-                      </span>
-                    </label>
-                    <HiddenTurnstile onToken={setTurnstileToken} className="justify-center" />
-                    <Button
-                      type="submit"
-                      className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`}
-                      size="lg"
-                    >
-                      {emailSending ? (
-                        "Sending your report..."
-                      ) : (
-                        <>
-                          View My Savings Report{" "}
-                          <span className="ml-2">&rarr;</span>
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-center text-xs leading-relaxed text-envrt-muted/70">
-                      Your results will be emailed to you. See our{" "}
-                      <Link
-                        href="/privacy"
-                        className="underline hover:text-envrt-teal"
-                      >
-                        privacy policy
-                      </Link>{" "}
-                      for how we handle your data.
-                    </p>
-                  </form>
-
-                </div>
-              </SectionCard>
-            </FadeUp>
-          </Container>
-        </div>
-      )}
-
-      {/* ---- RESULTS ---- */}
-      {screen === "results" && results && (
-        <div className="pb-20 pt-28 sm:pt-32">
-          <Container className="max-w-[720px]">
-            {/* Till receipt — itemised cost comparison + saving */}
-            <FadeUp>
-              <RoiResultsReceipt
-                envrtCost={results.envrtCost}
-                envrtPlan={results.envrtPlan}
-                consultantCost={results.consultantCost}
-                inhouseCost={results.inhouseCost}
-                savingVsConsultant={results.savingVsConsultant}
-                savingVsInhouse={results.savingVsInhouse}
-                maxSaving={results.maxSaving}
-                skuCount={skuCount}
-                market={market}
-                brandName={formDataRef.current?.brandName ?? null}
-              />
-            </FadeUp>
-
-            {/* Time savings + recommended plan */}
-            <FadeUp delay={0.25}>
-              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <SectionCard>
-                  <div className="p-6">
-                    <h3 className="mb-1 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                      What&apos;s included at this price
-                    </h3>
-                    <p className="mb-4 text-xs text-envrt-muted">
-                      Other platforms charge separately for LCA or don&apos;t offer it at all.
-                    </p>
-                    <ul className="space-y-2.5">
-                      {[
-                        "Product-level LCA data included, not an add-on",
-                        "CO₂e and water scarcity metrics, not just material declarations",
-                        "Supply chain reconstruction built into every DPP",
-                        "Scan analytics and engagement data per product",
-                        ...(results.envrtPlan !== "Starter"
-                          ? ["Hotspot detection across lifecycle stages"]
-                          : []),
-                      ].map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-envrt-teal" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
-                          </svg>
-                          <span className="text-sm text-envrt-charcoal">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-5 border-t border-envrt-charcoal/5 pt-4 text-xs leading-relaxed text-envrt-muted">
-                      Most DPP platforms charge £300+/mo before lifecycle data. ENVRT includes it from £149.
-                    </p>
-                  </div>
-                </SectionCard>
-                <SectionCard>
-                  <div className="p-6">
-                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
-                      Recommended Plan
-                    </h3>
-                    <p className="text-3xl font-bold text-envrt-teal">
-                      {results.envrtPlan}
-                    </p>
-                    <p className="mt-1 text-sm text-envrt-muted">
-                      {results.envrtPlanPrice} for {skuCount} products
-                    </p>
-                    {results.envrtPlan === "Pro" ? (
-                      <Link
-                        href="/contact"
-                        className="mt-3 inline-block text-xs font-medium text-envrt-teal underline hover:text-envrt-teal/80"
-                      >
-                        Get a tailored quote
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/pricing"
-                        className="mt-3 inline-block text-xs font-medium text-envrt-teal underline hover:text-envrt-teal/80"
-                      >
-                        View full pricing details
-                      </Link>
-                    )}
-                  </div>
-                </SectionCard>
-              </div>
-            </FadeUp>
-
-            {/* Assumptions */}
-            <FadeUp delay={0.35}>
-              <div className="mt-6">
-                <button
-                  type="button"
-                  onClick={() => setAssumptionsOpen(!assumptionsOpen)}
-                  className="flex w-full items-center justify-between rounded-xl border border-envrt-charcoal/10 bg-white px-6 py-4 text-left transition-colors hover:bg-envrt-cream/50"
-                >
-                  <span className="text-sm font-medium text-envrt-charcoal">
-                    Assumptions and methodology
-                  </span>
-                  <span
-                    className={`text-envrt-muted transition-transform duration-200 ${assumptionsOpen ? "rotate-180" : ""}`}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M4 6l4 4 4-4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </button>
-                {assumptionsOpen && (
-                  <div className="mt-2 rounded-xl border border-envrt-charcoal/10 bg-white p-6">
-                    <div className="space-y-3 text-xs leading-relaxed text-envrt-muted">
-                      <p>
-                        <strong className="text-envrt-charcoal">ENVRT pricing:</strong>{" "}
-                        Based on published plan rates. Starter (up to 50 products) at £149/mo, Growth (up to 250) at £495/mo. Pro (250+) is custom-priced and shaped around SKU count, supplier complexity and support needs. The figure above uses an indicative monthly value for illustration. <a href="/contact" className="text-envrt-teal hover:underline">Contact sales</a> for a tailored quote.
-                      </p>
-                      <p>
-                        <strong className="text-envrt-charcoal">Consultant cost:</strong>{" "}
-                        Based on 5 setup days plus per-product effort with diminishing returns at scale (reflecting template reuse and batching). Adjusted for data maturity and{market === "both" ? " a 1.3x dual-market multiplier" : " target market"}. Day rates scale with brand size: £500/day (up to 50 products), £650/day (51-250), £800/day (250+).
-                      </p>
-                      <p>
-                        <strong className="text-envrt-charcoal">In-house cost:</strong>{" "}
-                        Based on typical UK salary plus overhead for a sustainability-focused role, scaled by brand size: £43k (up to 50 products), £55k (51-250), £67k (250+). Adjusted for data maturity.
-                      </p>
-                      <p className="pt-2 text-envrt-muted/60">
-                        These are estimates for illustration only and may vary based on your specific circumstances.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </FadeUp>
-
-            {/* CTA block */}
-            <FadeUp delay={0.4}>
-              <SectionCard dark className="mt-10">
-                <div className="px-6 py-16 sm:px-10 sm:py-20">
-                  <div className="mx-auto max-w-2xl text-center">
-                    <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                      Ready to save £{results.maxSaving.toLocaleString()} this year?
-                    </h2>
-                    <p className="mt-4 text-base leading-relaxed text-white/80">
-                      ENVRT replaces the need for expensive consultants or
-                      in-house hires. Get in touch and we will walk you through
-                      how it works for your brand.
-                    </p>
-                    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                      <Link
-                        href="/contact"
-                        data-cta="roi-cta-contact"
-                        className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-envrt-green transition-all duration-300 hover:bg-envrt-cream shadow-sm hover:shadow-md"
-                      >
-                        Get in touch
-                        <span className="ml-2">&rarr;</span>
-                      </Link>
-                      <Link
-                        href="/pricing"
-                        data-cta="roi-cta-pricing"
-                        className="inline-flex items-center justify-center rounded-xl border border-white/30 px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
-                      >
-                        View pricing
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </SectionCard>
-            </FadeUp>
-
-            {/* Recalculate */}
-            <div className="mt-8 text-center">
-              <Button variant="ghost" onClick={recalculate}>
-                Recalculate
-              </Button>
-            </div>
-          </Container>
-        </div>
-      )}
-
-      {/* Slider styles */}
-      <style jsx global>{`
-        .roi-slider {
-          -webkit-appearance: none;
-          appearance: none;
-          height: 8px;
-          background: rgba(27, 58, 45, 0.08);
-          border-radius: 9999px;
-          outline: none;
-          position: relative;
-          z-index: 1;
-        }
-        .roi-slider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: #1a7a6d;
-          cursor: pointer;
-          border: 3px solid #ffffff;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-          position: relative;
-          z-index: 2;
-        }
-        .roi-slider::-moz-range-thumb {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: #1a7a6d;
-          cursor: pointer;
-          border: 3px solid #ffffff;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-        }
-        .roi-slider::-moz-range-track {
-          height: 8px;
-          background: rgba(27, 58, 45, 0.08);
-          border-radius: 9999px;
-        }
-      `}</style>
-    </>
-  );
-}
-

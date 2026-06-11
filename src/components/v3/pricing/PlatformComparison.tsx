@@ -188,7 +188,7 @@ export function PlatformComparison() {
         <FadeUp delay={0.3}>
           <p className="mt-10 text-center font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-envrt-brand-black/45 sm:text-[11px]">
             Want the full maths? See the ROI calculator
-            <ButtonV3 href="/preview/v3/roi" variant="ghost" className="!ml-2">
+            <ButtonV3 href="//roi" variant="ghost" className="!ml-2">
               Open ROI<span>→</span>
             </ButtonV3>
           </p>

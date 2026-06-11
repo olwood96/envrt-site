@@ -39,28 +39,28 @@ const PAINS: Pain[] = [
     headline: "Suppliers won't send the data.",
     body: "Tier 2 and tier 3 evidence stalls every project around month two. The contact you have can't authorise what you need.",
     citation: "When suppliers refuse",
-    citationHref: "/preview/v3/insights/dpp-supplier-data-collection-when-suppliers-refuse",
+    citationHref: "//insights/dpp-supplier-data-collection-when-suppliers-refuse",
   },
   {
     index: "02",
     headline: "Five regulations, same data, five workflows.",
     body: "ESPR, UK DMCCA, French AGEC, California SB 253 and the NY Fashion Act overlap by 80%. You shouldn't be paying for five answers.",
     citation: "One compliance stack",
-    citationHref: "/preview/v3/insights/us-fashion-brands-eu-dpp-california-ny-compliance",
+    citationHref: "//insights/us-fashion-brands-eu-dpp-california-ny-compliance",
   },
   {
     index: "03",
     headline: "Green claims now sit with the brand.",
     body: "DMCCA enforcement is live. Green Claims Directive next. Marketing copy without evidence is brand exposure, not agency exposure.",
     citation: "Substantiating green claims in 2026",
-    citationHref: "/preview/v3/insights/green-claims-sustainability-marketing-fashion",
+    citationHref: "//insights/green-claims-sustainability-marketing-fashion",
   },
   {
     index: "04",
     headline: "The platform isn't the bottleneck. The data is.",
     body: "Vendors quote weeks of setup. The supplier evidence and methodology work take months. The brands that ship a first DPP fast already had structured data.",
     citation: "An honest DPP timeline",
-    citationHref: "/preview/v3/insights/dpp-implementation-timeline-honest",
+    citationHref: "//insights/dpp-implementation-timeline-honest",
   },
 ];
 
@@ -95,7 +95,7 @@ export function ProblemSection() {
         <FadeUp delay={0.16}>
           <div className="mt-6 flex justify-center sm:mt-8">
             <Link
-              href="/preview/v3/dpp-timeline"
+              href="//dpp-timeline"
               aria-live="polite"
               className="group inline-flex items-center gap-3 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 transition-colors duration-200 hover:border-envrt-brand-crimson/40 hover:text-envrt-brand-crimson sm:gap-4 sm:text-[11px]"
             >

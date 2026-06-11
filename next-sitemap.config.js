@@ -9,17 +9,18 @@ module.exports = {
     "/404",
     "/payment/**",
     "/api/**",
-    "/preview/**",
+    "/collective/*/*/widget",
+    "/monitoring",
   ],
   robotsTxtOptions: {
     policies: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/payment/", "/preview/"],
+        disallow: ["/api/", "/payment/", "/monitoring"],
       },
     ],
-    additionalSitemaps: [],
+    additionalSitemaps: ["https://envrt.com/insights/rss.xml"],
   },
   additionalPaths: async (config) => [
     { loc: "/llms.txt", changefreq: "monthly", priority: 0.5 },
