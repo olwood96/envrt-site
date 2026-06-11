@@ -12,9 +12,20 @@ import {
   getAllPostsMeta,
   type InsightsPostMeta,
 } from "@/lib/insights";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "Insights v3 preview",
+  title: "Insights | DPP, LCA and fashion environmental data",
+  description:
+    "Guides on Digital Product Passports, lifecycle assessment and fashion environmental data. Built from work with brands, not from press releases.",
+  alternates: {
+    canonical: "/insights",
+    types: {
+      "application/rss+xml": [
+        { url: "/insights/rss.xml", title: "ENVRT Insights" },
+      ],
+    },
+  },
   robots: { index: false, follow: false },
 };
 
@@ -34,6 +45,37 @@ export default function InsightsV3IndexPage() {
 
   return (
     <main className="theme-sunny">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Insights", url: "https://envrt.com/insights" },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            name: "ENVRT Insights",
+            url: "https://envrt.com/insights",
+            description:
+              "Insights on Digital Product Passports, lifecycle assessment, supply chain transparency and the regulatory landscape facing fashion brands.",
+            publisher: {
+              "@type": "Organization",
+              name: "ENVRT",
+              url: "https://envrt.com",
+            },
+            blogPost: posts.slice(0, 10).map((p) => ({
+              "@type": "BlogPosting",
+              headline: p.title,
+              url: `https://envrt.com/insights/${p.slug}`,
+              datePublished: p.date,
+              author: { "@type": "Organization", name: p.author },
+            })),
+          }),
+        }}
+      />
       <PageHero
         tone="sunny"
         eyebrow="Insights"

@@ -13,11 +13,14 @@ import { AssetIcon } from "@/components/sections/v3/AssetIcon";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import AssessmentTool from "@/components/assessment/AssessmentTool";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
 export const metadata: Metadata = {
-  title: "DPP readiness assessment | ENVRT v3",
+  title: "DPP readiness assessment | Free 10-minute check by ENVRT",
   description:
-    "A free 10-minute readiness assessment across four DPP dimensions: supply chain, product data, regulatory awareness and infrastructure.",
+    "A free 10-minute readiness assessment across four DPP dimensions: supply chain, product data, regulatory awareness and infrastructure. Built for fashion brands.",
+  alternates: { canonical: "/assessment" },
   robots: { index: false, follow: false },
 };
 
@@ -84,6 +87,13 @@ const faqs = [
 export default function AssessmentV3Page() {
   return (
     <main className="theme-sunny">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Readiness assessment", url: "https://envrt.com/assessment" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
       <PageHero
         tone="sunny"
         eyebrow="Readiness assessment"

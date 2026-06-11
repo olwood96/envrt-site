@@ -8,6 +8,9 @@ import {
   getAllPostsMeta,
   tagSlug,
 } from "@/lib/insights";
+import { ArticleJsonLd } from "@/components/insights/ArticleJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { MdxContentV3 } from "@/components/insights/MdxContentV3";
 import { TableOfContentsV3 } from "@/components/insights/TableOfContentsV3";
 import { ArticleFaqAccordionV3 } from "@/components/insights/ArticleFaqAccordionV3";
@@ -33,8 +36,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return {};
 
   return {
-    title: `${post.title} | v3 preview`,
+    title: `${post.title} | ENVRT Insights`,
     description: post.description,
+    alternates: { canonical: `/insights/${slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.date,
+      ...(post.updated ? { modifiedTime: post.updated } : {}),
+      authors: [post.author],
+      ...(post.ogImage ? { images: [{ url: post.ogImage }] } : {}),
+    },
     robots: { index: false, follow: false },
   };
 }
@@ -60,8 +73,19 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
     )
     .slice(0, 3);
 
+  const articleUrl = `https://envrt.com/insights/${post.slug}`;
+
   return (
     <main className="bg-envrt-brand-vista">
+      <ArticleJsonLd post={post} url={articleUrl} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Insights", url: "https://envrt.com/insights" },
+          { name: post.title, url: articleUrl },
+        ]}
+      />
+      {post.faq && post.faq.length > 0 && <FAQJsonLd items={post.faq} />}
       <section className="relative overflow-hidden bg-envrt-brand-vista pt-24 pb-14 sm:pt-32 sm:pb-20">
         <SectionCorners left="ENVRT/01" right="Insights" />
         <div className="relative mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">

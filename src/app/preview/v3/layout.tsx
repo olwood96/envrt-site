@@ -4,6 +4,9 @@ import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { Navbar } from "@/components/v3";
 import { FooterV3 } from "@/components/v3/FooterV3";
 import { PricingProvider } from "@/components/v3/pricing/PricingContext";
+import { ConsentProvider } from "@/components/v3/ConsentContext";
+import { CookieBanner } from "@/components/v3/CookieBanner";
+import { GA4 } from "@/components/v3/GA4";
 
 // Shared layout for every page under /preview/v3/. Loads the brand fonts
 // once, mounts the v3 navbar and footer, wraps content in Lenis smooth
@@ -26,16 +29,20 @@ const body = Karla({
 
 export default function V3Layout({ children }: { children: ReactNode }) {
   return (
-    <PricingProvider>
-      <SmoothScroll>
-        <div
-          className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
-        >
-          <Navbar />
-          {children}
-          <FooterV3 />
-        </div>
-      </SmoothScroll>
-    </PricingProvider>
+    <ConsentProvider>
+      <PricingProvider>
+        <SmoothScroll>
+          <div
+            className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+          >
+            <Navbar />
+            {children}
+            <FooterV3 />
+          </div>
+        </SmoothScroll>
+        <CookieBanner />
+        <GA4 />
+      </PricingProvider>
+    </ConsentProvider>
   );
 }

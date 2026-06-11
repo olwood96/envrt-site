@@ -6,9 +6,14 @@ import {
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { GlossaryJsonLd } from "@/components/seo/GlossaryJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "Glossary v3 preview",
+  title: "Glossary | DPP, LCA and fashion sustainability terms",
+  description:
+    "Plain-English definitions for Digital Product Passports, lifecycle assessment, supply chain transparency, EU PEF, AWARE, ESPR and the rest of the language fashion brands now have to speak.",
+  alternates: { canonical: "/glossary" },
   robots: { index: false, follow: false },
 };
 
@@ -165,6 +170,13 @@ export default function GlossaryV3Page() {
 
   return (
     <main className="theme-sunny">
+      <GlossaryJsonLd terms={TERMS} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Glossary", url: "https://envrt.com/glossary" },
+        ]}
+      />
       <PageHero
         tone="sunny"
         eyebrow="Glossary"

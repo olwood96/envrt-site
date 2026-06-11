@@ -7,16 +7,29 @@ import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { ComparisonMatrix } from "@/components/v3/pricing/ComparisonMatrix";
 import { PricingTiersV3 } from "@/components/v3/pricing/PricingTiersV3";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "Pricing | ENVRT v3",
-  description: "Three tiers. SME pricing for fashion environmental work.",
+  title: "Pricing | ENVRT for fashion brands",
+  description:
+    "Three tiers built for fashion. Per-garment LCA, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier. EUR, GBP and USD pricing.",
+  alternates: { canonical: "/pricing" },
   robots: { index: false, follow: false },
 };
 
 export default function PricingV3Page() {
   return (
     <main>
+      <SoftwareApplicationJsonLd />
+      <FAQJsonLd items={pricingFaqItems} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Pricing", url: "https://envrt.com/pricing" },
+        ]}
+      />
       <PageHero
         eyebrow="Pricing"
         heading={

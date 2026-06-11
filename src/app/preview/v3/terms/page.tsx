@@ -11,7 +11,10 @@ import {
 } from "@/components/v3/LegalShell";
 
 export const metadata: Metadata = {
-  title: "Terms v3 preview",
+  title: "Terms of service | ENVRT",
+  description:
+    "Terms governing access to and use of the ENVRT platform, including data ownership, supplier evidence handling and methodology.",
+  alternates: { canonical: "/terms" },
   robots: { index: false, follow: false },
 };
 

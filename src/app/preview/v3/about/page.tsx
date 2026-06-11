@@ -7,15 +7,27 @@ import {
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
-  title: "About v3 preview",
+  title: "About ENVRT | Environmental platform for fashion brands",
+  description:
+    "ENVRT measures what fashion brands make, proves what they claim and publishes what they can show. One platform, end to end. Built in-house, EU PEF and ISO 14040 throughout.",
+  alternates: { canonical: "/about" },
   robots: { index: false, follow: false },
 };
 
 export default function AboutV3Page() {
   return (
     <main className="theme-lilac">
+      <OrganizationJsonLd />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "About", url: "https://envrt.com/about" },
+        ]}
+      />
       <PageHero
         tone="lilac"
         eyebrow="About"

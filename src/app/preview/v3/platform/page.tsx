@@ -12,11 +12,16 @@ import {
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { ItemListJsonLd } from "@/components/seo/ItemListJsonLd";
 
 export const metadata: Metadata = {
-  title: "Platform | ENVRT v3",
+  title: "Platform | ENVRT environmental software for fashion",
   description:
-    "Supply chain mapping, in-house LCA, water scarcity, Eco-Score, DPP production and more. The full environmental platform for fashion.",
+    "Supply chain mapping, in-house LCA, AWARE water scarcity, French Eco-Score, hosted DPPs, evidence vault, audit-ready reports, compliance monitoring and green-claims audit. Nine capabilities, one platform.",
+  alternates: { canonical: "/platform" },
   robots: { index: false, follow: false },
 };
 
@@ -168,6 +173,24 @@ const platformFaqs = [
 export default function PlatformV3Page() {
   return (
     <main>
+      <SoftwareApplicationJsonLd />
+      <FAQJsonLd items={platformFaqs} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Platform", url: "https://envrt.com/platform" },
+        ]}
+      />
+      <ItemListJsonLd
+        name="ENVRT platform capabilities"
+        description="Nine capabilities across supply chain mapping, in-house LCA, French Eco-Score, hosted DPPs, evidence vault, audit-ready exports, compliance monitoring, scan analytics and green-claims audit."
+        url="https://envrt.com/platform"
+        items={CAPABILITIES.map((c) => ({
+          name: c.name,
+          description: c.tagline,
+          url: `https://envrt.com/platform#${c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+        }))}
+      />
       <PageHero
         eyebrow="Platform"
         heading={

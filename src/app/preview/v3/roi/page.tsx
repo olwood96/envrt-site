@@ -20,6 +20,8 @@ import {
   formatFromGBP,
   usePricing,
 } from "@/components/v3/pricing/PricingContext";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
 // /preview/v3/roi — ROI calculator. SKU count + data maturity + market +
 // current approach determines the savings vs consultants and vs an
@@ -218,6 +220,13 @@ export default function RoiV3Page() {
 
   return (
     <main className="theme-sunny">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "ROI calculator", url: "https://envrt.com/roi" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
       <PageHero
         tone="sunny"
         eyebrow="ROI calculator"

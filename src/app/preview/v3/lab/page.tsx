@@ -13,11 +13,14 @@ import { AssetIcon } from "@/components/sections/v3/AssetIcon";
 import { FadeUp } from "@/components/ui/Motion";
 import { AnatomyOfLcaSection } from "@/components/sections/v3/AnatomyOfLcaSection";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
 export const metadata: Metadata = {
-  title: "Lab | ENVRT v3",
+  title: "ENVRT Lab | In-house LCA engine for fashion",
   description:
-    "Inside the ENVRT calculation engine. EU PEF, ISO 14040, AWARE water scarcity. Built in-house, not licensed.",
+    "Inside the ENVRT calculation engine. EU PEF, ISO 14040, AWARE water scarcity and the French Coût Environnemental. Built in-house, not licensed.",
+  alternates: { canonical: "/lab" },
   robots: { index: false, follow: false },
 };
 
@@ -95,6 +98,13 @@ const faqs = [
 export default function LabV3Page() {
   return (
     <main>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Lab", url: "https://envrt.com/lab" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
       <PageHero
         eyebrow="ENVRT Lab"
         heading={

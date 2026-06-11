@@ -11,7 +11,10 @@ import {
 } from "@/components/v3/LegalShell";
 
 export const metadata: Metadata = {
-  title: "Privacy v3 preview",
+  title: "Privacy policy | ENVRT",
+  description:
+    "How ENVRT collects, uses and protects personal data. UK GDPR aligned. Plain English explanation of what we store and why.",
+  alternates: { canonical: "/privacy" },
   robots: { index: false, follow: false },
 };
 

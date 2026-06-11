@@ -18,6 +18,8 @@ import {
   freeDppFaqItems,
   readinessAssessmentFaqItems,
 } from "@/lib/config";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 // /preview/v3/faq — full FAQ page. Five accordion sections grouped by
 // topic. Each section's questions come from the existing config exports
@@ -129,8 +131,25 @@ const SECTIONS: FaqSection[] = [
 ];
 
 export default function FaqV3Page() {
+  const allFaqItems = [
+    ...faqItems,
+    ...pricingFaqItems,
+    ...roiFaqItems,
+    ...freeDppFaqItems,
+    ...readinessAssessmentFaqItems,
+    ...METHODOLOGY_FAQS,
+    ...COMPLIANCE_FAQS,
+  ];
+
   return (
     <main className="theme-sunny">
+      <FAQJsonLd items={allFaqItems} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "FAQ", url: "https://envrt.com/faq" },
+        ]}
+      />
       <PageHero
         tone="sunny"
         eyebrow="FAQ"

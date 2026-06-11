@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
@@ -15,6 +17,7 @@ const nextConfig = {
 
   experimental: {
     optimizePackageImports: ["framer-motion"],
+    instrumentationHook: true,
   },
 
   async redirects() {
@@ -108,4 +111,19 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wrapping. Source maps upload only when a SENTRY_AUTH_TOKEN
+// is present (Vercel build), keeping local dev builds quiet. The
+// tunnel route routes browser-side error events through a same-origin
+// proxy so ad blockers do not drop them.
+export default withSentryConfig(nextConfig, {
+  // Set SENTRY_ORG, SENTRY_PROJECT and SENTRY_AUTH_TOKEN in Vercel
+  // env so source maps upload on deploy. Without them, the build
+  // still works, source maps just aren't uploaded.
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  disableLogger: true,
+  automaticVercelMonitors: false,
+});

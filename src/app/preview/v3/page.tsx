@@ -17,22 +17,29 @@ import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSe
 import { PolaroidStackSection } from "@/components/sections/v3/PolaroidStackSection";
 import { getAllPostsMeta } from "@/lib/insights";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
+import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
+import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
+import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
+import { AlignedWithJsonLd } from "@/components/seo/AlignedWithJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { faqItems } from "@/lib/config";
 
 // Root of /preview/v3, the full v3 homepage. Fonts, SmoothScroll, and
 // the v3 navbar are mounted by /preview/v3/layout.tsx, so this file
 // only renders the section composition.
 
 export const metadata: Metadata = {
-  title: "ENVRT v3 preview",
+  title:
+    "ENVRT | Environmental software for fashion brands. DPPs, LCA and supply chain.",
   description:
-    "v3 redesign of the ENVRT homepage. Internal preview, not for public consumption.",
+    "Trace every supplier. Calculate every garment. Substantiate every claim. Publish every Digital Product Passport. One platform, end to end, for fashion and apparel brands selling into the EU and UK.",
+  alternates: { canonical: "/" },
   robots: {
     index: false,
     follow: false,
     nocache: true,
     googleBot: { index: false, follow: false, noimageindex: true },
   },
-  alternates: { canonical: undefined },
 };
 
 export const revalidate = 3600;
@@ -54,6 +61,12 @@ export default async function V3HomePage() {
 
   return (
     <>
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
+      <SoftwareApplicationJsonLd />
+      <AlignedWithJsonLd />
+      <FAQJsonLd items={faqItems} />
+
       <ScrollProgressBar />
 
       <HeroV3 />

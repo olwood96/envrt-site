@@ -16,6 +16,8 @@ import {
   SectionCorners,
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
 // /preview/v3/contact — demo booking form. Three fields plus a product
 // interest dropdown. Done state replaces the form on submit.
@@ -102,6 +104,13 @@ export default function ContactV3Page() {
 
   return (
     <main>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Contact", url: "https://envrt.com/contact" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
       <PageHero
         eyebrow="Contact"
         heading={

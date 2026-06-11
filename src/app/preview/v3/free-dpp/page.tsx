@@ -23,6 +23,8 @@ import {
   SectionCorners,
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 
 // /preview/v3/free-dpp — three-step wizard. Submit one garment, receive
 // a regulation-ready DPP within a day. Brand-aligned form primitives,
@@ -179,6 +181,13 @@ export default function FreeDppV3Page() {
 
   return (
     <main>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Free DPP", url: "https://envrt.com/free-dpp" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
       <PageHero
         eyebrow="Free DPP"
         heading={

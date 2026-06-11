@@ -14,6 +14,9 @@ import {
 } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { HowToJsonLd } from "@/components/seo/HowToJsonLd";
 
 // /preview/v3/dpp-timeline — regulatory timeline for DPPs in fashion.
 // Hero shows live countdown to the textile DPP enforcement target.
@@ -141,6 +144,23 @@ export default function DppTimelineV3Page() {
 
   return (
     <main className="theme-sunny">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "DPP timeline", url: "https://envrt.com/dpp-timeline" },
+        ]}
+      />
+      <FAQJsonLd items={faqs} />
+      <HowToJsonLd
+        name="Textile Digital Product Passport regulatory timeline"
+        description="The major regulatory milestones that govern when textile Digital Product Passports become mandatory across the EU, UK and France."
+        url="https://envrt.com/dpp-timeline"
+        steps={MILESTONES.map((m) => ({
+          name: `${m.date} — ${m.title}`,
+          text: m.body,
+          ...(m.sourceUrl ? { url: m.sourceUrl } : {}),
+        }))}
+      />
       <PageHero
         tone="sunny"
         eyebrow="Regulatory timeline"

@@ -8,9 +8,14 @@ import {
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { teamMembers } from "@/lib/config";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 
 export const metadata: Metadata = {
-  title: "Team v3 preview",
+  title: "Team | ENVRT",
+  description:
+    "Two founders running the product. Two advisors shaping the methodology. Environmental engineering, data science and applied AI behind the ENVRT platform.",
+  alternates: { canonical: "/team" },
   robots: { index: false, follow: false },
 };
 
@@ -20,8 +25,30 @@ export default function TeamV3Page() {
   const founders = teamMembers.filter((m) => m.type === "founder");
   const advisors = teamMembers.filter((m) => m.type === "advisor");
 
+  const peopleJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": teamMembers.map((m) => ({
+      "@type": "Person",
+      name: m.name,
+      jobTitle: m.role,
+      worksFor: { "@type": "Organization", name: "ENVRT" },
+      description: m.bullets[0],
+    })),
+  };
+
   return (
     <main className="theme-lilac">
+      <OrganizationJsonLd />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://envrt.com" },
+          { name: "Team", url: "https://envrt.com/team" },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(peopleJsonLd) }}
+      />
       <PageHero
         tone="lilac"
         eyebrow="Team"
