@@ -21,22 +21,7 @@ export default function AboutV3Page() {
         eyebrow="About"
         heading={
           <>
-            {/* Image-mask text: the first clause is filled with the
-                provenance-loom photo via background-clip:text, so the
-                colourful thread runs through the heading itself. The
-                trailing "So we built them." stays as faded ink for
-                contrast. */}
-            <span
-              className="inline bg-clip-text text-transparent"
-              style={{
-                backgroundImage: "url('/v3-assets/provenance-loom.jpg')",
-                backgroundSize: "140% 160%",
-                backgroundPosition: "center 35%",
-                WebkitBackgroundClip: "text",
-              }}
-            >
-              Fashion&apos;s environmental work deserves better tools.
-            </span>{" "}
+            Fashion&apos;s environmental work deserves better tools.{" "}
             <span className="text-envrt-brand-black/40">
               So we built them.
             </span>

@@ -32,6 +32,56 @@ type FaqSection = {
   items: FaqItem[];
 };
 
+// Methodology + regulatory FAQ groups. Live inline rather than in
+// /lib/config because they cover engine-level + regulator-facing detail
+// rather than buyer onboarding content.
+
+const METHODOLOGY_FAQS: FaqItem[] = [
+  {
+    question: "How does ENVRT calculate the environmental impact of a garment?",
+    answer:
+      "Per garment, stage by stage. Six lifecycle stages (fibre, yarn, fabric, dyeing, assembly, transport) each run against per-stage emission factors, country-specific energy grids and the AWARE water scarcity weighting. Every passport runs the same engine, with 68,000+ reference cells per garment.",
+  },
+  {
+    question: "Which lifecycle stages are modelled?",
+    answer:
+      "Fibre extraction, yarn spinning, fabric production, dyeing and finishing, assembly, and tier-by-tier transport. Each stage has its own factor source, its own loss assumption and its own location-aware grid mix.",
+  },
+  {
+    question: "What standards does the calculation engine follow?",
+    answer:
+      "EU PEF 3.1 for the Product Environmental Footprint method, ISO 14040 for lifecycle assessment principles, AWARE for water scarcity weighting, and Ecobalyse for the French Coût Environnemental score. Every calculation traces back to a named standard with a published reference.",
+  },
+  {
+    question: "Where does the factor data come from?",
+    answer:
+      "Public emission factor databases for fibre, yarn and fabric stages, IEA grid mix data per country for energy, AWARE for water scarcity, and Ecobalyse for the French Eco-Score factors. The lab page lists every source by name.",
+  },
+];
+
+const COMPLIANCE_FAQS: FaqItem[] = [
+  {
+    question: "Which DPP regulations does ENVRT cover?",
+    answer:
+      "EU ESPR for textile Digital Product Passports, the French Coût Environnemental labelling framework, UK DMCCA-aligned green-claims hygiene and the EU Green Claims Directive once enforcement begins. The DPP timeline page tracks the dates.",
+  },
+  {
+    question: "When will the EU Digital Product Passport be required for textiles?",
+    answer:
+      "Mandatory passports phase in from 2027. The textile delegated act, which defines what a passport must contain and how it must be published, is expected mid-2026. Building now means you have a working passport well before the enforcement clock starts.",
+  },
+  {
+    question: "Is the methodology aligned with the French Eco-Score?",
+    answer:
+      "Yes. The Coût Environnemental score is calculated for every garment using the official Ecobalyse methodology. Sixteen data blocks per product, French regulator-recognised, ready to display on the DPP or your own product pages.",
+  },
+  {
+    question: "What evidence does ENVRT need to support a regulator audit?",
+    answer:
+      "Every input ties back to a versioned, dated source document in the evidence vault. Supplier declarations, test reports, audit certificates, geo-tagged photos. The DPP shows the customer-facing view; the underlying chain of evidence is available for export when a regulator asks.",
+  },
+];
+
 const SECTIONS: FaqSection[] = [
   {
     index: "01",
@@ -41,24 +91,36 @@ const SECTIONS: FaqSection[] = [
   },
   {
     index: "02",
+    label: "Methodology",
+    description: "How the calculation engine works, stage by stage.",
+    items: METHODOLOGY_FAQS,
+  },
+  {
+    index: "03",
+    label: "Compliance and regulation",
+    description: "EU ESPR, French Eco-Score, evidence for audits.",
+    items: COMPLIANCE_FAQS,
+  },
+  {
+    index: "04",
     label: "Pricing",
     description: "Plans, tiers, billing.",
     items: pricingFaqItems as FaqItem[],
   },
   {
-    index: "03",
+    index: "05",
     label: "ROI and savings",
     description: "Cost compared to consultants and in-house teams.",
     items: roiFaqItems as FaqItem[],
   },
   {
-    index: "04",
+    index: "06",
     label: "Free DPP",
     description: "What the free trial covers, what you get back.",
     items: freeDppFaqItems as FaqItem[],
   },
   {
-    index: "05",
+    index: "07",
     label: "Readiness assessment",
     description: "How the 10-minute quiz scores your brand.",
     items: readinessAssessmentFaqItems as FaqItem[],

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import {
   getAllSlugs,
@@ -123,6 +124,24 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
                 )}
               </div>
             </FadeUp>
+
+            {/* Cover image. Opt-in per article via `ogImage` in the
+                MDX frontmatter — same field as the social share image,
+                so writers only set it once. */}
+            {post.ogImage && (
+              <FadeUp delay={0.24}>
+                <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10 sm:mt-12">
+                  <Image
+                    src={post.ogImage}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width: 1024px) 720px, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              </FadeUp>
+            )}
           </div>
         </div>
       </section>
