@@ -60,12 +60,12 @@ export default async function V3HomePage() {
       <ProblemSection />
       <ScatterToOrderSection />
 
-      <SceneMark index="02" label="The passport" />
+      <SceneMark index="02" label="What we do" />
+      <CapabilitiesSection />
+
+      <SceneMark index="03" label="The passport" />
       <ScrollTourSection />
       <InTheWildSection collectiveCards={collective.cards.slice(0, 6)} />
-
-      <SceneMark index="03" label="What we do" />
-      <CapabilitiesSection />
 
       <SceneMark index="04" label="The proof" dark />
       <NumbersSection />
