@@ -111,7 +111,7 @@ const CAPABILITIES: Capability[] = [
     body: "Regulations move. Schemas update. We track the changes for you and apply them to your passports so you do not ship a DPP today that fails an audit in six months. Coverage includes EU PEF updates, ISO revisions, French AGEC and emerging US state-level acts.",
     detail: [
       { label: "Coverage", value: "EU PEF, ISO, AGEC, US state acts" },
-      { label: "Update cadence", value: "Live, applied automatically" },
+      { label: "Update cadence", value: "Reviewed regularly, applied as schemas change" },
       { label: "Change log", value: "Per regulation, dated" },
     ],
   },

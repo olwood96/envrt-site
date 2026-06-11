@@ -67,7 +67,7 @@ const CAPABILITIES: Capability[] = [
     id: "compliance",
     name: "Compliance monitoring",
     desc: "Active watch on EU PEF, ISO updates, AGEC, US state-level acts.",
-    stat: { value: "Live", label: "watch" },
+    stat: { value: "Active", label: "watch" },
     theme: "comply",
   },
   {
