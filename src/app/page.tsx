@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { HeroV3 } from "@/components/sections/v3/HeroV3";
-import { BrandStripV3 } from "@/components/sections/v3/BrandStripV3";
 import { ProblemSection } from "@/components/sections/v3/ProblemSection";
 import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
 import { InTheWildSection } from "@/components/sections/v3/InTheWildSection";
@@ -69,7 +68,6 @@ export default async function V3HomePage() {
       <ScrollProgressBar />
 
       <HeroV3 />
-      <BrandStripV3 />
       <ProblemSection />
       <ScatterToOrderSection />
 

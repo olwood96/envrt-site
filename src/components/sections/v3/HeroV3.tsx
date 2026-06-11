@@ -3,30 +3,16 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/ui/Motion";
-import { AssetIcon, type AssetIconType } from "./AssetIcon";
 import { DotGridBackground, Eyebrow } from "./_shared";
+import { BrandStripV3 } from "./BrandStripV3";
 
 // ─── Hero ────────────────────────────────────────────────────────────────
 // Positions ENVRT as the environmental engine for fashion, with the DPP
 // reframed as the final output rather than the product. Hero copy leads
 // with what the platform does end to end (supplier mapping → LCA → water
-// → score → DPP). Garment photo carries no labels; the stat strip below
-// it lists the six capabilities the platform brings.
-
-type Capability = {
-  icon: AssetIconType;
-  label: string;
-  stat: string;
-};
-
-const CAPABILITIES: Capability[] = [
-  { icon: "supply-chain", label: "Supply chain",  stat: "4 tiers, fibre to factory" },
-  { icon: "lca",          label: "In-house LCA",  stat: "EU PEF · ISO 14040" },
-  { icon: "compliance",   label: "Water · AWARE", stat: "UN water scarcity model" },
-  { icon: "eco-score",    label: "Eco-Score",     stat: "FR Coût Environnemental method" },
-  { icon: "dpp",          label: "Hosted DPP",    stat: "Permanent URL + QR" },
-  { icon: "vault",        label: "Evidence vault", stat: "Versioned and signed" },
-];
+// → score → DPP). Garment photo carries no labels. A compact brand
+// proof strip closes the hero with one rotating brand logo plus two
+// trust stats.
 
 export function HeroV3() {
   return (
@@ -52,11 +38,6 @@ export function HeroV3() {
               Trace every supplier. Calculate every garment. Substantiate
               every claim. Publish every Digital Product Passport. One
               platform, end to end.
-            </p>
-          </FadeUp>
-          <FadeUp delay={0.22}>
-            <p className="mt-3 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45 sm:text-[11px]">
-              Built for fashion and apparel brands selling into the EU and UK
             </p>
           </FadeUp>
           <FadeUp delay={0.28}>
@@ -94,9 +75,9 @@ export function HeroV3() {
         </FadeUp>
       </div>
 
-      <div className="relative mx-auto max-w-[1320px] px-5 pb-16 sm:px-8 lg:px-12 lg:pb-24">
+      <div className="relative mx-auto max-w-[1320px] px-5 pb-12 sm:px-8 lg:px-12 lg:pb-16">
         <FadeUp delay={0.3}>
-          <CapabilityStrip />
+          <BrandStripV3 />
         </FadeUp>
       </div>
     </section>
@@ -151,35 +132,6 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-// ─── Capability strip ────────────────────────────────────────────────────
-// Six capabilities, full width below the hero. Replaces the previous
-// numbered annotations on the garment, which never pointed at anything
-// physical. Reads as "here's what the platform actually does".
-
-function CapabilityStrip() {
-  return (
-    <div className="grid grid-cols-2 gap-x-5 gap-y-5 border-t border-envrt-brand-black/10 pt-6 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-6 sm:pt-8 lg:grid-cols-6 lg:gap-x-6">
-      {CAPABILITIES.map((cap) => (
-        <div key={cap.label} className="flex items-start gap-3">
-          <AssetIcon
-            type={cap.icon}
-            size={20}
-            className="mt-0.5 flex-shrink-0 text-envrt-brand-ultramarine"
-          />
-          <div className="min-w-0">
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[10px]">
-              {cap.label}
-            </p>
-            <p className="mt-0.5 text-[11px] leading-snug text-envrt-brand-black/75 sm:text-xs">
-              {cap.stat}
-            </p>
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
