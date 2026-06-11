@@ -36,29 +36,29 @@ type Pain = {
 const PAINS: Pain[] = [
   {
     index: "01",
-    headline: "Suppliers stall the data, every time.",
-    body: "Average DPP project hits the wall in month two or three, chasing tier 2 and tier 3 evidence that production contacts can't authorise to share.",
-    citation: "When suppliers refuse, what to do",
+    headline: "Suppliers won't send the data.",
+    body: "Tier 2 and tier 3 evidence stalls every project around month two. The contact you have can't authorise what you need.",
+    citation: "When suppliers refuse",
     citationHref: "/preview/v3/insights/dpp-supplier-data-collection-when-suppliers-refuse",
   },
   {
     index: "02",
-    headline: "Five regulations. ~80% the same data.",
-    body: "ESPR, UK DMCCA, French AGEC, California SB 253 and the New York Fashion Act ask for overlapping data. Most brands still solve them as five separate workflows.",
+    headline: "Five regulations, same data, five workflows.",
+    body: "ESPR, UK DMCCA, French AGEC, California SB 253 and the NY Fashion Act overlap by 80%. You shouldn't be paying for five answers.",
     citation: "One compliance stack",
     citationHref: "/preview/v3/insights/us-fashion-brands-eu-dpp-california-ny-compliance",
   },
   {
     index: "03",
-    headline: "Marketing claims now carry legal penalties.",
-    body: "DMCCA enforcement is live in the UK. The EU Green Claims Directive is queued. Unsubstantiated environmental claims now expose the brand, not just the brief.",
-    citation: "Greenwashing is an evidence problem",
-    citationHref: "/preview/v3/insights/greenwashing-in-fashion",
+    headline: "Green claims now sit with the brand.",
+    body: "DMCCA enforcement is live. Green Claims Directive next. Marketing copy without evidence is brand exposure, not agency exposure.",
+    citation: "Substantiating green claims in 2026",
+    citationHref: "/preview/v3/insights/green-claims-sustainability-marketing-fashion",
   },
   {
     index: "04",
-    headline: "Vendor timelines say weeks. Reality is 6–12 months.",
-    body: "Data work is the bottleneck, not the platform. Brands that ship a credible first DPP in three or four months almost always already had the data layer in place.",
+    headline: "Vendor timelines say weeks. Reality is months.",
+    body: "Data work, not platform setup, is the bottleneck. The brands that ship a first DPP in three months already had the data in place.",
     citation: "An honest DPP timeline",
     citationHref: "/preview/v3/insights/dpp-implementation-timeline-honest",
   },
@@ -89,56 +89,46 @@ export function ProblemSection() {
           </FadeUp>
         </div>
 
-        {/* Countdown panel */}
+        {/* Subtle timeline hint — small pill linking to the full
+            timeline page. Replaces the bigger countdown card; the main
+            section heading already anchors the 2027 message. */}
         <FadeUp delay={0.16}>
-          <div className="relative mt-10 overflow-hidden rounded-3xl border border-envrt-brand-black/8 border-l-[3px] border-l-envrt-brand-crimson bg-white p-6 sm:mt-12 sm:p-8 lg:p-10">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-20 top-1/2 h-[280px] w-[280px] -translate-y-1/2 rounded-full bg-envrt-brand-crimson/[0.08] blur-3xl"
-            />
-            <div className="relative grid grid-cols-1 items-center gap-6 sm:grid-cols-[1fr_auto] sm:gap-8">
-              <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-crimson sm:text-[11px]">
-                  EU ESPR · Textile DPP target
-                </p>
-                <h3 className="mt-3 font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-[1.6rem]">
-                  Mandatory passports phase in from 2027.
-                </h3>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
-                  Textile delegated act expected mid-2026. Data
-                  infrastructure, supplier onboarding and methodology choices
-                  take longer than the platform itself.
-                </p>
-                <Link
-                  href="/preview/v3/dpp-timeline"
-                  className="group mt-4 inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-crimson sm:text-[11px]"
+          <div className="mt-6 flex justify-center sm:mt-8">
+            <Link
+              href="/preview/v3/dpp-timeline"
+              aria-live="polite"
+              className="group inline-flex items-center gap-3 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 transition-colors duration-200 hover:border-envrt-brand-crimson/40 hover:text-envrt-brand-crimson sm:gap-4 sm:text-[11px]"
+            >
+              <span className="flex items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className="inline-block h-1.5 w-1.5 rounded-full bg-envrt-brand-crimson"
+                />
+                EU ESPR
+              </span>
+              <span className="text-envrt-brand-black/25">·</span>
+              <span>
+                <span className="font-semibold text-envrt-brand-crimson tabular-nums">
+                  {days === null ? "—" : days.toLocaleString()}
+                </span>{" "}
+                days to 2027
+              </span>
+              <span className="text-envrt-brand-black/25">·</span>
+              <span className="flex items-center gap-1">
+                See timeline
+                <span
+                  aria-hidden
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
                 >
-                  See the full timeline
-                  <span
-                    aria-hidden
-                    className="transition-transform duration-200 group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </Link>
-              </div>
-              <div className="flex flex-col items-start sm:items-end">
-                <p
-                  aria-live="polite"
-                  className="font-display text-5xl font-semibold leading-none tracking-[-0.03em] text-envrt-brand-crimson tabular-nums sm:text-6xl lg:text-7xl"
-                >
-                  {days === null ? "n/a" : days.toLocaleString()}
-                </p>
-                <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
-                  Days until 2027-01-01
-                </p>
-              </div>
-            </div>
+                  →
+                </span>
+              </span>
+            </Link>
           </div>
         </FadeUp>
 
         {/* Four pain rows */}
-        <ul className="mt-10 divide-y divide-envrt-brand-black/10 border-t border-envrt-brand-black/10 sm:mt-14">
+        <ul className="mt-10 divide-y divide-envrt-brand-black/10 border-t border-envrt-brand-black/10 sm:mt-12">
           {PAINS.map((pain, i) => (
             <FadeUp key={pain.index} delay={0.2 + i * 0.06}>
               <PainRow pain={pain} />
