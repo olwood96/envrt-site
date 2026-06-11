@@ -22,6 +22,7 @@ import {
 } from "@/components/v3/pricing/PricingContext";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 // //roi — ROI calculator. SKU count + data maturity + market +
 // current approach determines the savings vs consultants and vs an
@@ -177,6 +178,7 @@ export default function RoiV3Page() {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const results = calculateROI(skuCount, dataMaturity, market, approach);
 
@@ -204,6 +206,7 @@ export default function RoiV3Page() {
           dataMaturity,
           market,
           approach,
+          turnstileToken,
           ...results,
         }),
       });
@@ -441,6 +444,7 @@ export default function RoiV3Page() {
                         {emailError}
                       </p>
                     )}
+                    <HiddenTurnstile onToken={setTurnstileToken} />
                     <ButtonV3
                       type="submit"
                       variant="primary"

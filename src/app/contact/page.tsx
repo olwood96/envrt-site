@@ -18,6 +18,7 @@ import {
 import { FadeUp } from "@/components/ui/Motion";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 // //contact — demo booking form. Three fields plus a product
 // interest dropdown. Done state replaces the form on submit.
@@ -61,6 +62,7 @@ export default function ContactV3Page() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const canSubmit = name && brandName && email && interest;
 
@@ -85,6 +87,7 @@ export default function ContactV3Page() {
           company: brandName,
           interest,
           message,
+          turnstileToken,
         }),
       });
       if (!res.ok) {
@@ -193,6 +196,8 @@ export default function ContactV3Page() {
                     {error}
                   </p>
                 )}
+
+                <HiddenTurnstile onToken={setTurnstileToken} />
 
                 <div className="pt-2">
                   <ButtonV3

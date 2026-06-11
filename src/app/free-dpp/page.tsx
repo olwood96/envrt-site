@@ -25,6 +25,7 @@ import {
 import { FadeUp } from "@/components/ui/Motion";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
+import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
 
 // //free-dpp — three-step wizard. Submit one garment, receive
 // a regulation-ready DPP within a day. Brand-aligned form primitives,
@@ -132,6 +133,7 @@ export default function FreeDppV3Page() {
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const [form, setForm] = useState<FormData>({
     garment_name: "",
@@ -166,8 +168,34 @@ export default function FreeDppV3Page() {
     setSubmitting(true);
     setError(null);
     try {
-      // Submit handler stub. Reuse existing /api/free-dpp endpoint.
-      await new Promise((r) => setTimeout(r, 800));
+      const res = await fetch("/api/free-dpp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          garment_name: form.garment_name,
+          garment_type: form.garment_type,
+          materials: [{ name: form.material_1, share: 100 }],
+          weight_g: weightNum,
+          country_assembly: form.country_assembly,
+          fabric_process: "",
+          number_of_references: form.number_of_references
+            ? parseInt(form.number_of_references)
+            : null,
+          price_eur: null,
+          business_type: form.business_type || null,
+          dead_stock_pct: null,
+          making_waste_pct: null,
+          contact_name: form.contact_name,
+          brand_name: form.brand_name,
+          contact_email: form.contact_email,
+          product_url: null,
+          turnstile_token: turnstileToken,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Submission failed");
+      }
       setDone(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Submission failed");
@@ -238,6 +266,7 @@ export default function FreeDppV3Page() {
                   error={error}
                   onBack={() => setStep(1)}
                   onSubmit={handleSubmit}
+                  onTurnstileToken={setTurnstileToken}
                 />
               )}
             </Card>
@@ -435,6 +464,7 @@ function Step2({
   error,
   onBack,
   onSubmit,
+  onTurnstileToken,
 }: {
   form: FormData;
   update: <K extends keyof FormData>(k: K, v: FormData[K]) => void;
@@ -443,6 +473,7 @@ function Step2({
   error: string | null;
   onBack: () => void;
   onSubmit: () => void;
+  onTurnstileToken: (token: string) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -493,6 +524,8 @@ function Step2({
           {error}
         </p>
       )}
+
+      <HiddenTurnstile onToken={onTurnstileToken} />
 
       <div className="flex items-center justify-between pt-4">
         <ButtonV3 variant="ghost" onClick={onBack} disabled={submitting}>
