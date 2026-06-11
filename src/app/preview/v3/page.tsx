@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { HeroV3 } from "@/components/sections/v3/HeroV3";
-import { ManifestoSection } from "@/components/sections/v3/ManifestoSection";
-import { EsprCountdownSection } from "@/components/sections/v3/EsprCountdownSection";
+import { ProblemSection } from "@/components/sections/v3/ProblemSection";
 import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
 import { InTheWildSection } from "@/components/sections/v3/InTheWildSection";
 import { CapabilitiesSection } from "@/components/sections/v3/CapabilitiesSection";
@@ -17,7 +16,6 @@ import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
 import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSection";
 import { PolaroidStackSection } from "@/components/sections/v3/PolaroidStackSection";
 import { getAllPostsMeta } from "@/lib/insights";
-import { fetchPlatformStats } from "@/lib/impact-stats";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 
 // Root of /preview/v3, the full v3 homepage. Fonts, SmoothScroll, and
@@ -40,7 +38,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function V3HomePage() {
-  const [posts, stats, collective] = await Promise.all([
+  const [posts, collective] = await Promise.all([
     Promise.resolve(
       getAllPostsMeta()
         .filter(
@@ -48,7 +46,6 @@ export default async function V3HomePage() {
         )
         .slice(0, 3),
     ),
-    fetchPlatformStats(),
     // Featured DPP product images feed the "More in The Collective"
     // mosaic in InTheWildSection. Failure-safe: empty array falls
     // through to the static folded-clothes image.
@@ -60,14 +57,7 @@ export default async function V3HomePage() {
       <ScrollProgressBar />
 
       <HeroV3 />
-      <ManifestoSection
-        stats={{
-          dppScans: stats.dppScans,
-          countryCount: stats.countryCount,
-          co2Kg: stats.co2Kg,
-        }}
-      />
-      <EsprCountdownSection />
+      <ProblemSection />
       <ScatterToOrderSection />
 
       <SceneMark index="02" label="The passport" />
