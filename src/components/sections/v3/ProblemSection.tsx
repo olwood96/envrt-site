@@ -57,8 +57,8 @@ const PAINS: Pain[] = [
   },
   {
     index: "04",
-    headline: "Vendor timelines say weeks. Reality is months.",
-    body: "Data work, not platform setup, is the bottleneck. The brands that ship a first DPP in three months already had the data in place.",
+    headline: "The platform isn't the bottleneck. The data is.",
+    body: "Vendors quote weeks of setup. The supplier evidence and methodology work take months. The brands that ship a first DPP fast already had structured data.",
     citation: "An honest DPP timeline",
     citationHref: "/preview/v3/insights/dpp-implementation-timeline-honest",
   },
