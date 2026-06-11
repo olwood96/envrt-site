@@ -76,23 +76,49 @@ function ManifestoSection() {
           <FadeUp>
             <Eyebrow>02 · Manifesto</Eyebrow>
           </FadeUp>
-          <FadeUp delay={0.08}>
-            <p className="mt-6 max-w-3xl font-display text-2xl font-medium leading-[1.25] tracking-[-0.02em] text-envrt-brand-black sm:text-3xl lg:text-[2.25rem]">
-              Most sustainability software for fashion is built to generate
-              the report at the end.{" "}
-              <span className="text-envrt-brand-black/45">
-                We build for the work that happens before the report.
-              </span>
-            </p>
-          </FadeUp>
-          <FadeUp delay={0.16}>
-            <p className="mt-8 max-w-2xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
-              The receipt is the easy part. The hard part is the supply chain
-              mapping, the data collection, the calculation, the reconciliation
-              with what marketing wants to say. ENVRT does that work alongside
-              the people doing it, then publishes the result.
-            </p>
-          </FadeUp>
+          <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_220px] lg:items-start lg:gap-12">
+            <div>
+              <FadeUp delay={0.08}>
+                <p className="max-w-3xl font-display text-2xl font-medium leading-[1.25] tracking-[-0.02em] text-envrt-brand-black sm:text-3xl lg:text-[2.25rem]">
+                  Most sustainability software for fashion is built to
+                  generate the report at the end.{" "}
+                  <span className="text-envrt-brand-black/45">
+                    We build for the work that happens before the report.
+                  </span>
+                </p>
+              </FadeUp>
+              <FadeUp delay={0.16}>
+                <p className="mt-8 max-w-2xl text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
+                  The receipt is the easy part. The hard part is the supply
+                  chain mapping, the data collection, the calculation, the
+                  reconciliation with what marketing wants to say. ENVRT
+                  does that work alongside the people doing it, then
+                  publishes the result.
+                </p>
+              </FadeUp>
+            </div>
+            {/* The work-before-the-report visualised. Small ambient loom
+                loop, desktop only — sits to the right of the manifesto
+                statement at a deliberately modest size so it grounds the
+                claim without competing with the copy. */}
+            <FadeUp delay={0.24}>
+              <div className="relative hidden aspect-[4/5] w-full overflow-hidden rounded-xl ring-1 ring-envrt-brand-black/12 shadow-[0_18px_36px_-22px_rgba(14,14,14,0.35)] lg:block">
+                <video
+                  src="/v3-assets/videos/loom-loom.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  aria-hidden
+                  className="h-full w-full object-cover"
+                />
+                <span className="pointer-events-none absolute bottom-2 left-2 rounded-md bg-envrt-brand-black/65 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.18em] text-white">
+                  The work, live
+                </span>
+              </div>
+            </FadeUp>
+          </div>
         </div>
       </div>
     </section>
