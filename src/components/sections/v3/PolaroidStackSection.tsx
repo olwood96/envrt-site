@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import {
   motion,
@@ -140,25 +141,32 @@ export function PolaroidStackSection() {
     >
       <SectionCorners left="ENVRT/LAB" right="Hoodie 0509-1882" />
 
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-5 py-6 sm:px-8 lg:px-16 lg:py-10">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-5 py-6 sm:px-8 lg:px-16 lg:py-8">
         <div className="mx-auto w-full max-w-[1200px]">
           <div className="mx-auto max-w-2xl text-center">
             <FadeUp>
-              <Eyebrow>The receipt</Eyebrow>
+              <Eyebrow>Our LCA engine</Eyebrow>
             </FadeUp>
             <FadeUp delay={0.08}>
               <h2 className="mt-3 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-[2.5rem]">
-                Five stages, one garment.{" "}
+                We wrote the engine.{" "}
                 <span className="text-envrt-brand-black/40">
-                  Every input, every kilo, every litre.
+                  Every kilo, every litre, calculated in-house.
                 </span>
               </h2>
+            </FadeUp>
+            <FadeUp delay={0.16}>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
+                EU PEF, ISO 14040 and AWARE water scarcity, all in code we
+                own. Below is the live cradle-to-gate calculation for
+                Hoodie 0509-1882.
+              </p>
             </FadeUp>
           </div>
 
           {/* Two-column on lg: stack on left, ticker on right. Stacks on
               mobile + tablet with the ticker dropping below the polaroids. */}
-          <div className="mt-8 grid gap-8 sm:mt-10 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
+          <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
             {/* Stack stage */}
             <div className="relative mx-auto h-[360px] w-full max-w-[520px] sm:h-[420px]">
               {POLAROIDS.map((p, i) => (
@@ -176,9 +184,43 @@ export function PolaroidStackSection() {
             {/* Ticker */}
             <Ticker co2={co2} water={water} />
           </div>
+
+          {/* Footer — credits the methodology + invites readers to the
+              full Lab breakdown. Anchors the section's "in-house engine"
+              claim with named, citeable standards rather than just words. */}
+          <FadeUp delay={0.24}>
+            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-between sm:gap-5">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                <FactorChip>EU PEF</FactorChip>
+                <FactorChip>ISO 14040</FactorChip>
+                <FactorChip>AWARE</FactorChip>
+                <FactorChip>Ecobalyse</FactorChip>
+              </div>
+              <Link
+                href="/preview/v3/lab"
+                className="group inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]"
+              >
+                See the methodology
+                <span
+                  aria-hidden
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </Link>
+            </div>
+          </FadeUp>
         </div>
       </div>
     </section>
+  );
+}
+
+function FactorChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-envrt-brand-black/15 bg-white/70 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 backdrop-blur sm:text-[11px]">
+      {children}
+    </span>
   );
 }
 
