@@ -122,30 +122,6 @@ export function AnatomyOfLcaSection() {
     >
       <SectionCorners left="ENVRT/LAB" right="IN-HOUSE LCA" />
 
-      {/* Specimen-jar accent — small looping loom video at top-right of the
-          section. Sits outside the sticky inner so it doesn't affect the
-          pinned card track. Desktop only — saves bytes on mobile and the
-          sticky inner is already dense at narrow widths. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-6 top-6 z-20 hidden lg:block"
-      >
-        <div className="relative h-28 w-40 overflow-hidden rounded-xl ring-1 ring-envrt-brand-black/15 shadow-[0_18px_30px_-18px_rgba(14,14,14,0.35)] xl:h-32 xl:w-48">
-          <video
-            src="/v3-assets/videos/loom-loom.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="h-full w-full object-cover"
-          />
-          <span className="absolute bottom-1.5 left-2 rounded-md bg-envrt-brand-black/65 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.18em] text-white">
-            Live · ENVRT/LAB
-          </span>
-        </div>
-      </div>
-
       <DesktopAnatomy />
       <MobileAnatomy />
     </section>

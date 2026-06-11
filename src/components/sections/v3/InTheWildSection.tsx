@@ -165,13 +165,33 @@ export function InTheWildSection({
   );
 }
 
-// Mosaic on the left of the "More in The Collective" card. Uses the
-// first four featured products with images, each cropped to an identical
-// box so source-aspect-ratio differences don't bleed into the layout.
-// Falls back to the editorial folded-clothes photo if no cards are
-// available (e.g. DB fetch failed at build time).
+// Mosaic on the left of the "More in The Collective" card. Picks one
+// product per brand (in order of appearance) so the four tiles always
+// represent four different brands when at least four brands are
+// available. Each tile is cropped to an identical box so source-
+// aspect-ratio differences don't bleed into the layout. Falls back to
+// the editorial folded-clothes photo when we can't get four distinct
+// brand-with-image cards.
 function CollectiveMosaic({ cards }: { cards: CollectiveCardData[] }) {
-  const withImages = cards.filter((c) => c.productImageUrl).slice(0, 4);
+  const seenBrands = new Set<string>();
+  const oneEach: CollectiveCardData[] = [];
+  for (const c of cards) {
+    if (!c.productImageUrl) continue;
+    if (seenBrands.has(c.brand.id)) continue;
+    seenBrands.add(c.brand.id);
+    oneEach.push(c);
+    if (oneEach.length === 4) break;
+  }
+  // Top up with second-best products from already-seen brands if we
+  // didn't reach four distinct brands (small Collective)
+  const withImages = oneEach.length === 4
+    ? oneEach
+    : [
+        ...oneEach,
+        ...cards
+          .filter((c) => c.productImageUrl && !oneEach.includes(c))
+          .slice(0, 4 - oneEach.length),
+      ];
 
   if (withImages.length < 4) {
     return (

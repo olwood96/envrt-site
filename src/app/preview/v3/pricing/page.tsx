@@ -83,19 +83,21 @@ function PricingTiers() {
       <SectionCorners left="ENVRT/02" right="Tiers" />
 
       {/* Ambient texture strip on the right edge. The vista-to-transparent
-          gradient stops it competing with the tier cards. */}
+          gradient stops it competing with the tier cards. Opacity bumped
+          + gradient pulled back so the texture reads more clearly without
+          fighting the tier cards. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[40%] overflow-hidden lg:block"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[45%] overflow-hidden lg:block"
       >
         <Image
           src="/v3-assets/story-fabric.jpg"
           alt=""
           fill
-          sizes="40vw"
-          className="object-cover opacity-[0.35]"
+          sizes="45vw"
+          className="object-cover opacity-[0.55]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista via-envrt-brand-vista/85 to-envrt-brand-vista/35" />
+        <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista via-envrt-brand-vista/70 to-envrt-brand-vista/15" />
       </div>
 
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">

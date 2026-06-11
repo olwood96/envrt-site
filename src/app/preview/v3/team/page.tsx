@@ -124,13 +124,13 @@ function MemberCard({ member, accent = false }: { member: Member; accent?: boole
       }`}
     >
       {photoPath && (
-        <div className="relative aspect-[5/4] w-full overflow-hidden bg-envrt-brand-vista">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-envrt-brand-vista">
           <Image
             src={photoPath}
             alt={member.name}
             fill
             sizes="(min-width: 1024px) 520px, (min-width: 640px) 50vw, 100vw"
-            className="object-cover object-center grayscale-[0.6] transition-[filter] duration-300 hover:grayscale-0"
+            className="object-cover object-top grayscale-[0.6] transition-[filter] duration-300 hover:grayscale-0"
           />
         </div>
       )}
