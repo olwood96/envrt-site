@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FadeUp } from "@/components/ui/Motion";
-import { EcoScoreLabel } from "@/components/sections/v3/EcoScoreLabel";
 import type { CollectiveCardData } from "@/lib/collective/types";
 import { LivePill } from "./_shared";
 
@@ -39,10 +38,18 @@ export function InTheWildSection({
                   sizes="(min-width: 1024px) 580px, 100vw"
                   className="object-cover"
                 />
-                {/* Eco-Score label, anchored as an inside corner overlay so it
-                    reads as part of the photo (not floating beside it). */}
+                {/* Official French Coût Environnemental label (Ecobalyse portal SVG).
+                    Policy: the label may not be redrawn or restyled. Anchored as an
+                    inside corner overlay so it reads as part of the photo. */}
                 <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
-                  <EcoScoreLabel score={1573} perHundredG={449} envrtAccent />
+                  <Image
+                    src="/v3-assets/angry-pablo-ecoscore.svg"
+                    alt="Coût environnemental : 1573 points d'impact, 449 pour 100g"
+                    width={154}
+                    height={77}
+                    className="h-auto w-[140px] rounded-md bg-white shadow-[0_4px_14px_-6px_rgba(0,0,0,0.18)] sm:w-[170px]"
+                    unoptimized
+                  />
                 </div>
               </div>
             </div>
