@@ -1,96 +1,116 @@
 "use client";
 
-import Image from "next/image";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow } from "./_shared";
+import { Eyebrow, SectionCorners } from "./_shared";
 
 type Step = {
   index: string;
   title: string;
   body: string;
   caption: string;
-  /** Square thumbnail rendered to the right on desktop, below the body on mobile. */
-  image: { src: string; alt: string };
 };
 
 const steps: Step[] = [
   {
     index: "01",
     title: "Upload your collection.",
-    body: "CSV, line sheet, or the ENVRT collection form. Garment names, materials, weights, suppliers, country of origin. Whatever you have.",
-    caption: "≈ 30 minutes for a typical SS collection",
-    image: {
-      src: "/v3-assets/step1-studio.jpg",
-      alt: "Fashion design studio with line-sheet sketches",
-    },
+    body: "CSV, line sheet or our collection form. Names, materials, weights, suppliers. Whatever you have.",
+    caption: "≈ 30 min for a typical SS collection",
   },
   {
     index: "02",
     title: "ENVRT fills the gaps.",
-    body: "Our calculator pulls verified factors for fibres, processing, transport. Missing entries are flagged with a confidence score so you can review.",
+    body: "We pull verified factors for fibres, processing and transport. Missing entries get a confidence score so you can review.",
     caption: "EU PEF · ISO 14040 · AWARE",
-    image: {
-      src: "/v3-assets/step2-swatches.jpg",
-      alt: "Fabric swatches in warm neutral tones",
-    },
   },
   {
     index: "03",
     title: "Ship the QR.",
-    body: "Each garment gets a hosted passport at a permanent URL. Attach the QR to the care label, hangtag, or packaging. Customers scan, regulators audit.",
+    body: "Each garment gets a hosted passport at a permanent URL. Attach the QR to care label, hangtag or packaging.",
     caption: "Hosted on envrt.com or your own domain",
-    image: {
-      src: "/v3-assets/step3-qr.jpg",
-      alt: "Phone scanning a QR code on a printed card",
-    },
   },
 ];
 
+// "How it works" — three steps card row. Brand-aligned typography
+// (font-display headlines, mono caps captions, ultramarine accent) and
+// SectionCorners construction marks to match the rest of the v3
+// vocabulary. Drops the previous stock thumbnails — they weren't
+// earning their space and the typographic numeral does the visual work.
+
 export function HowItWorksV3() {
   return (
-    <section className="bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
-      <div className="mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
-        <FadeUp>
-          <Eyebrow>How it works</Eyebrow>
-          <h2 className="mt-5 max-w-3xl font-display text-2xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
-            Three steps. Half a day. One passport per garment.
-          </h2>
-        </FadeUp>
+    <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
+      <SectionCorners left="ENVRT/HIW" right="How it works" />
 
-        <div className="mt-14 border-t border-envrt-brand-black/8">
-          {steps.map((step, i) => (
-            <FadeUp key={step.index} delay={0.08 + i * 0.08}>
-              {/* 4 col on desktop: numeral / text / thumbnail / caption */}
-              <div className="group grid grid-cols-1 gap-6 border-b border-envrt-brand-black/8 py-10 transition-colors duration-300 hover:bg-white/60 sm:grid-cols-[80px_1fr_160px_200px] sm:items-center sm:gap-8 sm:px-2 sm:py-12 lg:gap-10">
-                <p className="text-5xl font-semibold leading-none tracking-[-0.04em] text-envrt-brand-black/15 transition-colors duration-300 group-hover:text-envrt-brand-ultramarine sm:text-6xl">
-                  {step.index}
-                </p>
-                <div>
-                  <h3 className="text-2xl font-semibold leading-snug tracking-[-0.01em] text-envrt-brand-black sm:text-[1.75rem]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-4 max-w-xl text-base leading-relaxed text-envrt-brand-black/70">
-                    {step.body}
-                  </p>
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+        <div className="mx-auto max-w-3xl text-center">
+          <FadeUp>
+            <Eyebrow>How it works</Eyebrow>
+          </FadeUp>
+          <FadeUp delay={0.08}>
+            <h2 className="mt-4 font-display text-2xl font-medium leading-[1.05] tracking-[-0.02em] text-envrt-brand-black sm:text-3xl lg:text-[2.5rem]">
+              Three steps. Half a day.{" "}
+              <span className="text-envrt-brand-black/40">
+                One passport per garment.
+              </span>
+            </h2>
+          </FadeUp>
+        </div>
+
+        {/* Steps. lg+ renders as a 3-column row with thin connector
+            hairlines between cards. Anything narrower stacks. */}
+        <div className="relative mt-12 sm:mt-16">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+            {steps.map((step, i) => (
+              <FadeUp key={step.index} delay={0.12 + i * 0.08}>
+                <StepCard step={step} />
+              </FadeUp>
+            ))}
+          </div>
+
+          {/* Connector hairlines + arrows between cards (lg+ only). The
+              top row of each card sits on the same y-line, so a centred
+              horizontal hairline reads as "next step". */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-[58px] hidden lg:block"
+          >
+            <div className="mx-auto grid max-w-[1320px] grid-cols-3 px-16">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="relative">
+                  {i < 2 && (
+                    <span className="absolute right-[-12px] top-0 inline-flex items-center font-mono text-[14px] font-semibold text-envrt-brand-black/25">
+                      →
+                    </span>
+                  )}
                 </div>
-                {/* Thumbnail */}
-                <div className="relative aspect-square w-full max-w-[160px] overflow-hidden rounded-2xl bg-envrt-stone">
-                  <Image
-                    src={step.image.src}
-                    alt={step.image.alt}
-                    fill
-                    sizes="(min-width: 640px) 160px, 60vw"
-                    className="object-cover"
-                  />
-                </div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-right">
-                  {step.caption}
-                </p>
-              </div>
-            </FadeUp>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function StepCard({ step }: { step: Step }) {
+  return (
+    <div className="flex h-full flex-col rounded-3xl border border-envrt-brand-black/10 bg-white p-6 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30 sm:p-7 lg:p-8">
+      <div className="flex items-baseline gap-3">
+        <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-envrt-brand-ultramarine sm:text-5xl">
+          {step.index}
+        </span>
+        <span className="h-px flex-1 bg-envrt-brand-black/10" />
+      </div>
+      <h3 className="mt-5 font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-[1.65rem]">
+        {step.title}
+      </h3>
+      <p className="mt-3 flex-1 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
+        {step.body}
+      </p>
+      <p className="mt-6 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+        {step.caption}
+      </p>
+    </div>
   );
 }
