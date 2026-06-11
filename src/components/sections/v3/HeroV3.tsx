@@ -49,14 +49,14 @@ export function HeroV3() {
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
-              Create regulation-ready Digital Product Passports. Calculate
-              emissions, water scarcity and Eco-Score. Share it all with your
-              customers.
+              Trace every supplier. Calculate every garment. Substantiate
+              every claim. Publish every Digital Product Passport. One
+              platform, end to end.
             </p>
           </FadeUp>
           <FadeUp delay={0.22}>
             <p className="mt-3 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/45 sm:text-[11px]">
-              Built for fashion and apparel brands selling into the EU
+              Built for fashion and apparel brands selling into the EU and UK
             </p>
           </FadeUp>
           <FadeUp delay={0.28}>
