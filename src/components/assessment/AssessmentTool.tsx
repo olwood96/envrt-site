@@ -643,7 +643,7 @@ function getBand(overall: number) {
   if (overall <= 80)
     return {
       label: "COMPLIANCE READY",
-      cls: "bg-envrt-teal/10 text-envrt-teal",
+      cls: "bg-envrt-brand-ultramarine/10 text-envrt-brand-ultramarine",
       headline:
         "Strong foundations. Now it’s about formalising and scaling.",
       summary:
@@ -651,7 +651,7 @@ function getBand(overall: number) {
     };
   return {
     label: "ADVANCED",
-    cls: "bg-envrt-teal/10 text-envrt-teal",
+    cls: "bg-envrt-brand-ultramarine/10 text-envrt-brand-ultramarine",
     headline:
       "You’re ahead of the curve. Let’s make sure it stays that way.",
     summary:
@@ -755,8 +755,8 @@ function OptionTile({
       className={`flex w-full items-center gap-3 rounded-xl border-[1.5px] px-4 py-3.5 text-left transition-all duration-200
         ${
           selected
-            ? "border-envrt-teal bg-envrt-teal/5 shadow-sm"
-            : "border-envrt-charcoal/8 bg-white hover:border-envrt-charcoal/15 hover:shadow-sm"
+            ? "border-envrt-brand-ultramarine bg-envrt-brand-ultramarine/5 shadow-sm"
+            : "border-envrt-brand-black/8 bg-white hover:border-envrt-brand-black/15 hover:shadow-sm"
         }`}
     >
       <span
@@ -764,8 +764,8 @@ function OptionTile({
           ${type === "single" ? "rounded-full" : "rounded"}
           ${
             selected
-              ? "border-envrt-teal bg-envrt-teal"
-              : "border-envrt-muted/40"
+              ? "border-envrt-brand-ultramarine bg-envrt-brand-ultramarine"
+              : "border-envrt-brand-black/40"
           }`}
       >
         {selected && type === "single" && (
@@ -783,7 +783,7 @@ function OptionTile({
           </svg>
         )}
       </span>
-      <span className="text-sm text-envrt-charcoal">{option.label}</span>
+      <span className="text-sm text-envrt-brand-black">{option.label}</span>
     </button>
   );
 }
@@ -813,18 +813,18 @@ function ProgressBar({
 
   return (
     <div className="fixed left-0 right-0 top-[48px] sm:top-[60px] z-[45]">
-      <div className="h-[3px] w-full bg-envrt-charcoal/[0.04]">
+      <div className="h-[3px] w-full bg-envrt-brand-black/[0.04]">
         <div
-          className="h-full bg-envrt-teal transition-all duration-700 ease-out"
+          className="h-full bg-envrt-brand-ultramarine transition-all duration-700 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
       <div className="pointer-events-none flex justify-end px-5 sm:px-8">
-        <span className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium tracking-wide text-envrt-muted shadow-sm ring-1 ring-envrt-charcoal/[0.06] backdrop-blur-md">
+        <span className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium tracking-wide text-envrt-brand-black/55 shadow-sm ring-1 ring-envrt-brand-black/[0.06] backdrop-blur-md">
           {currentSection + 1}
-          <span className="text-envrt-charcoal/20">/</span>
+          <span className="text-envrt-brand-black/20">/</span>
           5
-          <span className="ml-0.5 tabular-nums text-envrt-teal">{pct}%</span>
+          <span className="ml-0.5 tabular-nums text-envrt-brand-ultramarine">{pct}%</span>
         </span>
       </div>
     </div>
@@ -871,7 +871,7 @@ function ScoreRing({
           fill="none"
           stroke="currentColor"
           strokeWidth="10"
-          className="text-envrt-charcoal/5"
+          className="text-envrt-brand-black/5"
         />
         <circle
           cx="80"
@@ -883,14 +883,14 @@ function ScoreRing({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="text-envrt-teal transition-all duration-[1500ms] ease-out"
+          className="text-envrt-brand-ultramarine transition-all duration-[1500ms] ease-out"
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-5xl font-bold text-envrt-green">
+        <span className="text-5xl font-bold text-envrt-brand-ultramarine">
           {displayScore}
         </span>
-        <span className="mt-1 text-xs uppercase tracking-widest text-envrt-muted">
+        <span className="mt-1 text-xs uppercase tracking-widest text-envrt-brand-black/55">
           out of 100
         </span>
       </div>
@@ -940,16 +940,16 @@ function DimensionBar({
   return (
     <div className="mb-5 last:mb-0">
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-envrt-charcoal">
+        <span className="text-sm font-medium text-envrt-brand-black">
           {label}
         </span>
-        <span className="text-sm font-bold text-envrt-teal">
+        <span className="text-sm font-bold text-envrt-brand-ultramarine">
           {displayScore}
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-envrt-charcoal/5">
+      <div className="h-2 overflow-hidden rounded-full bg-envrt-brand-black/5">
         <div
-          className="h-full rounded-full bg-envrt-teal transition-all duration-[1200ms] ease-out"
+          className="h-full rounded-full bg-envrt-brand-ultramarine transition-all duration-[1200ms] ease-out"
           style={{ width: show ? `${score}%` : "0%" }}
         />
       </div>
@@ -972,6 +972,22 @@ export default function AssessmentTool() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
   const [shareView, setShareView] = useState(false);
+
+  // Anchor scrolls between sections (and from hero into the first
+  // question) to the questions container rather than the very top of
+  // the page. The dashboard preserves position context for the user.
+  const questionsRef = useRef<HTMLDivElement | null>(null);
+  const scrollToQuestions = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const target = questionsRef.current;
+    if (!target) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const rect = target.getBoundingClientRect();
+    const top = window.scrollY + rect.top - 24;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1028,17 +1044,17 @@ export default function AssessmentTool() {
     if (!sectionComplete) return;
     if (currentSection < sections.length - 1) {
       setCurrentSection((s) => s + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToQuestions();
     } else {
       setScreen("email");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToQuestions();
     }
   };
 
   const goBack = () => {
     if (currentSection > 0) {
       setCurrentSection((s) => s - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToQuestions();
     }
   };
 
@@ -1104,18 +1120,23 @@ export default function AssessmentTool() {
           <FadeUp>
             <div className="mx-auto max-w-2xl">
               <Badge className="mb-6">Start your assessment</Badge>
-              <h2 className="text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-3xl">
+              <h2 className="font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
                 Ready when you are.
               </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base text-envrt-muted">
+              <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-envrt-brand-black/65 sm:text-lg">
                 25 questions across five sections. Around 10 minutes. Your results are emailed straight to you.
               </p>
-              <div className="mt-8">
+              <div className="mt-10">
                 <Button
                   size="lg"
                   onClick={() => {
                     setScreen("assessment");
-                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    // Defer until the assessment screen renders and
+                    // questionsRef is mounted, then scroll to it
+                    // rather than the top of the page.
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(scrollToQuestions);
+                    });
                   }}
                 >
                   Begin assessment <span className="ml-2">&rarr;</span>
@@ -1129,30 +1150,30 @@ export default function AssessmentTool() {
       {screen === "assessment" && (
         <>
           <ProgressBar currentSection={currentSection} answers={answers} />
-          <div className="pb-24 pt-24 sm:pt-28">
+          <div ref={questionsRef} className="pb-24 pt-16 sm:pt-20">
             <Container className="max-w-[720px]">
               <div
                 key={section.id}
                 className="animate-[fadeUp_0.4s_ease_forwards]"
               >
-                <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-envrt-teal">
+                <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
                   Section {currentSection + 1} of 5
                 </p>
-                <h2 className="text-2xl font-bold tracking-tight text-envrt-charcoal sm:text-3xl">
+                <h2 className="font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-[2.5rem]">
                   {section.title}
                 </h2>
-                <p className="mt-2 text-sm text-envrt-muted">
+                <p className="mt-3 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
                   {section.description}
                 </p>
 
                 <div className="mt-10 space-y-8">
                   {section.questions.map((q) => (
                     <div key={q.id}>
-                      <p className="mb-1 text-sm font-semibold text-envrt-charcoal">
+                      <p className="mb-1 text-sm font-semibold text-envrt-brand-black">
                         {q.text}
                       </p>
                       {q.hint && (
-                        <p className="mb-3 text-xs text-envrt-muted">
+                        <p className="mb-3 text-xs text-envrt-brand-black/55">
                           {q.hint}
                         </p>
                       )}
@@ -1187,7 +1208,7 @@ export default function AssessmentTool() {
                   ))}
                 </div>
 
-                <div className="mt-10 flex items-center justify-between border-t border-envrt-charcoal/5 pt-6">
+                <div className="mt-10 flex items-center justify-between border-t border-envrt-brand-black/5 pt-6">
                   {currentSection > 0 ? (
                     <Button variant="ghost" onClick={goBack}>
                       &larr; Back
@@ -1213,10 +1234,10 @@ export default function AssessmentTool() {
           <FadeUp>
             <SectionCard className="mx-auto max-w-md">
               <div className="p-8 text-center sm:p-10">
-                <h2 className="text-xl font-bold tracking-tight text-envrt-charcoal sm:text-2xl">
+                <h2 className="text-xl font-bold tracking-tight text-envrt-brand-black sm:text-2xl">
                   Your report is ready
                 </h2>
-                <p className="mt-3 text-sm text-envrt-muted">
+                <p className="mt-3 text-sm text-envrt-brand-black/55">
                   Enter your details to view your results and receive your
                   full personalised DPP Readiness Report by email.
                 </p>
@@ -1277,7 +1298,7 @@ export default function AssessmentTool() {
                   }}
                 >
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
+                    <label className="mb-1.5 block text-sm font-medium text-envrt-brand-black">
                       First name
                     </label>
                     <input
@@ -1285,11 +1306,11 @@ export default function AssessmentTool() {
                       name="firstName"
                       required
                       placeholder="Your first name"
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
+                      className="w-full rounded-xl border border-envrt-brand-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-brand-ultramarine/40 focus:ring-1 focus:ring-envrt-brand-ultramarine/20"
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
+                    <label className="mb-1.5 block text-sm font-medium text-envrt-brand-black">
                       Brand name
                     </label>
                     <input
@@ -1297,11 +1318,11 @@ export default function AssessmentTool() {
                       name="brandName"
                       required
                       placeholder="Your brand name"
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
+                      className="w-full rounded-xl border border-envrt-brand-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-brand-ultramarine/40 focus:ring-1 focus:ring-envrt-brand-ultramarine/20"
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-envrt-charcoal">
+                    <label className="mb-1.5 block text-sm font-medium text-envrt-brand-black">
                       Email address
                     </label>
                     <input
@@ -1309,16 +1330,16 @@ export default function AssessmentTool() {
                       name="email"
                       required
                       placeholder="you@brand.com"
-                      className="w-full rounded-xl border border-envrt-charcoal/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-teal/40 focus:ring-1 focus:ring-envrt-teal/20"
+                      className="w-full rounded-xl border border-envrt-brand-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-envrt-brand-ultramarine/40 focus:ring-1 focus:ring-envrt-brand-ultramarine/20"
                     />
                   </div>
                   <label className="flex items-start gap-2.5 pt-1">
                     <input
                       type="checkbox"
                       name="marketingConsent"
-                      className="mt-0.5 h-4 w-4 rounded border-envrt-charcoal/20 text-envrt-teal accent-envrt-teal"
+                      className="mt-0.5 h-4 w-4 rounded border-envrt-brand-black/20 text-envrt-brand-ultramarine accent-envrt-brand-ultramarine"
                     />
-                    <span className="text-xs leading-relaxed text-envrt-muted">
+                    <span className="text-xs leading-relaxed text-envrt-brand-black/55">
                       I am happy to receive follow-up communications from ENVRT
                       about DPP compliance and product updates.
                     </span>
@@ -1332,9 +1353,9 @@ export default function AssessmentTool() {
                   <Button type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
                     {emailSending ? "Sending your report..." : <>View My Report <span className="ml-2">&rarr;</span></>}
                   </Button>
-                  <p className="text-center text-xs leading-relaxed text-envrt-muted/70">
+                  <p className="text-center text-xs leading-relaxed text-envrt-brand-black/70">
                     Your results will be emailed to you. See our{" "}
-                    <Link href="/privacy" className="underline hover:text-envrt-teal">
+                    <Link href="/privacy" className="underline hover:text-envrt-brand-ultramarine">
                       privacy policy
                     </Link>{" "}
                     for how we handle your data.
@@ -1351,8 +1372,8 @@ export default function AssessmentTool() {
         <div className="pb-20 pt-28">
           <Container className="max-w-[720px]">
             {shareView && (
-              <div className="mb-6 rounded-xl border border-envrt-teal/15 bg-envrt-teal/5 px-4 py-3 text-sm text-envrt-charcoal/80">
-                You are viewing a shared assessment result. <button onClick={retake} className="font-semibold text-envrt-teal underline-offset-2 hover:underline">Take the assessment yourself</button> to generate your own.
+              <div className="mb-6 rounded-xl border border-envrt-brand-ultramarine/15 bg-envrt-brand-ultramarine/5 px-4 py-3 text-sm text-envrt-brand-black/80">
+                You are viewing a shared assessment result. <button onClick={retake} className="font-semibold text-envrt-brand-ultramarine underline-offset-2 hover:underline">Take the assessment yourself</button> to generate your own.
               </div>
             )}
             <FadeUp>
@@ -1366,10 +1387,10 @@ export default function AssessmentTool() {
                 >
                   {band.label}
                 </span>
-                <h2 className="mt-5 text-xl font-bold tracking-tight text-envrt-charcoal sm:text-2xl">
+                <h2 className="mt-5 text-xl font-bold tracking-tight text-envrt-brand-black sm:text-2xl">
                   {band.headline}
                 </h2>
-                <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-charcoal/80 sm:text-base">
+                <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-envrt-brand-black/80 sm:text-base">
                   {band.summary}
                 </p>
                 {!shareView && (
@@ -1385,13 +1406,13 @@ export default function AssessmentTool() {
             <FadeUp delay={0.12}>
               <SectionCard className="mt-10">
                 <div className="p-6 sm:p-8">
-                  <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-brand-black">
                     How You Compare
                   </h3>
-                  <p className="text-sm leading-relaxed text-envrt-charcoal/80">
+                  <p className="text-sm leading-relaxed text-envrt-brand-black/80">
                     {benchmark.text}
                   </p>
-                  <p className="mt-3 text-xs text-envrt-muted">{benchmark.caveat}</p>
+                  <p className="mt-3 text-xs text-envrt-brand-black/55">{benchmark.caveat}</p>
                 </div>
               </SectionCard>
             </FadeUp>
@@ -1399,7 +1420,7 @@ export default function AssessmentTool() {
             <FadeUp delay={0.15}>
               <SectionCard className="mt-6">
                 <div className="p-6 sm:p-8">
-                  <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                  <h3 className="mb-6 text-xs font-bold uppercase tracking-widest text-envrt-brand-black">
                     Dimension Scores
                   </h3>
                   <DimensionBar
@@ -1436,7 +1457,7 @@ export default function AssessmentTool() {
                   <h3 className="text-sm font-bold text-red-700">
                     {"⚠️"} Green Claims Risk Detected
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-envrt-charcoal/80">
+                  <p className="mt-2 text-sm leading-relaxed text-envrt-brand-black/80">
                     Your brand is making public sustainability claims without
                     verified data to substantiate them. Under the EU Green
                     Claims Directive and UK DMCCA provisions coming into force
@@ -1464,11 +1485,11 @@ export default function AssessmentTool() {
             {!shareView && (
               <FadeUp delay={0.3}>
                 <SectionCard className="mt-6">
-                  <div className="border-l-4 border-envrt-teal p-6 sm:p-8">
-                    <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                  <div className="border-l-4 border-envrt-brand-ultramarine p-6 sm:p-8">
+                    <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-envrt-brand-black">
                       Timeline Risk
                     </h3>
-                    <p className="text-sm leading-relaxed text-envrt-charcoal/80">
+                    <p className="text-sm leading-relaxed text-envrt-brand-black/80">
                       {getTimelineRisk(answers)}
                     </p>
                   </div>
@@ -1480,24 +1501,24 @@ export default function AssessmentTool() {
               <FadeUp delay={0.35}>
                 <SectionCard className="mt-6">
                   <div className="p-6 sm:p-8">
-                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-brand-black">
                       Recommended Next Steps
                     </h3>
                     {barriers.length > 0 && (
-                      <p className="mb-5 text-xs leading-relaxed text-envrt-muted">
+                      <p className="mb-5 text-xs leading-relaxed text-envrt-brand-black/55">
                         You identified{" "}
                         {barriers.map((b) => barrierLabels[b] || b).join(" and ")}{" "}
                         as your primary barriers. The actions below are
                         prioritised with this in mind.
                       </p>
                     )}
-                    <div className="divide-y divide-envrt-charcoal/5">
+                    <div className="divide-y divide-envrt-brand-black/5">
                       {getRecommendedActions(scores, answers).map((action, i) => (
                         <div key={i} className="flex gap-3.5 py-4 first:pt-0 last:pb-0">
-                          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-envrt-teal/10 text-xs font-bold text-envrt-teal">
+                          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-envrt-brand-ultramarine/10 text-xs font-bold text-envrt-brand-ultramarine">
                             {i + 1}
                           </span>
-                          <span className="text-sm leading-relaxed text-envrt-charcoal/80">
+                          <span className="text-sm leading-relaxed text-envrt-brand-black/80">
                             {action}
                           </span>
                         </div>
@@ -1512,21 +1533,21 @@ export default function AssessmentTool() {
               <FadeUp delay={0.4}>
                 <SectionCard className="mt-6">
                   <div className="p-6 sm:p-8">
-                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-charcoal">
+                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-envrt-brand-black">
                       Recommended Reading
                     </h3>
-                    <p className="mb-5 text-sm text-envrt-muted">
-                      Your lowest-scoring area is <strong className="text-envrt-charcoal">{weakestReading.label}</strong>. These articles cover what to do next.
+                    <p className="mb-5 text-sm text-envrt-brand-black/55">
+                      Your lowest-scoring area is <strong className="text-envrt-brand-black">{weakestReading.label}</strong>. These articles cover what to do next.
                     </p>
                     <div className="space-y-4">
                       {weakestReading.links.map((link) => (
                         <Link
                           key={link.href}
                           href={link.href}
-                          className="block rounded-xl border border-envrt-charcoal/8 bg-white p-4 transition-all hover:border-envrt-teal/30 hover:shadow-sm"
+                          className="block rounded-xl border border-envrt-brand-black/8 bg-white p-4 transition-all hover:border-envrt-brand-ultramarine/30 hover:shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-envrt-charcoal">{link.title}</p>
-                          <p className="mt-1 text-xs text-envrt-muted">{link.description}</p>
+                          <p className="text-sm font-semibold text-envrt-brand-black">{link.title}</p>
+                          <p className="mt-1 text-xs text-envrt-brand-black/55">{link.description}</p>
                         </Link>
                       ))}
                     </div>
@@ -1546,7 +1567,7 @@ export default function AssessmentTool() {
                       <Link
                         href={bandCta.primaryHref}
                         data-cta={`assessment-cta-${bandKey}-primary`}
-                        className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-envrt-green transition-all duration-300 hover:bg-envrt-cream shadow-sm hover:shadow-md"
+                        className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-envrt-brand-ultramarine transition-all duration-300 hover:bg-envrt-brand-vista shadow-sm hover:shadow-md"
                       >
                         {bandCta.primaryLabel}
                         <span className="ml-2">&rarr;</span>

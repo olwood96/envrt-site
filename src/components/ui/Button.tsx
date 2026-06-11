@@ -13,11 +13,11 @@ interface ButtonProps {
 
 const variants = {
   primary:
-    "bg-envrt-green text-white hover:bg-envrt-green-light shadow-sm hover:shadow-md",
+    "bg-envrt-brand-ultramarine text-white hover:bg-envrt-brand-ultramarine/90 shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)]",
   secondary:
-    "bg-transparent text-envrt-charcoal border border-envrt-charcoal/20 hover:border-envrt-charcoal/40 hover:bg-envrt-cream",
+    "bg-white text-envrt-brand-black border border-envrt-brand-black/12 hover:border-envrt-brand-black/25",
   ghost:
-    "bg-transparent text-envrt-charcoal hover:text-envrt-teal",
+    "bg-transparent text-envrt-brand-black hover:text-envrt-brand-ultramarine",
 };
 
 const sizes = {
