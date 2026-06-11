@@ -51,12 +51,12 @@ const METHODOLOGY_FAQS: FaqItem[] = [
   {
     question: "What standards does the calculation engine follow?",
     answer:
-      "EU PEF 3.1 for the Product Environmental Footprint method, ISO 14040 for lifecycle assessment principles, AWARE for water scarcity weighting, and Ecobalyse for the French Coût Environnemental score. Every calculation traces back to a named standard with a published reference.",
+      "EU PEF 3.1 for the Product Environmental Footprint method, ISO 14040 for lifecycle assessment principles, AWARE for water scarcity weighting and Ecobalyse for the French Coût Environnemental score. Every calculation traces back to a named standard with a published reference.",
   },
   {
     question: "Where does the factor data come from?",
     answer:
-      "Public emission factor databases for fibre, yarn and fabric stages, IEA grid mix data per country for energy, AWARE for water scarcity, and Ecobalyse for the French Eco-Score factors. The lab page lists every source by name.",
+      "Public emission factor databases for fibre, yarn and fabric stages, IEA grid mix data per country for energy, AWARE for water scarcity and Ecobalyse for the French Eco-Score factors. The lab page lists every source by name.",
   },
 ];
 
