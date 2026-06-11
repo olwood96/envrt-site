@@ -110,7 +110,7 @@ export default function AssessmentV3Page() {
             <ButtonV3 href="#assessment-start" variant="primary">
               Start the assessment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//pricing" variant="ghost">
+            <ButtonV3 href="/pricing" variant="ghost">
               See pricing<span>→</span>
             </ButtonV3>
           </>
@@ -151,7 +151,7 @@ export default function AssessmentV3Page() {
         eyebrow="Common questions"
         heading="About the readiness assessment"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

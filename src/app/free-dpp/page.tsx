@@ -249,7 +249,7 @@ export default function FreeDppV3Page() {
         eyebrow="Common questions"
         heading="About the free DPP"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
     </main>
@@ -534,10 +534,10 @@ function DoneState({ brandName }: { brandName: string }) {
         body={`Thanks ${brandName}. We will email the hosted DPP plus audit exports within 1 working day.`}
         actions={
           <>
-            <ButtonV3 href="//platform" variant="primary">
+            <ButtonV3 href="/platform" variant="primary">
               See the full platform<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//pricing" variant="ghost">
+            <ButtonV3 href="/pricing" variant="ghost">
               See pricing<span>→</span>
             </ButtonV3>
           </>

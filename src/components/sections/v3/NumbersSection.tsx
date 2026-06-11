@@ -17,11 +17,29 @@ type Stat = {
   prefix?: string;
   label: string;
   body: string;
+  // Optional formatter for the in-flight count-up. Lets stats with
+  // suffix-style display ("167M+") match their final readout during
+  // the animation rather than scrolling raw digits.
+  formatter?: (v: number) => string;
 };
 
 // Starter pricing stat reads from the same source as the pricing page,
 // so a currency / billing switch propagates here without a navigation.
 const STARTER_PLAN = pricingPlans.find((p) => p.slug === "starter");
+
+// Round to 3sf with M / k suffix. 167,040,071 → "167M". Sub-1k passes
+// through unchanged.
+function formatBig(n: number): string {
+  if (n >= 1_000_000) {
+    const millions = n / 1_000_000;
+    return `${millions >= 100 ? Math.round(millions) : millions.toFixed(1)}M`;
+  }
+  if (n >= 1_000) {
+    const thousands = n / 1_000;
+    return `${thousands >= 100 ? Math.round(thousands) : thousands.toFixed(1)}k`;
+  }
+  return n.toString();
+}
 
 function useStats(dataPointsServed: number): Stat[] {
   const { currency, billing } = usePricing();
@@ -37,14 +55,9 @@ function useStats(dataPointsServed: number): Stat[] {
       body: "A 30-minute onboarding call walks your team through the platform. Once your data is in, your first passport is generated the same day.",
     },
     {
-      number: 68431,
-      display: "68,431",
-      label: "reference cells per LCA",
-      body: "Materials, processes, dyeing, energy grids, transport, AWARE water scarcity, trims. Every passport pulls the same full database.",
-    },
-    {
       number: dataPointsServed,
-      display: dataPointsServed.toLocaleString(),
+      display: `${formatBig(dataPointsServed)}+`,
+      formatter: (v) => `${formatBig(v)}+`,
       label: "data points served via DPPs",
       body: "Cumulative reference cells delivered to consumers across every DPP scan. Each scan opens the full 68,431-cell calculation behind that garment.",
     },
@@ -70,10 +83,12 @@ function CountUp({
   to,
   display,
   prefix,
+  formatter,
 }: {
   to: number;
   display: string;
   prefix?: string;
+  formatter?: (v: number) => string;
 }) {
   const ref = useRef<HTMLSpanElement | null>(null);
   // once: false so the count re-fires every time the section enters view
@@ -82,6 +97,7 @@ function CountUp({
   const motionVal = useMotionValue(0);
   const formatted = useTransform(motionVal, (v) => {
     const rounded = Math.round(v);
+    if (formatter) return formatter(rounded);
     return prefix ? `${prefix}${rounded.toLocaleString()}` : rounded.toLocaleString();
   });
   const [done, setDone] = useState(false);
@@ -121,7 +137,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
   const inView = useInView(ref, { once: false, amount: 0.3 });
 
   return (
-    <div ref={ref} className="lg:px-6 lg:first:pl-0 lg:last:pr-0">
+    <div ref={ref} className="sm:px-8 sm:first:pl-0 sm:last:pr-0">
       {/* Big numeral with translateY entrance */}
       <motion.p
         initial={{ y: 32, opacity: 0 }}
@@ -135,9 +151,14 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
         // letterforms read as "ENVRT-stamped" at display sizes and give the
         // page's most visible numbers their own voice (vs the generic display
         // font everywhere else).
-        className="font-n27 text-[4rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[4.5rem] lg:text-[4.75rem] xl:text-[5.25rem]"
+        className="font-n27 text-[4.5rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
       >
-        <CountUp to={stat.number} display={stat.display} prefix={stat.prefix} />
+        <CountUp
+          to={stat.number}
+          display={stat.display}
+          prefix={stat.prefix}
+          formatter={stat.formatter}
+        />
         {stat.unit && (
           <motion.span
             initial={{ opacity: 0, y: 8 }}
@@ -206,7 +227,7 @@ export function NumbersSection({
           </h2>
         </FadeUp>
 
-        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-white/12 pt-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0 lg:divide-x lg:divide-white/12">
+        <div className="mt-14 grid grid-cols-1 gap-y-12 border-t border-white/12 pt-12 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-white/12">
           {stats.map((s, i) => (
             <StatColumn key={s.label} stat={s} index={i} />
           ))}

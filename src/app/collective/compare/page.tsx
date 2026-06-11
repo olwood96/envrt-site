@@ -77,7 +77,7 @@ function CompareHero({
         <FadeUp>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <Link
-              href="//collective"
+              href="/collective"
               className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
             >
               <span aria-hidden>←</span>
@@ -135,10 +135,10 @@ function ComparisonSection({ cards }: { cards: CollectiveCardData[] }) {
 
           <FadeUp delay={0.24}>
             <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <ButtonV3 href="//collective" variant="primary">
+              <ButtonV3 href="/collective" variant="primary">
                 Browse the Collective<span aria-hidden>→</span>
               </ButtonV3>
-              <ButtonV3 href="//free-dpp" variant="ghost">
+              <ButtonV3 href="/free-dpp" variant="ghost">
                 Get your brand featured<span aria-hidden>→</span>
               </ButtonV3>
             </div>

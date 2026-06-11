@@ -70,10 +70,10 @@ export default async function InsightsV3TagPage({ params }: PageProps) {
         body={`${posts.length} ${posts.length === 1 ? "article" : "articles"} grouped by topic. Long-form pieces, not press releases.`}
         actions={
           <>
-            <ButtonV3 href="//insights" variant="primary">
+            <ButtonV3 href="/insights" variant="primary">
               All insights<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//glossary" variant="ghost">
+            <ButtonV3 href="/glossary" variant="ghost">
               Glossary of terms<span>→</span>
             </ButtonV3>
           </>
@@ -110,7 +110,7 @@ function ParentTopicNav({
             {topics.map((t) => (
               <li key={t.slug}>
                 <Link
-                  href={`//insights?topic=${t.slug}`}
+                  href={`/insights?topic=${t.slug}`}
                   className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-ultramarine/30 bg-envrt-brand-ultramarine/8 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:bg-envrt-brand-ultramarine/15 sm:text-[11px]"
                 >
                   {t.label}
@@ -139,7 +139,7 @@ function OtherTagsNav({ tags }: { tags: string[] }) {
             {tags.map((t) => (
               <li key={t}>
                 <Link
-                  href={`//insights/tag/${tagSlug(t)}`}
+                  href={`/insights/tag/${tagSlug(t)}`}
                   className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:border-envrt-brand-ultramarine/30 hover:text-envrt-brand-ultramarine sm:text-[11px]"
                 >
                   <span className="text-envrt-brand-ultramarine">#</span>
@@ -179,7 +179,7 @@ function ResultsSection({
             {posts.map((post, i) => (
               <FadeUp key={post.slug} delay={Math.min(0.12 + i * 0.04, 0.4)}>
                 <Link
-                  href={`//insights/${post.slug}`}
+                  href={`/insights/${post.slug}`}
                   className="group flex h-full flex-col rounded-2xl border border-envrt-brand-black/10 bg-white p-7 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30"
                 >
                   <div className="flex flex-wrap items-center gap-3 text-envrt-brand-black/55">

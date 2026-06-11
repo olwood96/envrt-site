@@ -62,10 +62,10 @@ export default function TeamV3Page() {
         body="Two founders running the product. Two advisors shaping the methodology. Environmental engineering, data science, applied AI."
         actions={
           <>
-            <ButtonV3 href="//contact" variant="primary">
+            <ButtonV3 href="/contact" variant="primary">
               Talk to us<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//about" variant="ghost">
+            <ButtonV3 href="/about" variant="ghost">
               Read the founding story<span>→</span>
             </ButtonV3>
           </>

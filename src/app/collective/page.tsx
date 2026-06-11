@@ -36,10 +36,10 @@ export default async function CollectiveV3Page() {
         body="Every product here ships with a Digital Product Passport. Click any card to open the full passport in place, or compare products from the same brand side by side."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Get your brand featured<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//about" variant="ghost">
+            <ButtonV3 href="/about" variant="ghost">
               How the Collective works<span>→</span>
             </ButtonV3>
           </>
@@ -89,7 +89,7 @@ function GridSection({
                   featured.
                 </p>
                 <div className="mt-6">
-                  <ButtonV3 href="//free-dpp" variant="primary">
+                  <ButtonV3 href="/free-dpp" variant="primary">
                     Get featured<span>→</span>
                   </ButtonV3>
                 </div>

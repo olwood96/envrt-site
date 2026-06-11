@@ -41,10 +41,10 @@ export default function AboutV3Page() {
         body="ENVRT is an environmental platform for fashion. We measure what brands make, prove what they claim and publish what they can show. One product, end to end."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//team" variant="ghost">
+            <ButtonV3 href="/team" variant="ghost">
               Meet the team<span>→</span>
             </ButtonV3>
           </>

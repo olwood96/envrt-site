@@ -62,7 +62,7 @@ export function FinalCtaV3() {
         <FadeUp delay={0.26}>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row">
             <ButtonV3
-              href="//free-dpp"
+              href="/free-dpp"
               variant="primary"
               size="lg"
               data-cta="final-v3-free-dpp"
@@ -70,7 +70,7 @@ export function FinalCtaV3() {
               Get a free DPP<span aria-hidden>→</span>
             </ButtonV3>
             <ButtonV3
-              href="//contact"
+              href="/contact"
               variant="secondary"
               size="lg"
               data-cta="final-v3-book-demo"

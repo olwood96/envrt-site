@@ -46,10 +46,10 @@ export function LegalShell({
         body={pageBody}
         actions={
           <>
-            <ButtonV3 href="//contact" variant="primary">
+            <ButtonV3 href="/contact" variant="primary">
               Contact us<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//about" variant="ghost">
+            <ButtonV3 href="/about" variant="ghost">
               About ENVRT<span>→</span>
             </ButtonV3>
           </>

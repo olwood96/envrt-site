@@ -124,7 +124,7 @@ function TierCard({ plan }: { plan: PricingPlan }) {
 
       <div className="mt-8 pt-2">
         <ButtonV3
-          href={plan.customPricing ? "/contact" : "//free-dpp"}
+          href={plan.customPricing ? "/contact" : "/free-dpp"}
           variant={isHighlighted ? "primary" : "secondary"}
           className="w-full"
         >

@@ -122,7 +122,7 @@ export function CollectiveCardV3({
   const origin = deriveOrigin(dpp);
   const year = deriveYear(dpp);
   const metrics = buildMetrics(dpp);
-  const brandHref = `//collective/${brandSlugFor(brand)}`;
+  const brandHref = `/collective/${brandSlugFor(brand)}`;
 
   return (
     <>

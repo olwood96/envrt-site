@@ -164,10 +164,10 @@ export default function FaqV3Page() {
         body="Everything we are asked most often, grouped by topic. If something is missing, message us and we will add it."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//contact" variant="ghost">
+            <ButtonV3 href="/contact" variant="ghost">
               Ask a question<span>→</span>
             </ButtonV3>
           </>

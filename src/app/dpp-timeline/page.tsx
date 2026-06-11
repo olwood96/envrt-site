@@ -175,10 +175,10 @@ export default function DppTimelineV3Page() {
         body="The EU ESPR textile delegated act lands mid-2026. Mandatory DPPs phase in from 2027. The UK DMCCA and France's AGEC apply now. Brands that wait will scramble."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Get DPP-ready<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//platform" variant="ghost">
+            <ButtonV3 href="/platform" variant="ghost">
               See the platform<span>→</span>
             </ButtonV3>
           </>
@@ -196,7 +196,7 @@ export default function DppTimelineV3Page() {
         eyebrow="Common questions"
         heading="About the DPP timeline"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

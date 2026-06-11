@@ -89,10 +89,10 @@ export default function InsightsV3IndexPage() {
         body="Guides on Digital Product Passports, Life Cycle Assessment and fashion environmental data. Built from work with brands, not from press releases."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//glossary" variant="ghost">
+            <ButtonV3 href="/glossary" variant="ghost">
               Glossary of terms<span>→</span>
             </ButtonV3>
           </>
@@ -105,7 +105,7 @@ export default function InsightsV3IndexPage() {
       {posts.length > 0 ? (
         <InsightsBrowserV3
           posts={rest}
-          basePath="//insights"
+          basePath="/insights"
         />
       ) : (
         <EmptyState />
@@ -128,7 +128,7 @@ function FeaturedSection({ post }: { post: InsightsPostMeta }) {
 
           <FadeUp delay={0.08}>
             <Link
-              href={`//insights/${post.slug}`}
+              href={`/insights/${post.slug}`}
               className="group mt-8 block rounded-3xl border border-envrt-brand-black/10 bg-white p-7 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30 sm:p-10"
             >
               <div className="grid gap-10 sm:grid-cols-[1fr,auto] sm:items-end">

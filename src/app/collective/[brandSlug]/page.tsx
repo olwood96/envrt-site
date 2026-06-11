@@ -85,7 +85,7 @@ function BrandHero({
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <FadeUp>
           <Link
-            href="//collective"
+            href="/collective"
             className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors duration-200 hover:text-envrt-brand-neon sm:text-[11px]"
           >
             <span aria-hidden>←</span>
@@ -142,7 +142,7 @@ function BrandHero({
                   </a>
                 )}
                 <a
-                  href="//collective"
+                  href="/collective"
                   className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white/85 transition-colors duration-200 hover:text-envrt-brand-neon sm:px-6 sm:py-3 sm:text-base"
                 >
                   Browse all brands<span aria-hidden>→</span>

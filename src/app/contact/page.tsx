@@ -218,7 +218,7 @@ export default function ContactV3Page() {
         eyebrow="Common questions"
         heading="About booking a demo"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
     </main>
@@ -245,10 +245,10 @@ function DoneState() {
         body="Thanks for reaching out. The same person who answers replies. No marketing chain emails."
         actions={
           <>
-            <ButtonV3 href="//platform" variant="primary">
+            <ButtonV3 href="/platform" variant="primary">
               See the full platform<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//pricing" variant="ghost">
+            <ButtonV3 href="/pricing" variant="ghost">
               See pricing<span>→</span>
             </ButtonV3>
           </>

@@ -456,7 +456,7 @@ export default function RoiV3Page() {
 
               <div className="mt-6">
                 <ButtonV3
-                  href="//free-dpp"
+                  href="/free-dpp"
                   variant="primary"
                   className="w-full"
                 >
@@ -473,7 +473,7 @@ export default function RoiV3Page() {
         eyebrow="Common questions"
         heading="About the ROI calculator"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

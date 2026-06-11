@@ -117,10 +117,10 @@ export default function LabV3Page() {
         body="EU PEF and ISO 14040 throughout, with AWARE water scarcity baked in. Real factor sources, named standards, exportable methodology per garment. The depth that lets us claim native LCA, not a partner API."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//platform" variant="ghost">
+            <ButtonV3 href="/platform" variant="ghost">
               See the platform<span>→</span>
             </ButtonV3>
           </>
@@ -140,7 +140,7 @@ export default function LabV3Page() {
         eyebrow="Methodology questions"
         heading="About the calculation engine"
         items={faqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

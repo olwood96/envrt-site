@@ -10,37 +10,37 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
   {
     heading: "Product",
     links: [
-      { label: "Platform", href: "//platform" },
-      { label: "Lab", href: "//lab" },
-      { label: "Free DPP", href: "//free-dpp" },
-      { label: "Pricing", href: "//pricing" },
-      { label: "The Collective", href: "//collective" },
+      { label: "Platform", href: "/platform" },
+      { label: "Lab", href: "/lab" },
+      { label: "Free DPP", href: "/free-dpp" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "The Collective", href: "/collective" },
     ],
   },
   {
     heading: "Resources",
     links: [
-      { label: "Insights", href: "//insights" },
-      { label: "DPP timeline", href: "//dpp-timeline" },
-      { label: "FAQ", href: "//faq" },
-      { label: "Glossary", href: "//glossary" },
-      { label: "Readiness assessment", href: "//assessment" },
-      { label: "ROI calculator", href: "//roi" },
+      { label: "Insights", href: "/insights" },
+      { label: "DPP timeline", href: "/dpp-timeline" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Glossary", href: "/glossary" },
+      { label: "Readiness assessment", href: "/assessment" },
+      { label: "ROI calculator", href: "/roi" },
     ],
   },
   {
     heading: "Company",
     links: [
-      { label: "About", href: "//about" },
-      { label: "Team", href: "//team" },
-      { label: "Contact", href: "//contact" },
+      { label: "About", href: "/about" },
+      { label: "Team", href: "/team" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
     heading: "Legal",
     links: [
-      { label: "Privacy policy", href: "//privacy" },
-      { label: "Terms of service", href: "//terms" },
+      { label: "Privacy policy", href: "/privacy" },
+      { label: "Terms of service", href: "/terms" },
     ],
   },
 ];

@@ -58,7 +58,7 @@ const CAPABILITIES: Capability[] = [
       { label: "Stages modelled", value: "Fibre, yarn, fabric, dye, assembly, transport" },
       { label: "Reference cells per LCA", value: "68,431" },
     ],
-    cta: { label: "See the engine anatomy", href: "//lab" },
+    cta: { label: "See the engine anatomy", href: "/lab" },
   },
   {
     index: "03",
@@ -203,10 +203,10 @@ export default function PlatformV3Page() {
         body="Nine capabilities, one platform. Supplier mapping, in-house lifecycle assessment, water scarcity, Eco-Score, hosted DPPs, evidence vault, audit reports, compliance monitoring and green-claims audit. EU PEF and ISO 14040 throughout."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//pricing" variant="ghost">
+            <ButtonV3 href="/pricing" variant="ghost">
               See pricing<span>→</span>
             </ButtonV3>
           </>
@@ -240,7 +240,7 @@ export default function PlatformV3Page() {
         eyebrow="Platform questions"
         heading="Common platform questions"
         items={platformFaqs}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

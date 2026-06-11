@@ -42,7 +42,7 @@ export default function PricingV3Page() {
         body="Per-garment lifecycle assessment, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier. Switch currency or billing period below."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
             <ButtonV3 href="/contact" variant="ghost">
@@ -61,7 +61,7 @@ export default function PricingV3Page() {
         eyebrow="Pricing questions"
         heading="Common pricing questions"
         items={pricingFaqItems}
-        ctaHref="//faq"
+        ctaHref="/faq"
         ctaLabel="See all FAQs"
       />
 

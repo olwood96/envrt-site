@@ -137,7 +137,7 @@ export function InTheWildSection({
             stops mattering. */}
         <FadeUp delay={0.2}>
           <Link
-            href="//collective"
+            href="/collective"
             className="group mt-12 grid overflow-hidden rounded-3xl bg-envrt-brand-vista ring-1 ring-envrt-brand-black/8 transition-shadow duration-300 hover:shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)] sm:mt-16 sm:grid-cols-[1fr_1.4fr]"
           >
             <CollectiveMosaic cards={collectiveCards} />

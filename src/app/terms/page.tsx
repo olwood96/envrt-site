@@ -207,7 +207,7 @@ const SECTIONS: LegalSection[] = [
         <LegalP>
           While we take reasonable steps to protect private data, no system is
           completely secure. We do not guarantee absolute security. See our{" "}
-          <LegalLink href="//privacy">Privacy policy</LegalLink> for
+          <LegalLink href="/privacy">Privacy policy</LegalLink> for
           details on how we process, retain and protect personal data.
         </LegalP>
         <LegalP>
@@ -227,7 +227,7 @@ const SECTIONS: LegalSection[] = [
           services, monitor performance, and understand how the platform is
           used. This section summarises what we collect. For full details, see
           our{" "}
-          <LegalLink href="//privacy">Privacy policy</LegalLink>.
+          <LegalLink href="/privacy">Privacy policy</LegalLink>.
         </LegalP>
 
         <LegalH3>Public DPP pages</LegalH3>
@@ -590,7 +590,7 @@ const SECTIONS: LegalSection[] = [
           <LegalLi>
             After the export window, we will delete or anonymise your data in
             line with our{" "}
-            <LegalLink href="//privacy">Privacy policy</LegalLink>,
+            <LegalLink href="/privacy">Privacy policy</LegalLink>,
             unless we are required to retain it by law.
           </LegalLi>
         </LegalUl>
@@ -675,7 +675,7 @@ const SECTIONS: LegalSection[] = [
         <LegalP>ENVRT Ltd, United Kingdom.</LegalP>
         <LegalP>
           Related:{" "}
-          <LegalLink href="//privacy">Privacy policy</LegalLink>.
+          <LegalLink href="/privacy">Privacy policy</LegalLink>.
         </LegalP>
       </>
     ),

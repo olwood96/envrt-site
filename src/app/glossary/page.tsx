@@ -190,10 +190,10 @@ export default function GlossaryV3Page() {
         body="Key terms in fashion sustainability, Digital Product Passports, Life Cycle Assessment and environmental regulation. Plain definitions, no marketing gloss."
         actions={
           <>
-            <ButtonV3 href="//free-dpp" variant="primary">
+            <ButtonV3 href="/free-dpp" variant="primary">
               Try ENVRT on one garment<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//faq" variant="ghost">
+            <ButtonV3 href="/faq" variant="ghost">
               Read the FAQ<span>→</span>
             </ButtonV3>
           </>

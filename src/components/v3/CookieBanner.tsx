@@ -43,7 +43,7 @@ export function CookieBanner() {
                 envrt.com. You can decline and the site works exactly the
                 same.{" "}
                 <Link
-                  href="//privacy"
+                  href="/privacy"
                   className="underline underline-offset-2 hover:text-envrt-brand-ultramarine"
                 >
                   Privacy details

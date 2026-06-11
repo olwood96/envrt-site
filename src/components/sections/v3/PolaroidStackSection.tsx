@@ -197,7 +197,7 @@ export function PolaroidStackSection() {
                 <FactorChip>Ecobalyse</FactorChip>
               </div>
               <Link
-                href="//lab"
+                href="/lab"
                 className="group inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]"
               >
                 See the methodology

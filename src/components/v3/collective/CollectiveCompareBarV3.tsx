@@ -77,7 +77,7 @@ export function CollectiveCompareBarV3({
             <Link
               href={
                 ready
-                  ? `//collective/compare?products=${products}`
+                  ? `/collective/compare?products=${products}`
                   : "#"
               }
               aria-disabled={!ready}

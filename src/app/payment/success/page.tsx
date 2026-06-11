@@ -53,7 +53,7 @@ export default function PaymentSuccessV3Page() {
             <ButtonV3 href="/" variant="primary">
               Back to home<span>→</span>
             </ButtonV3>
-            <ButtonV3 href="//contact" variant="ghost">
+            <ButtonV3 href="/contact" variant="ghost">
               Need help? Contact us<span>→</span>
             </ButtonV3>
           </>
@@ -134,7 +134,7 @@ function SupportSection() {
           </FadeUp>
           <FadeUp delay={0.24}>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <ButtonV3 href="//contact" variant="primary">
+              <ButtonV3 href="/contact" variant="primary">
                 Contact us<span>→</span>
               </ButtonV3>
               <ButtonV3 href="mailto:info@envrt.com" variant="ghost">

@@ -91,7 +91,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
           <div className="mx-auto max-w-[720px]">
             <FadeUp>
               <Link
-                href="//insights"
+                href="/insights"
                 className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
               >
                 <span aria-hidden>←</span>
@@ -105,7 +105,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
                   {post.tags.map((tag) => (
                     <Link
                       key={tag}
-                      href={`//insights/tag/${tagSlug(tag)}`}
+                      href={`/insights/tag/${tagSlug(tag)}`}
                       className="rounded-full bg-envrt-brand-ultramarine/10 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:bg-envrt-brand-ultramarine/15 sm:text-[11px]"
                     >
                       {tag}
@@ -225,7 +225,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
                 {related.map((p, i) => (
                   <FadeUp key={p.slug} delay={0.12 + i * 0.05}>
                     <Link
-                      href={`//insights/${p.slug}`}
+                      href={`/insights/${p.slug}`}
                       className="group flex h-full flex-col rounded-2xl border border-envrt-brand-black/10 bg-white p-6 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30"
                     >
                       <time
@@ -246,7 +246,7 @@ export default async function InsightsV3PostPage({ params }: PageProps) {
               </div>
 
               <div className="mt-12">
-                <ButtonV3 href="//insights" variant="ghost">
+                <ButtonV3 href="/insights" variant="ghost">
                   All insights<span>→</span>
                 </ButtonV3>
               </div>
