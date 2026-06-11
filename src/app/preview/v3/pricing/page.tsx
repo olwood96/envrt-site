@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { pricingPlans } from "@/lib/config";
+import { pricingPlans, pricingFaqItems } from "@/lib/config";
 import { PageHero, FaqSnippet, Card, ButtonV3 } from "@/components/v3";
 import { Eyebrow, SectionCorners } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
@@ -12,24 +12,6 @@ export const metadata: Metadata = {
   description: "Three tiers. SME pricing for fashion environmental work.",
   robots: { index: false, follow: false },
 };
-
-const pricingFaqs = [
-  {
-    question: "What is included in the £149 Starter plan?",
-    answer:
-      "Up to 50 products, regulation-ready DPPs, CO₂e and AWARE water indicators, French Eco-Score, fibre-to-assembly supply chain reconstruction, evidence uploads, transparency score per product and compliance exports. Full breakdown in the comparison table above.",
-  },
-  {
-    question: "Can I upgrade or downgrade plans mid-cycle?",
-    answer:
-      "Yes, you can upgrade or downgrade at any time. Changes take effect at the start of your next billing cycle.",
-  },
-  {
-    question: "What happens if I outgrow my SKU allowance?",
-    answer:
-      "Starter caps at 50 SKUs, Growth at 250. Above that, Pro is custom-priced based on SKU count, supplier complexity and support needs. Contact us for a quote.",
-  },
-];
 
 export default function PricingV3Page() {
   return (
@@ -65,7 +47,7 @@ export default function PricingV3Page() {
       <FaqSnippet
         eyebrow="Pricing questions"
         heading="Common pricing questions"
-        items={pricingFaqs}
+        items={pricingFaqItems}
         ctaHref="/preview/v3/faq"
         ctaLabel="See all FAQs"
       />

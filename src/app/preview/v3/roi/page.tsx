@@ -6,6 +6,7 @@ import {
   FaqSnippet,
   ButtonV3,
   Card,
+  Input,
   Label,
 } from "@/components/v3";
 import { DropdownV3 } from "@/components/v3/DropdownV3";
@@ -153,7 +154,7 @@ const faqs = [
   {
     question: "Will my data stay private?",
     answer:
-      "Yes. The calculator runs locally in your browser. Nothing is sent to ENVRT until you book a demo or submit the free DPP form.",
+      "Yes. The calculator runs locally in your browser. Nothing is sent to ENVRT unless you opt in to email yourself a copy of the results, book a demo, or submit the free DPP form.",
   },
 ];
 
@@ -163,7 +164,50 @@ export default function RoiV3Page() {
   const [market, setMarket] = useState<Market>("eu");
   const [approach, setApproach] = useState<Approach>("spreadsheets");
 
+  // Optional lead capture — emails the results, posts to /api/roi-lead.
+  // Keeps the calculator instant + private by default; the form opens
+  // on demand so buyers can ask for a written copy without forcing it.
+  const [firstName, setFirstName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [email, setEmail] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   const results = calculateROI(skuCount, dataMaturity, market, approach);
+
+  async function handleEmailResults(e: React.FormEvent) {
+    e.preventDefault();
+    if (!firstName || !brandName || !email) return;
+    setEmailSending(true);
+    setEmailError(null);
+    try {
+      const res = await fetch("/api/roi-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          brandName,
+          email,
+          marketingConsent,
+          skuCount,
+          dataMaturity,
+          market,
+          approach,
+          ...results,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Submission failed");
+      }
+      setEmailSent(true);
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : "Submission failed");
+    }
+    setEmailSending(false);
+  }
 
   return (
     <main className="theme-sunny">
@@ -178,7 +222,7 @@ export default function RoiV3Page() {
             </span>
           </>
         }
-        body="Plug in your SKU count, data maturity and current approach. The calculator shows your annual ENVRT cost, the consultant equivalent and the in-house equivalent. Runs locally in your browser, nothing is sent."
+        body="Plug in your SKU count, data maturity and current approach. The calculator shows your annual ENVRT cost, the consultant equivalent and the in-house equivalent. Email yourself a copy if useful, otherwise nothing leaves your browser."
         cornerLeft="ENVRT/01"
         cornerRight="ROI"
       />
@@ -299,6 +343,95 @@ export default function RoiV3Page() {
                   Plus {results.daysSaved.toLocaleString()} working days back
                   for your team across the year.
                 </p>
+              </div>
+
+              {/* Optional email-the-results form. Posts to /api/roi-lead
+                  with the calculator state + results so sales gets the
+                  whole picture in their inbox. */}
+              <div className="mt-6 rounded-2xl border border-envrt-brand-black/12 bg-white p-5 sm:p-6">
+                {emailSent ? (
+                  <p className="text-sm text-envrt-brand-black/75 sm:text-base">
+                    Thanks {firstName}. We have sent the breakdown to{" "}
+                    <span className="font-semibold text-envrt-brand-black">
+                      {email}
+                    </span>
+                    . If it does not arrive within five minutes, check spam.
+                  </p>
+                ) : (
+                  <form className="space-y-4" onSubmit={handleEmailResults}>
+                    <div>
+                      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+                        Optional
+                      </p>
+                      <p className="mt-1.5 font-display text-base font-medium tracking-tight text-envrt-brand-black sm:text-lg">
+                        Email me a copy of these numbers
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-envrt-brand-black/60 sm:text-sm">
+                        We send a one-page summary you can forward to your
+                        CFO. No further outreach unless you tick consent.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <Label htmlFor="roi-first-name">First name</Label>
+                        <Input
+                          id="roi-first-name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Your first name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="roi-brand-name">Brand name</Label>
+                        <Input
+                          id="roi-brand-name"
+                          value={brandName}
+                          onChange={(e) => setBrandName(e.target.value)}
+                          placeholder="Your brand"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="roi-email">Email</Label>
+                      <Input
+                        id="roi-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@brand.com"
+                        required
+                      />
+                    </div>
+                    <label className="flex items-start gap-2 text-xs leading-relaxed text-envrt-brand-black/70 sm:text-sm">
+                      <input
+                        type="checkbox"
+                        checked={marketingConsent}
+                        onChange={(e) => setMarketingConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-envrt-brand-black/30 text-envrt-brand-ultramarine focus:ring-envrt-brand-ultramarine"
+                      />
+                      <span>
+                        Send me occasional ENVRT updates. Unsubscribe any
+                        time.
+                      </span>
+                    </label>
+                    {emailError && (
+                      <p className="text-xs text-envrt-brand-crimson sm:text-sm">
+                        {emailError}
+                      </p>
+                    )}
+                    <ButtonV3
+                      type="submit"
+                      variant="primary"
+                      className="w-full"
+                      disabled={emailSending}
+                    >
+                      {emailSending ? "Sending..." : "Email me the breakdown"}
+                      <span>→</span>
+                    </ButtonV3>
+                  </form>
+                )}
               </div>
 
               <div className="mt-6">

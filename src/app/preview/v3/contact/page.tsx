@@ -68,8 +68,27 @@ export default function ContactV3Page() {
     setSubmitting(true);
     setError(null);
     try {
-      // Submit handler stub. Reuse existing /api/contact endpoint when wiring.
-      await new Promise((r) => setTimeout(r, 700));
+      // Split the single name field into first/last to match the v1
+      // API shape. /api/contact persists to Supabase + sends the
+      // confirmation email; brandName lands in the company column.
+      const [firstName, ...rest] = name.trim().split(/\s+/);
+      const lastName = rest.join(" ");
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          company: brandName,
+          interest,
+          message,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Submission failed");
+      }
       setDone(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Submission failed");
