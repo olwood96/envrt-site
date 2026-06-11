@@ -7,6 +7,7 @@ import {
   tagSlug,
   type InsightsPostMeta,
 } from "@/lib/insights";
+import { getTopicsForTag } from "@/lib/insightTopics";
 import { PageHero, ButtonV3 } from "@/components/v3";
 import {
   Eyebrow,
@@ -54,6 +55,7 @@ export default async function InsightsV3TagPage({ params }: PageProps) {
   const displayTag =
     posts[0]?.tags.find((t) => tagSlug(t) === tagSlug(tag)) ?? tag;
   const otherTags = getAllTags().filter((t) => tagSlug(t) !== tagSlug(tag));
+  const parentTopics = getTopicsForTag(displayTag);
 
   return (
     <main className="theme-sunny">
@@ -81,12 +83,46 @@ export default async function InsightsV3TagPage({ params }: PageProps) {
         cornerRight={`#${displayTag}`}
       />
 
+      {parentTopics.length > 0 && <ParentTopicNav topics={parentTopics} />}
       {otherTags.length > 0 && <OtherTagsNav tags={otherTags} />}
 
       <ResultsSection posts={posts} displayTag={displayTag} />
 
       <FinalCtaV3 />
     </main>
+  );
+}
+
+function ParentTopicNav({
+  topics,
+}: {
+  topics: { slug: string; label: string }[];
+}) {
+  return (
+    <section className="relative bg-envrt-brand-vista pt-10 sm:pt-14">
+      <div className="mx-auto max-w-[1100px] px-5 sm:px-8 lg:px-16">
+        <FadeUp>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
+            Part of topic
+          </p>
+        </FadeUp>
+        <FadeUp delay={0.06}>
+          <ul className="mt-3 flex flex-wrap gap-2 sm:gap-3">
+            {topics.map((t) => (
+              <li key={t.slug}>
+                <Link
+                  href={`/preview/v3/insights?topic=${t.slug}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-ultramarine/30 bg-envrt-brand-ultramarine/8 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine transition-colors duration-200 hover:bg-envrt-brand-ultramarine/15 sm:text-[11px]"
+                >
+                  {t.label}
+                  <span aria-hidden>→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </FadeUp>
+      </div>
+    </section>
   );
 }
 
