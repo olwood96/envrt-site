@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PageHero, ButtonV3 } from "@/components/v3";
 import {
   Eyebrow,
@@ -20,7 +21,22 @@ export default function AboutV3Page() {
         eyebrow="About"
         heading={
           <>
-            Fashion&apos;s environmental work deserves better tools.{" "}
+            {/* Image-mask text: the first clause is filled with the
+                provenance-loom photo via background-clip:text, so the
+                colourful thread runs through the heading itself. The
+                trailing "So we built them." stays as faded ink for
+                contrast. */}
+            <span
+              className="inline bg-clip-text text-transparent"
+              style={{
+                backgroundImage: "url('/v3-assets/provenance-loom.jpg')",
+                backgroundSize: "140% 160%",
+                backgroundPosition: "center 35%",
+                WebkitBackgroundClip: "text",
+              }}
+            >
+              Fashion&apos;s environmental work deserves better tools.
+            </span>{" "}
             <span className="text-envrt-brand-black/40">
               So we built them.
             </span>
@@ -39,7 +55,21 @@ export default function AboutV3Page() {
         }
         cornerLeft="ENVRT/01"
         cornerRight="About"
-      />
+      >
+        {/* Editorial header strip — sits between the hero copy and the
+            manifesto body. Establishes the "real product, real materials"
+            mood before we start talking about the platform. */}
+        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10">
+          <Image
+            src="/v3-assets/folded-clothes.jpg"
+            alt="Folded knitwear, editorial"
+            fill
+            sizes="(min-width: 1024px) 1200px, 100vw"
+            className="object-cover"
+            priority
+          />
+        </div>
+      </PageHero>
 
       <ManifestoSection />
       <ProblemSection />

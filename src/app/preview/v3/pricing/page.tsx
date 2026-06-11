@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { pricingPlans } from "@/lib/config";
 import { PageHero, FaqSnippet, Card, ButtonV3 } from "@/components/v3";
 import { Eyebrow, SectionCorners } from "@/components/sections/v3/_shared";
@@ -78,9 +79,26 @@ export default function PricingV3Page() {
 
 function PricingTiers() {
   return (
-    <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
+    <section className="relative overflow-hidden bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
       <SectionCorners left="ENVRT/02" right="Tiers" />
-      <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+
+      {/* Ambient texture strip on the right edge. The vista-to-transparent
+          gradient stops it competing with the tier cards. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[40%] overflow-hidden lg:block"
+      >
+        <Image
+          src="/v3-assets/story-fabric.jpg"
+          alt=""
+          fill
+          sizes="40vw"
+          className="object-cover opacity-[0.35]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-envrt-brand-vista via-envrt-brand-vista/85 to-envrt-brand-vista/35" />
+      </div>
+
+      <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           <FadeUp>
             <Eyebrow>Three tiers</Eyebrow>

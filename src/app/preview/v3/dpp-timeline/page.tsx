@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   PageHero,
   FaqSnippet,
@@ -30,6 +31,10 @@ type Milestone = {
   title: string;
   body: string;
   status: Status;
+  // Public reference link for the regulation / framework. Optional —
+  // omitted for future milestones that haven't published yet.
+  sourceUrl?: string;
+  sourceLabel?: string;
 };
 
 const MILESTONES: Milestone[] = [
@@ -40,6 +45,8 @@ const MILESTONES: Milestone[] = [
     title: "Circular Economy Action Plan adopted",
     body: "Foundation document that flagged Digital Product Passports as a future requirement across multiple product categories.",
     status: "passed",
+    sourceUrl: "https://environment.ec.europa.eu/strategy/circular-economy-action-plan_en",
+    sourceLabel: "ec.europa.eu",
   },
   {
     date: "Jan 2022",
@@ -48,6 +55,8 @@ const MILESTONES: Milestone[] = [
     title: "AGEC: French Anti-Waste law in force",
     body: "France's Coût Environnemental framework becomes the operational baseline for textile environmental labelling.",
     status: "passed",
+    sourceUrl: "https://www.ecologie.gouv.fr/loi-anti-gaspillage-economie-circulaire",
+    sourceLabel: "ecologie.gouv.fr",
   },
   {
     date: "Jul 2024",
@@ -56,6 +65,8 @@ const MILESTONES: Milestone[] = [
     title: "ESPR Framework Regulation enters into force",
     body: "Ecodesign for Sustainable Products Regulation passes. Empowers the Commission to publish category-specific delegated acts, with textiles in the first wave.",
     status: "passed",
+    sourceUrl: "https://eur-lex.europa.eu/eli/reg/2024/1781/oj",
+    sourceLabel: "Regulation (EU) 2024/1781",
   },
   {
     date: "Sep 2024",
@@ -64,6 +75,8 @@ const MILESTONES: Milestone[] = [
     title: "DMCCA: Digital Markets, Competition and Consumers Act",
     body: "UK greenwashing enforcement framework. Tightens scrutiny of environmental claims and creates penalties for unsubstantiated marketing language.",
     status: "passed",
+    sourceUrl: "https://www.legislation.gov.uk/ukpga/2024/13",
+    sourceLabel: "legislation.gov.uk",
   },
   {
     date: "Mid 2026",
@@ -209,7 +222,26 @@ function Timeline() {
     <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
       <SectionCorners left="ENVRT/02" right="Milestones" />
       <div className="mx-auto max-w-[900px] px-5 sm:px-8 lg:px-16">
-        <div className="text-center">
+        {/* Authority anchor — the Berlaymont in Brussels (Commission HQ).
+            Sets the regulatory mood before the milestone list. */}
+        <FadeUp>
+          <div className="relative aspect-[21/8] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10">
+            <Image
+              src="/v3-assets/regulatory-eu-building.jpg"
+              alt="Berlaymont, European Commission, Brussels"
+              fill
+              sizes="(min-width: 1024px) 900px, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-envrt-brand-black/55 via-envrt-brand-black/15 to-transparent p-4 sm:p-5">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85 sm:text-[11px]">
+                Berlaymont · Brussels · the regulators who write the law
+              </p>
+            </div>
+          </div>
+        </FadeUp>
+
+        <div className="mt-12 text-center sm:mt-16">
           <FadeUp>
             <Eyebrow>Milestones</Eyebrow>
           </FadeUp>
@@ -296,6 +328,22 @@ function TimelineItem({ milestone }: { milestone: Milestone }) {
       >
         {milestone.body}
       </p>
+      {milestone.sourceUrl && (
+        <a
+          href={milestone.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group mt-3 inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine hover:text-envrt-brand-ultramarine/80 sm:text-[11px]"
+        >
+          Read source · {milestone.sourceLabel}
+          <span
+            aria-hidden
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+          >
+            ↗
+          </span>
+        </a>
+      )}
     </li>
   );
 }

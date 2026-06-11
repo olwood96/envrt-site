@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PageHero, FaqSnippet, ButtonV3 } from "@/components/v3";
 import {
   AssetIcon,
@@ -190,6 +191,23 @@ export default function PlatformV3Page() {
         cornerLeft="ENVRT/01"
         cornerRight="Platform"
       />
+
+      {/* Editorial header strip — graded thread spool wall. Suggests
+          "every material, every supplier" before we list the nine
+          capabilities. Full-bleed, no caption, lets the image speak. */}
+      <section className="relative -mt-1 bg-envrt-brand-vista pb-12 sm:pb-16 lg:pb-20">
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
+          <div className="relative aspect-[21/8] w-full overflow-hidden rounded-3xl ring-1 ring-envrt-brand-black/10 sm:aspect-[21/7]">
+            <Image
+              src="/v3-assets/platform-thread-spools.jpg"
+              alt="Wall of dyed thread spool cones in a textile mill"
+              fill
+              sizes="(min-width: 1024px) 1200px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </section>
 
       <CapabilitiesList />
 

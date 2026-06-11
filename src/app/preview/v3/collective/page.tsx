@@ -8,6 +8,7 @@ import {
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { CollectiveGridV3 } from "@/components/v3/collective/CollectiveGridV3";
+import { CollectiveMarqueeV3 } from "@/components/v3/collective/CollectiveMarqueeV3";
 import { CollectiveSubscribeV3 } from "@/components/v3/collective/CollectiveSubscribeV3";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 
@@ -48,6 +49,15 @@ export default async function CollectiveV3Page() {
         cornerLeft="ENVRT/01"
         cornerRight="Collective"
       />
+
+      {/* Marquee teaser strip — real product photos from every live DPP,
+          scrolling infinitely. Sits between the hero and the filterable
+          grid as a "wall of proof". */}
+      {cards.length > 0 && (
+        <section className="relative bg-envrt-brand-vista py-10 sm:py-12 lg:py-14">
+          <CollectiveMarqueeV3 cards={cards} />
+        </section>
+      )}
 
       <GridSection cards={cards} filters={filters} />
 
