@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  AnimatePresence,
   easeInOut,
   motion,
   useMotionTemplate,
@@ -343,6 +344,65 @@ function ActiveStageLabel({ activeIndex }: { activeIndex: number }) {
   );
 }
 
+// ─── Stage card slot ──────────────────────────────────────────────────────
+// Single card slot that swaps the active stage card discretely. New card
+// flies in from the right, current card flies out to the left (reversed
+// for backward scroll). Gives readers time to actually read each card
+// instead of watching a continuous slide.
+
+function StageCardSlot({
+  activeIndex,
+  size,
+}: {
+  activeIndex: number;
+  size: "desktop" | "mobile";
+}) {
+  // Track previous index so we know which direction to animate in/out.
+  const prevIndexRef = useRef(activeIndex);
+  const direction = activeIndex >= prevIndexRef.current ? 1 : -1;
+  useEffect(() => {
+    prevIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  const stage = STAGES[activeIndex] ?? STAGES[0];
+
+  // Card width: kept narrow enough to read at a glance. Desktop max ~640px
+  // (slightly under half a 1320 container), mobile clamps to viewport with
+  // a 32px breathing margin.
+  const widthCls =
+    size === "desktop"
+      ? "w-full max-w-[640px]"
+      : "w-[calc(100vw-2rem)] max-w-[420px]";
+
+  const variants = {
+    enter: (d: number) => ({ x: d * 80, opacity: 0, scale: 0.96 }),
+    center: { x: 0, opacity: 1, scale: 1 },
+    exit: (d: number) => ({ x: d * -80, opacity: 0, scale: 0.96 }),
+  };
+
+  return (
+    <div className={`relative mx-auto h-[260px] sm:h-[280px] ${widthCls}`}>
+      <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+        <motion.div
+          key={stage.index}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            duration: 0.42,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="absolute inset-0"
+        >
+          <StageCard stage={stage} size={size} />
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ─── Stage card ───────────────────────────────────────────────────────────
 
 function StageCard({
@@ -443,41 +503,18 @@ function DesktopAnatomy() {
     [activeIndexMv],
   );
 
-  // Horizontal track — translates left as scroll progresses. Cards 60% of
-  // VIEWPORT width with 20vw padding-left so the first card starts centred,
-  // and translateX goes from 0 to -(N-1)*60vw + the px gap between them to
-  // bring each card in turn. The gap-4 = 16px between cards must be added
-  // to the translate, otherwise the final card lands 80px off centre.
-  // Track is intentionally pulled outside the max-w-1320px container so it
-  // spans the full viewport, breaking up the rigid central column.
-  const trackProgress = useTransform(
-    scrollYProgress,
-    [windowStart, windowEnd],
-    [0, 1],
-    { ease: [easeInOut] },
-  );
-  const trackXVw = useTransform(
-    trackProgress,
-    (p) => -60 * (STAGES.length - 1) * p,
-  );
-  const trackXPx = useTransform(
-    trackProgress,
-    (p) => -16 * (STAGES.length - 1) * p,
-  );
-  const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
-
   return (
     <div
       ref={sectionRef}
       className="scroll-pinned relative hidden lg:block"
-      style={{ height: "640vh" }}
+      style={{ height: "500vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
         {/* Header + pipeline inside the constrained max-w container */}
         <div className="mx-auto w-full max-w-[1320px] px-16">
           <Header />
 
-          <div className="mx-auto mt-14 max-w-[1100px]">
+          <div className="mx-auto mt-12 max-w-[1100px]">
             <Pipeline
               progress={scrollYProgress}
               activeIndex={activeIndex}
@@ -488,23 +525,16 @@ function DesktopAnatomy() {
           </div>
         </div>
 
-        {/* Card track — full viewport width, breaks out of the container */}
-        <div className="mt-10 overflow-hidden">
-          <motion.div
-            style={{ transform: trackTransform, willChange: "transform" }}
-            className="flex gap-4 pl-[20vw] pr-[20vw]"
-          >
-            {STAGES.map((stage) => (
-              <div key={stage.index} className="w-[60vw] flex-shrink-0">
-                <StageCard stage={stage} size="desktop" />
-              </div>
-            ))}
-          </motion.div>
+        {/* Single card slot — discrete swap, no continuous track. */}
+        <div className="mx-auto w-full max-w-[1320px] px-16">
+          <div className="mt-10">
+            <StageCardSlot activeIndex={activeIndex} size="desktop" />
+          </div>
         </div>
 
         {/* Closing tag back inside the constrained container */}
         <div className="mx-auto w-full max-w-[1320px] px-16">
-          <div className="mt-10">
+          <div className="mt-8">
             <ClosingTag />
           </div>
         </div>
@@ -547,46 +577,13 @@ function MobileAnatomy() {
     [activeIndexMv],
   );
 
-  // Track translates in both vw and px so the gap-3 (12px) between cards
-  // is included in the centring math, otherwise card 6 lands 60px off
-  // centre.
-  const trackProgress = useTransform(
-    scrollYProgress,
-    [windowStart, windowEnd],
-    [0, 1],
-    { ease: [easeInOut] },
-  );
-  const trackXVw = useTransform(
-    trackProgress,
-    (p) => -85 * (STAGES.length - 1) * p,
-  );
-  const trackXPx = useTransform(
-    trackProgress,
-    (p) => -12 * (STAGES.length - 1) * p,
-  );
-  const trackTransform = useMotionTemplate`translate3d(calc(${trackXVw}vw + ${trackXPx}px), 0, 0)`;
-
-  // Mobile section height: 480vh. mobileActivation now stretches the six
-  // stages across 0.06 → 0.76 of scroll (vs the old 0.06 → 0.56), so
-  // card 6 settles at ~80% of the section's mappable scroll instead of
-  // 60%. The remaining 20% of scroll (~76vh) is "dwell on the centred
-  // final card" — enough to read it, not so much that the section feels
-  // like it never ends. The bigger container (480vh up from 360vh) also
-  // slows each card's individual transit, so the animation reads
-  // deliberately rather than rapid-fire.
-  //
   // Stats + closing tag live OUTSIDE the sticky ref'd container so they
   // render as a normal flow band after the sticky pin releases.
-  //
-  // Card track wrapper lives OUTSIDE the padded inner container so it
-  // spans full viewport width — otherwise cards centred at 50vw end up
-  // ~20px right of where they should be (the container's px-5 padding
-  // shifts the track's left edge inward while cards use viewport units).
   return (
     <div className="relative border-b border-envrt-brand-black/8 lg:hidden">
-      <div ref={sectionRef} className="scroll-pinned" style={{ height: "480vh" }}>
+      <div ref={sectionRef} className="scroll-pinned" style={{ height: "420vh" }}>
         <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-6">
-          {/* Padded inner container — text only */}
+          {/* Padded inner container */}
           <div className="mx-auto w-full px-5 sm:px-8">
             <Header compact />
 
@@ -600,21 +597,11 @@ function MobileAnatomy() {
               <PipelineLabels activeIndex={activeIndex} variant="mobile" />
               <ActiveStageLabel activeIndex={activeIndex} />
             </div>
-          </div>
 
-          {/* Card track — full viewport, outside the padded container so
-              the centring math (cards at viewport-centre 50vw) lines up. */}
-          <div className="mt-5 overflow-hidden">
-            <motion.div
-              style={{ transform: trackTransform, willChange: "transform" }}
-              className="flex gap-3 pl-[7.5vw] pr-[7.5vw]"
-            >
-              {STAGES.map((stage) => (
-                <div key={stage.index} className="w-[85vw] flex-shrink-0">
-                  <StageCard stage={stage} size="mobile" />
-                </div>
-              ))}
-            </motion.div>
+            {/* Single card slot — discrete swap on stage change. */}
+            <div className="mt-5">
+              <StageCardSlot activeIndex={activeIndex} size="mobile" />
+            </div>
           </div>
         </div>
       </div>
