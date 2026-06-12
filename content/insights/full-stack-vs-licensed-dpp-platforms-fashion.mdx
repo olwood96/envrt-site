@@ -1,0 +1,89 @@
+---
+title: "Why Full-Stack Matters in DPP Platforms"
+description: "Most DPP platforms license at least one core layer. This guide explains what each handoff costs, why stacked platforms fail in subtle ways and what to ask a vendor before signing."
+date: "2026-06-12"
+author: "ENVRT"
+tags: ["DPP", "Comparison", "Procurement"]
+ogImage: "/v3-assets/provenance-loom.jpg"
+keywords: ["full-stack DPP platform", "in-house LCA engine fashion", "built vs licensed DPP", "partner API DPP risk", "LCA vendor lock-in", "native DPP rendering", "DPP procurement questions"]
+featured: false
+draft: false
+faq:
+  - question: "What does 'full-stack' mean in a DPP platform?"
+    answer: "A full-stack DPP platform owns the supply chain mapping layer, the LCA calculation layer and the DPP rendering layer in code its own team writes and maintains. Platforms that license one or more of these layers from a partner are stacked, not full-stack."
+  - question: "Why does it matter whether a vendor builds or licenses the LCA engine?"
+    answer: "A licensed engine updates on its vendor's release schedule, not yours. When PEFCR changes, when AWARE water data refreshes, when ISO 14040 receives a clarification, your timeline depends on three contracts aligning instead of one team shipping. The handoff also introduces a margin layer, an integration layer and a data ownership question that single-vendor deployments avoid."
+  - question: "How can a buyer tell whether a DPP platform is full-stack?"
+    answer: "Ask the vendor three direct questions. Who wrote the LCA code? What happens to my timeline when PEFCR updates? Which other platforms must I contract with to publish a complete DPP? Honest vendors answer each in one sentence."
+  - question: "Is a stacked platform always worse than a full-stack one?"
+    answer: "Not always. A specialist vendor with deep methodology investment may genuinely deliver better data in a single layer than an integrated platform. The trade-off for the brand is one extra contract, one extra integration, one extra renewal cycle and one extra handoff point per layer. For most SME and mid-market brands the integrated path is operationally simpler and structurally cheaper."
+---
+
+Every fashion DPP platform has to do three jobs. Map the supply chain down to fibre level. Calculate the lifecycle impact per garment. Render and host the consumer-facing passport. Few platforms own all three.
+
+Most vendors specialise in one layer, then license the rest from a partner. Retraced and TrusTrace map supply chains and integrate with LCA platforms like Carbonfact, Bcome or Peftrust for the calculation layer. Carbonfact runs the LCA engine and accepts traceability data from upstream. Aura, EON and Arianee focus on the consumer-facing rendering layer and ingest data from whichever LCA platform the brand chose.
+
+This is a reasonable structural choice for any single vendor. It is rarely the right structural choice for the brand buying from them.
+
+This piece explains what each handoff costs in practice, why stacked platforms fail in ways most procurement specs do not catch, and what to ask a DPP vendor before signing.
+
+## The Three Layers Every Fashion DPP Has To Solve
+
+A complete DPP for ESPR readiness requires three things working together.
+
+**Layer 1: Supply chain mapping.** The structured supplier dataset. Country of origin per stage, recognised certifications held, material composition at fibre level, supplier identity in tiered access, chain of custody documentation.
+
+**Layer 2: LCA calculation.** The environmental engine. ISO 14040 and 14044 methodology, [PEFCR alignment for textiles](/insights/eu-dpp-data-methodology-fashion-brands), 16 PEF impact indicators or a defensible subset, [AWARE water scarcity](/insights/water-scarcity-dpp-framework) weighting, French Coût Environnemental for brands selling into France.
+
+**Layer 3: Rendering and hosting.** The consumer-facing passport. QR data carrier, [role-based access tiers](/insights/dpp-data-access-tiers), brand-aligned design, scan analytics and durable URL hosting for the lifetime of the product.
+
+A platform that runs all three layers in its own code makes one team responsible for end-to-end behaviour. A platform that licenses any of the three pushes responsibility across vendor boundaries, where things take longer to fix, cost more to update and behave differently when the data flows across them.
+
+## Three Things That Break When a Layer Is Licensed
+
+**Methodology updates move at the slowest vendor's pace.** When PEFCR receives a version bump, when AWARE's underlying dataset refreshes, when ISO 14040 issues a clarification, every brand using a stacked platform waits for three contracts to align. The LCA partner ships first. The traceability platform refreshes its ingest. The rendering platform updates its data schema. The brand's timeline depends on the slowest vendor in the chain. A full-stack platform ships the update once.
+
+**Margin stacks on margin.** Each vendor in the chain prices for the full value of its layer. The [Renoon market analysis](/insights/dpp-software-pricing-transparency-fashion-2026) places mid-market DPP solutions in the €15,000 to €70,000 per year range, with two-platform configurations typically at the higher end or above. The brand pays the margin of two vendors for one DPP, because two companies are taking commercial value in the middle.
+
+**Data ownership splits across contracts.** Supplier data that flows from a traceability platform into an LCA engine has two custodians, two privacy policies and two exit clauses. When the brand wants to move platforms or audit its own data, the question of who owns what gets answered by lawyers, not engineers. Single-vendor deployments avoid this entirely.
+
+These are not edge cases. They are the typical behaviour of stacked DPP platforms in their second year of use.
+
+## What "All in Our Code" Means at ENVRT
+
+ENVRT runs all three layers as a single product. The supply chain map feeds the LCA engine. The engine writes to the DPP. The DPP surfaces scan analytics that flow back into the map. One team writes the code, one team ships the updates, one contract governs the data.
+
+What this means in practice for a brand:
+
+- **One LCA engine.** Calculation logic, factor sources, gap-filling and confidence scoring live in the [ENVRT LAB™ engine](/lab). Built around EU PEF, ISO 14040 and ISO 14044, with AWARE water scarcity weighting in the same calculation pass.
+- **One traceability map.** Tier 1 to Tier 4 supplier reconstruction, certificate vault, country of origin per stage. The data lives in the system the LCA engine reads from.
+- **One passport layer.** Hosted DPPs at permanent URLs on `dpp.envrt.com`, brand-customisable, QR-ready. Scan analytics by SKU. Evidence exports in a click.
+- **One contract, one price.** Published [pricing tiers](/pricing) from £149 per month plus custom. No partner markup on the LCA layer, no integration fee on the passport renderer.
+
+This is the structural difference between a full-stack and a stacked platform. Both can publish a DPP. Only one keeps the methodology, the data and the renewal cycle inside one team's control.
+
+## Five Questions to Ask Any DPP Vendor
+
+The cleanest way to test whether a platform is full-stack is to ask the vendor directly. Honest vendors answer each in one sentence.
+
+1. **Who wrote the LCA code?** A full-stack vendor names its own team. A stacked vendor names a partner.
+2. **What happens to my timeline when PEFCR updates?** A full-stack vendor describes a single release. A stacked vendor describes a coordination problem.
+3. **Which other platforms do I need to contract with to publish a complete DPP?** A full-stack vendor says none. A stacked vendor lists at least one partner.
+4. **Where is my data when it moves between layers?** A full-stack vendor describes one database. A stacked vendor describes an integration.
+5. **What is the price at 50 SKUs, 250 SKUs and 1,000 SKUs?** A full-stack vendor publishes the answer. A stacked vendor needs a workshop.
+
+If the vendor cannot answer all five in one short paragraph each, the platform is stacked. There is nothing wrong with stacked platforms. There is something wrong with stacked platforms sold as integrated ones.
+
+## When a Stack Is the Right Answer
+
+A stacked platform is the right structural choice for some brands. A luxury maison with a deep authentication and resale programme already invested in a specialist Layer 3 rendering vendor. A large group running a traceability platform deployed before DPP became urgent. A brand whose total volume justifies the cost of running two contracts to get specialised depth in each layer.
+
+For SME and mid-market fashion brands, the integrated path is operationally simpler, methodologically cleaner and structurally cheaper. The compound cost of running two vendors for one DPP rarely pays back at this scale.
+
+## What This Means for Procurement
+
+The procurement question is not whether a platform produces a DPP today. Almost every platform in the category produces a DPP. The question is who owns the methodology, the data and the renewal cycle behind it.
+
+A full-stack platform answers that question in one sentence. A stacked platform answers it in a partnership diagram.
+
+If you want to test ENVRT against your specific catalogue and DPP requirements, [submit one garment](/free-dpp) for a free regulation-ready DPP, or [book a 30-minute call](/contact) to walk through how the engine, the map and the passport fit together.

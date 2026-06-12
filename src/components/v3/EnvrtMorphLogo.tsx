@@ -50,7 +50,9 @@ export function EnvrtMorphLogo({
         position: "relative",
       }}
     >
-      {/* Full ENVRT wordmark — anchored to left edge, fades on compact. */}
+      {/* Full ENVRT wordmark — anchored to left edge, fades on compact.
+          mix-blend-mode: multiply drops the PNG's white background so
+          only the black strokes show against the glass pill. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 0 : 1 }}
@@ -60,6 +62,7 @@ export function EnvrtMorphLogo({
           inset: 0,
           width: envrtWidth,
           height,
+          mixBlendMode: "multiply",
         }}
       >
         <Image
@@ -72,7 +75,8 @@ export function EnvrtMorphLogo({
         />
       </motion.div>
 
-      {/* NV mark — anchored to left edge, fades in on compact. */}
+      {/* NV mark — anchored to left edge, fades in on compact. Same
+          multiply blend so the PNG's white box dissolves. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 1 : 0 }}
@@ -82,6 +86,7 @@ export function EnvrtMorphLogo({
           inset: 0,
           width: nvWidth,
           height,
+          mixBlendMode: "multiply",
         }}
       >
         <Image

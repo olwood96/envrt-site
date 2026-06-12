@@ -185,28 +185,47 @@ export function Navbar() {
         <motion.div
           initial={false}
           animate={{
-            // iOS/Instagram-style glass on mobile gets a dual shadow:
-            // outer lift plus an inset top highlight that mimics light
-            // catching the curve. Desktop keeps the simpler shadow
-            // because its 95% white background doesn't need the
-            // highlight to read as glass.
+            // iOS-style "ring of light" inset highlight on mobile:
+            // brightest at the top, softer down the sides. No outer
+            // border — the inset highlight does the edge definition.
+            // Desktop keeps the simpler shadow because its 95% white
+            // pill doesn't need the highlight to read as glass.
             boxShadow: scrolled
-              ? "0 18px 40px -22px rgba(14,14,14,0.18), inset 0 1px 0 0 rgba(255,255,255,0.7)"
-              : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.6)",
+              ? "0 18px 40px -22px rgba(14,14,14,0.18), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)"
+              : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.75), inset 0 -1px 0 0 rgba(255,255,255,0.12), inset 1px 0 0 0 rgba(255,255,255,0.30), inset -1px 0 0 0 rgba(255,255,255,0.30)",
           }}
           transition={{ duration: 0.3 }}
-          // Mobile-only liquid glass: heavy backdrop blur, saturation
-          // boost (the "vibrancy" trick that makes the colours behind
-          // pop instead of washing out), low-opacity white fill, and a
-          // high-contrast white border. Desktop keeps the more solid
-          // 95% white pill because the desktop bar carries nav items
-          // that need to read against any background underneath.
-          className={`relative flex items-stretch rounded-full border bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 ${
-            scrolled
-              ? "border-white/55 lg:border-envrt-brand-black/15"
-              : "border-white/45 lg:border-envrt-brand-black/10"
-          }`}
+          // Mobile-only liquid glass:
+          //   - bg-white/55 + backdrop-blur-[28px] + backdrop-saturate
+          //     [180%]: vibrancy effect that makes colours behind pop
+          //   - no border (was creating a visible ring); inset
+          //     highlights from the box-shadow define the edge instead
+          //   - filter: url(#liquid-glass-refract) applies the SVG
+          //     displacement filter from root layout for subtle edge
+          //     refraction
+          // Desktop keeps the more solid 95% white pill because its
+          // bar carries nav items that have to read against any
+          // background underneath.
+          className="relative flex items-stretch rounded-full bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:border lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 lg:border-envrt-brand-black/15"
         >
+          {/* Refraction overlay — mobile only. A diagonal linear
+              gradient that brightens the top-left and softens toward
+              the bottom-right, mimicking the way light bends through a
+              curved glass surface. Sits below all content (first
+              child, rendered behind) with pointer-events none so it
+              doesn't catch clicks. Combined with the ring-of-light
+              inset highlights, this gives the iOS Liquid Glass feel
+              without the heavy SVG displacement that distorts
+              content. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-full lg:hidden"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.10) 100%)",
+            }}
+          />
+
           {/* Wordmark — desktop uses the official PNG; mobile uses the
               typography-based morph wordmark so it can shrink ENVRT → NV
               when the bar compacts on scroll-down. */}
