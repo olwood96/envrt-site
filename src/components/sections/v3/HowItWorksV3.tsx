@@ -39,7 +39,7 @@ const steps: Step[] = [
 
 export function HowItWorksV3() {
   return (
-    <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
+    <section id="how-it-works" className="relative scroll-mt-24 bg-envrt-brand-vista py-20 sm:py-24 lg:py-28">
       <SectionCorners left="ENVRT/HIW" right="How it works" />
 
       <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-16">
