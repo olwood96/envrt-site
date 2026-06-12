@@ -69,6 +69,12 @@ export default function ContactV3Page() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
+    if (!turnstileToken) {
+      setError(
+        "Could not complete bot check. Please wait a moment and try again, or refresh the page if this keeps happening.",
+      );
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {

@@ -973,13 +973,14 @@ export default function AssessmentTool() {
   const [shareCopied, setShareCopied] = useState(false);
   const [shareView, setShareView] = useState(false);
 
-  // Anchor scrolls between sections (and from hero into the first
-  // question) to the questions container rather than the very top of
-  // the page. The dashboard preserves position context for the user.
-  const questionsRef = useRef<HTMLDivElement | null>(null);
+  // Anchor scrolls between screens and section transitions to the top
+  // of the quiz container, not the top of the page. Outer ref because
+  // it persists across every screen (hero, assessment, email, results)
+  // and survives screen-driven remounts.
+  const toolRef = useRef<HTMLDivElement | null>(null);
   const scrollToQuestions = useCallback(() => {
     if (typeof window === "undefined") return;
-    const target = questionsRef.current;
+    const target = toolRef.current;
     if (!target) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -1044,22 +1045,23 @@ export default function AssessmentTool() {
     if (!sectionComplete) return;
     if (currentSection < sections.length - 1) {
       setCurrentSection((s) => s + 1);
-      scrollToQuestions();
+      requestAnimationFrame(scrollToQuestions);
     } else {
       setScreen("email");
-      scrollToQuestions();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(scrollToQuestions);
+      });
     }
   };
 
   const goBack = () => {
     if (currentSection > 0) {
       setCurrentSection((s) => s - 1);
-      scrollToQuestions();
+      requestAnimationFrame(scrollToQuestions);
     }
   };
 
   const showResults = (s: Scores) => {
-    window.scrollTo(0, 0);
     setScreen("results");
     setAnimateResults(false);
     if (typeof window !== "undefined") {
@@ -1067,6 +1069,9 @@ export default function AssessmentTool() {
       const newUrl = `${window.location.pathname}?${params}`;
       window.history.replaceState(null, "", newUrl);
     }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToQuestions);
+    });
     setTimeout(() => setAnimateResults(true), 300);
   };
 
@@ -1080,7 +1085,9 @@ export default function AssessmentTool() {
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", window.location.pathname);
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToQuestions);
+    });
   };
 
   const copyShareLink = async () => {
@@ -1114,7 +1121,7 @@ export default function AssessmentTool() {
   const barriers = (answers.q25 as string[]) || [];
 
   return (
-    <>
+    <div ref={toolRef}>
       {screen === "hero" && (
         <div id="assessment-start" className="flex min-h-[60vh] items-center justify-center px-5 py-16 text-center">
           <FadeUp>
@@ -1150,7 +1157,7 @@ export default function AssessmentTool() {
       {screen === "assessment" && (
         <>
           <ProgressBar currentSection={currentSection} answers={answers} />
-          <div ref={questionsRef} className="pb-24 pt-16 sm:pt-20">
+          <div className="pb-24 pt-16 sm:pt-20">
             <Container className="max-w-[720px]">
               <div
                 key={section.id}
@@ -1593,6 +1600,6 @@ export default function AssessmentTool() {
           </Container>
         </div>
       )}
-    </>
+    </div>
   );
 }

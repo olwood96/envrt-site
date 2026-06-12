@@ -47,7 +47,21 @@ export function TurnstileWidget({
 
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    if (!siteKey) return;
+    if (!siteKey) {
+      // Surface the misconfig in the console so the cause is obvious
+      // when forms reject with "Bot verification failed". Server-side
+      // TURNSTILE_SECRET_KEY drives the verifier; if it's set, the
+      // widget MUST produce a token. Missing public key = no widget,
+      // no token, every submission rejected.
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[Turnstile] NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set. " +
+          "Forms will be rejected by the API. " +
+          "Set this env var in Vercel and redeploy."
+      );
+      onStatusChangeRef.current?.("error");
+      return;
+    }
 
     onStatusChangeRef.current?.("loading");
 
