@@ -7,12 +7,11 @@ import {
   motion,
   useMotionValueEvent,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, SECTION_SPRING, SectionCorners } from "./_shared";
+import { Eyebrow, SectionCorners } from "./_shared";
 
 // Polaroid stack — sticky 100vh window with five photo cards that fly in
 // from below as scroll progresses, fanning into a centred stack like a
@@ -121,13 +120,18 @@ const TICKER_WATER = [0, ...POLAROIDS.map((p) => p.cumWaterL), POLAROIDS[POLAROI
 export function PolaroidStackSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress: rawProgress } = useScroll({
+  const { scrollYProgress: progress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Shared smooth-scroll spring used across all v3 scroll-pinned sections.
-  const progress = useSpring(rawProgress, SECTION_SPRING);
+  // Spring smoothing removed. With heavy per-frame GPU cost from the
+  // five polaroid drop-shadows, frames vary in length. Spring math is
+  // timestep-sensitive — under irregular dt it overshoots its target
+  // then corrects, producing the visible "up and down jitter". Lenis
+  // already smooths the underlying scroll position, so the extra
+  // spring layer is redundant and only adds instability when frames
+  // get tight.
 
   // Cumulative ticker values — interpolate between stage arrival points.
   const co2 = useTransform(progress, [...TICKER_INPUT], [...TICKER_CO2]);

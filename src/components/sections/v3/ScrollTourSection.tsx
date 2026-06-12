@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, LivePill, SECTION_SPRING } from "./_shared";
+import { Eyebrow, LivePill } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
@@ -74,14 +74,18 @@ export function ScrollTourSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
-  const { scrollYProgress: rawProgress } = useScroll({
+  const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Spring-smoothed scroll — matches the unified mechanic used across v3
-  // scroll-pinned sections.
-  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
+  // Spring smoothing removed. With the cross-origin iframe being
+  // panned every frame, GPU cost is variable — and useSpring is
+  // timestep-sensitive, so under irregular dt it overshoots its
+  // target then corrects, producing the visible "up and down
+  // jitter". Lenis already smooths the underlying scroll position,
+  // so the spring layer is redundant and only adds instability when
+  // frames get tight.
 
   // Pan curve calibrated against the real DPP section positions (see the
   // stops table above and measurements.json). Lands the care section
