@@ -4,6 +4,7 @@ import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
+import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { Navbar } from "@/components/v3";
 import { FooterV3 } from "@/components/v3/FooterV3";
 import { PricingProvider } from "@/components/v3/pricing/PricingContext";
@@ -133,13 +134,15 @@ export default function RootLayout({
 
         <ConsentProvider>
           <PricingProvider>
-            <div
-              className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
-            >
-              <Navbar />
-              {children}
-              <FooterV3 />
-            </div>
+            <SmoothScroll>
+              <div
+                className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+              >
+                <Navbar />
+                {children}
+                <FooterV3 />
+              </div>
+            </SmoothScroll>
             <CookieBanner />
             <GA4 />
           </PricingProvider>

@@ -109,34 +109,13 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
           />
         </div>
 
-        {/* Real customer hangtag side-detail */}
-        <div
-          className={`absolute z-20 ${isDesktop ? "right-0 top-8 w-32 sm:w-36 lg:w-40" : "right-2 top-4 w-20 sm:right-4 sm:w-24"} -rotate-6`}
-        >
-          <div
-            className={`relative aspect-[3/4] overflow-hidden ${isDesktop ? "rounded-xl shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)]" : "rounded-lg shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)]"} bg-white ring-1 ring-envrt-brand-black/8`}
-          >
-            <Image
-              src="/v3-assets/angry-pablo-tag.jpg"
-              alt="ENVRT-issued Angry Pablo hangtag"
-              fill
-              sizes={isDesktop ? "160px" : "96px"}
-              className="object-cover"
-            />
-          </div>
-          {isDesktop && (
-            <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
-              Angry Pablo · live
-            </p>
-          )}
-        </div>
-
         {/* Official French Coût Environnemental label for the hoodie. The
             SVG is the calculated score from Ecobalyse; per their policy the
             label cannot be redrawn or restyled, so it sits inside a white
-            card pinned to the hoodie image. Balances the hangtag at top-right. */}
+            card pinned to the hoodie image. Slightly tilted so it reads as
+            hand-pinned rather than chrome. */}
         <div
-          className={`absolute z-20 ${isDesktop ? "left-0 bottom-12 w-40 sm:w-44" : "left-2 bottom-8 w-28 sm:left-4 sm:w-32"} rotate-[4deg]`}
+          className={`absolute z-20 ${isDesktop ? "right-0 top-8 w-40 sm:w-44" : "right-2 top-4 w-28 sm:right-4 sm:w-32"} -rotate-[5deg]`}
         >
           <div
             className={`relative rounded-xl bg-white ${isDesktop ? "p-2 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)]" : "p-1.5 shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)]"} ring-1 ring-envrt-brand-black/8`}

@@ -55,11 +55,15 @@ const SUPPLIERS = [
   { name: "Aydın · Fibre", tier: "T4", lng: 27.84, lat: 37.85, color: "#FFBF00", count: 1 },
 ];
 
-const TIER_LEGEND = [
-  { label: "T1 · Assembly", color: "#3E00FF" },
-  { label: "T2 · Fabric", color: "#00DAFF" },
-  { label: "T3 · Yarn", color: "#00B92C" },
-  { label: "T4 · Fibre", color: "#FFBF00" },
+// Process-order legend at the bottom of the map. Reads left-to-right as
+// the lifecycle flow (raw fibre → assembled garment), no "All Stages"
+// filter chip since this visual is a static snapshot of the dashboard.
+const PROCESS_LEGEND = [
+  { label: "Fibre", color: "#FFBF00" },
+  { label: "Yarn", color: "#00B92C" },
+  { label: "Fabric", color: "#00DAFF" },
+  { label: "Dyeing", color: "#DF5FFF" },
+  { label: "Assembly", color: "#3E00FF" },
 ];
 
 function VisualSupplyChainMap() {
@@ -141,8 +145,8 @@ function VisualSupplyChainMap() {
                 />
                 {s.count > 1 && (
                   <>
-                    <circle cx={r * 0.7} cy={-r * 0.7} r={9} fill="white" stroke={s.color} strokeWidth={1.4} />
-                    <text x={r * 0.7} y={-r * 0.7} textAnchor="middle" dominantBaseline="central" fill={s.color} fontSize="11" fontWeight="700">
+                    <circle cx={r * 0.85} cy={-r * 0.85} r={14} fill="white" stroke={s.color} strokeWidth={1.8} />
+                    <text x={r * 0.85} y={-r * 0.85} textAnchor="middle" dominantBaseline="central" fill={s.color} fontSize="16" fontWeight="700">
                       {s.count}
                     </text>
                   </>
@@ -153,27 +157,23 @@ function VisualSupplyChainMap() {
         </svg>
       </div>
 
-      {/* Pill toggle row — matches dashboard PillToggle visuals. */}
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-full bg-gray-100 p-1">
-        <PillTab label="All Stages" active />
-        {TIER_LEGEND.map((t) => (
-          <PillTab key={t.label} label={t.label.split(" · ")[1]} dot={t.color} />
+      {/* Process-order legend. Reads left to right as the lifecycle flow:
+          raw fibre on the left through to final assembly on the right.
+          Static snapshot of the dashboard PillToggle styling, no
+          interactive filtering. */}
+      <div className="mt-3 flex items-center justify-center gap-1 rounded-full bg-gray-100 p-1">
+        {PROCESS_LEGEND.map((t) => (
+          <PillTab key={t.label} label={t.label} dot={t.color} />
         ))}
       </div>
     </Card>
   );
 }
 
-function PillTab({ label, active, dot }: { label: string; active?: boolean; dot?: string }) {
+function PillTab({ label, dot }: { label: string; dot?: string }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium ${
-        active
-          ? "bg-white text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
-          : "text-gray-600"
-      }`}
-    >
-      {dot && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: dot }} />}
+    <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium text-gray-700">
+      {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}
       {label}
     </span>
   );
@@ -197,36 +197,46 @@ const LCA_STAGES = [
 function VisualLcaStages() {
   const maxCo2 = Math.max(...LCA_STAGES.map((s) => s.co2));
   const maxWater = Math.max(...LCA_STAGES.map((s) => s.water));
+  const totalCo2 = LCA_STAGES.reduce((s, x) => s + x.co2, 0);
+  const totalWater = LCA_STAGES.reduce((s, x) => s + x.water, 0);
 
   return (
     <Card title="Per-garment lifecycle impact">
       <div className="flex items-baseline justify-between">
         <p className="text-xs text-gray-500">Hoodie 0509-1882</p>
-        <p className="text-[10px] font-mono uppercase tracking-[0.14em] text-gray-400">6 stages</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gray-400">6 stages</p>
       </div>
 
-      <div className="mt-3 space-y-2">
+      {/* Stage rows. Label + kg value on the top line, full-width pill
+          bar below (green palette, light track + brighter fill, matches
+          the dashboard styling). AWARE water shown as a thinner aqua
+          pill stacked below for a per-stage water comparison. */}
+      <div className="mt-4 flex flex-1 flex-col justify-between gap-3">
         {LCA_STAGES.map((s) => {
           const co2Width = (s.co2 / maxCo2) * 100;
-          const waterFill = maxWater > 0 ? s.water / maxWater : 0;
+          const waterWidth = maxWater > 0 ? (s.water / maxWater) * 100 : 0;
           return (
-            <div key={s.stage} className="grid grid-cols-[88px_1fr_30px] items-center gap-2">
-              <span className="truncate text-[10px] font-medium text-gray-600">
-                {s.stage}
-              </span>
-              <div className="relative h-3.5 overflow-hidden rounded bg-gray-100">
-                <div
-                  className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-envrt-brand-ultramarine to-envrt-brand-royal"
-                  style={{ width: `${co2Width}%` }}
-                />
-                <span className="absolute inset-y-0 right-1.5 flex items-center font-mono text-[9px] font-semibold text-gray-900">
-                  {s.co2.toFixed(2)} kg
+            <div key={s.stage}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[11px] font-semibold text-envrt-brand-black">
+                  {s.stage}
+                </span>
+                <span className="font-mono text-[10px] font-semibold tracking-tight text-envrt-brand-black">
+                  {s.co2.toFixed(2)} <span className="text-gray-400">kg</span>
+                  <span className="ml-1.5 text-gray-400">·</span>
+                  <span className="ml-1.5 text-envrt-brand-aqua">{s.water.toFixed(1)} m³</span>
                 </span>
               </div>
-              <div className="relative h-3.5 overflow-hidden rounded bg-envrt-brand-aqua/12" title={`AWARE ${s.water.toFixed(1)} m³`}>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-envrt-green-light/40">
                 <div
-                  className="absolute inset-x-0 bottom-0 rounded bg-envrt-brand-aqua/70"
-                  style={{ height: `${Math.max(waterFill * 100, s.water > 0 ? 12 : 0)}%` }}
+                  className="h-full rounded-full bg-envrt-green"
+                  style={{ width: `${co2Width}%` }}
+                />
+              </div>
+              <div className="mt-1 h-1 overflow-hidden rounded-full bg-envrt-brand-aqua/12">
+                <div
+                  className="h-full rounded-full bg-envrt-brand-aqua/80"
+                  style={{ width: `${waterWidth}%` }}
                 />
               </div>
             </div>
@@ -234,14 +244,16 @@ function VisualLcaStages() {
         })}
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2.5">
         <div className="flex items-center gap-1">
           <Chip label="EU PEF" />
           <Chip label="ISO 14040" />
           <Chip label="AWARE" tone="aqua" />
         </div>
-        <p className="font-mono text-[10px] font-semibold text-gray-900">
-          7.45 kg CO₂e
+        <p className="font-mono text-[10px] font-semibold tracking-tight text-envrt-brand-black">
+          {totalCo2.toFixed(2)} kg <span className="text-gray-400">CO₂e</span>
+          <span className="ml-1.5 text-gray-300">·</span>
+          <span className="ml-1.5 text-envrt-brand-aqua">{totalWater.toFixed(1)} m³</span>
         </p>
       </div>
     </Card>
@@ -420,28 +432,29 @@ const VAULT_ROWS: VaultRow[] = [
   { name: "SGS_test_report_FW26.xlsx", size: "1.1 MB", category: "Testing", sku: "HOODIE-0509", status: "Approved", date: "2026-03-30", icon: "xlsx" },
   { name: "CoC_supplier_042.pdf", size: "318 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-03-18", icon: "pdf" },
   { name: "BoM_FW26.csv", size: "26 KB", category: "Materials", sku: "HOODIE-0509", status: "Approved", date: "2026-04-02", icon: "csv" },
+  { name: "GOTS_certificate.pdf", size: "284 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-03-04", icon: "pdf" },
   { name: "audit_log_export.eml", size: "9 KB", category: "Other", sku: "—", status: "Pending", date: "2026-04-15", icon: "email" },
 ];
 
 function VisualEvidenceVault() {
   return (
     <Card title="Evidence & Documentation">
-      <div className="overflow-hidden rounded-lg ring-1 ring-gray-200">
-        <table className="w-full text-left">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-lg ring-1 ring-gray-200">
+        <table className="w-full flex-1 text-left">
           <thead className="bg-gray-50 text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-500">
             <tr>
-              <th className="px-2.5 py-1.5">File</th>
-              <th className="px-2 py-1.5">Category</th>
-              <th className="px-2 py-1.5 text-right">Status</th>
+              <th className="px-2.5 py-2">File</th>
+              <th className="px-2 py-2">Category</th>
+              <th className="px-2 py-2 text-right">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-[10px]">
             {VAULT_ROWS.map((r) => (
               <tr key={r.name}>
-                <td className="px-2.5 py-1.5">
-                  <div className="flex items-center gap-1.5">
+                <td className="px-2.5 py-2.5">
+                  <div className="flex items-center gap-2">
                     <span className="flex-shrink-0 text-gray-400">
-                      <AssetIcon type={r.icon} size={13} />
+                      <AssetIcon type={r.icon} size={14} />
                     </span>
                     <div className="min-w-0">
                       <p className="truncate font-mono text-[10px] font-medium text-gray-900">
@@ -453,12 +466,12 @@ function VisualEvidenceVault() {
                     </div>
                   </div>
                 </td>
-                <td className="px-2 py-1.5">
+                <td className="px-2 py-2.5">
                   <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[9px] font-medium text-gray-700">
                     {r.category}
                   </span>
                 </td>
-                <td className="px-2 py-1.5 text-right">
+                <td className="px-2 py-2.5 text-right">
                   <StatusPill status={r.status} />
                 </td>
               </tr>
@@ -588,25 +601,23 @@ function VisualComplianceTimeline() {
     <Card title="Compliance">
       <p className="text-xs text-gray-500">Six regimes monitored. New ones picked up automatically.</p>
 
-      <div className="mt-3 grid grid-cols-2 gap-1.5">
+      <div className="mt-3 grid flex-1 grid-cols-2 gap-2">
         {REGIMES.map((r) => {
           const s = REGIME_STATUS[r.status];
           return (
-            <div key={r.label} className="rounded-lg border border-gray-200 bg-white p-2">
+            <div key={r.label} className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-2.5">
               <div className="flex items-start justify-between gap-1.5">
-                <div className="min-w-0">
-                  <p className="truncate text-[10px] font-semibold text-gray-900">
-                    {r.label}
-                  </p>
-                  <p className="truncate text-[9px] text-gray-500">
-                    {r.blurb}
-                  </p>
-                </div>
+                <p className="text-[10px] font-semibold leading-tight text-gray-900">
+                  {r.label}
+                </p>
                 <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8px] font-medium ${s.bg} ${s.text}`}>
                   <span className={`h-1 w-1 rounded-full ${s.dot}`} />
                   {s.label}
                 </span>
               </div>
+              <p className="mt-1.5 text-[9px] leading-snug text-gray-500">
+                {r.blurb}
+              </p>
             </div>
           );
         })}
@@ -702,7 +713,7 @@ function VisualScanAnalytics() {
         </div>
       </div>
 
-      <div className="relative mt-2 h-[180px]">
+      <div className="relative mt-2 min-h-[160px] flex-1">
         <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full" preserveAspectRatio="none">
           <defs>
             <linearGradient id="scans-grad-views" x1="0" y1="0" x2="0" y2="1">
@@ -804,21 +815,22 @@ function VisualGreenClaims() {
   return (
     <Card title="Marketing claim · pre-publish">
       {/* Quoted claim */}
-      <div className="rounded-lg bg-gray-50 p-2.5">
+      <div className="rounded-lg bg-gray-50 p-3">
         <p className="text-[11px] font-medium italic text-gray-700">
           &ldquo;Made with 80% organic cotton.&rdquo;
         </p>
-        <p className="mt-0.5 font-mono text-[9px] tracking-tight text-gray-400">
-          Hoodie 0509-1882
+        <p className="mt-1 font-mono text-[9px] tracking-tight text-gray-400">
+          Hoodie 0509-1882 · product description
         </p>
       </div>
 
-      {/* Evidence rows */}
-      <div className="mt-2.5 space-y-1.5">
+      {/* Evidence rows. flex-1 + gap so they grow with the canvas and
+          distribute evenly down the card. */}
+      <div className="mt-3 flex flex-1 flex-col justify-between gap-2">
         {CLAIM_EVIDENCE.map((e) => {
           const p = CLAIM_PILL[e.status];
           return (
-            <div key={e.label} className="rounded-lg border border-gray-200 bg-white p-2">
+            <div key={e.label} className="flex-1 rounded-lg border border-gray-200 bg-white p-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold text-gray-900">
@@ -827,7 +839,7 @@ function VisualGreenClaims() {
                   <p className="truncate font-mono text-[9px] text-gray-400">
                     {e.source}
                   </p>
-                  <p className="mt-0.5 truncate text-[10px] text-gray-500">
+                  <p className="mt-0.5 text-[10px] leading-snug text-gray-500">
                     {e.hint}
                   </p>
                 </div>
@@ -842,7 +854,7 @@ function VisualGreenClaims() {
       </div>
 
       {/* Footer summary */}
-      <div className="mt-2.5 flex items-center justify-between border-t border-gray-100 pt-2">
+      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2.5">
         <span className="text-[10px] text-gray-500">Pre-publish check</span>
         <span className="rounded bg-red-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-red-700">
           1 flag · cannot ship
