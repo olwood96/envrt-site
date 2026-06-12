@@ -4,27 +4,22 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 // Morphs between the two real brand marks: the full ENVRT wordmark
-// and the standalone NV mark (the same one used as the favicon).
-// Both PNGs sit stacked in the same fixed-height window; the visible
-// one cross-fades while the outer container width animates to fit
-// whichever mark is showing. NV stays anchored to the left edge so
-// the wordmark feels like it's collapsing inward to its initials.
+// and the standalone NV mark. Visual shrink of the pill itself is
+// done on the parent via `transform: scale()` (GPU-composited), so
+// this component only handles the cross-fade between the two assets.
 //
-// Two source assets so each mark renders with its own designed
-// geometry rather than as a crop of the other.
+// Critical: this component MUST NOT animate width, height, padding,
+// margin or any other layout property. Layout-property animations
+// during scroll-pinned section playback cause main-thread reflow
+// that stutters the heavy useScroll/useTransform chains in those
+// sections (Polaroid, ScrollTour). All animations here are opacity
+// only — pure GPU composite, no main-thread cost.
 
-import type { Transition } from "framer-motion";
+const FADE = { duration: 0.18, ease: "easeOut" } as const;
 
-const SPRING: Transition = {
-  type: "spring",
-  stiffness: 280,
-  damping: 18,
-  mass: 0.7,
-};
-
-// ENVRT wordmark is 1643×518 → ratio ≈ 3.17
-// NV mark is 384×344 → ratio ≈ 1.12 (two bars + diagonal, slightly
-// wider than tall).
+// Source dimensions used to pick a stable container size. Container
+// width is the FULL ENVRT width at all times so layout never moves;
+// the NV image renders left-aligned inside that fixed slot.
 const ENVRT_RATIO = 1643 / 518;
 const NV_RATIO = 384 / 344;
 
@@ -39,25 +34,22 @@ export function EnvrtMorphLogo({
   const nvWidth = Math.round(height * NV_RATIO);
 
   return (
-    <motion.div
+    <div
       role="img"
       aria-label="ENVRT"
-      initial={false}
-      animate={{ width: compact ? nvWidth : envrtWidth }}
-      transition={SPRING}
       style={{
+        // Fixed-width container. The pill shrinks via parent scale
+        // transform, not by changing this width.
+        width: envrtWidth,
         height,
         position: "relative",
       }}
     >
-      {/* Full ENVRT wordmark — anchored to left edge, fades on compact.
-          Underlying PNG is true RGBA (processed by
-          scripts/transparent-logo.mjs) so it sits cleanly on the
-          glass without needing a blend-mode workaround. */}
+      {/* Full ENVRT wordmark — left-anchored, fades out on compact. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 0 : 1 }}
-        transition={{ duration: 0.18, ease: "easeOut" }}
+        transition={FADE}
         style={{
           position: "absolute",
           inset: 0,
@@ -75,14 +67,15 @@ export function EnvrtMorphLogo({
         />
       </motion.div>
 
-      {/* NV mark — anchored to left edge, fades in on compact. */}
+      {/* NV mark — sits in the leftmost slot, fades in on compact. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 1 : 0 }}
-        transition={{ duration: 0.18, ease: "easeOut" }}
+        transition={FADE}
         style={{
           position: "absolute",
-          inset: 0,
+          left: 0,
+          top: 0,
           width: nvWidth,
           height,
         }}
@@ -96,6 +89,6 @@ export function EnvrtMorphLogo({
           style={{ display: "block", width: nvWidth, height }}
         />
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

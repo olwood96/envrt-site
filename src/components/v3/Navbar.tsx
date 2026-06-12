@@ -200,38 +200,29 @@ export function Navbar() {
         <motion.div
           initial={false}
           animate={{
-            // iOS-style "ring of light" inset highlight on mobile:
-            // brightest at the top, softer down the sides. No outer
-            // border — the inset highlight does the edge definition.
-            // Desktop keeps the simpler shadow because its 95% white
-            // pill doesn't need the highlight to read as glass.
+            // Scale the WHOLE pill via transform on compact. Pure GPU
+            // composite, no layout reflow — the homepage scroll-pinned
+            // sections (Polaroid, ScrollTour) keep their full frame
+            // budget. Spring config matches the original "bouncy"
+            // pill expand.
+            scale: compact ? 0.82 : 1,
+            // iOS "ring of light" inset highlight, brightest at top.
             boxShadow: scrolled
               ? "0 18px 40px -22px rgba(14,14,14,0.18), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)"
               : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.75), inset 0 -1px 0 0 rgba(255,255,255,0.12), inset 1px 0 0 0 rgba(255,255,255,0.30), inset -1px 0 0 0 rgba(255,255,255,0.30)",
           }}
-          transition={{ duration: 0.3 }}
-          // Mobile-only liquid glass + perf containment:
-          //   - bg-white/55 + backdrop-blur-[28px] + backdrop-saturate
-          //     [180%]: vibrancy effect that makes colours behind pop
-          //   - no border (was creating a visible ring); inset
-          //     highlights from the box-shadow define the edge instead
-          //   - contain: layout style paint isolates the pill's
-          //     internal reflows (from the compact-state width
-          //     spring animations) so they don't cascade into the
-          //     rest of the document and stutter the scroll-pinned
-          //     sections elsewhere on the page.
-          // Desktop keeps the more solid 95% white pill because its
-          // bar carries nav items that have to read against any
-          // background underneath.
+          transition={{
+            scale: { type: "spring", stiffness: 280, damping: 18, mass: 0.7 },
+            boxShadow: { duration: 0.3 },
+          }}
           className="relative flex items-stretch rounded-full bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:border lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 lg:border-envrt-brand-black/15"
           style={{
             // Force the pill onto its own GPU compositor layer so
             // scrolling underneath only requires a layer translation,
-            // not a main-thread repaint. Avoid CSS `contain` on the
-            // pill itself — its desktop dropdowns are positioned
-            // absolutely below the pill and any containment on the
-            // pill clips them out of view.
-            transform: "translateZ(0)",
+            // not a main-thread repaint. Compact-state scale animates
+            // on the same layer — zero layout cost, zero stuttering
+            // of homepage scroll-pinned sections.
+            transformOrigin: "center center",
             willChange: "transform",
           }}
         >
@@ -268,12 +259,6 @@ export function Navbar() {
                 setMobileOpen(true);
               }
             }}
-            // contain: layout style isolates the wordmark's compact-
-            // state width spring so its per-frame reflow can't
-            // cascade out and stutter scroll-pinned sections below.
-            // Safe on this element specifically because nothing
-            // absolutely-positioned escapes out of the wordmark.
-            style={{ contain: "layout style" }}
             className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
             aria-label={compact ? "Open menu" : "ENVRT"}
           >
@@ -321,25 +306,13 @@ export function Navbar() {
 
           {/* Mobile hamburger. Bars also shrink slightly when compact
               so the visual weight tracks the smaller pill. */}
-          <motion.button
+          {/* Hamburger no longer animates its own width/height. The
+              whole pill scales via transform on compact, which scales
+              the hamburger with it — pure GPU, zero reflow. */}
+          <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            initial={false}
-            animate={{
-              width: compact ? 36 : 48,
-              height: compact ? 36 : 48,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 280,
-              damping: 18,
-              mass: 0.7,
-            }}
-            // contain: layout style isolates the hamburger's compact-
-            // state size spring so its per-frame reflow can't
-            // cascade out and stutter scroll-pinned sections below.
-            style={{ contain: "layout style" }}
-            className="flex flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
+            className="flex h-12 w-12 flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
           >
@@ -358,7 +331,7 @@ export function Navbar() {
               transition={{ duration: 0.2 }}
               className="block h-0.5 w-5 bg-envrt-brand-black"
             />
-          </motion.button>
+          </button>
         </motion.div>
       </header>
 

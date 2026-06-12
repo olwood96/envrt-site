@@ -172,10 +172,7 @@ export function PolaroidStackSection() {
               mobile + tablet with the ticker dropping below the polaroids. */}
           <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
             {/* Stack stage */}
-            <div
-              className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]"
-              style={{ contain: "layout style paint" }}
-            >
+            <div className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]">
               {POLAROIDS.map((p, i) => (
                 <PolaroidCard
                   key={p.index}
