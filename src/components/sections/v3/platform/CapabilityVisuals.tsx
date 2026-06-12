@@ -207,14 +207,13 @@ function VisualLcaStages() {
         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gray-400">6 stages</p>
       </div>
 
-      {/* Stage rows. Label + kg value on the top line, full-width pill
-          bar below (green palette, light track + brighter fill, matches
-          the dashboard styling). AWARE water shown as a thinner aqua
-          pill stacked below for a per-stage water comparison. */}
-      <div className="mt-4 flex flex-1 flex-col justify-between gap-3">
+      {/* Stage rows. One row per stage: label + kg / m³ values on the
+          top line, single green pill bar below. AWARE water is shown
+          inline as a small aqua text value, not a second bar — a
+          stacked dual-bar reads as cluttered at this canvas size. */}
+      <div className="mt-4 flex flex-1 flex-col justify-between gap-2">
         {LCA_STAGES.map((s) => {
           const co2Width = (s.co2 / maxCo2) * 100;
-          const waterWidth = maxWater > 0 ? (s.water / maxWater) * 100 : 0;
           return (
             <div key={s.stage}>
               <div className="flex items-baseline justify-between gap-2">
@@ -222,21 +221,19 @@ function VisualLcaStages() {
                   {s.stage}
                 </span>
                 <span className="font-mono text-[10px] font-semibold tracking-tight text-envrt-brand-black">
-                  {s.co2.toFixed(2)} <span className="text-gray-400">kg</span>
-                  <span className="ml-1.5 text-gray-400">·</span>
-                  <span className="ml-1.5 text-envrt-brand-aqua">{s.water.toFixed(1)} m³</span>
+                  {s.co2.toFixed(2)}
+                  <span className="ml-0.5 text-gray-400">kg</span>
+                  <span className="mx-1.5 text-gray-300">·</span>
+                  <span className="text-envrt-brand-aqua/80">
+                    {s.water.toFixed(1)}
+                    <span className="ml-0.5">m³</span>
+                  </span>
                 </span>
               </div>
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-green-100">
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-green-100">
                 <div
                   className="h-full rounded-full bg-green-500"
                   style={{ width: `${co2Width}%` }}
-                />
-              </div>
-              <div className="mt-1 h-1 overflow-hidden rounded-full bg-envrt-brand-aqua/15">
-                <div
-                  className="h-full rounded-full bg-envrt-brand-aqua/80"
-                  style={{ width: `${waterWidth}%` }}
                 />
               </div>
             </div>
@@ -581,10 +578,15 @@ function VisualAuditPack() {
 // Mirrors the dashboard compliance hub: a grid of regime tiles, each with
 // label, blurb and status. Plus a small "watching" pill at top.
 
+// Mirrors what the site copy actually claims we track. The platform body
+// names "EU PEF updates, ISO revisions, French AGEC and emerging US
+// state-level acts"; the FAQ names "EU ESPR for textile DPPs, French
+// Coût Environnemental, UK DMCCA-aligned green-claims hygiene and the
+// EU Green Claims Directive". Every tile here ties back to one of those.
 const REGIMES = [
   { label: "France · Coût Environnemental", blurb: "AGEC, Décret 2025-957", status: "live" as const },
   { label: "EU · ESPR DPP", blurb: "Regulation 2024/1781", status: "watching" as const },
-  { label: "EU · CSRD ESRS", blurb: "Sustainability reporting", status: "watching" as const },
+  { label: "EU · PEF v3.1", blurb: "Product Environmental Footprint", status: "live" as const },
   { label: "ISO 14040", blurb: "LCA standards revision", status: "live" as const },
   { label: "CA SB-707", blurb: "EPR for textile producers", status: "scope" as const },
   { label: "NY S-4859", blurb: "Disclosure draft tracked", status: "watching" as const },
@@ -649,12 +651,17 @@ const SCAN_DATA: { date: string; views: number; visitors: number }[] = [
 ];
 
 function VisualScanAnalytics() {
+  // viewBox aspect chosen to match the chart container's rendered aspect
+  // inside the 5:4 canvas (card padding + title + header strip taken into
+  // account). Lets the default preserveAspectRatio="xMidYMid meet" scale
+  // the chart uniformly without stretching axis text or distorting the
+  // area fill the way preserveAspectRatio="none" did.
   const W = 480;
-  const H = 200;
-  const PAD_L = 32;
-  const PAD_R = 12;
-  const PAD_T = 8;
-  const PAD_B = 24;
+  const H = 300;
+  const PAD_L = 38;
+  const PAD_R = 14;
+  const PAD_T = 12;
+  const PAD_B = 34;
 
   const maxY = Math.max(...SCAN_DATA.map((d) => d.views));
   const xStep = (W - PAD_L - PAD_R) / (SCAN_DATA.length - 1);
@@ -693,7 +700,11 @@ function VisualScanAnalytics() {
   const xLabels = SCAN_DATA.map((d, i) => ({
     x: PAD_L + i * xStep,
     label: formatDate(d.date),
-    show: i === 0 || i === SCAN_DATA.length - 1 || i % 4 === 0,
+    // Every 4th tick plus the last. Skip the i%4 tick if it lands next
+    // to the last-index tick to avoid the labels colliding visually.
+    show:
+      (i === 0 || i % 4 === 0 || i === SCAN_DATA.length - 1) &&
+      !(i % 4 === 0 && i === SCAN_DATA.length - 2),
   }));
 
   const totalScans = SCAN_DATA.reduce((sum, d) => sum + d.views, 0);
@@ -713,8 +724,8 @@ function VisualScanAnalytics() {
         </div>
       </div>
 
-      <div className="relative mt-2 min-h-[160px] flex-1">
-        <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full" preserveAspectRatio="none">
+      <div className="relative mt-2 flex-1">
+        <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full">
           <defs>
             <linearGradient id="scans-grad-views" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#20E036" stopOpacity="0.18" />
@@ -734,14 +745,14 @@ function VisualScanAnalytics() {
                 x2={W - PAD_R}
                 y2={t.y}
                 stroke="#E5E7EB"
-                strokeWidth={0.8}
-                strokeDasharray="3 3"
+                strokeWidth={1}
+                strokeDasharray="4 4"
               />
               <text
-                x={PAD_L - 4}
-                y={t.y + 3}
+                x={PAD_L - 6}
+                y={t.y + 4}
                 textAnchor="end"
-                fontSize="9"
+                fontSize="11"
                 fontFamily="ui-sans-serif, system-ui, sans-serif"
                 fill="#9CA3AF"
               >
@@ -751,17 +762,17 @@ function VisualScanAnalytics() {
           ))}
 
           <path d={areaFor(pointsVisitors)} fill="url(#scans-grad-visitors)" />
-          <path d={lineFor(pointsVisitors)} fill="none" stroke="#3E00FF" strokeWidth={1.4} strokeDasharray="4 2" />
+          <path d={lineFor(pointsVisitors)} fill="none" stroke="#3E00FF" strokeWidth={2} strokeDasharray="5 3" />
 
           <path d={areaFor(pointsViews)} fill="url(#scans-grad-views)" />
-          <path d={lineFor(pointsViews)} fill="none" stroke="#20E036" strokeWidth={2} />
+          <path d={lineFor(pointsViews)} fill="none" stroke="#20E036" strokeWidth={2.5} />
 
           {(() => {
             const peakIdx = SCAN_DATA.reduce((max, d, i) => (d.views > SCAN_DATA[max].views ? i : max), 0);
             const [px, py] = pointsViews[peakIdx];
             return (
               <g>
-                <circle cx={px} cy={py} r={3.5} fill="#fff" stroke="#20E036" strokeWidth={2} />
+                <circle cx={px} cy={py} r={5} fill="#fff" stroke="#20E036" strokeWidth={2.5} />
               </g>
             );
           })()}
@@ -770,9 +781,9 @@ function VisualScanAnalytics() {
             <text
               key={i}
               x={l.x}
-              y={H - PAD_B + 14}
+              y={H - PAD_B + 18}
               textAnchor="middle"
-              fontSize="9"
+              fontSize="11"
               fontFamily="ui-sans-serif, system-ui, sans-serif"
               fill="#9CA3AF"
             >
