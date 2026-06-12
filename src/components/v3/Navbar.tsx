@@ -224,7 +224,16 @@ export function Navbar() {
           // bar carries nav items that have to read against any
           // background underneath.
           className="relative flex items-stretch rounded-full bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:border lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 lg:border-envrt-brand-black/15"
-          style={{ contain: "layout style paint" }}
+          style={{
+            // Force the pill onto its own GPU compositor layer so
+            // scrolling underneath only requires a layer translation,
+            // not a main-thread repaint. Avoid CSS `contain` on the
+            // pill itself — its desktop dropdowns are positioned
+            // absolutely below the pill and any containment on the
+            // pill clips them out of view.
+            transform: "translateZ(0)",
+            willChange: "transform",
+          }}
         >
           {/* Refraction overlay — mobile only. A diagonal linear
               gradient that brightens the top-left and softens toward
@@ -259,6 +268,12 @@ export function Navbar() {
                 setMobileOpen(true);
               }
             }}
+            // contain: layout style isolates the wordmark's compact-
+            // state width spring so its per-frame reflow can't
+            // cascade out and stutter scroll-pinned sections below.
+            // Safe on this element specifically because nothing
+            // absolutely-positioned escapes out of the wordmark.
+            style={{ contain: "layout style" }}
             className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
             aria-label={compact ? "Open menu" : "ENVRT"}
           >
@@ -320,6 +335,10 @@ export function Navbar() {
               damping: 18,
               mass: 0.7,
             }}
+            // contain: layout style isolates the hamburger's compact-
+            // state size spring so its per-frame reflow can't
+            // cascade out and stutter scroll-pinned sections below.
+            style={{ contain: "layout style" }}
             className="flex flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
