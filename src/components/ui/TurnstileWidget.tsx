@@ -29,6 +29,8 @@ interface TurnstileWidgetProps {
   onToken: (token: string) => void;
   onStatusChange?: (status: TurnstileStatus) => void;
   appearance?: "always" | "execute" | "interaction-only";
+  size?: "normal" | "compact";
+  theme?: "light" | "dark" | "auto";
   className?: string;
 }
 
@@ -36,6 +38,8 @@ export function TurnstileWidget({
   onToken,
   onStatusChange,
   appearance = "always",
+  size = "normal",
+  theme = "light",
   className,
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,7 +90,8 @@ export function TurnstileWidget({
           onTokenRef.current("");
           onStatusChangeRef.current?.("error");
         },
-        theme: "light",
+        theme,
+        size,
         appearance,
       });
     }
@@ -166,8 +171,18 @@ export function TurnstileIndicator({ status }: { status: TurnstileStatus }) {
 }
 
 /**
- * Drop-in replacement: renders a hidden Turnstile widget + a small visual indicator.
- * Use this instead of TurnstileWidget when you don't want the Cloudflare branding.
+ * Compact Turnstile mount for inline form use.
+ *
+ * Themed to fit v3: compact size, light theme, wrapped in a brand
+ * caption. We can't restyle the actual challenge box (it lives in
+ * a Cloudflare-controlled iframe), but the size + theme + frame
+ * makes it feel intentional rather than bolted on.
+ *
+ * Uses `appearance="always"` so the widget is always rendered (not
+ * the previous `interaction-only` inside an invisible container,
+ * which silently broke any flow where Cloudflare needed the user to
+ * actually click the checkbox: VPN, ad blocker, suspicious
+ * fingerprint, etc).
  */
 export function HiddenTurnstile({
   onToken,
@@ -176,19 +191,18 @@ export function HiddenTurnstile({
   onToken: (token: string) => void;
   className?: string;
 }) {
-  const [status, setStatus] = useState<TurnstileStatus>("loading");
-
   return (
-    <div className={`flex items-center ${className ?? ""}`}>
-      {/* Hidden Turnstile — rendered off-screen but still in DOM */}
-      <div className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0" aria-hidden="true">
-        <TurnstileWidget
-          onToken={onToken}
-          onStatusChange={setStatus}
-          appearance="interaction-only"
-        />
-      </div>
-      <TurnstileIndicator status={status} />
+    <div
+      className={`flex flex-col items-center gap-2 rounded-2xl border border-envrt-brand-black/10 bg-white/60 px-4 py-4 backdrop-blur sm:px-5 ${className ?? ""}`}
+    >
+      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[10px]">
+        Quick bot check
+      </p>
+      <TurnstileWidget
+        onToken={onToken}
+        appearance="always"
+        size="compact"
+      />
     </div>
   );
 }
