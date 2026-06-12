@@ -142,7 +142,10 @@ export function ScrollTourSection() {
                   mobile viewport width so the DPP's responsive layout reads
                   correctly), then scaled down per breakpoint to fit the
                   phone frame. */}
-              <div className="relative h-[268px] overflow-hidden bg-white sm:h-[370px] lg:h-[600px]">
+              <div
+                className="relative h-[268px] overflow-hidden bg-white sm:h-[370px] lg:h-[600px]"
+                style={{ contain: "layout style paint" }}
+              >
                 {/* Skeleton placeholder. Renders behind the iframe so the
                     phone never shows a blank white screen during the iframe
                     fetch. Hidden once the iframe finishes loading. */}

@@ -172,7 +172,10 @@ export function PolaroidStackSection() {
               mobile + tablet with the ticker dropping below the polaroids. */}
           <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
             {/* Stack stage */}
-            <div className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]">
+            <div
+              className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]"
+              style={{ contain: "layout style paint" }}
+            >
               {POLAROIDS.map((p, i) => (
                 <PolaroidCard
                   key={p.index}
@@ -235,10 +238,22 @@ function PolaroidCard({
 
   return (
     <motion.div
-      style={{ x, y, rotate, opacity, zIndex }}
+      style={{
+        x,
+        y,
+        rotate,
+        opacity,
+        zIndex,
+        // GPU-rasterised drop-shadow instead of the previous 50px
+        // box-shadow blur which had to be CPU-painted every frame
+        // for every animating card. drop-shadow runs on the
+        // compositor, so the cost stops scaling with animation
+        // frequency.
+        filter: "drop-shadow(0 14px 18px rgba(14,14,14,0.28))",
+      }}
       className="absolute left-1/2 top-1/2 -ml-[110px] -mt-[140px] sm:-ml-[130px] sm:-mt-[170px]"
     >
-      <div className="w-[220px] rounded-sm bg-white p-3 pb-5 shadow-[0_24px_50px_-18px_rgba(14,14,14,0.35)] ring-1 ring-envrt-brand-black/8 sm:w-[260px] sm:p-4 sm:pb-6">
+      <div className="w-[220px] rounded-sm bg-white p-3 pb-5 ring-1 ring-envrt-brand-black/8 sm:w-[260px] sm:p-4 sm:pb-6">
         <div className="relative aspect-square w-full overflow-hidden">
           <Image
             src={polaroid.src}
