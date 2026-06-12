@@ -469,7 +469,7 @@ function DesktopAnatomy() {
   return (
     <div
       ref={sectionRef}
-      className="relative hidden lg:block"
+      className="scroll-pinned relative hidden lg:block"
       style={{ height: "640vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-12">
@@ -584,7 +584,7 @@ function MobileAnatomy() {
   // shifts the track's left edge inward while cards use viewport units).
   return (
     <div className="relative border-b border-envrt-brand-black/8 lg:hidden">
-      <div ref={sectionRef} style={{ height: "480vh" }}>
+      <div ref={sectionRef} className="scroll-pinned" style={{ height: "480vh" }}>
         <div className="sticky top-0 flex h-screen flex-col justify-center bg-envrt-brand-vista py-6">
           {/* Padded inner container — text only */}
           <div className="mx-auto w-full px-5 sm:px-8">

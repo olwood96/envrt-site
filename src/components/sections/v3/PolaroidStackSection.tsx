@@ -136,7 +136,7 @@ export function PolaroidStackSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-envrt-brand-vista"
+      className="scroll-pinned relative bg-envrt-brand-vista"
       style={{ height: "360vh", overflowX: "clip" }}
     >
       <SectionCorners left="ENVRT/LAB" right="Hoodie 0509-1882" />

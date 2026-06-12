@@ -248,7 +248,7 @@ function DesktopScatter() {
   return (
     <div
       ref={sectionRef}
-      className="relative hidden lg:block"
+      className="scroll-pinned relative hidden lg:block"
       style={{ height: "480vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
@@ -564,7 +564,7 @@ function MobileScatter() {
   return (
     <div
       ref={sectionRef}
-      className="relative lg:hidden"
+      className="scroll-pinned relative lg:hidden"
       style={{ height: "440vh" }}
     >
       <div className="sticky top-0 flex h-screen flex-col bg-envrt-brand-vista px-5 pt-12 pb-6 sm:px-8 sm:pt-16 sm:pb-8">

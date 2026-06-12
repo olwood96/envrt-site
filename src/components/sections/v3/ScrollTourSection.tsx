@@ -72,7 +72,7 @@ export function ScrollTourSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-envrt-brand-vista text-envrt-brand-black"
+      className="scroll-pinned relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ height: "500vh", overflowX: "clip" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
