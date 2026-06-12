@@ -160,8 +160,9 @@ function VisualSupplyChainMap() {
       {/* Process-order legend. Reads left to right as the lifecycle flow:
           raw fibre on the left through to final assembly on the right.
           Static snapshot of the dashboard PillToggle styling, no
-          interactive filtering. */}
-      <div className="mt-3 flex items-center justify-center gap-1 rounded-full bg-gray-100 p-1">
+          interactive filtering. flex-wrap so the row gracefully drops
+          to two lines on narrow mobile widths instead of overflowing. */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 rounded-full bg-gray-100 p-1">
         {PROCESS_LEGEND.map((t) => (
           <PillTab key={t.label} label={t.label} dot={t.color} />
         ))}
@@ -172,8 +173,8 @@ function VisualSupplyChainMap() {
 
 function PillTab({ label, dot }: { label: string; dot?: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium text-gray-700">
-      {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}
+    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium text-gray-700 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-[11px]">
+      {dot && <span className="h-1.5 w-1.5 rounded-full sm:h-2 sm:w-2" style={{ backgroundColor: dot }} />}
       {label}
     </span>
   );
@@ -216,13 +217,13 @@ function VisualLcaStages() {
           return (
             <div key={s.stage}>
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[11px] font-semibold text-envrt-brand-black">
+                <span className="min-w-0 truncate text-[10px] font-semibold text-envrt-brand-black sm:text-[11px]">
                   {s.stage}
                 </span>
-                <span className="font-mono text-[10px] font-semibold tracking-tight text-envrt-brand-black">
+                <span className="flex-shrink-0 font-mono text-[9px] font-semibold tracking-tight text-envrt-brand-black sm:text-[10px]">
                   {s.co2.toFixed(2)}
                   <span className="ml-0.5 text-gray-400">kg</span>
-                  <span className="mx-1.5 text-gray-300">·</span>
+                  <span className="mx-1 text-gray-300 sm:mx-1.5">·</span>
                   <span className="text-envrt-brand-aqua/80">
                     {s.water.toFixed(1)}
                     <span className="ml-0.5">m³</span>
@@ -240,16 +241,16 @@ function VisualLcaStages() {
         })}
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2.5">
-        <div className="flex items-center gap-1">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 border-t border-gray-100 pt-2.5">
+        <div className="flex flex-wrap items-center gap-1">
           <Chip label="EU PEF" />
           <Chip label="ISO 14040" />
           <Chip label="AWARE" tone="aqua" />
         </div>
-        <p className="font-mono text-[10px] font-semibold tracking-tight text-envrt-brand-black">
+        <p className="font-mono text-[9px] font-semibold tracking-tight text-envrt-brand-black sm:text-[10px]">
           {totalCo2.toFixed(2)} kg <span className="text-gray-400">CO₂e</span>
-          <span className="ml-1.5 text-gray-300">·</span>
-          <span className="ml-1.5 text-envrt-brand-aqua">{totalWater.toFixed(1)} m³</span>
+          <span className="mx-1 text-gray-300 sm:mx-1.5">·</span>
+          <span className="text-envrt-brand-aqua">{totalWater.toFixed(1)} m³</span>
         </p>
       </div>
     </Card>
@@ -434,7 +435,6 @@ const VAULT_ROWS: VaultRow[] = [
   { name: "SGS_test_report_FW26.xlsx", size: "1.1 MB", category: "Testing", sku: "HOODIE-0509", status: "Approved", date: "2026-03-30", icon: "xlsx" },
   { name: "CoC_supplier_042.pdf", size: "318 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-03-18", icon: "pdf" },
   { name: "BoM_FW26.csv", size: "26 KB", category: "Materials", sku: "HOODIE-0509", status: "Approved", date: "2026-04-02", icon: "csv" },
-  { name: "GOTS_certificate.pdf", size: "284 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-03-04", icon: "pdf" },
   { name: "audit_log_export.eml", size: "9 KB", category: "Other", sku: "—", status: "Pending", date: "2026-04-15", icon: "email" },
 ];
 
@@ -445,15 +445,15 @@ function VisualEvidenceVault() {
         <table className="w-full flex-1 text-left">
           <thead className="bg-gray-50 text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-500">
             <tr>
-              <th className="px-2.5 py-2">File</th>
-              <th className="px-2 py-2">Category</th>
-              <th className="px-2 py-2 text-right">Status</th>
+              <th className="px-2.5 py-1.5">File</th>
+              <th className="px-2 py-1.5">Category</th>
+              <th className="px-2 py-1.5 text-right">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-[10px]">
             {VAULT_ROWS.map((r) => (
               <tr key={r.name}>
-                <td className="px-2.5 py-2.5">
+                <td className="px-2.5 py-1.5 sm:py-2">
                   <div className="flex items-center gap-2">
                     <span className="flex-shrink-0 text-gray-400">
                       <AssetIcon type={r.icon} size={14} />
@@ -468,12 +468,12 @@ function VisualEvidenceVault() {
                     </div>
                   </div>
                 </td>
-                <td className="px-2 py-2.5">
+                <td className="px-2 py-1.5 sm:py-2">
                   <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[9px] font-medium text-gray-700">
                     {r.category}
                   </span>
                 </td>
-                <td className="px-2 py-2.5 text-right">
+                <td className="px-2 py-1.5 sm:py-2 text-right">
                   <StatusPill status={r.status} />
                 </td>
               </tr>
@@ -510,9 +510,9 @@ function StatusPill({ status }: { status: "Approved" | "Pending" }) {
 
 function VisualAuditPack() {
   return (
-    <div className="grid h-full w-full grid-cols-[1fr_1fr] gap-3">
+    <div className="grid h-full w-full grid-cols-[1fr_1fr] gap-2 sm:gap-3">
       {/* PDF mock — narrow, all values short and right-aligned. */}
-      <div className="flex flex-col overflow-hidden rounded-2xl bg-white p-3 ring-1 ring-envrt-brand-black/10 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)]">
+      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-2.5 ring-1 ring-envrt-brand-black/10 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] sm:p-3">
         <div className="flex items-center justify-between">
           <span className="rounded bg-envrt-brand-crimson/15 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-crimson">
             PDF
@@ -553,7 +553,7 @@ function VisualAuditPack() {
       </div>
 
       {/* JSON mock — bounded width, no horizontal scroll, tight tokens. */}
-      <div className="flex flex-col overflow-hidden rounded-2xl bg-envrt-brand-black p-3 text-white ring-1 ring-envrt-brand-black/40">
+      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-envrt-brand-black p-2.5 text-white ring-1 ring-envrt-brand-black/40 sm:p-3">
         <div className="flex items-center justify-between">
           <span className="rounded bg-envrt-brand-neon/20 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-neon">
             JSON
@@ -606,23 +606,23 @@ const REGIME_STATUS: Record<"live" | "watching" | "scope", { bg: string; text: s
 function VisualComplianceTimeline() {
   return (
     <Card title="Compliance">
-      <p className="text-xs text-gray-500">Six regimes monitored. New ones picked up automatically.</p>
+      <p className="text-[11px] text-gray-500 sm:text-xs">Six regimes monitored. New ones picked up automatically.</p>
 
-      <div className="mt-3 grid flex-1 grid-cols-2 gap-2">
+      <div className="mt-3 grid flex-1 grid-cols-2 gap-1.5 sm:gap-2">
         {REGIMES.map((r) => {
           const s = REGIME_STATUS[r.status];
           return (
-            <div key={r.label} className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-2.5">
-              <div className="flex items-start justify-between gap-1.5">
-                <p className="text-[10px] font-semibold leading-tight text-gray-900">
+            <div key={r.label} className="flex min-w-0 flex-col justify-between overflow-hidden rounded-lg border border-gray-200 bg-white p-2">
+              <div className="flex items-start justify-between gap-1">
+                <p className="line-clamp-2 min-w-0 text-[9px] font-semibold leading-tight text-gray-900 sm:text-[10px]">
                   {r.label}
                 </p>
-                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8px] font-medium ${s.bg} ${s.text}`}>
+                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1 py-0.5 text-[7.5px] font-medium ${s.bg} ${s.text} sm:px-1.5 sm:text-[8px]`}>
                   <span className={`h-1 w-1 rounded-full ${s.dot}`} />
                   {s.label}
                 </span>
               </div>
-              <p className="mt-1.5 text-[9px] leading-snug text-gray-500">
+              <p className="mt-1 truncate text-[8.5px] leading-snug text-gray-500 sm:text-[9px]">
                 {r.blurb}
               </p>
             </div>
@@ -840,26 +840,27 @@ function VisualGreenClaims() {
         </p>
       </div>
 
-      {/* Evidence rows. flex-1 + gap so they grow with the canvas and
-          distribute evenly down the card. */}
-      <div className="mt-3 flex flex-1 flex-col justify-between gap-2">
+      {/* Evidence rows. Natural intrinsic height (no flex-1) so each row
+          shows its label / source / hint cleanly without the content
+          overflowing the row border on narrow mobile canvases. */}
+      <div className="mt-2 flex flex-col gap-1.5 sm:mt-3 sm:gap-2">
         {CLAIM_EVIDENCE.map((e) => {
           const p = CLAIM_PILL[e.status];
           return (
-            <div key={e.label} className="flex-1 rounded-lg border border-gray-200 bg-white p-2.5">
+            <div key={e.label} className="rounded-lg border border-gray-200 bg-white p-2 sm:p-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold text-gray-900">
+                  <p className="text-[10px] font-semibold text-gray-900 sm:text-[11px]">
                     {e.label}
                   </p>
-                  <p className="truncate font-mono text-[9px] text-gray-400">
+                  <p className="truncate font-mono text-[8.5px] text-gray-400 sm:text-[9px]">
                     {e.source}
                   </p>
-                  <p className="mt-0.5 text-[10px] leading-snug text-gray-500">
+                  <p className="mt-0.5 truncate text-[9px] leading-snug text-gray-500 sm:text-[10px]">
                     {e.hint}
                   </p>
                 </div>
-                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8.5px] font-medium ${p.bg} ${p.text}`}>
+                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1 py-0.5 text-[8px] font-medium ${p.bg} ${p.text} sm:px-1.5 sm:text-[8.5px]`}>
                   <span className={`h-1 w-1 rounded-full ${p.dot}`} />
                   {p.label}
                 </span>

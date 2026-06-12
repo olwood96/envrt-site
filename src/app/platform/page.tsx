@@ -338,13 +338,17 @@ function CapabilityRow({
 }
 
 function CapabilityVisual({ cap }: { cap: Capability }) {
+  // Cap 04 (DPP phone) opts out of the 5:4 canvas because the phone is
+  // a 9:19 portrait — forcing it into a wide canvas either shrinks the
+  // phone or makes it overflow into the preceding row. For 04 the canvas
+  // grows to fit the phone's natural height. All other visuals keep the
+  // shared aspect so the page reads as a consistent set of "screenshots".
+  const fixedAspect = cap.index !== "04";
   return (
-    <div className="relative mx-auto aspect-[5/4] w-full max-w-[520px]">
-      {/* Capability-specific visual fills the canvas. Each visual ships
-          its own white card / chart / map so the row's identity comes
-          from the visual itself. No tinted backdrop — the visual owns
-          the whole space and rests directly on the vista section. */}
-      <div className="absolute inset-0">
+    <div
+      className={`relative mx-auto w-full max-w-[520px] ${fixedAspect ? "aspect-[5/4]" : ""}`}
+    >
+      <div className={fixedAspect ? "absolute inset-0" : ""}>
         <VisualFor id={cap.index} />
       </div>
     </div>
