@@ -196,7 +196,6 @@ const LCA_STAGES = [
 
 function VisualLcaStages() {
   const maxCo2 = Math.max(...LCA_STAGES.map((s) => s.co2));
-  const maxWater = Math.max(...LCA_STAGES.map((s) => s.water));
   const totalCo2 = LCA_STAGES.reduce((s, x) => s + x.co2, 0);
   const totalWater = LCA_STAGES.reduce((s, x) => s + x.water, 0);
 
