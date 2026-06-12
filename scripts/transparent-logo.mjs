@@ -46,10 +46,28 @@ async function makeTransparent(file) {
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
+    const sourceAlpha = data[i + 3];
+
+    // Respect the source alpha: if a pixel is already transparent,
+    // keep it transparent regardless of its RGB. Without this, PNGs
+    // that came in with proper transparency (e.g. a logo on
+    // transparent background) get filled in as solid black because
+    // their "background" pixels are R=G=B=0 under transparency.
+    if (sourceAlpha === 0) {
+      out[i] = 0;
+      out[i + 1] = 0;
+      out[i + 2] = 0;
+      out[i + 3] = 0;
+      continue;
+    }
+
     // Luma-weighted brightness (Rec. 709) so green-leaning pixels
     // aren't accidentally retained where the logo is pure black.
     const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    const alpha = Math.max(0, Math.min(255, Math.round(255 - brightness)));
+    // Multiply derived alpha by the source alpha so partially-
+    // transparent input pixels stay partially transparent.
+    const derivedAlpha = (255 - brightness) * (sourceAlpha / 255);
+    const alpha = Math.max(0, Math.min(255, Math.round(derivedAlpha)));
 
     out[i] = 0;
     out[i + 1] = 0;
