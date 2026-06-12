@@ -51,8 +51,9 @@ export function EnvrtMorphLogo({
       }}
     >
       {/* Full ENVRT wordmark — anchored to left edge, fades on compact.
-          mix-blend-mode: multiply drops the PNG's white background so
-          only the black strokes show against the glass pill. */}
+          Underlying PNG is true RGBA (processed by
+          scripts/transparent-logo.mjs) so it sits cleanly on the
+          glass without needing a blend-mode workaround. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 0 : 1 }}
@@ -62,7 +63,6 @@ export function EnvrtMorphLogo({
           inset: 0,
           width: envrtWidth,
           height,
-          mixBlendMode: "multiply",
         }}
       >
         <Image
@@ -75,8 +75,7 @@ export function EnvrtMorphLogo({
         />
       </motion.div>
 
-      {/* NV mark — anchored to left edge, fades in on compact. Same
-          multiply blend so the PNG's white box dissolves. */}
+      {/* NV mark — anchored to left edge, fades in on compact. */}
       <motion.div
         initial={false}
         animate={{ opacity: compact ? 1 : 0 }}
@@ -86,7 +85,6 @@ export function EnvrtMorphLogo({
           inset: 0,
           width: nvWidth,
           height,
-          mixBlendMode: "multiply",
         }}
       >
         <Image

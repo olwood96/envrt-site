@@ -452,9 +452,9 @@ function VisualEvidenceVault() {
       <div className="flex flex-1 flex-col overflow-hidden rounded-lg ring-1 ring-gray-200">
         <table className="w-full flex-1 table-fixed text-left">
           <colgroup>
-            <col className="w-[55%]" />
-            <col className="w-[27%]" />
-            <col className="w-[18%]" />
+            <col className="w-[48%]" />
+            <col className="w-[22%]" />
+            <col className="w-[30%]" />
           </colgroup>
           <thead className="bg-gray-50 text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-500">
             <tr>
@@ -669,19 +669,18 @@ const SCAN_DATA: { date: string; views: number; visitors: number }[] = [
 ];
 
 function VisualScanAnalytics() {
-  // viewBox aspect chosen to match the chart container's rendered aspect
-  // inside the 5:4 canvas (card padding + title + header strip taken into
-  // account). Lets the default preserveAspectRatio="xMidYMid meet" scale
-  // the chart uniformly without stretching axis text or distorting the
-  // area fill the way preserveAspectRatio="none" did. PAD_B + extra
-  // bottom margin on the container give the x-axis date labels room
-  // to breathe instead of being flush to the card edge.
+  // viewBox + padding tuned so the x-axis date labels have generous
+  // breathing room above the card bottom edge. Earlier values had PAD_B
+  // at 34/48 and the labels still read as cramped because the chart
+  // fills the container down to its baseline; bumping PAD_B + a
+  // taller viewBox shifts the plotted area up and leaves an explicit
+  // gutter under the axis text.
   const W = 480;
-  const H = 320;
+  const H = 340;
   const PAD_L = 38;
   const PAD_R = 14;
   const PAD_T = 12;
-  const PAD_B = 48;
+  const PAD_B = 64;
 
   const maxY = Math.max(...SCAN_DATA.map((d) => d.views));
   const xStep = (W - PAD_L - PAD_R) / (SCAN_DATA.length - 1);
@@ -902,14 +901,16 @@ function VisualGreenClaims() {
 // chrome so the marketing page reads as a set of real dashboard snapshots.
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  // overflow-hidden + min-h-0 on the content area give every Card-using
-  // visual a safety net: if intrinsic content exceeds the 5:4 canvas
-  // height on a narrow viewport, the flex children can actually shrink
-  // (min-h-0 lifts the default min-content floor) and anything that
-  // still doesn't fit gets clipped at the card boundary rather than
-  // spilling into the surrounding section vista.
+  // Card sizing pairs with the canvas in platform/page.tsx:
+  // - Mobile: card is content-sized with a min-h floor. Stage rows,
+  //   table rows and chart axes get their natural height instead of
+  //   being clipped or compressed into the 5:4 box.
+  // - Desktop (lg+): card fills the 5:4 canvas (h-full of the absolute
+  //   inset-0 wrapper), so the page reads as a row of consistent
+  //   "screenshots". min-h-0 lifts the flex floor so the content area
+  //   distributes correctly in the fixed-height parent.
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-2xl bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] ring-1 ring-gray-200">
+    <div className="flex w-full min-h-[300px] flex-col overflow-hidden rounded-2xl bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] ring-1 ring-gray-200 lg:h-full lg:min-h-0">
       <h3 className="text-[11px] font-semibold text-gray-900">
         {title}
       </h3>

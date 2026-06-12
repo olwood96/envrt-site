@@ -338,17 +338,21 @@ function CapabilityRow({
 }
 
 function CapabilityVisual({ cap }: { cap: Capability }) {
-  // Cap 04 (DPP phone) opts out of the 5:4 canvas because the phone is
-  // a 9:19 portrait — forcing it into a wide canvas either shrinks the
-  // phone or makes it overflow into the preceding row. For 04 the canvas
-  // grows to fit the phone's natural height. All other visuals keep the
-  // shared aspect so the page reads as a consistent set of "screenshots".
+  // Canvas sizing strategy:
+  // - Desktop (lg+): every visual except cap 04 sits inside a fixed 5:4
+  //   aspect canvas so the page reads as a consistent set of "screenshots".
+  // - Mobile / tablet: the canvas grows to fit content instead of forcing
+  //   stage rows, table rows or chart axes to be squeezed into a too-short
+  //   box. The visuals were getting clipped or overlapping the card border
+  //   before. min-h baseline keeps light-content visuals from collapsing.
+  // - Cap 04 (DPP phone) always opts out of the fixed aspect because the
+  //   phone is a 9:19 portrait that wants its own natural height.
   const fixedAspect = cap.index !== "04";
   return (
     <div
-      className={`relative mx-auto w-full max-w-[520px] ${fixedAspect ? "aspect-[5/4]" : ""}`}
+      className={`relative mx-auto w-full max-w-[520px] ${fixedAspect ? "lg:aspect-[5/4]" : ""}`}
     >
-      <div className={fixedAspect ? "absolute inset-0" : ""}>
+      <div className={fixedAspect ? "lg:absolute lg:inset-0" : ""}>
         <VisualFor id={cap.index} />
       </div>
     </div>
