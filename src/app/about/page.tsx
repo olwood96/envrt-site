@@ -120,7 +120,7 @@ function ManifestoSection() {
                   loop
                   muted
                   playsInline
-                  preload="auto"
+                  preload="metadata"
                   aria-hidden
                   className="h-full w-full object-cover"
                 />

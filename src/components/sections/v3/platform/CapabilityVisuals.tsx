@@ -6,10 +6,10 @@
 // fill the inner canvas only.
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
-import type { Topology } from "topojson-specification";
+import type { GeometryCollection, Topology } from "topojson-specification";
 import { AssetIcon } from "../AssetIcon";
 import { LivePill } from "../_shared";
 
@@ -64,8 +64,11 @@ function VisualSupplyChainMap() {
       .then((r) => r.json())
       .then((topo: Topology) => {
         if (cancelled) return;
-        const countries = feature(topo, topo.objects.countries as any);
-        setGeoFeatures((countries as any).features);
+        const countries = feature(
+          topo,
+          topo.objects.countries as GeometryCollection,
+        );
+        setGeoFeatures(countries.features as GeoPermissibleObjects[]);
       })
       .catch(() => {});
     return () => { cancelled = true; };
