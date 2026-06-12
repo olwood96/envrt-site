@@ -130,6 +130,32 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
             </p>
           )}
         </div>
+
+        {/* Official French Coût Environnemental label for the hoodie. The
+            SVG is the calculated score from Ecobalyse; per their policy the
+            label cannot be redrawn or restyled, so it sits inside a white
+            card pinned to the hoodie image. Balances the hangtag at top-right. */}
+        <div
+          className={`absolute z-20 ${isDesktop ? "left-0 bottom-12 w-40 sm:w-44" : "left-2 bottom-8 w-28 sm:left-4 sm:w-32"} rotate-[4deg]`}
+        >
+          <div
+            className={`relative rounded-xl bg-white ${isDesktop ? "p-2 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)]" : "p-1.5 shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)]"} ring-1 ring-envrt-brand-black/8`}
+          >
+            <Image
+              src="/v3-assets/angry-pablo-ecoscore.svg"
+              alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
+              width={180}
+              height={90}
+              className="block h-auto w-full"
+              unoptimized
+            />
+          </div>
+          {isDesktop && (
+            <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
+              Coût Environnemental
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

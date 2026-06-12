@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PageHero, FaqSnippet, ButtonV3 } from "@/components/v3";
 import { PlatformComparison } from "@/components/v3/pricing/PlatformComparison";
-import {
-  AssetIcon,
-  type AssetIconType,
-} from "@/components/sections/v3/AssetIcon";
+import { type AssetIconType } from "@/components/sections/v3/AssetIcon";
 import {
   Eyebrow,
   SectionCorners,
 } from "@/components/sections/v3/_shared";
+import { VisualFor } from "@/components/sections/v3/platform/CapabilityVisuals";
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
@@ -339,21 +337,19 @@ function CapabilityVisual({ cap }: { cap: Capability }) {
         aria-hidden
         className="absolute inset-6 rounded-3xl bg-envrt-brand-ultramarine/5"
       />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative flex h-32 w-32 items-center justify-center rounded-[2rem] border border-envrt-brand-black/12 bg-white shadow-[0_30px_70px_-30px_rgba(62,0,255,0.35)] sm:h-40 sm:w-40">
-          <AssetIcon
-            type={cap.icon}
-            size={56}
-            className="text-envrt-brand-ultramarine"
-          />
-        </div>
+
+      {/* Capability-specific visual fills the inner canvas. Each visual
+          ships its own white card / chart / map so the row's identity
+          comes from the visual itself, not a generic icon tile. */}
+      <div className="absolute inset-4 sm:inset-6">
+        <VisualFor id={cap.index} />
       </div>
 
       {/* Index chip */}
-      <span className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65">
+      <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 sm:left-3 sm:top-3">
         <span className="text-envrt-brand-ultramarine">{cap.index}</span>
         <span aria-hidden className="text-envrt-brand-black/20">/</span>
-        <span>Capability</span>
+        <span>{cap.name}</span>
       </span>
     </div>
   );
