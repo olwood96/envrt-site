@@ -480,14 +480,34 @@ function DropdownCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/60 bg-white/55 p-2 shadow-[0_24px_50px_-22px_rgba(14,14,14,0.22),inset_0_0_0_1px_rgba(255,255,255,0.55)] backdrop-blur-2xl backdrop-saturate-150 ${
+      // Liquid glass: heavy blur + saturation vibrancy, low-opacity
+      // white fill, no visible border (inset highlights handle edge
+      // definition), four-sided ring-of-light box-shadow matching
+      // the mobile nav pill so the system feels coherent.
+      className={`relative rounded-2xl bg-white/55 p-2 backdrop-blur-[28px] backdrop-saturate-[180%] ${
         columns === 2 ? "w-[580px]" : "w-[320px]"
       }`}
+      style={{
+        boxShadow:
+          "0 24px 50px -22px rgba(14,14,14,0.22), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
+      }}
     >
+      {/* Refraction overlay — diagonal gradient that mimics light
+          bending through curved glass. Same recipe as the navbar
+          pill, just sized for the dropdown's rounded-2xl corners. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-2xl"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.10) 100%)",
+        }}
+      />
+
       <ul
-        className={
+        className={`relative ${
           columns === 2 ? "grid grid-cols-2 gap-x-1 gap-y-0.5" : "space-y-0.5"
-        }
+        }`}
       >
         {items.map((item) => (
           <li key={item.href}>
@@ -564,9 +584,30 @@ function MobileDrawer({
             transition: { duration: 0.3, ease: EASE_BRAND },
           }}
           exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
-          className="fixed inset-x-4 top-[78px] z-40 max-h-[calc(100vh-96px)] overflow-y-auto rounded-3xl border border-envrt-brand-black/12 bg-white/97 p-4 shadow-[0_24px_60px_-30px_rgba(14,14,14,0.25)] backdrop-blur sm:inset-x-6 sm:p-5 lg:hidden"
+          // Liquid glass: same recipe as the navbar pill and desktop
+          // dropdown so the whole nav system feels coherent. Heavy
+          // backdrop blur + saturation vibrancy, low-opacity white
+          // fill, no visible border, four-sided ring-of-light inset
+          // shadow.
+          className="fixed inset-x-4 top-[78px] z-40 max-h-[calc(100vh-96px)] overflow-y-auto rounded-3xl bg-white/55 p-4 backdrop-blur-[28px] backdrop-saturate-[180%] sm:inset-x-6 sm:p-5 lg:hidden"
+          style={{
+            boxShadow:
+              "0 24px 60px -30px rgba(14,14,14,0.25), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
+          }}
         >
-          <div className="space-y-5">
+          {/* Refraction overlay — same diagonal gradient as the pill
+              and the desktop dropdown. Sized for the drawer's
+              rounded-3xl corners. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-3xl"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.10) 100%)",
+            }}
+          />
+
+          <div className="relative space-y-5">
             {NAV.map((item) =>
               item.kind === "group" ? (
                 <div key={item.label}>
