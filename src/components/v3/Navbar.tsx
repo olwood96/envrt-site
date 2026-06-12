@@ -185,15 +185,26 @@ export function Navbar() {
         <motion.div
           initial={false}
           animate={{
+            // iOS/Instagram-style glass on mobile gets a dual shadow:
+            // outer lift plus an inset top highlight that mimics light
+            // catching the curve. Desktop keeps the simpler shadow
+            // because its 95% white background doesn't need the
+            // highlight to read as glass.
             boxShadow: scrolled
-              ? "0 18px 40px -22px rgba(14,14,14,0.18)"
-              : "0 8px 24px -18px rgba(14,14,14,0.06)",
+              ? "0 18px 40px -22px rgba(14,14,14,0.18), inset 0 1px 0 0 rgba(255,255,255,0.7)"
+              : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.6)",
           }}
           transition={{ duration: 0.3 }}
-          className={`relative flex items-stretch rounded-full border bg-white/95 backdrop-blur transition-colors duration-300 ${
+          // Mobile-only liquid glass: heavy backdrop blur, saturation
+          // boost (the "vibrancy" trick that makes the colours behind
+          // pop instead of washing out), low-opacity white fill, and a
+          // high-contrast white border. Desktop keeps the more solid
+          // 95% white pill because the desktop bar carries nav items
+          // that need to read against any background underneath.
+          className={`relative flex items-stretch rounded-full border bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 ${
             scrolled
-              ? "border-envrt-brand-black/15"
-              : "border-envrt-brand-black/10"
+              ? "border-white/55 lg:border-envrt-brand-black/15"
+              : "border-white/45 lg:border-envrt-brand-black/10"
           }`}
         >
           {/* Wordmark — desktop uses the official PNG; mobile uses the
