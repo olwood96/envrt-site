@@ -204,7 +204,7 @@ export function HiddenTurnstile({
   };
 
   return (
-    <div className={`flex flex-col items-center gap-3 ${className ?? ""}`}>
+    <div className={`flex flex-col items-center gap-2 ${className ?? ""}`}>
       {/* Cloudflare widget. Renders 0 height when CF can verify
           silently. Expands into the visible challenge only when
           interaction is required. */}
@@ -225,10 +225,10 @@ export function HiddenTurnstile({
 function StatusPill({ status }: { status: TurnstileStatus }) {
   if (status === "verified") {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-ultramarine/15 bg-envrt-brand-ultramarine/5 px-3 py-1.5">
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-envrt-brand-ultramarine/15 bg-envrt-brand-ultramarine/5 px-2 py-0.5">
         <svg
           aria-hidden
-          className="h-3 w-3 text-envrt-brand-ultramarine"
+          className="h-2.5 w-2.5 text-envrt-brand-ultramarine"
           viewBox="0 0 12 12"
           fill="none"
         >
@@ -241,8 +241,8 @@ function StatusPill({ status }: { status: TurnstileStatus }) {
             strokeLinejoin="round"
           />
         </svg>
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
-          Verified, you&apos;re human
+        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[9px]">
+          Verified
         </span>
       </div>
     );
@@ -250,8 +250,8 @@ function StatusPill({ status }: { status: TurnstileStatus }) {
 
   if (status === "error" || status === "expired") {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-crimson/20 bg-envrt-brand-crimson/5 px-3 py-1.5">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-crimson sm:text-[11px]">
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-envrt-brand-crimson/20 bg-envrt-brand-crimson/5 px-2 py-0.5">
+        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-crimson sm:text-[9px]">
           {status === "expired" ? "Check expired" : "Verification failed"}
         </span>
       </div>
@@ -260,13 +260,13 @@ function StatusPill({ status }: { status: TurnstileStatus }) {
 
   // loading + verifying
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/10 bg-white/60 px-3 py-1.5 backdrop-blur">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-envrt-brand-black/10 bg-white/60 px-2 py-0.5 backdrop-blur">
       <span
         aria-hidden
-        className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-envrt-brand-black/15 border-t-envrt-brand-ultramarine"
+        className="h-2.5 w-2.5 animate-spin rounded-full border-[1.5px] border-envrt-brand-black/15 border-t-envrt-brand-ultramarine"
       />
-      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
-        Confirming you&apos;re human
+      <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[9px]">
+        Verifying
       </span>
     </div>
   );

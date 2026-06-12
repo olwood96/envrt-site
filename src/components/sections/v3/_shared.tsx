@@ -25,50 +25,21 @@ export const SECTION_SPRING = {
 
 // ─── Section corners — small mono labels at top-left and top-right ────────
 
-export function SectionCorners({
-  left,
-  right,
-  bottomLeft,
-  bottomRight,
-  tone = "light",
-}: {
+// Section corner labels were retired per user request — they cluttered
+// the mobile layout and weren't earning their space. The component
+// stays as a no-op so every existing import keeps compiling; if we
+// ever want them back, restore the spans below.
+type SectionCornersProps = {
   left: string;
   right: string;
   bottomLeft?: string;
   bottomRight?: string;
   tone?: "light" | "dark" | "sunny" | "lilac";
-}) {
-  const text =
-    tone === "dark"
-      ? "text-envrt-brand-lilac/45"
-      : tone === "sunny"
-        ? "text-envrt-brand-sunny"
-        : tone === "lilac"
-          ? "text-envrt-brand-lilac"
-          : "text-envrt-brand-black/25";
+};
 
-  const cls = `pointer-events-none absolute z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] ${text}`;
-
-  return (
-    <>
-      <span aria-hidden className={`${cls} left-4 top-6 sm:left-6`}>
-        {left}
-      </span>
-      <span aria-hidden className={`${cls} right-4 top-6 sm:right-6`}>
-        {right}
-      </span>
-      {bottomLeft && (
-        <span aria-hidden className={`${cls} bottom-6 left-4 sm:left-6`}>
-          {bottomLeft}
-        </span>
-      )}
-      {bottomRight && (
-        <span aria-hidden className={`${cls} bottom-6 right-4 sm:right-6`}>
-          {bottomRight}
-        </span>
-      )}
-    </>
-  );
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SectionCorners(_: SectionCornersProps) {
+  return null;
 }
 
 // ─── Eyebrow — the small label above headings. Default and neon and white

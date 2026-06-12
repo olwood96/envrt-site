@@ -18,7 +18,6 @@ export function HeroV3() {
   return (
     <section className="relative overflow-hidden bg-envrt-brand-vista">
       <DotGridBackground opacity={0.04} size={22} />
-      <ConstructionMarks />
 
       <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-8 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-10">
         <div className="max-w-xl lg:py-8">
@@ -136,17 +135,3 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
   );
 }
 
-// ─── Construction marks ──────────────────────────────────────────────────
-// Brand fingerprint at the section corners. "v3" dev artefact removed.
-
-function ConstructionMarks() {
-  const cls =
-    "absolute font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/25";
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0">
-      <span className={`${cls} bottom-4 left-4 sm:bottom-6 sm:left-6`}>
-        ENVRT/01
-      </span>
-    </div>
-  );
-}
