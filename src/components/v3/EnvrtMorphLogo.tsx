@@ -1,69 +1,98 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
-// Typography-based wordmark used in the mobile navbar pill so we can
-// morph ENVRT ↔ NV smoothly as the bar compacts and expands on scroll.
-// Renders as five separate letters using N27 (the brand's wordmark
-// font); E, R and T collapse their max-width and fade out when
-// compact, leaving N + V at full size. The pill width naturally
-// shrinks as a result without any explicit width animation.
+// Morphs between the two real brand marks: the full ENVRT wordmark
+// and the standalone NV mark (the same one used as the favicon).
+// Both PNGs sit stacked in the same fixed-height window; the visible
+// one cross-fades while the outer container width animates to fit
+// whichever mark is showing. NV stays anchored to the left edge so
+// the wordmark feels like it's collapsing inward to its initials.
 //
-// Desktop continues to use the official PNG via <EnvrtLogo />. We
-// reach for typography only on the surface where the morph is
-// load-bearing.
+// Two source assets so each mark renders with its own designed
+// geometry rather than as a crop of the other.
 
-type Letter = {
-  char: string;
-  keep: boolean;
-};
+import type { Transition } from "framer-motion";
 
-const LETTERS: Letter[] = [
-  { char: "E", keep: false },
-  { char: "N", keep: true },
-  { char: "V", keep: true },
-  { char: "R", keep: false },
-  { char: "T", keep: false },
-];
-
-// Spring tuned for a quick, springy expansion (Instagram-style bounce)
-// and a slightly damped contraction. Same stiffness both ways keeps the
-// motion familiar; mass and damping change the bounce character.
-const SPRING = {
-  type: "spring" as const,
+const SPRING: Transition = {
+  type: "spring",
   stiffness: 280,
   damping: 18,
   mass: 0.7,
 };
 
-export function EnvrtMorphLogo({ compact }: { compact: boolean }) {
+// ENVRT wordmark is 1643×518 → ratio ≈ 3.17
+// NV mark is 384×344 → ratio ≈ 1.12 (two bars + diagonal, slightly
+// wider than tall).
+const ENVRT_RATIO = 1643 / 518;
+const NV_RATIO = 384 / 344;
+
+export function EnvrtMorphLogo({
+  compact,
+  height = 24,
+}: {
+  compact: boolean;
+  height?: number;
+}) {
+  const envrtWidth = Math.round(height * ENVRT_RATIO);
+  const nvWidth = Math.round(height * NV_RATIO);
+
   return (
-    <span
+    <motion.div
+      role="img"
       aria-label="ENVRT"
-      className="inline-flex select-none items-baseline font-n27 text-[1.35rem] font-bold leading-none tracking-[0.01em] text-envrt-brand-black sm:text-[1.5rem]"
+      initial={false}
+      animate={{ width: compact ? nvWidth : envrtWidth }}
+      transition={SPRING}
+      style={{
+        height,
+        position: "relative",
+      }}
     >
-      {LETTERS.map((l, i) => {
-        const hide = compact && !l.keep;
-        return (
-          <motion.span
-            key={i}
-            initial={false}
-            animate={{
-              maxWidth: hide ? "0em" : "0.85em",
-              opacity: hide ? 0 : 1,
-            }}
-            transition={SPRING}
-            style={{
-              display: "inline-block",
-              overflow: "hidden",
-              verticalAlign: "baseline",
-            }}
-            aria-hidden
-          >
-            {l.char}
-          </motion.span>
-        );
-      })}
-    </span>
+      {/* Full ENVRT wordmark — anchored to left edge, fades on compact. */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: compact ? 0 : 1 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: envrtWidth,
+          height,
+        }}
+      >
+        <Image
+          src="/brand/envrt-logo.png"
+          alt=""
+          width={envrtWidth}
+          height={height}
+          priority
+          style={{ display: "block", width: envrtWidth, height }}
+        />
+      </motion.div>
+
+      {/* NV mark — anchored to left edge, fades in on compact. */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: compact ? 1 : 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: nvWidth,
+          height,
+        }}
+      >
+        <Image
+          src="/brand/envrt-nv.png"
+          alt=""
+          width={nvWidth}
+          height={height}
+          priority
+          style={{ display: "block", width: nvWidth, height }}
+        />
+      </motion.div>
+    </motion.div>
   );
 }
