@@ -4,7 +4,6 @@ import { siteConfig } from "@/lib/config";
 import WebsiteBeacon from "@/components/WebsiteBeacon";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
-import { SmoothScroll } from "@/components/sections/v3/SmoothScroll";
 import { Navbar } from "@/components/v3";
 import { FooterV3 } from "@/components/v3/FooterV3";
 import { PricingProvider } from "@/components/v3/pricing/PricingContext";
@@ -91,15 +90,12 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/n27/n27-regular-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/n27/n27-bold-webfont.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
 
-        {/* Establish TCP+TLS to the DPP subdomain before the iframe even mounts. */}
+        {/* Establish TCP+TLS to the DPP subdomain so the iframe handshake
+            is warm by the time a user opens the demo. Cheap on its own
+            (no payload). The full demo page is NOT prefetched any more
+            because >95% of marketing visitors never open it. */}
         <link rel="preconnect" href="https://dashboard.envrt.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://dashboard.envrt.com" />
-
-        <link
-          rel="prefetch"
-          href={siteConfig.dppDemoUrl}
-          as="document"
-        />
       </head>
       <body className="font-n27 bg-envrt-offwhite text-envrt-charcoal antialiased">
         <OrganizationJsonLd />
@@ -137,15 +133,13 @@ export default function RootLayout({
 
         <ConsentProvider>
           <PricingProvider>
-            <SmoothScroll>
-              <div
-                className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
-              >
-                <Navbar />
-                {children}
-                <FooterV3 />
-              </div>
-            </SmoothScroll>
+            <div
+              className={`${display.variable} ${body.variable} font-karla bg-envrt-brand-vista text-envrt-brand-black`}
+            >
+              <Navbar />
+              {children}
+              <FooterV3 />
+            </div>
             <CookieBanner />
             <GA4 />
           </PricingProvider>

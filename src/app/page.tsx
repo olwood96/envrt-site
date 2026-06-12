@@ -1,20 +1,72 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+// Above-the-fold sections — static imports so they ship in the main
+// chunk and hydrate immediately.
 import { HeroV3 } from "@/components/sections/v3/HeroV3";
 import { ProblemSection } from "@/components/sections/v3/ProblemSection";
-import { ScrollTourSection } from "@/components/sections/v3/ScrollTourSection";
-import { InTheWildSection } from "@/components/sections/v3/InTheWildSection";
-import { CapabilitiesSection } from "@/components/sections/v3/CapabilitiesSection";
-import { NumbersSection } from "@/components/sections/v3/NumbersSection";
-import { HowItWorksV3 } from "@/components/sections/v3/HowItWorksV3";
-import { InsightsTeaseSection } from "@/components/sections/v3/InsightsTeaseSection";
-import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
-import { StickyCta } from "@/components/sections/v3/StickyCta";
 import { ScrollProgressBar } from "@/components/sections/v3/ScrollProgressBar";
 import { SceneMark } from "@/components/sections/v3/SceneMark";
-import { AlignedWithCarouselV3 } from "@/components/sections/v3/AlignedWithCarouselV3";
-import { FAQSectionV3 } from "@/components/sections/v3/FAQSectionV3";
-import { ScatterToOrderSection } from "@/components/sections/v3/ScatterToOrderSection";
-import { PolaroidStackSection } from "@/components/sections/v3/PolaroidStackSection";
+
+// Below-the-fold sections — code-split into their own chunks so the
+// initial JS payload stays lean. Default `ssr: true` keeps the
+// server-rendered HTML for SEO; only the client hydration JS is
+// deferred until the section enters view.
+const ScatterToOrderSection = dynamic(() =>
+  import("@/components/sections/v3/ScatterToOrderSection").then(
+    (m) => m.ScatterToOrderSection,
+  ),
+);
+const CapabilitiesSection = dynamic(() =>
+  import("@/components/sections/v3/CapabilitiesSection").then(
+    (m) => m.CapabilitiesSection,
+  ),
+);
+const ScrollTourSection = dynamic(() =>
+  import("@/components/sections/v3/ScrollTourSection").then(
+    (m) => m.ScrollTourSection,
+  ),
+);
+const InTheWildSection = dynamic(() =>
+  import("@/components/sections/v3/InTheWildSection").then(
+    (m) => m.InTheWildSection,
+  ),
+);
+const NumbersSection = dynamic(() =>
+  import("@/components/sections/v3/NumbersSection").then(
+    (m) => m.NumbersSection,
+  ),
+);
+const PolaroidStackSection = dynamic(() =>
+  import("@/components/sections/v3/PolaroidStackSection").then(
+    (m) => m.PolaroidStackSection,
+  ),
+);
+const HowItWorksV3 = dynamic(() =>
+  import("@/components/sections/v3/HowItWorksV3").then(
+    (m) => m.HowItWorksV3,
+  ),
+);
+const AlignedWithCarouselV3 = dynamic(() =>
+  import("@/components/sections/v3/AlignedWithCarouselV3").then(
+    (m) => m.AlignedWithCarouselV3,
+  ),
+);
+const InsightsTeaseSection = dynamic(() =>
+  import("@/components/sections/v3/InsightsTeaseSection").then(
+    (m) => m.InsightsTeaseSection,
+  ),
+);
+const FAQSectionV3 = dynamic(() =>
+  import("@/components/sections/v3/FAQSectionV3").then(
+    (m) => m.FAQSectionV3,
+  ),
+);
+const FinalCtaV3 = dynamic(() =>
+  import("@/components/sections/v3/FinalCtaV3").then((m) => m.FinalCtaV3),
+);
+const StickyCta = dynamic(() =>
+  import("@/components/sections/v3/StickyCta").then((m) => m.StickyCta),
+);
 import { getAllPostsMeta } from "@/lib/insights";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 import { fetchImpactStats } from "@/lib/impact-stats";
@@ -25,7 +77,7 @@ import { AlignedWithJsonLd } from "@/components/seo/AlignedWithJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { faqItems } from "@/lib/config";
 
-// Root of /, the full v3 homepage. Fonts, SmoothScroll, and
+// Root of /, the full v3 homepage. Fonts and
 // the v3 navbar are mounted by //layout.tsx, so this file
 // only renders the section composition.
 
