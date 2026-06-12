@@ -227,13 +227,13 @@ function VisualLcaStages() {
                   <span className="ml-1.5 text-envrt-brand-aqua">{s.water.toFixed(1)} m³</span>
                 </span>
               </div>
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-envrt-green-light/40">
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-green-100">
                 <div
-                  className="h-full rounded-full bg-envrt-green"
+                  className="h-full rounded-full bg-green-500"
                   style={{ width: `${co2Width}%` }}
                 />
               </div>
-              <div className="mt-1 h-1 overflow-hidden rounded-full bg-envrt-brand-aqua/12">
+              <div className="mt-1 h-1 overflow-hidden rounded-full bg-envrt-brand-aqua/15">
                 <div
                   className="h-full rounded-full bg-envrt-brand-aqua/80"
                   style={{ width: `${waterWidth}%` }}
