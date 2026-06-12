@@ -8,9 +8,12 @@ import { Eyebrow, LivePill, SECTION_SPRING } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
-// Tall enough to cover the full DPP content at the -82% pan max. Trim
-// later once we can confirm the real DPP height in the live preview.
-const IFRAME_HEIGHT = 4700;
+// Real height of the live DPP at the iframe's 414px width. Measured by
+// scripts/capture-dpp-screenshot.mjs and stored in
+// public/screenshots/dpp/measurements.json. Bumping this from the old
+// 4700 placeholder unclips the bottom ~650px which contained the back
+// half of care-end-of-life and the feedback band.
+const IFRAME_HEIGHT = 5353;
 
 type Stop = {
   title: string;
@@ -19,34 +22,51 @@ type Stop = {
   range: [number, number];
 };
 
-// Stops compressed to end at progress 0.85, leaving 0.85 → 1.0 of section
-// scroll as dwell time so the final DPP state stays on-screen before the
-// section unpins.
+// Stop ranges are derived from the actual DPP section boundaries
+// (measurements.json) and the pan curve (0% → -78% over progress
+// 0 → 0.85). Each stop's midpoint is calibrated so the labelled
+// section is centred in the phone window when the label is bold.
+// Verified positions at midpoints (px into 5353-px DPP):
+//
+//   01 scan        @ p≈0.05 → pan -4.6%  → top of page (hero 80–452)
+//   02 metrics     @ p≈0.16 → pan -14.7% → headline-metrics 468–835
+//   03 materials   @ p≈0.34 → pan -30.7% → production-journey 1290–2565
+//   04 footprint   @ p≈0.52 → pan -48.2% → env-impact 2581–3039
+//   05 standards   @ p≈0.66 → pan -60.6% → certifications 3055–3848
+//   06 care        @ p≈0.79 → pan -72.0% → care-end-of-life 3864–4657
+//
+// 0.85–1.00 is dwell at -78% so care + actions stay on screen
+// before the section unpins.
 const stops: Stop[] = [
   {
     title: "The scan moment",
     body: "Customer scans the QR on the care label. They land on a hosted page with the garment's hero image and brand voice.",
-    range: [0.0, 0.15],
+    range: [0.0, 0.10],
   },
   {
     title: "Headline impact",
     body: "CO₂e, water scarcity and data depth, calculated per garment with EU PEF and ISO 14040 methodology.",
-    range: [0.15, 0.31],
+    range: [0.10, 0.22],
   },
   {
     title: "Materials and journey",
     body: "Every fibre, every tier, every country mapped. Customers see provenance, regulators see traceability.",
-    range: [0.31, 0.51],
+    range: [0.22, 0.45],
+  },
+  {
+    title: "Environmental footprint",
+    body: "AWARE water scarcity, stage-by-stage CO₂e and the rest of the underlying data. The headline figures are auditable line by line.",
+    range: [0.45, 0.60],
   },
   {
     title: "Recognised standards",
-    body: "French Eco-Score, EU PEF, ISO 14040, AWARE water stress. Standards referenced with their issuing bodies on every passport.",
-    range: [0.51, 0.68],
+    body: "French Eco-Score, EU PEF, ISO 14040. Standards referenced with their issuing bodies on every passport.",
+    range: [0.60, 0.72],
   },
   {
     title: "Care and end of life",
     body: "Repair guidance, washing instructions, take-back and recycling options. The story doesn't stop at the till.",
-    range: [0.68, 0.85],
+    range: [0.72, 0.85],
   },
 ];
 
@@ -63,11 +83,12 @@ export function ScrollTourSection() {
   // scroll-pinned sections.
   const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
 
-  // Iframe pan also completes at progress 0.85 — matches the last stop,
-  // and the remaining 0.15 of section scroll holds the iframe at its
-  // final position so the user can read the last DPP screen before the
-  // section unpins.
-  const dppY = useTransform(scrollYProgress, [0, 0.85], ["0%", "-82%"]);
+  // Pan curve calibrated against the real DPP section positions (see the
+  // stops table above and measurements.json). Lands the care section
+  // dead-centre in the phone window at p=0.79 (mid stop 06), then holds
+  // at -78% during the 0.85→1.0 dwell so care + actions stay readable
+  // before the section unpins.
+  const dppY = useTransform(scrollYProgress, [0, 0.85], ["0%", "-78%"]);
 
   return (
     <section
