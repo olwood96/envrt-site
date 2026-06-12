@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -171,18 +171,24 @@ export function TurnstileIndicator({ status }: { status: TurnstileStatus }) {
 }
 
 /**
- * Compact Turnstile mount for inline form use.
+ * Inline Turnstile mount used by every form on the site.
  *
- * Themed to fit v3: compact size, light theme, wrapped in a brand
- * caption. We can't restyle the actual challenge box (it lives in
- * a Cloudflare-controlled iframe), but the size + theme + frame
- * makes it feel intentional rather than bolted on.
+ * Uses `appearance="interaction-only"`: Cloudflare keeps the widget
+ * collapsed to 0 height while it can verify silently in the
+ * background (95%+ of users), and self-expands it into the visible
+ * "Verify you are human" challenge only when human interaction is
+ * actually required (VPN, ad blocker, suspicious fingerprint, etc).
  *
- * Uses `appearance="always"` so the widget is always rendered (not
- * the previous `interaction-only` inside an invisible container,
- * which silently broke any flow where Cloudflare needed the user to
- * actually click the checkbox: VPN, ad blocker, suspicious
- * fingerprint, etc).
+ * Critical: we do NOT wrap the widget in a hidden container. The
+ * previous version pinned it to `h-0 w-0 opacity-0 pointer-events-
+ * none absolute`, which silently broke every flagged user because
+ * the Cloudflare challenge tried to render in an invisible 0x0
+ * box. Here the wrapper lets the iframe size itself.
+ *
+ * For unflagged users we render a v3-styled "Verified, you're
+ * human" pill instead of the Cloudflare box. The box only appears
+ * if interaction is genuinely required, at which point it sits
+ * inline above the pill and the user can click it.
  */
 export function HiddenTurnstile({
   onToken,
@@ -191,18 +197,77 @@ export function HiddenTurnstile({
   onToken: (token: string) => void;
   className?: string;
 }) {
+  const [status, setStatus] = useState<TurnstileStatus>("loading");
+
+  const handleToken = (token: string) => {
+    onToken(token);
+  };
+
   return (
-    <div
-      className={`flex flex-col items-center gap-2 rounded-2xl border border-envrt-brand-black/10 bg-white/60 px-4 py-4 backdrop-blur sm:px-5 ${className ?? ""}`}
-    >
-      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[10px]">
-        Quick bot check
-      </p>
+    <div className={`flex flex-col items-center gap-3 ${className ?? ""}`}>
+      {/* Cloudflare widget. Renders 0 height when CF can verify
+          silently. Expands into the visible challenge only when
+          interaction is required. */}
       <TurnstileWidget
-        onToken={onToken}
-        appearance="always"
+        onToken={handleToken}
+        onStatusChange={setStatus}
+        appearance="interaction-only"
         size="compact"
       />
+
+      {/* v3-styled status pill. Replaces the Cloudflare branded
+          box for the silent-pass path. */}
+      <StatusPill status={status} />
+    </div>
+  );
+}
+
+function StatusPill({ status }: { status: TurnstileStatus }) {
+  if (status === "verified") {
+    return (
+      <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-ultramarine/15 bg-envrt-brand-ultramarine/5 px-3 py-1.5">
+        <svg
+          aria-hidden
+          className="h-3 w-3 text-envrt-brand-ultramarine"
+          viewBox="0 0 12 12"
+          fill="none"
+        >
+          <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.25" />
+          <path
+            d="M3.75 6.25l1.5 1.5 3-3.25"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine sm:text-[11px]">
+          Verified, you&apos;re human
+        </span>
+      </div>
+    );
+  }
+
+  if (status === "error" || status === "expired") {
+    return (
+      <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-crimson/20 bg-envrt-brand-crimson/5 px-3 py-1.5">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-crimson sm:text-[11px]">
+          {status === "expired" ? "Check expired" : "Verification failed"}
+        </span>
+      </div>
+    );
+  }
+
+  // loading + verifying
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/10 bg-white/60 px-3 py-1.5 backdrop-blur">
+      <span
+        aria-hidden
+        className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-envrt-brand-black/15 border-t-envrt-brand-ultramarine"
+      />
+      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[11px]">
+        Confirming you&apos;re human
+      </span>
     </div>
   );
 }
