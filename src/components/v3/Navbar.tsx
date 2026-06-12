@@ -148,10 +148,17 @@ export function Navbar() {
 
   useEffect(() => {
     let lastY = window.scrollY;
-    const THRESHOLD = 4; // px of movement before flipping direction
+    let rafId: number | null = null;
+    const THRESHOLD = 10; // px of movement before flipping direction
     const TOP_GUARD = 100; // always expanded near top of page
 
-    const onScroll = () => {
+    // rAF-batch the handler so state updates happen at most once per
+    // frame. Without this, scroll-pinned sections (ScrollTour pan,
+    // Anatomy pipeline, Polaroid stack) get jittery on mobile
+    // because the navbar's compact spring animations fight the same
+    // main-thread budget as their own scroll-driven transforms.
+    const update = () => {
+      rafId = null;
       const y = window.scrollY;
       setScrolled(y > 24);
 
@@ -164,9 +171,17 @@ export function Navbar() {
       }
       lastY = y;
     };
-    onScroll();
+
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -195,18 +210,21 @@ export function Navbar() {
               : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.75), inset 0 -1px 0 0 rgba(255,255,255,0.12), inset 1px 0 0 0 rgba(255,255,255,0.30), inset -1px 0 0 0 rgba(255,255,255,0.30)",
           }}
           transition={{ duration: 0.3 }}
-          // Mobile-only liquid glass:
+          // Mobile-only liquid glass + perf containment:
           //   - bg-white/55 + backdrop-blur-[28px] + backdrop-saturate
           //     [180%]: vibrancy effect that makes colours behind pop
           //   - no border (was creating a visible ring); inset
           //     highlights from the box-shadow define the edge instead
-          //   - filter: url(#liquid-glass-refract) applies the SVG
-          //     displacement filter from root layout for subtle edge
-          //     refraction
+          //   - contain: layout style paint isolates the pill's
+          //     internal reflows (from the compact-state width
+          //     spring animations) so they don't cascade into the
+          //     rest of the document and stutter the scroll-pinned
+          //     sections elsewhere on the page.
           // Desktop keeps the more solid 95% white pill because its
           // bar carries nav items that have to read against any
           // background underneath.
           className="relative flex items-stretch rounded-full bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:border lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 lg:border-envrt-brand-black/15"
+          style={{ contain: "layout style paint" }}
         >
           {/* Refraction overlay — mobile only. A diagonal linear
               gradient that brightens the top-left and softens toward
@@ -490,11 +508,13 @@ function DropdownCard({
 }) {
   return (
     <div
-      // Liquid glass: heavy blur + saturation vibrancy, low-opacity
-      // white fill, no visible border (inset highlights handle edge
-      // definition), four-sided ring-of-light box-shadow matching
-      // the mobile nav pill so the system feels coherent.
-      className={`relative rounded-2xl bg-white/55 p-2 backdrop-blur-[28px] backdrop-saturate-[180%] ${
+      // Liquid glass: heavier than the pill's recipe because the
+      // dropdown is smaller — at the same blur radius (28px) it
+      // *felt* more transparent than the mobile drawer due to the
+      // smaller surface area. Bumped to blur-[36px] + bg-white/62
+      // so it reads as the same material as the drawer despite
+      // size difference.
+      className={`relative rounded-2xl bg-white/62 p-2 backdrop-blur-[36px] backdrop-saturate-[180%] ${
         columns === 2 ? "w-[580px]" : "w-[320px]"
       }`}
       style={{
