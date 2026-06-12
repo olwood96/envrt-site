@@ -95,7 +95,7 @@ function VisualSupplyChainMap() {
 
   return (
     <Card title="Supply Chain Locations">
-      <div className="relative w-full overflow-hidden rounded-xl">
+      <div className="relative w-full flex-1 overflow-hidden rounded-xl">
         <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="block h-full w-full">
           <defs>
             {SUPPLIERS.map((s, i) => (
@@ -208,10 +208,10 @@ function VisualLcaStages() {
       </div>
 
       {/* Stage rows. One row per stage: label + kg / m³ values on the
-          top line, single green pill bar below. AWARE water is shown
-          inline as a small aqua text value, not a second bar — a
-          stacked dual-bar reads as cluttered at this canvas size. */}
-      <div className="mt-4 flex flex-1 flex-col justify-between gap-2">
+          top line, single green pill bar below. min-h-0 on the parent
+          flex container so the rows can compress as needed without
+          the last row or the footer chips spilling outside the card. */}
+      <div className="mt-3 flex min-h-0 flex-1 flex-col justify-between gap-1.5">
         {LCA_STAGES.map((s) => {
           const co2Width = (s.co2 / maxCo2) * 100;
           return (
@@ -230,9 +230,13 @@ function VisualLcaStages() {
                   </span>
                 </span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-green-100">
+              {/* Track + fill. Slightly taller (h-2.5) and with a soft
+                  inset shadow on the track for a small bit of depth,
+                  so the bars feel less like flat divs and more like
+                  the live dashboard component. */}
+              <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-green-100/80 shadow-[inset_0_1px_0_rgba(20,83,45,0.06)]">
                 <div
-                  className="h-full rounded-full bg-green-500"
+                  className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500"
                   style={{ width: `${co2Width}%` }}
                 />
               </div>
@@ -241,7 +245,7 @@ function VisualLcaStages() {
         })}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 border-t border-gray-100 pt-2.5">
+      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-t border-gray-100 pt-2">
         <div className="flex flex-wrap items-center gap-1">
           <Chip label="EU PEF" />
           <Chip label="ISO 14040" />
@@ -441,8 +445,17 @@ const VAULT_ROWS: VaultRow[] = [
 function VisualEvidenceVault() {
   return (
     <Card title="Evidence & Documentation">
+      {/* table-fixed with explicit column widths so the filename is
+          forced to truncate. Without this the file column expanded to
+          fit "REACH_declaration_2026.pdf" and pushed the Status
+          column off the right edge of the card. */}
       <div className="flex flex-1 flex-col overflow-hidden rounded-lg ring-1 ring-gray-200">
-        <table className="w-full flex-1 text-left">
+        <table className="w-full flex-1 table-fixed text-left">
+          <colgroup>
+            <col className="w-[55%]" />
+            <col className="w-[27%]" />
+            <col className="w-[18%]" />
+          </colgroup>
           <thead className="bg-gray-50 text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-500">
             <tr>
               <th className="px-2.5 py-1.5">File</th>
@@ -454,22 +467,22 @@ function VisualEvidenceVault() {
             {VAULT_ROWS.map((r) => (
               <tr key={r.name}>
                 <td className="px-2.5 py-1.5 sm:py-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
                     <span className="flex-shrink-0 text-gray-400">
                       <AssetIcon type={r.icon} size={14} />
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="truncate font-mono text-[10px] font-medium text-gray-900">
                         {r.name}
                       </p>
-                      <p className="font-mono text-[9px] text-gray-400">
+                      <p className="truncate font-mono text-[9px] text-gray-400">
                         {r.size} · {r.date}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-2 py-1.5 sm:py-2">
-                  <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[9px] font-medium text-gray-700">
+                  <span className="inline-block max-w-full truncate rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[9px] font-medium text-gray-700">
                     {r.category}
                   </span>
                 </td>
@@ -660,13 +673,15 @@ function VisualScanAnalytics() {
   // inside the 5:4 canvas (card padding + title + header strip taken into
   // account). Lets the default preserveAspectRatio="xMidYMid meet" scale
   // the chart uniformly without stretching axis text or distorting the
-  // area fill the way preserveAspectRatio="none" did.
+  // area fill the way preserveAspectRatio="none" did. PAD_B + extra
+  // bottom margin on the container give the x-axis date labels room
+  // to breathe instead of being flush to the card edge.
   const W = 480;
-  const H = 300;
+  const H = 320;
   const PAD_L = 38;
   const PAD_R = 14;
   const PAD_T = 12;
-  const PAD_B = 34;
+  const PAD_B = 48;
 
   const maxY = Math.max(...SCAN_DATA.map((d) => d.views));
   const xStep = (W - PAD_L - PAD_R) / (SCAN_DATA.length - 1);
@@ -729,7 +744,7 @@ function VisualScanAnalytics() {
         </div>
       </div>
 
-      <div className="relative mt-2 flex-1">
+      <div className="relative mt-2 mb-1 flex-1">
         <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full">
           <defs>
             <linearGradient id="scans-grad-views" x1="0" y1="0" x2="0" y2="1">
@@ -887,12 +902,18 @@ function VisualGreenClaims() {
 // chrome so the marketing page reads as a set of real dashboard snapshots.
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  // overflow-hidden + min-h-0 on the content area give every Card-using
+  // visual a safety net: if intrinsic content exceeds the 5:4 canvas
+  // height on a narrow viewport, the flex children can actually shrink
+  // (min-h-0 lifts the default min-content floor) and anything that
+  // still doesn't fit gets clipped at the card boundary rather than
+  // spilling into the surrounding section vista.
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] ring-1 ring-gray-200">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-2xl bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] ring-1 ring-gray-200">
       <h3 className="text-[11px] font-semibold text-gray-900">
         {title}
       </h3>
-      <div className="mt-2 flex flex-1 flex-col">
+      <div className="mt-2 flex min-h-0 flex-1 flex-col">
         {children}
       </div>
     </div>
