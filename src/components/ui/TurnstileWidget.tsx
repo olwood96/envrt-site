@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -124,7 +124,7 @@ export function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, [appearance]);
+  }, [appearance, size, theme]);
 
   return <div ref={containerRef} className={className} />;
 }
