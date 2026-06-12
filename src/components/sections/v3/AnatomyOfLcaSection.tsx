@@ -106,12 +106,6 @@ const RAIL_START = STAGES[0].cx;
 const RAIL_END = STAGES[STAGES.length - 1].cx;
 const RAIL_SPAN = RAIL_END - RAIL_START;
 
-const STATS = [
-  { value: "EU PEF", label: "Product Environmental Footprint", since: "Methodology" },
-  { value: "ISO 14040", label: "Lifecycle assessment standard", since: "Compliance" },
-  { value: "AWARE", label: "UN water scarcity model", since: "Water" },
-];
-
 // ─── Section root ─────────────────────────────────────────────────────────
 
 export function AnatomyOfLcaSection() {
@@ -159,30 +153,6 @@ function Header({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function Stats() {
-  return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-      {STATS.map((s) => (
-        <div
-          key={s.value}
-          className="flex items-center justify-between rounded-xl border border-envrt-brand-black/12 bg-white/60 px-4 py-3.5 backdrop-blur sm:px-5 sm:py-4"
-        >
-          <div>
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-envrt-brand-ultramarine sm:text-[10px]">
-              {s.since}
-            </p>
-            <p className="mt-1 font-display text-base font-semibold leading-none tracking-[-0.01em] text-envrt-brand-black sm:text-lg">
-              {s.value}
-            </p>
-          </div>
-          <span className="ml-3 text-right text-[11px] leading-snug text-envrt-brand-black/55 sm:text-xs">
-            {s.label}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function ClosingTag() {
   return (
@@ -532,12 +502,9 @@ function DesktopAnatomy() {
           </motion.div>
         </div>
 
-        {/* Stats + closing tag back inside the constrained container */}
+        {/* Closing tag back inside the constrained container */}
         <div className="mx-auto w-full max-w-[1320px] px-16">
           <div className="mt-10">
-            <Stats />
-          </div>
-          <div className="mt-8">
             <ClosingTag />
           </div>
         </div>
@@ -655,10 +622,7 @@ function MobileAnatomy() {
       {/* Static aftermath — appears after the sticky pin releases.
           Anchors the section's end so it doesn't blur into HowItWorks. */}
       <div className="relative bg-envrt-brand-vista px-5 pb-12 pt-4 sm:px-8 sm:pb-16">
-        <Stats />
-        <div className="mt-6">
-          <ClosingTag />
-        </div>
+        <ClosingTag />
       </div>
     </div>
   );

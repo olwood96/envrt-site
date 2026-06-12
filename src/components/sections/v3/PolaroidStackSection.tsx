@@ -185,17 +185,9 @@ export function PolaroidStackSection() {
             <Ticker co2={co2} water={water} />
           </div>
 
-          {/* Footer — credits the methodology + invites readers to the
-              full Lab breakdown. Anchors the section's "in-house engine"
-              claim with named, citeable standards rather than just words. */}
+          {/* Footer — single methodology link, no factor chips. */}
           <FadeUp delay={0.24}>
-            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-between sm:gap-5">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-                <FactorChip>EU PEF</FactorChip>
-                <FactorChip>ISO 14040</FactorChip>
-                <FactorChip>AWARE</FactorChip>
-                <FactorChip>Ecobalyse</FactorChip>
-              </div>
+            <div className="mt-6 flex justify-center sm:mt-8">
               <Link
                 href="/lab"
                 className="group inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[11px]"
@@ -213,14 +205,6 @@ export function PolaroidStackSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function FactorChip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border border-envrt-brand-black/15 bg-white/70 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 backdrop-blur sm:text-[11px]">
-      {children}
-    </span>
   );
 }
 
