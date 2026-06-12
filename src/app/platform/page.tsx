@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { PageHero, FaqSnippet, ButtonV3 } from "@/components/v3";
 import { PlatformComparison } from "@/components/v3/pricing/PlatformComparison";
@@ -7,7 +8,14 @@ import {
   Eyebrow,
   SectionCorners,
 } from "@/components/sections/v3/_shared";
-import { VisualFor } from "@/components/sections/v3/platform/CapabilityVisuals";
+// Per-capability visuals are heavy (d3-geo + topojson + fetched
+// world map) and all sit below the fold. Code-split so the platform
+// hero ships without dragging them into the main chunk.
+const VisualFor = dynamic(() =>
+  import("@/components/sections/v3/platform/CapabilityVisuals").then(
+    (m) => m.VisualFor,
+  ),
+);
 import { FadeUp } from "@/components/ui/Motion";
 import { FinalCtaV3 } from "@/components/sections/v3/FinalCtaV3";
 import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
@@ -332,25 +340,13 @@ function CapabilityRow({
 function CapabilityVisual({ cap }: { cap: Capability }) {
   return (
     <div className="relative mx-auto aspect-[5/4] w-full max-w-[520px]">
-      {/* Soft brand-tinted wash behind */}
-      <div
-        aria-hidden
-        className="absolute inset-6 rounded-3xl bg-envrt-brand-ultramarine/5"
-      />
-
-      {/* Capability-specific visual fills the inner canvas. Each visual
-          ships its own white card / chart / map so the row's identity
-          comes from the visual itself, not a generic icon tile. */}
-      <div className="absolute inset-4 sm:inset-6">
+      {/* Capability-specific visual fills the canvas. Each visual ships
+          its own white card / chart / map so the row's identity comes
+          from the visual itself. No tinted backdrop — the visual owns
+          the whole space and rests directly on the vista section. */}
+      <div className="absolute inset-0">
         <VisualFor id={cap.index} />
       </div>
-
-      {/* Index chip */}
-      <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-2 rounded-full border border-envrt-brand-black/12 bg-white px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 sm:left-3 sm:top-3">
-        <span className="text-envrt-brand-ultramarine">{cap.index}</span>
-        <span aria-hidden className="text-envrt-brand-black/20">/</span>
-        <span>{cap.name}</span>
-      </span>
     </div>
   );
 }

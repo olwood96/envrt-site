@@ -1,12 +1,17 @@
 "use client";
 
 // Per-capability visuals for the platform page. One component per capability,
-// dispatched via VisualFor by capability index. Wrapper chrome (aspect ratio,
-// brand-tinted wash, index chip) lives on platform/page.tsx; these visuals
-// fill the inner canvas only.
+// dispatched via VisualFor by capability index. Each visual fills its canvas
+// directly (no tinted backdrop).
+//
+// For capabilities that map to a real dashboard surface (map, scan chart,
+// compliance hub), these visuals mirror the dashboard look 1:1 so they act
+// as marketing-ready snapshots of the live product. Self-contained: no
+// imports from envrt-dashboard, no recharts dependency. SVG + brand tokens
+// only.
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
@@ -31,14 +36,16 @@ export function VisualFor({ id }: { id: string }) {
 }
 
 // ─── 01 · Supply chain mapping ────────────────────────────────────────────
-// Lightweight static port of the dashboard SupplierMap. World mercator from
-// d3-geo + topojson, fetched once at mount. No interactions, no popup, no
-// zoom. Five seeded suppliers covering the four tiers of the hoodie supply
-// chain, glow + count badges identical in spirit to the dashboard.
+// Snapshot of the dashboard SupplierMap. World mercator from d3-geo +
+// topojson fetched at mount. Same dot styling (radial gradient fill, white
+// border, glow halo, ping ring, count badge) as the live component.
 
 const MAP_W = 960;
 const MAP_H = 480;
-const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+// Same-origin so it leans on our CDN cache and avoids a DNS lookup +
+// TLS handshake to jsdelivr on every /platform visit. Sourced from
+// world-atlas v2 at build time.
+const GEO_URL = "/v3-assets/data/countries-110m.json";
 
 const SUPPLIERS = [
   { name: "Viana do Castelo · Assembly", tier: "T1", lng: -8.83, lat: 41.70, color: "#3E00FF", count: 1 },
@@ -74,17 +81,17 @@ function VisualSupplyChainMap() {
     return () => { cancelled = true; };
   }, []);
 
-  // Frame on Europe + western Asia, where the hoodie's suppliers sit. Wider
-  // crop than the dashboard's world view so dots aren't dwarfed by ocean.
+  // Frame on Europe + western Asia — wider than the dashboard's world view
+  // so the hoodie's supplier dots aren't dwarfed by ocean.
   const projection = geoMercator()
-    .scale(620)
+    .scale(580)
     .center([14, 42])
     .translate([MAP_W / 2, MAP_H / 2]);
   const pathGenerator = geoPath().projection(projection);
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="relative w-full flex-1 overflow-hidden rounded-2xl bg-white ring-1 ring-envrt-brand-black/10">
+    <Card title="Supply Chain Locations">
+      <div className="relative w-full overflow-hidden rounded-xl">
         <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="block h-full w-full">
           <defs>
             {SUPPLIERS.map((s, i) => (
@@ -94,7 +101,7 @@ function VisualSupplyChainMap() {
               </radialGradient>
             ))}
             <filter id="map-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -102,19 +109,18 @@ function VisualSupplyChainMap() {
             </filter>
           </defs>
 
-          {/* Country shapes — tinted to match the dashboard's stone-grey
-              treatment, plus a subtle stroke. */}
+          {/* Country shapes — matches the dashboard's GRAY_100/GRAY_200 tone. */}
           {geoFeatures.map((geo, i) => (
             <path
               key={i}
               d={pathGenerator(geo) || ""}
-              fill="#F1EFE6"
-              stroke="#E2DECD"
+              fill="#F3F4F6"
+              stroke="#E5E7EB"
               strokeWidth={0.6}
             />
           ))}
 
-          {/* Supplier dots */}
+          {/* Supplier dots — same chrome as dashboard SupplierMap. */}
           {SUPPLIERS.map((s, i) => {
             const projected = projection([s.lng, s.lat]);
             if (!projected) return null;
@@ -145,37 +151,45 @@ function VisualSupplyChainMap() {
             );
           })}
         </svg>
-
-        {/* Heading chip */}
-        <div className="absolute left-3 top-3">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-            Supply chain · 4 tiers
-          </p>
-        </div>
       </div>
 
-      {/* Legend */}
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5 px-1">
+      {/* Pill toggle row — matches dashboard PillToggle visuals. */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-full bg-gray-100 p-1">
+        <PillTab label="All Stages" active />
         {TIER_LEGEND.map((t) => (
-          <span key={t.label} className="inline-flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-black/70">
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: t.color }} />
-            {t.label}
-          </span>
+          <PillTab key={t.label} label={t.label.split(" · ")[1]} dot={t.color} />
         ))}
       </div>
-    </div>
+    </Card>
+  );
+}
+
+function PillTab({ label, active, dot }: { label: string; active?: boolean; dot?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium ${
+        active
+          ? "bg-white text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+          : "text-gray-600"
+      }`}
+    >
+      {dot && <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: dot }} />}
+      {label}
+    </span>
   );
 }
 
 // ─── 02 · In-house LCA ────────────────────────────────────────────────────
-// Six stage rows. Each row: stage label, horizontal bar with kg CO₂e, and a
-// micro AWARE water column on the right. ISO 14040 + EU PEF stamp below.
+// Per-stage emissions breakdown, same shape as the dashboard's per-garment
+// impact card. Stage label, horizontal bar with gradient fill, kg CO₂e on
+// the right, AWARE water micro-column. EU PEF / ISO 14040 / AWARE chips at
+// the bottom mirror the dashboard's standards stamps.
 
 const LCA_STAGES = [
-  { stage: "Fibre", co2: 2.84, water: 4.1 },
-  { stage: "Yarn", co2: 0.71, water: 0.6 },
-  { stage: "Fabric", co2: 1.92, water: 0.9 },
-  { stage: "Dye", co2: 0.96, water: 0.7 },
+  { stage: "Fibre production", co2: 2.84, water: 4.1 },
+  { stage: "Yarn production", co2: 0.71, water: 0.6 },
+  { stage: "Fabric production", co2: 1.92, water: 0.9 },
+  { stage: "Dyeing", co2: 0.96, water: 0.7 },
   { stage: "Assembly", co2: 0.58, water: 0.1 },
   { stage: "Transport", co2: 0.44, water: 0.0 },
 ];
@@ -185,40 +199,33 @@ function VisualLcaStages() {
   const maxWater = Math.max(...LCA_STAGES.map((s) => s.water));
 
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-          Hoodie 0509-1882 · per garment
-        </p>
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
-          6 stages
-        </p>
+    <Card title="Per-garment lifecycle impact">
+      <div className="flex items-baseline justify-between">
+        <p className="text-xs text-gray-500">Hoodie 0509-1882</p>
+        <p className="text-[10px] font-mono uppercase tracking-[0.14em] text-gray-400">6 stages</p>
       </div>
 
-      {/* Stage bars */}
-      <div className="mt-4 flex-1 space-y-2.5">
+      <div className="mt-3 space-y-2">
         {LCA_STAGES.map((s) => {
           const co2Width = (s.co2 / maxCo2) * 100;
           const waterFill = maxWater > 0 ? s.water / maxWater : 0;
           return (
-            <div key={s.stage} className="grid grid-cols-[60px_1fr_36px] items-center gap-2.5">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-black/75">
+            <div key={s.stage} className="grid grid-cols-[88px_1fr_30px] items-center gap-2">
+              <span className="truncate text-[10px] font-medium text-gray-600">
                 {s.stage}
               </span>
-              <div className="relative h-4 overflow-hidden rounded-md bg-envrt-brand-ultramarine/8">
+              <div className="relative h-3.5 overflow-hidden rounded bg-gray-100">
                 <div
-                  className="absolute inset-y-0 left-0 rounded-md bg-gradient-to-r from-envrt-brand-ultramarine to-envrt-brand-royal"
+                  className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-envrt-brand-ultramarine to-envrt-brand-royal"
                   style={{ width: `${co2Width}%` }}
                 />
-                <span className="absolute inset-y-0 right-1.5 flex items-center font-mono text-[9px] font-semibold tracking-tight text-envrt-brand-black">
+                <span className="absolute inset-y-0 right-1.5 flex items-center font-mono text-[9px] font-semibold text-gray-900">
                   {s.co2.toFixed(2)} kg
                 </span>
               </div>
-              {/* AWARE water mini-column */}
-              <div className="relative h-4 overflow-hidden rounded-md bg-envrt-brand-aqua/12" title={`AWARE ${s.water.toFixed(1)} m³`}>
+              <div className="relative h-3.5 overflow-hidden rounded bg-envrt-brand-aqua/12" title={`AWARE ${s.water.toFixed(1)} m³`}>
                 <div
-                  className="absolute inset-x-0 bottom-0 rounded-md bg-envrt-brand-aqua/70"
+                  className="absolute inset-x-0 bottom-0 rounded bg-envrt-brand-aqua/70"
                   style={{ height: `${Math.max(waterFill * 100, s.water > 0 ? 12 : 0)}%` }}
                 />
               </div>
@@ -227,89 +234,150 @@ function VisualLcaStages() {
         })}
       </div>
 
-      {/* Footer stamp */}
-      <div className="mt-3 flex items-center justify-between border-t border-envrt-brand-black/10 pt-3">
-        <div className="flex items-center gap-1.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-          <span className="rounded bg-envrt-brand-black/8 px-1.5 py-0.5">EU PEF</span>
-          <span className="rounded bg-envrt-brand-black/8 px-1.5 py-0.5">ISO 14040</span>
-          <span className="rounded bg-envrt-brand-aqua/15 px-1.5 py-0.5 text-envrt-brand-aqua">AWARE</span>
+      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+        <div className="flex items-center gap-1">
+          <Chip label="EU PEF" />
+          <Chip label="ISO 14040" />
+          <Chip label="AWARE" tone="aqua" />
         </div>
-        <p className="font-mono text-[8.5px] font-semibold tracking-tight text-envrt-brand-black">
+        <p className="font-mono text-[10px] font-semibold text-gray-900">
           7.45 kg CO₂e
         </p>
       </div>
-    </div>
+    </Card>
   );
 }
 
 // ─── 03 · French Eco-Score ────────────────────────────────────────────────
-// Coût Environnemental SVG as the centrepiece. 4×4 grid of 16 data-block
-// tiles behind it. "Coût Environnemental" wordmark on top, score caption
-// below.
+// Official Coût Environnemental label sits unadorned on the section's vista
+// background. No gimmicky backdrop. Below it, a small dashboard-style row
+// shows the score breakdown — points total + per-100g + methodology stamp.
 
 function VisualEcoScore() {
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      {/* 4x4 data-block grid backdrop */}
-      <div
-        aria-hidden
-        className="absolute inset-x-8 inset-y-12 grid grid-cols-4 grid-rows-4 gap-2 opacity-[0.18]"
-      >
-        {Array.from({ length: 16 }).map((_, i) => (
-          <div key={i} className="rounded-md bg-envrt-brand-ultramarine" />
-        ))}
-      </div>
-
-      {/* Header */}
-      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-        Coût Environnemental · Ecobalyse
-      </p>
-
-      {/* Official label */}
-      <div className="relative z-10 mt-3 rounded-lg bg-white p-3 shadow-[0_10px_30px_-12px_rgba(14,14,14,0.18)] ring-1 ring-envrt-brand-black/8">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+      <div className="rounded-xl bg-white p-3 shadow-[0_18px_40px_-18px_rgba(14,14,14,0.18)] ring-1 ring-envrt-brand-black/8">
         <Image
           src="/v3-assets/angry-pablo-ecoscore.svg"
           alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
-          width={180}
-          height={90}
-          className="block h-auto w-[200px]"
+          width={240}
+          height={120}
+          className="block h-auto w-[220px] sm:w-[260px]"
           unoptimized
         />
       </div>
 
-      {/* Footer captions */}
-      <div className="relative z-10 mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70">
-          16 data blocks · per product
-        </span>
-        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
-          République Française
-        </span>
+      {/* Compact breakdown row — same shape as a dashboard stat strip. */}
+      <div className="grid w-full max-w-[320px] grid-cols-3 gap-2">
+        <Stat label="Points" value="1,573" />
+        <Stat label="Per 100g" value="449" />
+        <Stat label="Grade" value="C" tone="ultramarine" />
       </div>
+
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/55">
+        République Française · Ecobalyse
+      </p>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "ultramarine" }) {
+  return (
+    <div className="rounded-lg bg-white px-2 py-2 text-center ring-1 ring-envrt-brand-black/8">
+      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-black/55">
+        {label}
+      </p>
+      <p className={`mt-0.5 font-display text-base font-semibold tracking-tight ${tone === "ultramarine" ? "text-envrt-brand-ultramarine" : "text-envrt-brand-black"}`}>
+        {value}
+      </p>
     </div>
   );
 }
 
 // ─── 04 · DPP production ──────────────────────────────────────────────────
-// Static phone shell with the live DPP iframe inside. Cribbed from
-// ScrollTourSection but without the scroll pin: the iframe just shows the
-// top of the DPP and the user can click through to open it.
+// Real phone shell with the live DPP loaded inside a scrollable iframe.
+// Mirrors the v1 hero-phone implementation: notch + status bar, sandboxed
+// iframe, pointer-events-auto so users can scroll within the phone itself.
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
+const PHONE_VIEWPORT_WIDTH = 375;
+const PHONE_VIEWPORT_HEIGHT = 812;
 
 function VisualDppPhone() {
-  const [loaded, setLoaded] = useState(false);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      if (screenRef.current) {
+        setScale(screenRef.current.offsetWidth / PHONE_VIEWPORT_WIDTH);
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    if (screenRef.current) observer.observe(screenRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="relative flex h-full w-full items-center justify-center">
-      <div className="relative w-[60%] max-w-[220px]">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="relative w-full max-w-[200px]">
         <div className="relative overflow-hidden rounded-[2rem] border-[5px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_24px_50px_-18px_rgba(14,14,14,0.45)]">
-          <div className="relative h-[340px] overflow-hidden bg-white">
-            {/* Skeleton behind iframe */}
+          {/* Status bar */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[1.6rem] bg-white px-4" style={{ height: 18 }}>
+            <span className="text-[8px] font-semibold leading-none text-envrt-brand-black">9:41</span>
+            <div className="w-[56px]" />
+            <div className="flex items-center gap-[3px]">
+              <svg width="9" height="7" viewBox="0 0 14 10" fill="none" className="text-envrt-brand-black">
+                <rect x="0" y="7" width="2.5" height="3" rx="0.5" fill="currentColor" />
+                <rect x="3.5" y="5" width="2.5" height="5" rx="0.5" fill="currentColor" />
+                <rect x="7" y="2.5" width="2.5" height="7.5" rx="0.5" fill="currentColor" />
+                <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" />
+              </svg>
+              <div className="relative h-[6px] w-[12px] rounded-[1.5px] border border-envrt-brand-black/80">
+                <div className="absolute inset-[1px] rounded-[0.5px] bg-envrt-brand-black" style={{ width: "75%" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Notch */}
+          <div className="absolute left-1/2 top-[3px] z-30 h-[12px] w-[56px] -translate-x-1/2 rounded-full bg-envrt-brand-black" />
+
+          {/* Screen — 9:19.5 portrait aspect, iframe scaled to fit. */}
+          <div
+            ref={screenRef}
+            className="relative w-full overflow-hidden rounded-[1.6rem] bg-white"
+            style={{ aspectRatio: "9 / 19" }}
+          >
+            <div className="absolute inset-0 overflow-hidden">
+              <iframe
+                src={DPP_URL}
+                title="Live ENVRT Digital Product Passport"
+                loading="eager"
+                className="absolute border-0"
+                style={{
+                  top: 0,
+                  left: 0,
+                  width: `${PHONE_VIEWPORT_WIDTH}px`,
+                  height: `${PHONE_VIEWPORT_HEIGHT}px`,
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  overflow: "auto",
+                  WebkitOverflowScrolling: "touch",
+                  paddingTop: "18px",
+                }}
+                sandbox="allow-scripts allow-same-origin"
+                onLoad={() => setIframeLoaded(true)}
+              />
+            </div>
+
+            {/* Loading skeleton */}
             <div
               aria-hidden
-              className={`absolute inset-0 transition-opacity duration-500 ${loaded ? "pointer-events-none opacity-0" : "opacity-100"}`}
+              className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${iframeLoaded ? "opacity-0" : "opacity-100"}`}
             >
-              <div className="flex h-full flex-col gap-3 p-3">
+              <div className="flex h-full flex-col gap-3 p-3 pt-7">
                 <div className="h-[40%] animate-pulse rounded-md bg-envrt-brand-black/8" />
                 <div className="flex gap-2">
                   <div className="h-9 flex-1 animate-pulse rounded bg-envrt-brand-black/6" />
@@ -322,32 +390,16 @@ function VisualDppPhone() {
                 </div>
               </div>
             </div>
-
-            {/* Scale wrapper — iframe rendered at 414px native viewport, scaled
-                down to fit the small phone frame. Scale = (220 - 10) / 414 ≈ 0.507. */}
-            <div className="origin-top-left scale-[0.507]" style={{ width: "414px" }}>
-              <iframe
-                src={DPP_URL}
-                title="Live ENVRT Digital Product Passport"
-                style={{ width: "414px", height: "670px" }}
-                className={`pointer-events-none block border-0 transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
-                loading="lazy"
-                onLoad={() => setLoaded(true)}
-              />
-            </div>
-
-            {/* Bottom fade */}
-            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
           </div>
         </div>
 
-        <div className="mt-3 flex flex-col items-center gap-2">
+        <div className="mt-3 flex flex-col items-center gap-1.5">
           <LivePill label="dpp.envrt.com · live" />
           <a
             href={DPP_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine hover:underline"
+            className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-ultramarine hover:underline"
           >
             Open passport <span aria-hidden>↗</span>
           </a>
@@ -358,143 +410,152 @@ function VisualDppPhone() {
 }
 
 // ─── 05 · Evidence vault ──────────────────────────────────────────────────
-// Vertical stack of versioned, dated, signed documents. Each row: file icon,
-// filename, tier badge, signed pill, version. A faint left rail ties them
-// together as an audit trail.
+// Dashboard-style evidence table snapshot. Same column shape as the live
+// EvidenceList: file name + size, category, SKU, review status, date.
 
-const VAULT_DOCS = [
-  { icon: "pdf" as const, filename: "REACH_declaration_2026.pdf", tier: "T1", version: "v3", signed: true, date: "2026-04-12" },
-  { icon: "xlsx" as const, filename: "SGS_test_report_FW26.xlsx", tier: "T2", version: "v2", signed: true, date: "2026-03-30" },
-  { icon: "pdf" as const, filename: "CoC_supplier_042.pdf", tier: "T3", version: "v1", signed: true, date: "2026-03-18" },
-  { icon: "csv" as const, filename: "BoM_FW26.csv", tier: "T4", version: "v4", signed: true, date: "2026-04-02" },
-  { icon: "email" as const, filename: "audit_log_export.eml", tier: "—", version: "v1", signed: true, date: "2026-04-15" },
+type VaultRow = { name: string; size: string; category: string; sku: string; status: "Approved" | "Pending"; date: string; icon: "pdf" | "xlsx" | "csv" | "email" };
+
+const VAULT_ROWS: VaultRow[] = [
+  { name: "REACH_declaration_2026.pdf", size: "412 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-04-12", icon: "pdf" },
+  { name: "SGS_test_report_FW26.xlsx", size: "1.1 MB", category: "Testing", sku: "HOODIE-0509", status: "Approved", date: "2026-03-30", icon: "xlsx" },
+  { name: "CoC_supplier_042.pdf", size: "318 KB", category: "Certifications", sku: "HOODIE-0509", status: "Approved", date: "2026-03-18", icon: "pdf" },
+  { name: "BoM_FW26.csv", size: "26 KB", category: "Materials", sku: "HOODIE-0509", status: "Approved", date: "2026-04-02", icon: "csv" },
+  { name: "audit_log_export.eml", size: "9 KB", category: "Other", sku: "—", status: "Pending", date: "2026-04-15", icon: "email" },
 ];
 
 function VisualEvidenceVault() {
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-          Evidence vault · audit trail
-        </p>
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-ultramarine">
-          {VAULT_DOCS.length} docs
-        </p>
+    <Card title="Evidence & Documentation">
+      <div className="overflow-hidden rounded-lg ring-1 ring-gray-200">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 text-[9px] font-semibold uppercase tracking-[0.08em] text-gray-500">
+            <tr>
+              <th className="px-2.5 py-1.5">File</th>
+              <th className="px-2 py-1.5">Category</th>
+              <th className="px-2 py-1.5 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-[10px]">
+            {VAULT_ROWS.map((r) => (
+              <tr key={r.name}>
+                <td className="px-2.5 py-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="flex-shrink-0 text-gray-400">
+                      <AssetIcon type={r.icon} size={13} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-mono text-[10px] font-medium text-gray-900">
+                        {r.name}
+                      </p>
+                      <p className="font-mono text-[9px] text-gray-400">
+                        {r.size} · {r.date}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-2 py-1.5">
+                  <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[9px] font-medium text-gray-700">
+                    {r.category}
+                  </span>
+                </td>
+                <td className="px-2 py-1.5 text-right">
+                  <StatusPill status={r.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Rail + docs */}
-      <div className="relative mt-4 flex-1">
-        <div aria-hidden className="absolute bottom-2 left-3 top-2 w-px bg-envrt-brand-ultramarine/25" />
-        <div className="relative space-y-2.5">
-          {VAULT_DOCS.map((d) => (
-            <div
-              key={d.filename}
-              className="relative ml-7 flex items-center gap-2.5 rounded-xl bg-envrt-brand-vista p-2.5 ring-1 ring-envrt-brand-black/8"
-            >
-              {/* Rail dot */}
-              <span aria-hidden className="absolute -left-[1.05rem] top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-envrt-brand-ultramarine ring-2 ring-white" />
+      <p className="mt-2 text-[10px] text-gray-400">
+        {VAULT_ROWS.length} files · versioned and signed
+      </p>
+    </Card>
+  );
+}
 
-              <span className="flex-shrink-0 text-envrt-brand-black/65">
-                <AssetIcon type={d.icon} size={18} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-mono text-[10px] font-semibold text-envrt-brand-black">
-                  {d.filename}
-                </p>
-                <p className="mt-0.5 font-mono text-[9px] text-envrt-brand-black/55">
-                  {d.date}
-                </p>
-              </div>
-              <span className="rounded bg-envrt-brand-black/8 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-black/65">
-                {d.tier}
-              </span>
-              <span className="rounded bg-envrt-brand-ultramarine/12 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-ultramarine">
-                {d.version}
-              </span>
-              {d.signed && (
-                <span className="rounded-full bg-envrt-brand-vibrant/18 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-vibrant" title="Signed">
-                  ✓
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+function StatusPill({ status }: { status: "Approved" | "Pending" }) {
+  if (status === "Approved") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-1.5 py-0.5 text-[9px] font-medium text-green-700">
+        <span className="h-1 w-1 rounded-full bg-green-500" /> {status}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-medium text-amber-700">
+      <span className="h-1 w-1 rounded-full bg-amber-500" /> {status}
+    </span>
   );
 }
 
 // ─── 06 · Audit-ready reports ─────────────────────────────────────────────
-// PDF cover-sheet mock + JSON snippet, side by side. The contrast itself
-// makes the point: same data, two formats.
+// PDF + JSON side by side. Both kept narrow with bounded text so nothing
+// overflows the canvas.
 
 function VisualAuditPack() {
   return (
     <div className="grid h-full w-full grid-cols-[1fr_1fr] gap-3">
-      {/* PDF mock */}
-      <div className="relative flex flex-col overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-envrt-brand-black/10 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)]">
+      {/* PDF mock — narrow, all values short and right-aligned. */}
+      <div className="flex flex-col overflow-hidden rounded-2xl bg-white p-3 ring-1 ring-envrt-brand-black/10 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)]">
         <div className="flex items-center justify-between">
-          <span className="rounded bg-envrt-brand-crimson/15 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-crimson">
+          <span className="rounded bg-envrt-brand-crimson/15 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-crimson">
             PDF
           </span>
-          <span className="font-mono text-[8.5px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
+          <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/45">
             v3.1
           </span>
         </div>
-        <p className="mt-3 font-mono text-[8.5px] uppercase tracking-[0.16em] text-envrt-brand-black/55">
-          Garment Proof Pack
+        <p className="mt-2.5 font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/55">
+          Proof Pack
         </p>
-        <p className="mt-1 font-display text-sm font-semibold leading-tight tracking-tight text-envrt-brand-black">
+        <p className="mt-0.5 truncate font-display text-xs font-semibold tracking-tight text-envrt-brand-black">
           Hoodie 0509-1882
         </p>
 
-        <div className="mt-3 space-y-1.5 border-t border-envrt-brand-black/10 pt-3">
+        <div className="mt-3 space-y-1.5 border-t border-envrt-brand-black/10 pt-2.5">
           {[
-            ["Inputs", "12 fields"],
-            ["Factors", "EU PEF v3.1"],
-            ["Suppliers", "5 verified"],
-            ["Audit trail", "44 events"],
+            ["Inputs", "12"],
+            ["Factors", "v3.1"],
+            ["Suppliers", "5"],
+            ["Trail", "44"],
           ].map(([k, v]) => (
             <div key={k} className="flex items-center justify-between">
-              <span className="font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-black/60">{k}</span>
+              <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-envrt-brand-black/60">{k}</span>
               <span className="font-mono text-[8.5px] tracking-tight text-envrt-brand-black">{v}</span>
             </div>
           ))}
         </div>
 
-        <div className="mt-auto flex items-center justify-between border-t border-envrt-brand-black/10 pt-3">
-          <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
-            2026-04-12
+        <div className="mt-auto flex items-center justify-between border-t border-envrt-brand-black/10 pt-2.5">
+          <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/45">
+            04-12
           </span>
-          <span className="rounded-full bg-envrt-brand-vibrant/18 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-vibrant">
-            ✓ Signed
+          <span className="rounded-full bg-envrt-brand-vibrant/18 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-envrt-brand-vibrant">
+            Signed
           </span>
         </div>
       </div>
 
-      {/* JSON mock */}
-      <div className="relative flex flex-col overflow-hidden rounded-2xl bg-envrt-brand-black p-4 text-white ring-1 ring-envrt-brand-black/40">
+      {/* JSON mock — bounded width, no horizontal scroll, tight tokens. */}
+      <div className="flex flex-col overflow-hidden rounded-2xl bg-envrt-brand-black p-3 text-white ring-1 ring-envrt-brand-black/40">
         <div className="flex items-center justify-between">
-          <span className="rounded bg-envrt-brand-neon/20 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-neon">
+          <span className="rounded bg-envrt-brand-neon/20 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-neon">
             JSON
           </span>
-          <span className="font-mono text-[8.5px] uppercase tracking-[0.16em] text-white/45">
+          <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-white/45">
             v3.1
           </span>
         </div>
-        <pre className="mt-3 flex-1 overflow-hidden font-mono text-[8.5px] leading-relaxed text-white/90">
+        <pre className="mt-2.5 flex-1 overflow-hidden whitespace-pre-wrap break-all font-mono text-[8px] leading-relaxed text-white/90">
 {`{
-  "garment": "hoodie-0509-1882",
+  "id": "0509-1882",
   "co2e_kg": 7.45,
-  "water_m3": 6.477,
-  "methodology": "EU_PEF_v3.1",
-  "suppliers": [
-    { "tier": 1, "country": "PT" },
-    { "tier": 2, "country": "TR" },
-    { "tier": 4, "country": "TR" }
-  ],
-  "audit_trail": 44,
+  "water_m3": 6.48,
+  "method": "PEF_v3.1",
+  "tiers": 4,
+  "suppliers": 5,
+  "trail": 44,
   "signed": true
 }`}
         </pre>
@@ -504,71 +565,60 @@ function VisualAuditPack() {
 }
 
 // ─── 07 · Compliance monitoring ───────────────────────────────────────────
-// Vertical timeline of recent regulatory events. Each row has a status pill
-// (applied / monitoring / in-scope) and a date.
+// Mirrors the dashboard compliance hub: a grid of regime tiles, each with
+// label, blurb and status. Plus a small "watching" pill at top.
 
-const REG_EVENTS = [
-  { reg: "EU PEF", note: "Update v3.1 applied to all DPPs", date: "2026-04-12", status: "applied" as const },
-  { reg: "ISO 14040", note: "2026 revision reviewed", date: "2026-03-22", status: "applied" as const },
-  { reg: "AGEC (France)", note: "Article 13 schema watching", date: "2026-04-02", status: "monitoring" as const },
-  { reg: "CA SB-707", note: "Producer responsibility — in scope", date: "2026-02-15", status: "scope" as const },
-  { reg: "NY S-4859", note: "Disclosure draft tracked", date: "2026-01-30", status: "monitoring" as const },
+const REGIMES = [
+  { label: "France · Coût Environnemental", blurb: "AGEC, Décret 2025-957", status: "live" as const },
+  { label: "EU · ESPR DPP", blurb: "Regulation 2024/1781", status: "watching" as const },
+  { label: "EU · CSRD ESRS", blurb: "Sustainability reporting", status: "watching" as const },
+  { label: "ISO 14040", blurb: "LCA standards revision", status: "live" as const },
+  { label: "CA SB-707", blurb: "EPR for textile producers", status: "scope" as const },
+  { label: "NY S-4859", blurb: "Disclosure draft tracked", status: "watching" as const },
 ];
 
-const STATUS_STYLE: Record<"applied" | "monitoring" | "scope", { bg: string; text: string; label: string; dot: string }> = {
-  applied: { bg: "bg-envrt-brand-vibrant/18", text: "text-envrt-brand-vibrant", label: "Applied", dot: "bg-envrt-brand-vibrant" },
-  monitoring: { bg: "bg-envrt-brand-golden/22", text: "text-envrt-brand-black", label: "Monitoring", dot: "bg-envrt-brand-golden" },
-  scope: { bg: "bg-envrt-brand-ultramarine/15", text: "text-envrt-brand-ultramarine", label: "In scope", dot: "bg-envrt-brand-ultramarine" },
+const REGIME_STATUS: Record<"live" | "watching" | "scope", { bg: string; text: string; dot: string; label: string }> = {
+  live: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500", label: "Live" },
+  watching: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500", label: "Watching" },
+  scope: { bg: "bg-indigo-50", text: "text-indigo-700", dot: "bg-indigo-500", label: "In scope" },
 };
 
 function VisualComplianceTimeline() {
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-          Compliance · 90-day window
-        </p>
-        <LivePill label="Watching" />
-      </div>
+    <Card title="Compliance">
+      <p className="text-xs text-gray-500">Six regimes monitored. New ones picked up automatically.</p>
 
-      <div className="relative mt-4 flex-1">
-        <div aria-hidden className="absolute bottom-2 left-2 top-2 w-px bg-envrt-brand-black/10" />
-        <ul className="relative space-y-2.5">
-          {REG_EVENTS.map((e) => {
-            const s = STATUS_STYLE[e.status];
-            return (
-              <li key={e.reg} className="relative ml-6">
-                <span aria-hidden className={`absolute -left-[1.15rem] top-1.5 h-2 w-2 rounded-full ${s.dot} ring-2 ring-white`} />
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-display text-xs font-semibold tracking-tight text-envrt-brand-black">
-                      {e.reg}
-                    </p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-envrt-brand-black/65">
-                      {e.note}
-                    </p>
-                  </div>
-                  <div className="flex flex-shrink-0 flex-col items-end gap-1">
-                    <span className={`rounded-full px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] ${s.bg} ${s.text}`}>
-                      {s.label}
-                    </span>
-                    <span className="font-mono text-[8.5px] uppercase tracking-[0.14em] text-envrt-brand-black/45">
-                      {e.date}
-                    </span>
-                  </div>
+      <div className="mt-3 grid grid-cols-2 gap-1.5">
+        {REGIMES.map((r) => {
+          const s = REGIME_STATUS[r.status];
+          return (
+            <div key={r.label} className="rounded-lg border border-gray-200 bg-white p-2">
+              <div className="flex items-start justify-between gap-1.5">
+                <div className="min-w-0">
+                  <p className="truncate text-[10px] font-semibold text-gray-900">
+                    {r.label}
+                  </p>
+                  <p className="truncate text-[9px] text-gray-500">
+                    {r.blurb}
+                  </p>
                 </div>
-              </li>
-            );
-          })}
-        </ul>
+                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8px] font-medium ${s.bg} ${s.text}`}>
+                  <span className={`h-1 w-1 rounded-full ${s.dot}`} />
+                  {s.label}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </div>
+    </Card>
   );
 }
 
 // ─── 08 · QR scan analytics ───────────────────────────────────────────────
-// Static SVG area chart that mimics the dashboard DailyScansChart. Soft
-// gradient fill, 3-3 dashed grid, seeded fake data with a campaign spike.
+// Hand-tuned area chart in raw SVG matching the dashboard DailyScansChart
+// look: 3-3 dashed grid, dual line (views + visitors dashed), green primary,
+// ultramarine secondary, soft gradient area fills, axis labels in gray-500.
 
 const SCAN_DATA: { date: string; views: number; visitors: number }[] = [
   { date: "2026-03-16", views: 142, visitors: 118 },
@@ -588,12 +638,12 @@ const SCAN_DATA: { date: string; views: number; visitors: number }[] = [
 ];
 
 function VisualScanAnalytics() {
-  const W = 460;
-  const H = 250;
-  const PAD_L = 30;
+  const W = 480;
+  const H = 200;
+  const PAD_L = 32;
   const PAD_R = 12;
-  const PAD_T = 12;
-  const PAD_B = 26;
+  const PAD_T = 8;
+  const PAD_B = 24;
 
   const maxY = Math.max(...SCAN_DATA.map((d) => d.views));
   const xStep = (W - PAD_L - PAD_R) / (SCAN_DATA.length - 1);
@@ -602,7 +652,6 @@ function VisualScanAnalytics() {
   const pointsViews = SCAN_DATA.map((d, i) => [PAD_L + i * xStep, yScale(d.views)] as [number, number]);
   const pointsVisitors = SCAN_DATA.map((d, i) => [PAD_L + i * xStep, yScale(d.visitors)] as [number, number]);
 
-  // Smooth path via Catmull-Rom-like bezier for the area + line
   const lineFor = (pts: [number, number][]) => {
     let d = `M ${pts[0][0]} ${pts[0][1]}`;
     for (let i = 1; i < pts.length; i++) {
@@ -621,62 +670,51 @@ function VisualScanAnalytics() {
     return `${line} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
   };
 
-  // Y-axis ticks (4 levels)
+  const formatCompact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => ({
     y: PAD_T + (H - PAD_T - PAD_B) * (1 - t),
-    label: Math.round(maxY * t),
+    label: formatCompact(Math.round(maxY * t)),
   }));
 
-  // Inline date format: "DD MMM"
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-  };
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 
-  // Show every 3rd date label
-  const xLabels = SCAN_DATA.map((d, i) => ({ x: PAD_L + i * xStep, label: formatDate(d.date), show: i % 3 === 0 || i === SCAN_DATA.length - 1 }));
+  const xLabels = SCAN_DATA.map((d, i) => ({
+    x: PAD_L + i * xStep,
+    label: formatDate(d.date),
+    show: i === 0 || i === SCAN_DATA.length - 1 || i % 4 === 0,
+  }));
 
   const totalScans = SCAN_DATA.reduce((sum, d) => sum + d.views, 0);
 
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      {/* Header */}
+    <Card title="Daily scans">
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-            Daily scans · last 6 weeks
+          <p className="font-display text-xl font-semibold tracking-tight text-gray-900">
+            {totalScans.toLocaleString()}
           </p>
-          <p className="mt-1 font-display text-xl font-semibold tracking-tight text-envrt-brand-black">
-            {totalScans.toLocaleString()} <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-envrt-brand-black/45">views</span>
-          </p>
+          <p className="text-[10px] uppercase tracking-[0.12em] text-gray-500">last 6 weeks</p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-vibrant">
-            <span className="h-2 w-2 rounded-full bg-envrt-brand-vibrant" />
-            Views
-          </span>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-ultramarine">
-            <span className="h-2 w-2 rounded-full bg-envrt-brand-ultramarine" />
-            Visitors
-          </span>
+          <Legend color="#20E036" label="Views" />
+          <Legend color="#3E00FF" label="Visitors" dashed />
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="relative mt-3 flex-1">
-        <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full">
+      <div className="relative mt-2 h-[180px]">
+        <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full" preserveAspectRatio="none">
           <defs>
             <linearGradient id="scans-grad-views" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#20E036" stopOpacity="0.20" />
+              <stop offset="0%" stopColor="#20E036" stopOpacity="0.18" />
               <stop offset="100%" stopColor="#20E036" stopOpacity="0.02" />
             </linearGradient>
             <linearGradient id="scans-grad-visitors" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#3E00FF" stopOpacity="0.12" />
+              <stop offset="0%" stopColor="#3E00FF" stopOpacity="0.10" />
               <stop offset="100%" stopColor="#3E00FF" stopOpacity="0.01" />
             </linearGradient>
           </defs>
 
-          {/* Y-grid + labels */}
           {yTicks.map((t, i) => (
             <g key={i}>
               <line
@@ -684,47 +722,39 @@ function VisualScanAnalytics() {
                 y1={t.y}
                 x2={W - PAD_R}
                 y2={t.y}
-                stroke="#E5E1D2"
+                stroke="#E5E7EB"
                 strokeWidth={0.8}
                 strokeDasharray="3 3"
               />
               <text
-                x={PAD_L - 6}
+                x={PAD_L - 4}
                 y={t.y + 3}
                 textAnchor="end"
                 fontSize="9"
-                fontFamily="ui-monospace, SFMono-Regular, monospace"
-                fill="#1A1A1A"
-                opacity={0.45}
+                fontFamily="ui-sans-serif, system-ui, sans-serif"
+                fill="#9CA3AF"
               >
                 {t.label}
               </text>
             </g>
           ))}
 
-          {/* Visitors (behind) */}
           <path d={areaFor(pointsVisitors)} fill="url(#scans-grad-visitors)" />
-          <path d={lineFor(pointsVisitors)} fill="none" stroke="#3E00FF" strokeWidth={1.5} strokeDasharray="4 2" />
+          <path d={lineFor(pointsVisitors)} fill="none" stroke="#3E00FF" strokeWidth={1.4} strokeDasharray="4 2" />
 
-          {/* Views (front) */}
           <path d={areaFor(pointsViews)} fill="url(#scans-grad-views)" />
           <path d={lineFor(pointsViews)} fill="none" stroke="#20E036" strokeWidth={2} />
 
-          {/* Spike marker on the campaign peak */}
           {(() => {
             const peakIdx = SCAN_DATA.reduce((max, d, i) => (d.views > SCAN_DATA[max].views ? i : max), 0);
             const [px, py] = pointsViews[peakIdx];
             return (
               <g>
-                <circle cx={px} cy={py} r={4} fill="#fff" stroke="#20E036" strokeWidth={2} />
-                <text x={px} y={py - 10} textAnchor="middle" fontSize="9" fontFamily="ui-monospace, SFMono-Regular, monospace" fill="#1A1A1A" fontWeight="600">
-                  {SCAN_DATA[peakIdx].views}
-                </text>
+                <circle cx={px} cy={py} r={3.5} fill="#fff" stroke="#20E036" strokeWidth={2} />
               </g>
             );
           })()}
 
-          {/* X labels */}
           {xLabels.map((l, i) => l.show && (
             <text
               key={i}
@@ -732,22 +762,32 @@ function VisualScanAnalytics() {
               y={H - PAD_B + 14}
               textAnchor="middle"
               fontSize="9"
-              fontFamily="ui-monospace, SFMono-Regular, monospace"
-              fill="#1A1A1A"
-              opacity={0.45}
+              fontFamily="ui-sans-serif, system-ui, sans-serif"
+              fill="#9CA3AF"
             >
               {l.label}
             </text>
           ))}
         </svg>
       </div>
-    </div>
+    </Card>
+  );
+}
+
+function Legend({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[9px] font-medium text-gray-600">
+      <svg width="14" height="2">
+        <line x1="0" y1="1" x2="14" y2="1" stroke={color} strokeWidth="2" strokeDasharray={dashed ? "3 2" : "0"} />
+      </svg>
+      {label}
+    </span>
   );
 }
 
 // ─── 09 · Green-claims audit ──────────────────────────────────────────────
-// One claim card with the marketing line at top and three evidence rows
-// underneath, each with verify/flag pills.
+// Claim card + three evidence rows + flag summary. Tidy, bounded, fits the
+// canvas without overflow.
 
 const CLAIM_EVIDENCE = [
   { label: "Material composition", source: "BoM_FW26.csv", status: "verified" as const, hint: "80% organic cotton (GOTS)" },
@@ -755,48 +795,44 @@ const CLAIM_EVIDENCE = [
   { label: "REACH declaration", source: "REACH_2026.pdf", status: "pending" as const, hint: "Supplier response overdue" },
 ];
 
-const CLAIM_PILL: Record<"verified" | "pending", { bg: string; text: string; label: string }> = {
-  verified: { bg: "bg-envrt-brand-vibrant/18", text: "text-envrt-brand-vibrant", label: "Verified" },
-  pending: { bg: "bg-envrt-brand-crimson/15", text: "text-envrt-brand-crimson", label: "Pending" },
+const CLAIM_PILL: Record<"verified" | "pending", { bg: string; text: string; label: string; dot: string }> = {
+  verified: { bg: "bg-green-50", text: "text-green-700", label: "Verified", dot: "bg-green-500" },
+  pending: { bg: "bg-red-50", text: "text-red-700", label: "Pending", dot: "bg-red-500" },
 };
 
 function VisualGreenClaims() {
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-5 ring-1 ring-envrt-brand-black/10">
-      {/* Header */}
-      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-        Marketing claim · pre-publish
-      </p>
-
+    <Card title="Marketing claim · pre-publish">
       {/* Quoted claim */}
-      <div className="mt-3 rounded-xl bg-envrt-brand-vista p-3">
-        <p className="font-mono text-[8.5px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-black/55">
-          “Made with 80% organic cotton.”
+      <div className="rounded-lg bg-gray-50 p-2.5">
+        <p className="text-[11px] font-medium italic text-gray-700">
+          &ldquo;Made with 80% organic cotton.&rdquo;
         </p>
-        <p className="mt-1 font-mono text-[8.5px] tracking-tight text-envrt-brand-black/55">
-          Hoodie 0509-1882 · product description
+        <p className="mt-0.5 font-mono text-[9px] tracking-tight text-gray-400">
+          Hoodie 0509-1882
         </p>
       </div>
 
       {/* Evidence rows */}
-      <div className="mt-4 flex-1 space-y-2.5">
+      <div className="mt-2.5 space-y-1.5">
         {CLAIM_EVIDENCE.map((e) => {
           const p = CLAIM_PILL[e.status];
           return (
-            <div key={e.label} className="rounded-xl border border-envrt-brand-black/10 p-2.5">
+            <div key={e.label} className="rounded-lg border border-gray-200 bg-white p-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="font-display text-xs font-semibold tracking-tight text-envrt-brand-black">
+                  <p className="text-[11px] font-semibold text-gray-900">
                     {e.label}
                   </p>
-                  <p className="mt-0.5 font-mono text-[9px] tracking-tight text-envrt-brand-black/55">
+                  <p className="truncate font-mono text-[9px] text-gray-400">
                     {e.source}
                   </p>
-                  <p className="mt-1 text-[10px] leading-snug text-envrt-brand-black/65">
+                  <p className="mt-0.5 truncate text-[10px] text-gray-500">
                     {e.hint}
                   </p>
                 </div>
-                <span className={`flex-shrink-0 rounded-full px-2 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] ${p.bg} ${p.text}`}>
+                <span className={`flex-shrink-0 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8.5px] font-medium ${p.bg} ${p.text}`}>
+                  <span className={`h-1 w-1 rounded-full ${p.dot}`} />
                   {p.label}
                 </span>
               </div>
@@ -806,14 +842,40 @@ function VisualGreenClaims() {
       </div>
 
       {/* Footer summary */}
-      <div className="mt-3 flex items-center justify-between border-t border-envrt-brand-black/10 pt-3">
-        <span className="font-mono text-[8.5px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
-          Pre-publish check
-        </span>
-        <span className="rounded bg-envrt-brand-crimson/15 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-crimson">
+      <div className="mt-2.5 flex items-center justify-between border-t border-gray-100 pt-2">
+        <span className="text-[10px] text-gray-500">Pre-publish check</span>
+        <span className="rounded bg-red-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-red-700">
           1 flag · cannot ship
         </span>
       </div>
+    </Card>
+  );
+}
+
+// ─── Shared dashboard-style chrome ────────────────────────────────────────
+// Mirrors the dashboard Card: rounded-2xl, soft shadow, gray border, padded
+// body, small bolded title. Every dashboard-feature visual sits in this
+// chrome so the marketing page reads as a set of real dashboard snapshots.
+
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex h-full w-full flex-col rounded-2xl bg-white p-4 shadow-[0_18px_40px_-22px_rgba(14,14,14,0.18)] ring-1 ring-gray-200">
+      <h3 className="text-[11px] font-semibold text-gray-900">
+        {title}
+      </h3>
+      <div className="mt-2 flex flex-1 flex-col">
+        {children}
+      </div>
     </div>
+  );
+}
+
+function Chip({ label, tone }: { label: string; tone?: "aqua" }) {
+  return (
+    <span className={`rounded px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] ${
+      tone === "aqua" ? "bg-envrt-brand-aqua/15 text-envrt-brand-aqua" : "bg-gray-100 text-gray-600"
+    }`}>
+      {label}
+    </span>
   );
 }
