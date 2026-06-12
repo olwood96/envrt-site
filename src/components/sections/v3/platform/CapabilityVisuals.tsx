@@ -328,15 +328,15 @@ function VisualDppPhone() {
     return () => observer.disconnect();
   }, []);
 
-  // Phone is sized by HEIGHT (not width). The shell uses aspect-[9/19] so
-  // its width is derived from the height the parent flex distributes.
-  // That keeps the phone inside the 5:4 canvas on every viewport size —
-  // before, max-w-[200px] meant the 9:19 portrait shell could be twice
-  // as tall as the canvas on narrow mobile screens and would overflow
-  // upward into the preceding capability text.
+  // Phone is sized by WIDTH (max-w-[220px]), with the shell's aspect-[9/19]
+  // deriving its height. Natural portrait sizing — same look as the v1
+  // hero phone. The overflow risk this used to create is handled by
+  // platform/page.tsx dropping the aspect-[5/4] canvas constraint for
+  // cap 04 specifically, so the row grows to fit the phone instead of
+  // the phone being squeezed into a wide canvas.
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-2 py-1">
-      <div className="relative aspect-[9/19] h-[85%] max-h-[400px] max-w-full overflow-hidden rounded-[1.6rem] border-[5px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_24px_50px_-18px_rgba(14,14,14,0.45)]">
+    <div className="flex w-full flex-col items-center gap-3">
+      <div className="relative aspect-[9/19] w-full max-w-[220px] overflow-hidden rounded-[1.6rem] border-[5px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_24px_50px_-18px_rgba(14,14,14,0.45)]">
         {/* Status bar */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[1.2rem] bg-white px-4" style={{ height: 18 }}>
           <span className="text-[8px] font-semibold leading-none text-envrt-brand-black">9:41</span>

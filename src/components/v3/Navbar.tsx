@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ButtonV3 } from "./Button";
 import { EnvrtLogo } from "./EnvrtLogo";
+import { EnvrtMorphLogo } from "./EnvrtMorphLogo";
 import {
   AssetIcon,
   type AssetIconType,
@@ -139,9 +140,30 @@ export function Navbar() {
   const pathname = usePathname() ?? "";
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Mobile-only compact state. When true, the wordmark morphs from
+  // ENVRT down to NV and the pill tightens up so it obstructs less
+  // of the screen. Triggered by scrolling DOWN; released by
+  // scrolling UP or returning near the top of the page.
+  const [compact, setCompact] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    let lastY = window.scrollY;
+    const THRESHOLD = 4; // px of movement before flipping direction
+    const TOP_GUARD = 100; // always expanded near top of page
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 24);
+
+      if (y < TOP_GUARD) {
+        setCompact(false);
+      } else if (y > lastY + THRESHOLD) {
+        setCompact(true);
+      } else if (y < lastY - THRESHOLD) {
+        setCompact(false);
+      }
+      lastY = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -150,6 +172,12 @@ export function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  // Force expanded whenever the drawer opens so users see the full
+  // wordmark while interacting with the menu.
+  useEffect(() => {
+    if (mobileOpen) setCompact(false);
+  }, [mobileOpen]);
 
   return (
     <>
@@ -168,13 +196,20 @@ export function Navbar() {
               : "border-envrt-brand-black/10"
           }`}
         >
-          {/* Wordmark */}
+          {/* Wordmark — desktop uses the official PNG; mobile uses the
+              typography-based morph wordmark so it can shrink ENVRT → NV
+              when the bar compacts on scroll-down. */}
           <Link
             href="/"
             className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
-            aria-label="ENVRT v3"
+            aria-label="ENVRT"
           >
-            <EnvrtLogo size="md" />
+            <span className="hidden lg:flex">
+              <EnvrtLogo size="md" />
+            </span>
+            <span className="flex lg:hidden">
+              <EnvrtMorphLogo compact={compact} />
+            </span>
           </Link>
 
           <Divider />
@@ -211,11 +246,23 @@ export function Navbar() {
             </ButtonV3>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
+          {/* Mobile hamburger. Bars also shrink slightly when compact
+              so the visual weight tracks the smaller pill. */}
+          <motion.button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            className="flex h-12 w-12 flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
+            initial={false}
+            animate={{
+              width: compact ? 36 : 48,
+              height: compact ? 36 : 48,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 280,
+              damping: 18,
+              mass: 0.7,
+            }}
+            className="flex flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
           >
@@ -234,7 +281,7 @@ export function Navbar() {
               transition={{ duration: 0.2 }}
               className="block h-0.5 w-5 bg-envrt-brand-black"
             />
-          </button>
+          </motion.button>
         </motion.div>
       </header>
 
