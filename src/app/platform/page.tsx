@@ -279,9 +279,14 @@ function CapabilityRow({
   reverse: boolean;
   isLast: boolean;
 }) {
+  // Anchor slug matches the homepage CapabilitiesSection link target and
+  // the ItemListJsonLd URLs. scroll-mt-24 keeps the heading clear of the
+  // sticky v3 navbar when navigated via hash.
+  const slug = cap.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div
-      className={`relative ${isLast ? "" : "border-b border-envrt-brand-black/8"}`}
+      id={slug}
+      className={`relative scroll-mt-24 ${isLast ? "" : "border-b border-envrt-brand-black/8"}`}
     >
       <SectionCorners left={`ENVRT/${cap.index}`} right={cap.name} />
 

@@ -227,12 +227,22 @@ export function Navbar() {
           />
 
           {/* Wordmark — desktop uses the official PNG; mobile uses the
-              typography-based morph wordmark so it can shrink ENVRT → NV
-              when the bar compacts on scroll-down. */}
+              NV-morph version. When the mobile pill is in compact
+              state, tapping it opens the menu instead of navigating
+              home: the user already shrunk the bar by scrolling, so
+              they're presumably looking for navigation, not the
+              homepage. Click intercept via onClick preserves Link
+              semantics for the not-compact and desktop cases. */}
           <Link
             href="/"
+            onClick={(e) => {
+              if (compact) {
+                e.preventDefault();
+                setMobileOpen(true);
+              }
+            }}
             className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
-            aria-label="ENVRT"
+            aria-label={compact ? "Open menu" : "ENVRT"}
           >
             <span className="hidden lg:flex">
               <EnvrtLogo size="md" />
@@ -607,81 +617,82 @@ function MobileDrawer({
             }}
           />
 
-          <div className="relative space-y-5">
+          <div className="relative space-y-4">
             {NAV.map((item) =>
               item.kind === "group" ? (
                 <div key={item.label}>
-                  <p className="px-3 pb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
+                  <p className="px-1 pb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
                     {item.label}
                   </p>
-                  <ul className="space-y-0.5">
+                  <ul className="grid grid-cols-2 gap-1">
                     {item.items.map((leaf) => (
                       <li key={leaf.href}>
                         <Link
                           href={leaf.href}
                           onClick={onClose}
-                          className={`flex items-start gap-3 rounded-xl px-3 py-3 ${
+                          className={`flex items-center gap-2 rounded-lg px-2 py-2 transition-colors duration-150 ${
                             pathname === leaf.href
-                              ? "bg-envrt-brand-ultramarine/8"
+                              ? "bg-envrt-brand-ultramarine/10"
                               : "hover:bg-envrt-brand-black/4"
                           }`}
                         >
                           <span
-                            className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg ${
+                            className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md ${
                               pathname === leaf.href
                                 ? "bg-envrt-brand-ultramarine/15 text-envrt-brand-ultramarine"
                                 : "bg-envrt-brand-ultramarine/8 text-envrt-brand-ultramarine"
                             }`}
                           >
-                            <AssetIcon type={leaf.icon} size={18} />
+                            <AssetIcon type={leaf.icon} size={14} />
                           </span>
-                          <div className="min-w-0 flex-1 pt-0.5">
-                            <p
-                              className={`font-display text-sm font-semibold leading-tight ${
-                                pathname === leaf.href
-                                  ? "text-envrt-brand-ultramarine"
-                                  : "text-envrt-brand-black"
-                              }`}
-                            >
-                              {leaf.label}
-                            </p>
-                            <p className="mt-0.5 text-xs leading-snug text-envrt-brand-black/60">
-                              {leaf.description}
-                            </p>
-                          </div>
+                          <span
+                            className={`min-w-0 truncate font-display text-[13px] font-semibold leading-tight ${
+                              pathname === leaf.href
+                                ? "text-envrt-brand-ultramarine"
+                                : "text-envrt-brand-black"
+                            }`}
+                          >
+                            {leaf.label}
+                          </span>
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </div>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] transition-colors duration-200 ${
-                    pathname === item.href
-                      ? "bg-envrt-brand-ultramarine/8 text-envrt-brand-ultramarine"
-                      : "text-envrt-brand-black/75 hover:bg-envrt-brand-black/5 hover:text-envrt-brand-ultramarine"
-                  }`}
-                >
-                  {item.label}
-                  <span aria-hidden className="text-envrt-brand-black/30">
-                    →
-                  </span>
-                </Link>
-              ),
+              ) : null,
             )}
 
-            <div className="border-t border-envrt-brand-black/8 pt-4">
-              <ButtonV3
-                href="/free-dpp"
-                variant="primary"
-                className="w-full !rounded-2xl"
-              >
-                Try ENVRT<span>→</span>
-              </ButtonV3>
+            {/* Inline standalone links (Pricing, Contact) — pulled out
+                of the per-group loop and rendered as a compact pill
+                row. Saves two full-width rows of vertical space. */}
+            <div className="flex gap-2 border-t border-envrt-brand-black/8 pt-3">
+              {NAV.filter((i) => i.kind === "link").map((item) => {
+                if (item.kind !== "link") return null;
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
+                    className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200 ${
+                      active
+                        ? "bg-envrt-brand-ultramarine/10 text-envrt-brand-ultramarine"
+                        : "bg-envrt-brand-black/4 text-envrt-brand-black/75 hover:bg-envrt-brand-ultramarine/8 hover:text-envrt-brand-ultramarine"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
+
+            <ButtonV3
+              href="/free-dpp"
+              variant="primary"
+              className="w-full !rounded-xl !py-2.5 !text-sm"
+            >
+              Try ENVRT<span>→</span>
+            </ButtonV3>
           </div>
         </motion.div>
       )}

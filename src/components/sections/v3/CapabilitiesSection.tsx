@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { FadeUp } from "@/components/ui/Motion";
 import { AssetIcon, type AssetIconType } from "./AssetIcon";
 import { Eyebrow } from "./_shared";
@@ -208,6 +209,11 @@ function CapabilityRow({
   const inView = useInView(ref, { once: true, amount: 0.5 });
   const [hovered, setHovered] = useState(false);
 
+  // Anchor slug matches the hash id set on each /platform CapabilityRow,
+  // so clicking a homepage row drops the reader straight onto that
+  // capability's detail section.
+  const slug = cap.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
   return (
     <motion.div
       ref={ref}
@@ -232,8 +238,12 @@ function CapabilityRow({
         </div>
       )}
 
-      {/* Row body */}
-      <div className="relative border-b border-envrt-brand-black/8">
+      {/* Row body — clickable, jumps to the matching section on /platform */}
+      <Link
+        href={`/platform#${slug}`}
+        aria-label={`See the ${cap.name} capability on the platform page`}
+        className="relative block border-b border-envrt-brand-black/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-envrt-brand-ultramarine/40"
+      >
         {/* Left-edge slide-in accent (animated via group-hover would clip; use motion) */}
         <motion.span
           aria-hidden
@@ -338,7 +348,7 @@ function CapabilityRow({
             ↗
           </motion.span>
         </div>
-      </div>
+      </Link>
     </motion.div>
   );
 }
