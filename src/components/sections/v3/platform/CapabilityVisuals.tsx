@@ -328,90 +328,96 @@ function VisualDppPhone() {
     return () => observer.disconnect();
   }, []);
 
+  // Phone is sized by HEIGHT (not width). The shell uses aspect-[9/19] so
+  // its width is derived from the height the parent flex distributes.
+  // That keeps the phone inside the 5:4 canvas on every viewport size —
+  // before, max-w-[200px] meant the 9:19 portrait shell could be twice
+  // as tall as the canvas on narrow mobile screens and would overflow
+  // upward into the preceding capability text.
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="relative w-full max-w-[200px]">
-        <div className="relative overflow-hidden rounded-[2rem] border-[5px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_24px_50px_-18px_rgba(14,14,14,0.45)]">
-          {/* Status bar */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[1.6rem] bg-white px-4" style={{ height: 18 }}>
-            <span className="text-[8px] font-semibold leading-none text-envrt-brand-black">9:41</span>
-            <div className="w-[56px]" />
-            <div className="flex items-center gap-[3px]">
-              <svg width="9" height="7" viewBox="0 0 14 10" fill="none" className="text-envrt-brand-black">
-                <rect x="0" y="7" width="2.5" height="3" rx="0.5" fill="currentColor" />
-                <rect x="3.5" y="5" width="2.5" height="5" rx="0.5" fill="currentColor" />
-                <rect x="7" y="2.5" width="2.5" height="7.5" rx="0.5" fill="currentColor" />
-                <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" />
-              </svg>
-              <div className="relative h-[6px] w-[12px] rounded-[1.5px] border border-envrt-brand-black/80">
-                <div className="absolute inset-[1px] rounded-[0.5px] bg-envrt-brand-black" style={{ width: "75%" }} />
-              </div>
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 py-1">
+      <div className="relative aspect-[9/19] h-[85%] max-h-[400px] max-w-full overflow-hidden rounded-[1.6rem] border-[5px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_24px_50px_-18px_rgba(14,14,14,0.45)]">
+        {/* Status bar */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between rounded-t-[1.2rem] bg-white px-4" style={{ height: 18 }}>
+          <span className="text-[8px] font-semibold leading-none text-envrt-brand-black">9:41</span>
+          <div className="w-[56px]" />
+          <div className="flex items-center gap-[3px]">
+            <svg width="9" height="7" viewBox="0 0 14 10" fill="none" className="text-envrt-brand-black">
+              <rect x="0" y="7" width="2.5" height="3" rx="0.5" fill="currentColor" />
+              <rect x="3.5" y="5" width="2.5" height="5" rx="0.5" fill="currentColor" />
+              <rect x="7" y="2.5" width="2.5" height="7.5" rx="0.5" fill="currentColor" />
+              <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" />
+            </svg>
+            <div className="relative h-[6px] w-[12px] rounded-[1.5px] border border-envrt-brand-black/80">
+              <div className="absolute inset-[1px] rounded-[0.5px] bg-envrt-brand-black" style={{ width: "75%" }} />
             </div>
           </div>
+        </div>
 
-          {/* Notch */}
-          <div className="absolute left-1/2 top-[3px] z-30 h-[12px] w-[56px] -translate-x-1/2 rounded-full bg-envrt-brand-black" />
+        {/* Notch */}
+        <div className="absolute left-1/2 top-[3px] z-30 h-[12px] w-[56px] -translate-x-1/2 rounded-full bg-envrt-brand-black" />
 
-          {/* Screen — 9:19.5 portrait aspect, iframe scaled to fit. */}
+        {/* Screen fills the shell. Width comes from the shell's
+            aspect-[9/19] constraint, height from h-full. iframe is
+            rendered at PHONE_VIEWPORT_WIDTH and scaled by the
+            ResizeObserver to match the live screen width. */}
+        <div
+          ref={screenRef}
+          className="relative h-full w-full overflow-hidden rounded-[1.2rem] bg-white"
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <iframe
+              src={DPP_URL}
+              title="Live ENVRT Digital Product Passport"
+              loading="eager"
+              className="absolute border-0"
+              style={{
+                top: 0,
+                left: 0,
+                width: `${PHONE_VIEWPORT_WIDTH}px`,
+                height: `${PHONE_VIEWPORT_HEIGHT}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                overflow: "auto",
+                WebkitOverflowScrolling: "touch",
+                paddingTop: "18px",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              onLoad={() => setIframeLoaded(true)}
+            />
+          </div>
+
+          {/* Loading skeleton */}
           <div
-            ref={screenRef}
-            className="relative w-full overflow-hidden rounded-[1.6rem] bg-white"
-            style={{ aspectRatio: "9 / 19" }}
+            aria-hidden
+            className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${iframeLoaded ? "opacity-0" : "opacity-100"}`}
           >
-            <div className="absolute inset-0 overflow-hidden">
-              <iframe
-                src={DPP_URL}
-                title="Live ENVRT Digital Product Passport"
-                loading="eager"
-                className="absolute border-0"
-                style={{
-                  top: 0,
-                  left: 0,
-                  width: `${PHONE_VIEWPORT_WIDTH}px`,
-                  height: `${PHONE_VIEWPORT_HEIGHT}px`,
-                  transform: `scale(${scale})`,
-                  transformOrigin: "top left",
-                  overflow: "auto",
-                  WebkitOverflowScrolling: "touch",
-                  paddingTop: "18px",
-                }}
-                sandbox="allow-scripts allow-same-origin"
-                onLoad={() => setIframeLoaded(true)}
-              />
-            </div>
-
-            {/* Loading skeleton */}
-            <div
-              aria-hidden
-              className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${iframeLoaded ? "opacity-0" : "opacity-100"}`}
-            >
-              <div className="flex h-full flex-col gap-3 p-3 pt-7">
-                <div className="h-[40%] animate-pulse rounded-md bg-envrt-brand-black/8" />
-                <div className="flex gap-2">
-                  <div className="h-9 flex-1 animate-pulse rounded bg-envrt-brand-black/6" />
-                  <div className="h-9 flex-1 animate-pulse rounded bg-envrt-brand-black/6" />
-                </div>
-                <div className="space-y-1.5">
-                  <div className="h-2.5 w-3/4 animate-pulse rounded bg-envrt-brand-black/6" />
-                  <div className="h-2.5 w-1/2 animate-pulse rounded bg-envrt-brand-black/6" />
-                  <div className="h-2.5 w-2/3 animate-pulse rounded bg-envrt-brand-black/6" />
-                </div>
+            <div className="flex h-full flex-col gap-3 p-3 pt-7">
+              <div className="h-[40%] animate-pulse rounded-md bg-envrt-brand-black/8" />
+              <div className="flex gap-2">
+                <div className="h-9 flex-1 animate-pulse rounded bg-envrt-brand-black/6" />
+                <div className="h-9 flex-1 animate-pulse rounded bg-envrt-brand-black/6" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="h-2.5 w-3/4 animate-pulse rounded bg-envrt-brand-black/6" />
+                <div className="h-2.5 w-1/2 animate-pulse rounded bg-envrt-brand-black/6" />
+                <div className="h-2.5 w-2/3 animate-pulse rounded bg-envrt-brand-black/6" />
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-3 flex flex-col items-center gap-1.5">
-          <LivePill label="dpp.envrt.com · live" />
-          <a
-            href={DPP_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-ultramarine hover:underline"
-          >
-            Open passport <span aria-hidden>↗</span>
-          </a>
-        </div>
+      <div className="flex flex-col items-center gap-1">
+        <LivePill label="dpp.envrt.com · live" />
+        <a
+          href={DPP_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-envrt-brand-ultramarine hover:underline"
+        >
+          Open passport <span aria-hidden>↗</span>
+        </a>
       </div>
     </div>
   );
