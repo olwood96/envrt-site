@@ -200,30 +200,28 @@ export function Navbar() {
         <motion.div
           initial={false}
           animate={{
-            // Scale the WHOLE pill via transform on compact. Pure GPU
-            // composite, no layout reflow — the homepage scroll-pinned
-            // sections (Polaroid, ScrollTour) keep their full frame
-            // budget. Spring config matches the original "bouncy"
-            // pill expand.
+            // Compact pill shrinks via transform scale only. Pure GPU
+            // composite, zero layout reflow.
             scale: compact ? 0.82 : 1,
-            // iOS "ring of light" inset highlight, brightest at top.
-            boxShadow: scrolled
-              ? "0 18px 40px -22px rgba(14,14,14,0.18), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)"
-              : "0 10px 28px -16px rgba(14,14,14,0.10), inset 0 1px 0 0 rgba(255,255,255,0.75), inset 0 -1px 0 0 rgba(255,255,255,0.12), inset 1px 0 0 0 rgba(255,255,255,0.30), inset -1px 0 0 0 rgba(255,255,255,0.30)",
           }}
           transition={{
             scale: { type: "spring", stiffness: 280, damping: 18, mass: 0.7 },
-            boxShadow: { duration: 0.3 },
           }}
           className="relative flex items-stretch rounded-full bg-white/55 backdrop-blur-[28px] backdrop-saturate-[180%] transition-colors duration-300 lg:border lg:bg-white/95 lg:backdrop-blur lg:backdrop-saturate-100 lg:border-envrt-brand-black/15"
           style={{
-            // Force the pill onto its own GPU compositor layer so
-            // scrolling underneath only requires a layer translation,
-            // not a main-thread repaint. Compact-state scale animates
-            // on the same layer — zero layout cost, zero stuttering
-            // of homepage scroll-pinned sections.
+            // Force the pill onto its own GPU compositor layer.
             transformOrigin: "center center",
             willChange: "transform",
+            // Static iOS "ring of light" inset highlights — moved out
+            // of the framer-motion animate prop so they don't repaint
+            // every frame when `scrolled` toggles around the 24px
+            // threshold. Box-shadow changes (especially compound ones
+            // with 5 stacked shadows) are expensive repaints and were
+            // the last main-thread cost the navbar was paying during
+            // scroll. Visual difference between the two old states was
+            // marginal anyway.
+            boxShadow:
+              "0 14px 32px -18px rgba(14,14,14,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8), inset 0 -1px 0 0 rgba(255,255,255,0.13), inset 1px 0 0 0 rgba(255,255,255,0.32), inset -1px 0 0 0 rgba(255,255,255,0.32)",
           }}
         >
           {/* Refraction overlay — mobile only. A diagonal linear

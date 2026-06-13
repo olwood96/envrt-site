@@ -235,22 +235,10 @@ function PolaroidCard({
 
   return (
     <motion.div
-      style={{
-        x,
-        y,
-        rotate,
-        opacity,
-        zIndex,
-        // GPU-rasterised drop-shadow instead of the previous 50px
-        // box-shadow blur which had to be CPU-painted every frame
-        // for every animating card. drop-shadow runs on the
-        // compositor, so the cost stops scaling with animation
-        // frequency.
-        filter: "drop-shadow(0 14px 18px rgba(14,14,14,0.28))",
-      }}
+      style={{ x, y, rotate, opacity, zIndex }}
       className="absolute left-1/2 top-1/2 -ml-[110px] -mt-[140px] sm:-ml-[130px] sm:-mt-[170px]"
     >
-      <div className="w-[220px] rounded-sm bg-white p-3 pb-5 ring-1 ring-envrt-brand-black/8 sm:w-[260px] sm:p-4 sm:pb-6">
+      <div className="w-[220px] rounded-sm bg-white p-3 pb-5 shadow-[0_24px_50px_-18px_rgba(14,14,14,0.35)] ring-1 ring-envrt-brand-black/8 sm:w-[260px] sm:p-4 sm:pb-6">
         <div className="relative aspect-square w-full overflow-hidden">
           <Image
             src={polaroid.src}

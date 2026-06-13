@@ -33,6 +33,17 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     ).matches;
     if (prefersReduced) return;
 
+    // Don't run Lenis on mobile. Mobile browsers already have great
+    // native momentum + rubber-band scroll, and Lenis's rAF loop
+    // calls window.scrollTo() every frame, which collides with the
+    // native scroll mechanism on iOS Safari. The sub-frame collision
+    // manifests as the "mini up-and-down jitter" visible on the
+    // heaviest scroll-pinned sections (Polaroid, ScrollTour) where
+    // any wobble in scroll position gets amplified by their
+    // useScroll-driven transforms.
+    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+    if (isMobile) return;
+
     const lenis = new Lenis({
       lerp: 0.12,
       smoothWheel: true,
