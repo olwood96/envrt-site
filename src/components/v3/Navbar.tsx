@@ -138,7 +138,11 @@ const HOVER_CLOSE_DELAY = 180;
 
 export function Navbar() {
   const pathname = usePathname() ?? "";
-  const [scrolled, setScrolled] = useState(false);
+  // `scrolled` state removed in the navbar-jitter investigation —
+  // see the static boxShadow comment on the motion.div below for the
+  // reasoning. The Y-threshold-driven shadow toggle was repainting on
+  // every scrollY change near 24px and was the last main-thread cost
+  // the navbar was paying during scroll.
   const [mobileOpen, setMobileOpen] = useState(false);
   // Mobile-only compact state. When true, the wordmark morphs from
   // ENVRT down to NV and the pill tightens up so it obstructs less
@@ -160,7 +164,6 @@ export function Navbar() {
     const update = () => {
       rafId = null;
       const y = window.scrollY;
-      setScrolled(y > 24);
 
       if (y < TOP_GUARD) {
         setCompact(false);
