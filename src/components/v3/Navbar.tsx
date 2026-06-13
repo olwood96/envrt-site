@@ -262,16 +262,13 @@ export function Navbar() {
             // Force the pill onto its own GPU compositor layer.
             transformOrigin: "center center",
             willChange: "transform",
-            // Static iOS "ring of light" inset highlights — moved out
-            // of the framer-motion animate prop so they don't repaint
-            // every frame when `scrolled` toggles around the 24px
-            // threshold. Box-shadow changes (especially compound ones
-            // with 5 stacked shadows) are expensive repaints and were
-            // the last main-thread cost the navbar was paying during
-            // scroll. Visual difference between the two old states was
-            // marginal anyway.
+            // Static iOS "ring of light" inset highlights — the top
+            // highlight is omitted because at 0.8 alpha it reads as a
+            // hard border line that fights the glassmorphism. The
+            // remaining three (bottom, left, right) at 0.13-0.32 alpha
+            // give the soft refraction edge without the harsh top line.
             boxShadow:
-              "0 14px 32px -18px rgba(14,14,14,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8), inset 0 -1px 0 0 rgba(255,255,255,0.13), inset 1px 0 0 0 rgba(255,255,255,0.32), inset -1px 0 0 0 rgba(255,255,255,0.32)",
+              "0 14px 32px -18px rgba(14,14,14,0.14), inset 0 -1px 0 0 rgba(255,255,255,0.13), inset 1px 0 0 0 rgba(255,255,255,0.32), inset -1px 0 0 0 rgba(255,255,255,0.32)",
           }}
         >
           {/* Refraction overlay — mobile only. A diagonal linear
@@ -307,7 +304,9 @@ export function Navbar() {
                 setMobileOpen(true);
               }
             }}
-            className="flex items-center pl-5 pr-4 sm:pl-6 sm:pr-5"
+            className={`flex h-12 items-center ${
+              compact ? "px-3.5" : "pl-5 pr-4 sm:pl-6 sm:pr-5"
+            }`}
             aria-label={compact ? "Open menu" : "ENVRT"}
           >
             <span className="hidden lg:flex">
@@ -318,7 +317,9 @@ export function Navbar() {
             </span>
           </Link>
 
-          <Divider />
+          {/* Divider after the logo — hidden when compact so the pill
+              collapses to a button shape around just the NV mark. */}
+          {!compact && <Divider />}
 
           {/* Desktop: top-level nav items */}
           <div className="hidden items-center gap-1 px-2 lg:flex">
@@ -352,34 +353,36 @@ export function Navbar() {
             </ButtonV3>
           </div>
 
-          {/* Mobile hamburger. Bars also shrink slightly when compact
-              so the visual weight tracks the smaller pill. */}
-          {/* Hamburger no longer animates its own width/height. The
-              whole pill scales via transform on compact, which scales
-              the hamburger with it — pure GPU, zero reflow. */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen((v) => !v)}
-            className="flex h-12 w-12 flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-          >
-            <motion.span
-              animate={mobileOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="block h-0.5 w-5 bg-envrt-brand-black"
-            />
-            <motion.span
-              animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-              transition={{ duration: 0.15 }}
-              className="block h-0.5 w-5 bg-envrt-brand-black"
-            />
-            <motion.span
-              animate={mobileOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="block h-0.5 w-5 bg-envrt-brand-black"
-            />
-          </button>
+          {/* Mobile hamburger — hidden when compact. In compact mode
+              the NV mark itself is the menu trigger (its Link onClick
+              opens the drawer), so the hamburger would be redundant
+              and would prevent the pill from collapsing into a
+              button shape. */}
+          {!compact && (
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="flex h-12 w-12 flex-col items-center justify-center gap-1.5 pr-2 lg:hidden"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+            >
+              <motion.span
+                animate={mobileOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block h-0.5 w-5 bg-envrt-brand-black"
+              />
+              <motion.span
+                animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
+                transition={{ duration: 0.15 }}
+                className="block h-0.5 w-5 bg-envrt-brand-black"
+              />
+              <motion.span
+                animate={mobileOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block h-0.5 w-5 bg-envrt-brand-black"
+              />
+            </button>
+          )}
         </motion.div>
       </header>
 
@@ -558,8 +561,10 @@ function DropdownCard({
         columns === 2 ? "w-[580px]" : "w-[320px]"
       }`}
       style={{
+        // Top inset highlight omitted — see the navbar pill for the
+        // same reasoning. The other three insets keep the soft edge.
         boxShadow:
-          "0 24px 50px -22px rgba(14,14,14,0.22), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
+          "0 24px 50px -22px rgba(14,14,14,0.22), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
       }}
     >
       {/* Refraction overlay — diagonal gradient that mimics light
@@ -661,8 +666,10 @@ function MobileDrawer({
           // shadow.
           className="fixed inset-x-4 top-[78px] z-40 max-h-[calc(100vh-96px)] overflow-y-auto rounded-3xl bg-white/55 p-4 backdrop-blur-[28px] backdrop-saturate-[180%] sm:inset-x-6 sm:p-5 lg:hidden"
           style={{
+            // Top inset highlight omitted — see the navbar pill for
+            // the same reasoning.
             boxShadow:
-              "0 24px 60px -30px rgba(14,14,14,0.25), inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
+              "0 24px 60px -30px rgba(14,14,14,0.25), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
           }}
         >
           {/* Refraction overlay — same diagonal gradient as the pill

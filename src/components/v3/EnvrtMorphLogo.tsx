@@ -4,22 +4,23 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 // Morphs between the two real brand marks: the full ENVRT wordmark
-// and the standalone NV mark. Visual shrink of the pill itself is
-// done on the parent via `transform: scale()` (GPU-composited), so
-// this component only handles the cross-fade between the two assets.
+// and the standalone NV mark. The pill itself shrinks via parent
+// `transform: scale()` (GPU-composited); this component handles the
+// cross-fade between the two assets and snaps its container width
+// so the surrounding pill can collapse to a button shape around just
+// NV in compact mode.
 //
-// Critical: this component MUST NOT animate width, height, padding,
-// margin or any other layout property. Layout-property animations
-// during scroll-pinned section playback cause main-thread reflow
-// that stutters the heavy useScroll/useTransform chains in those
-// sections (Polaroid, ScrollTour). All animations here are opacity
-// only — pure GPU composite, no main-thread cost.
+// The width snap is one-shot on the compact toggle, not a per-frame
+// animation, so it doesn't stutter the scroll-pinned sections
+// (Polaroid, ScrollTour) the way continuous layout-property
+// animations would. The cross-fade remains opacity only.
 
 const FADE = { duration: 0.18, ease: "easeOut" } as const;
 
-// Source dimensions used to pick a stable container size. Container
-// width is the FULL ENVRT width at all times so layout never moves;
-// the NV image renders left-aligned inside that fixed slot.
+// Source dimensions. The container resizes between two fixed widths:
+// envrtWidth when expanded, nvWidth when compact. overflow: hidden
+// clips the ENVRT image during the fade-out so it doesn't extend
+// past the new right edge.
 const ENVRT_RATIO = 1643 / 518;
 const NV_RATIO = 384 / 344;
 
@@ -38,11 +39,10 @@ export function EnvrtMorphLogo({
       role="img"
       aria-label="ENVRT"
       style={{
-        // Fixed-width container. The pill shrinks via parent scale
-        // transform, not by changing this width.
-        width: envrtWidth,
+        width: compact ? nvWidth : envrtWidth,
         height,
         position: "relative",
+        overflow: "hidden",
       }}
     >
       {/* Full ENVRT wordmark — left-anchored, fades out on compact. */}
