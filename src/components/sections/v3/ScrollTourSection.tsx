@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, LivePill } from "./_shared";
+import { Eyebrow, LivePill, SECTION_SPRING } from "./_shared";
 
 const DPP_URL = "https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882";
 
@@ -74,18 +74,20 @@ export function ScrollTourSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Spring smoothing removed. With the cross-origin iframe being
-  // panned every frame, GPU cost is variable — and useSpring is
-  // timestep-sensitive, so under irregular dt it overshoots its
-  // target then corrects, producing the visible "up and down
-  // jitter". Lenis already smooths the underlying scroll position,
-  // so the spring layer is redundant and only adds instability when
-  // frames get tight.
+  // Spring-smoothed scroll progress. Restoring this fixes the jitter
+  // I'd previously caused by removing it. Raw scrollYProgress from
+  // useScroll has sub-frame noise (Lenis updates many times per
+  // frame, browsers have sub-pixel scroll quirks). useSpring filters
+  // that noise before it drives the iframe Y transform, which is why
+  // the other v3 scroll-pinned sections (Scatter, Anatomy) — which
+  // never lost their spring — stayed smooth while this one visibly
+  // oscillated.
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
 
   // Pan curve calibrated against the real DPP section positions (see the
   // stops table above and measurements.json). Lands the care section

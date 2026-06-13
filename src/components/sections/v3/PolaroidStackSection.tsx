@@ -7,11 +7,12 @@ import {
   motion,
   useMotionValueEvent,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { FadeUp } from "@/components/ui/Motion";
-import { Eyebrow, SectionCorners } from "./_shared";
+import { Eyebrow, SECTION_SPRING, SectionCorners } from "./_shared";
 
 // Polaroid stack — sticky 100vh window with five photo cards that fly in
 // from below as scroll progresses, fanning into a centred stack like a
@@ -120,18 +121,20 @@ const TICKER_WATER = [0, ...POLAROIDS.map((p) => p.cumWaterL), POLAROIDS[POLAROI
 export function PolaroidStackSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress: progress } = useScroll({
+  const { scrollYProgress: rawProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Spring smoothing removed. With heavy per-frame GPU cost from the
-  // five polaroid drop-shadows, frames vary in length. Spring math is
-  // timestep-sensitive — under irregular dt it overshoots its target
-  // then corrects, producing the visible "up and down jitter". Lenis
-  // already smooths the underlying scroll position, so the extra
-  // spring layer is redundant and only adds instability when frames
-  // get tight.
+  // Spring-smoothed scroll progress. Restoring this fixes the jitter
+  // I'd previously caused by removing it. Raw scrollYProgress from
+  // useScroll has sub-frame noise (Lenis updates many times per
+  // frame, browsers have sub-pixel scroll quirks). useSpring filters
+  // that noise before it reaches the per-card x/y/rotate transforms,
+  // which is why the other v3 scroll-pinned sections (Scatter,
+  // Anatomy) — which never lost their spring — stayed smooth while
+  // these two visibly oscillated.
+  const progress = useSpring(rawProgress, SECTION_SPRING);
 
   // Cumulative ticker values — interpolate between stage arrival points.
   const co2 = useTransform(progress, [...TICKER_INPUT], [...TICKER_CO2]);
