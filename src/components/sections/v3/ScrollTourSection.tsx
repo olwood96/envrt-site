@@ -22,51 +22,56 @@ type Stop = {
   range: [number, number];
 };
 
-// Stop ranges are derived from the actual DPP section boundaries
-// (measurements.json) and the pan curve (0% → -78% over progress
-// 0 → 0.85). Each stop's midpoint is calibrated so the labelled
-// section is centred in the phone window when the label is bold.
-// Verified positions at midpoints (px into 5353-px DPP):
+// Stop ranges activate as each section enters the BOTTOM of the
+// phone window (top of section ≈ bottom of visible viewport), not
+// when it's centred. So the label lights up when the section first
+// comes into view, matching what's mostly visible on the DPP screen.
 //
-//   01 scan        @ p≈0.05 → pan -4.6%  → top of page (hero 80–452)
-//   02 metrics     @ p≈0.16 → pan -14.7% → headline-metrics 468–835
-//   03 materials   @ p≈0.34 → pan -30.7% → production-journey 1290–2565
-//   04 footprint   @ p≈0.52 → pan -48.2% → env-impact 2581–3039
-//   05 standards   @ p≈0.66 → pan -60.6% → certifications 3055–3848
-//   06 care        @ p≈0.79 → pan -72.0% → care-end-of-life 3864–4657
+// Pan curve 0% → -78% over progress 0 → 0.85, iframe height 5353,
+// visible window ≈ 833px in iframe coords. Section TOP enters the
+// bottom of the window at p = (sectionTop - 833) / 4912:
 //
-// 0.85–1.00 is dwell at -78% so care + actions stay on screen
-// before the section unpins.
+//   hero 80–452          → already visible at p=0
+//   headline-metrics 468 → already visible at p=0
+//   materials 1290       → enters at p≈0.09
+//   env-impact 2581      → enters at p≈0.36
+//   certifications 3055  → enters at p≈0.45
+//   care 3864            → enters at p≈0.62
+//
+// Hero and metrics are both in view from the start, so 01 and 02
+// share the 0–0.10 window with a soft split at 0.04 (where metrics
+// becomes the dominant section). 0.85–1.0 is dwell at -78% so care
+// + actions stay readable before the section unpins.
 const stops: Stop[] = [
   {
     title: "The scan moment",
-    body: "Customer scans the QR on the care label. They land on a hosted page with the garment's hero image and brand voice.",
-    range: [0.0, 0.10],
+    body: "Scan the QR. A hosted page with the hero garment and your brand voice.",
+    range: [0.0, 0.04],
   },
   {
     title: "Headline impact",
-    body: "CO₂e, water scarcity and data depth, calculated per garment with EU PEF and ISO 14040 methodology.",
-    range: [0.10, 0.22],
+    body: "CO₂e, water scarcity and data depth. EU PEF and ISO 14040.",
+    range: [0.04, 0.10],
   },
   {
     title: "Materials and journey",
-    body: "Every fibre, every tier, every country mapped. Customers see provenance, regulators see traceability.",
-    range: [0.22, 0.45],
+    body: "Every fibre, every tier, every country mapped.",
+    range: [0.10, 0.36],
   },
   {
     title: "Environmental footprint",
-    body: "AWARE water scarcity, stage-by-stage CO₂e and the rest of the underlying data. The headline figures are auditable line by line.",
-    range: [0.45, 0.60],
+    body: "AWARE water scarcity and stage-by-stage CO₂e. Auditable line by line.",
+    range: [0.36, 0.45],
   },
   {
     title: "Recognised standards",
-    body: "French Eco-Score, EU PEF, ISO 14040. Standards referenced with their issuing bodies on every passport.",
-    range: [0.60, 0.72],
+    body: "French Eco-Score, EU PEF, ISO 14040. Linked to issuing bodies.",
+    range: [0.45, 0.62],
   },
   {
     title: "Care and end of life",
-    body: "Repair guidance, washing instructions, take-back and recycling options. The story doesn't stop at the till.",
-    range: [0.72, 0.85],
+    body: "Repair, wash, take-back and recycling guidance.",
+    range: [0.62, 0.85],
   },
 ];
 
