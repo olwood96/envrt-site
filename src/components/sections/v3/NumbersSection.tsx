@@ -48,11 +48,10 @@ function useStats(dataPointsServed: number): Stat[] {
 
   return [
     {
-      number: 30,
-      display: "30",
-      unit: "min",
-      label: "to first DPP",
-      body: "A 30-minute onboarding call walks your team through the platform. Once your data is in, your first passport is generated the same day.",
+      number: 0,
+      display: "0",
+      label: "partner APIs in the middle",
+      body: "Supply chain map, LCA engine, water scarcity, French Eco-Score, hosted DPP, evidence vault. Every component written by the ENVRT team. No licensed code passed through.",
     },
     {
       number: dataPointsServed,

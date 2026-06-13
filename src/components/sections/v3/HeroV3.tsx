@@ -7,12 +7,11 @@ import { DotGridBackground, Eyebrow } from "./_shared";
 import { BrandStripV3 } from "./BrandStripV3";
 
 // ─── Hero ────────────────────────────────────────────────────────────────
-// Positions ENVRT as the environmental engine for fashion, with the DPP
-// reframed as the final output rather than the product. Hero copy leads
-// with what the platform does end to end (supplier mapping → LCA → water
-// → score → DPP). Garment photo carries no labels. A compact brand
-// proof strip closes the hero with one rotating brand logo plus two
-// trust stats.
+// Positions ENVRT as a full-stack platform: supply chain mapping, LCA and
+// DPP all in code we own. Hero copy leads with that worldview plus the
+// speed hook (DPPs in minutes, not months). Garment photo carries no
+// labels. A compact brand proof strip closes the hero with one rotating
+// brand logo plus two trust stats.
 
 export function HeroV3() {
   return (
@@ -22,21 +21,20 @@ export function HeroV3() {
       <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-8 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-10">
         <div className="max-w-xl lg:py-8">
           <FadeUp>
-            <Eyebrow>Your GARMENTS · Their IMPACT · One PLATFORM</Eyebrow>
+            <Eyebrow>DPPs in minutes, not months</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
             <h1 className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
-              Built for fashion&apos;s environmental work.{" "}
+              Supply chain, LCA and DPP.{" "}
               <span className="text-envrt-brand-black/45">
-                Not just the receipt at the end.
+                All in our code.
               </span>
             </h1>
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
-              Trace every supplier. Calculate every garment. Substantiate
-              every claim. Publish every Digital Product Passport. One
-              platform, end to end.
+              We map the suppliers, we wrote the LCA engine, we host the
+              passport. No partner APIs in the middle.
             </p>
           </FadeUp>
           <FadeUp delay={0.28}>
