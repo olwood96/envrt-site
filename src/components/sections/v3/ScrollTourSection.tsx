@@ -70,8 +70,40 @@ const stops: Stop[] = [
   },
 ];
 
+// Split into Desktop + Mobile components, each with its own useScroll +
+// useSpring chain. Mirrors ScatterToOrderSection + AnatomyOfLcaSection
+// (the v3 scroll-pinned sections that never showed the mini-jitter that
+// previously affected this section). Each viewport's scroll-pinned
+// wrapper gets its own GPU layer via .scroll-pinned in globals.css.
+// Pan + stop transforms only fire in the visible subtree, the hidden
+// one's target has no layout so its useScroll reports a parked 0 and
+// the spring never ticks.
+//
+// Both subtrees mount their own iframe. That's intentional: each phone
+// shell scales the iframe at a viewport-specific factor (0.319 mobile,
+// 0.411 sm, 0.720 desktop), and the alternative of a single hoisted
+// iframe would need branching scroll progress per viewport which would
+// re-introduce the cross-viewport coupling the split is supposed to
+// remove. Browsers dedupe cross-origin fetches to the same URL where
+// possible; if cache headers cooperate the second iframe rehydrates
+// from cache. Worth re-measuring if this turns out to cost a lot.
+
 export function ScrollTourSection() {
-  const sectionRef = useRef<HTMLElement>(null);
+  return (
+    <section
+      className="relative bg-envrt-brand-vista text-envrt-brand-black"
+      style={{ overflowX: "clip" }}
+    >
+      <DesktopScrollTour />
+      <MobileScrollTour />
+    </section>
+  );
+}
+
+// ─── Desktop ──────────────────────────────────────────────────────────────
+
+function DesktopScrollTour() {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
   const { scrollYProgress: rawProgress } = useScroll({
@@ -79,43 +111,34 @@ export function ScrollTourSection() {
     offset: ["start start", "end end"],
   });
 
-  // Spring-smoothed scroll progress. Restoring this fixes the jitter
-  // I'd previously caused by removing it. Raw scrollYProgress from
-  // useScroll has sub-frame noise (Lenis updates many times per
-  // frame, browsers have sub-pixel scroll quirks). useSpring filters
-  // that noise before it drives the iframe Y transform, which is why
-  // the other v3 scroll-pinned sections (Scatter, Anatomy) — which
-  // never lost their spring — stayed smooth while this one visibly
-  // oscillated.
   const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
 
-  // Pan curve calibrated against the real DPP section positions (see the
-  // stops table above and measurements.json). Lands the care section
-  // dead-centre in the phone window at p=0.79 (mid stop 06), then holds
-  // at -78% during the 0.85→1.0 dwell so care + actions stay readable
-  // before the section unpins.
+  // Pan curve calibrated against the real DPP section positions. Lands
+  // the care section dead-centre in the phone window at p=0.79 (mid
+  // stop 06), then holds at -78% during the 0.85→1.0 dwell so care +
+  // actions stay readable before the section unpins.
   const dppY = useTransform(scrollYProgress, [0, 0.85], ["0%", "-78%"]);
 
   return (
-    <section
+    <div
       ref={sectionRef}
-      className="scroll-pinned relative bg-envrt-brand-vista text-envrt-brand-black"
-      style={{ height: "500vh", overflowX: "clip" }}
+      className="scroll-pinned relative hidden lg:block"
+      style={{ height: "500vh" }}
     >
       <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
-        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_140px] items-center gap-3 px-5 sm:grid-cols-[1fr_180px] sm:gap-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-16">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1.05fr_1fr] items-center gap-16 px-16">
           <div className="relative min-w-0">
             <FadeUp>
               <Eyebrow>Tour · the passport</Eyebrow>
-              <h2 className="mt-3 max-w-xl font-display text-[1.05rem] font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl lg:text-[2.5rem]">
+              <h2 className="mt-4 max-w-xl font-display text-[2.5rem] font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black">
                 Scroll through a live passport.
               </h2>
-              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-envrt-brand-black/60">
                 Five moments of a real DPP. The phone tracks your scroll.
               </p>
             </FadeUp>
 
-            <div className="mt-5 space-y-4 sm:mt-8 sm:space-y-6 lg:space-y-7">
+            <div className="mt-8 space-y-7">
               {stops.map((stop, i) => (
                 <ScrollStop
                   key={stop.title}
@@ -127,37 +150,15 @@ export function ScrollTourSection() {
             </div>
           </div>
 
-          {/* Right: pinned phone. On mobile it's small (140px) and overlaps
-              the right edge of the viewport for a "peeking" effect. On
-              desktop it grows back to a normal phone size. */}
-          <div className="relative mx-auto w-full max-w-[140px] translate-x-3 sm:max-w-[180px] sm:translate-x-4 lg:max-w-[310px] lg:translate-x-0">
-            {/* Halo removed. Phone shell carries enough visual weight on its
-                own; the previous radial wash read as accent noise. */}
-
-            {/* Phone shell — borders slimmed so the screen content reads
-                bigger inside the same outer phone footprint. Rounded
-                corners also tightened slightly to match the thinner
-                bezel. */}
-            <div className="relative overflow-hidden rounded-[1.4rem] border-[4px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[1.8rem] sm:border-[5px] lg:rounded-[2.4rem] lg:border-[6px]">
-              {/* Screen window — fixed visible height, overflow clipped.
-                  The iframe inside is rendered at IFRAME_W (414px, a real
-                  mobile viewport width so the DPP's responsive layout reads
-                  correctly), then scaled down per breakpoint to fit the
-                  phone frame. */}
-              <div className="relative h-[268px] overflow-hidden bg-white sm:h-[370px] lg:h-[600px]">
-                {/* Skeleton placeholder. Renders behind the iframe so the
-                    phone never shows a blank white screen during the iframe
-                    fetch. Hidden once the iframe finishes loading. */}
+          <div className="relative mx-auto w-full max-w-[310px]">
+            <div className="relative overflow-hidden rounded-[2.4rem] border-[6px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)]">
+              <div className="relative h-[600px] overflow-hidden bg-white">
                 <DppSkeleton hidden={iframeLoaded} />
 
-                {/* Scale wrapper: explicit width matching iframe's natural
-                    width. Scale factor = inner phone width / 414, where
-                    inner width = phone outer width - (2 * border width).
-                    Mobile: (140 - 8) / 414 = 0.319
-                    sm:     (180 - 10) / 414 = 0.411
-                    lg:     (310 - 12) / 414 = 0.720 */}
+                {/* Scale wrapper. Inner width 310 - 12 = 298, scale =
+                    298 / 414 = 0.720. */}
                 <div
-                  className="origin-top-left scale-[0.319] will-change-transform sm:scale-[0.411] lg:scale-[0.720]"
+                  className="origin-top-left scale-[0.720] will-change-transform"
                   style={{ width: "414px" }}
                 >
                   <motion.div style={{ y: dppY, willChange: "transform" }}>
@@ -174,7 +175,109 @@ export function ScrollTourSection() {
                   </motion.div>
                 </div>
 
-                {/* Top + bottom fade masks */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-white to-transparent"
+                />
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col items-center gap-3">
+              <LivePill label="dpp.envrt.com · live" />
+              <a
+                href={DPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-1.5 rounded-xl bg-envrt-brand-ultramarine px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_-12px_rgba(62,0,255,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                Open the live passport
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────
+
+function MobileScrollTour() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  const { scrollYProgress: rawProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const scrollYProgress = useSpring(rawProgress, SECTION_SPRING);
+
+  const dppY = useTransform(scrollYProgress, [0, 0.85], ["0%", "-78%"]);
+
+  return (
+    <div
+      ref={sectionRef}
+      className="scroll-pinned relative lg:hidden"
+      style={{ height: "500vh" }}
+    >
+      <div className="sticky top-0 flex h-screen items-center bg-envrt-brand-vista">
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[1fr_140px] items-center gap-3 px-5 sm:grid-cols-[1fr_180px] sm:gap-5 sm:px-8">
+          <div className="relative min-w-0">
+            <FadeUp>
+              <Eyebrow>Tour · the passport</Eyebrow>
+              <h2 className="mt-3 max-w-xl font-display text-[1.05rem] font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl">
+                Scroll through a live passport.
+              </h2>
+              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
+                Five moments of a real DPP. The phone tracks your scroll.
+              </p>
+            </FadeUp>
+
+            <div className="mt-5 space-y-4 sm:mt-8 sm:space-y-6">
+              {stops.map((stop, i) => (
+                <ScrollStop
+                  key={stop.title}
+                  stop={stop}
+                  index={i}
+                  progress={scrollYProgress}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Phone overlaps the right edge for a peeking effect. */}
+          <div className="relative mx-auto w-full max-w-[140px] translate-x-3 sm:max-w-[180px] sm:translate-x-4">
+            <div className="relative overflow-hidden rounded-[1.4rem] border-[4px] border-envrt-brand-black bg-envrt-brand-black shadow-[0_20px_40px_-12px_rgba(14,14,14,0.4)] sm:rounded-[1.8rem] sm:border-[5px]">
+              <div className="relative h-[268px] overflow-hidden bg-white sm:h-[370px]">
+                <DppSkeleton hidden={iframeLoaded} />
+
+                {/* Scale wrapper.
+                    Mobile: (140 - 8) / 414 = 0.319
+                    sm:     (180 - 10) / 414 = 0.411 */}
+                <div
+                  className="origin-top-left scale-[0.319] will-change-transform sm:scale-[0.411]"
+                  style={{ width: "414px" }}
+                >
+                  <motion.div style={{ y: dppY, willChange: "transform" }}>
+                    <iframe
+                      src={DPP_URL}
+                      title="Live ENVRT Digital Product Passport"
+                      style={{ width: "414px", height: `${IFRAME_HEIGHT}px` }}
+                      className={`pointer-events-none block border-0 transition-opacity duration-500 ${
+                        iframeLoaded ? "opacity-100" : "opacity-0"
+                      }`}
+                      loading="eager"
+                      onLoad={() => setIframeLoaded(true)}
+                    />
+                  </motion.div>
+                </div>
+
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white to-transparent sm:h-10"
@@ -202,8 +305,8 @@ export function ScrollTourSection() {
         </div>
       </div>
 
-      {/* Mobile-only "open the live passport" CTA below the sticky tour.
-          Renders once at the end of the scroll-tour scroll range. */}
+      {/* Mobile-only CTA below the sticky tour, renders once at the
+          end of the scroll-tour scroll range. */}
       <div className="absolute inset-x-0 bottom-0 z-10 sm:hidden">
         <div className="mx-auto max-w-[1320px] px-5 pb-6">
           <a
@@ -217,7 +320,7 @@ export function ScrollTourSection() {
           </a>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 

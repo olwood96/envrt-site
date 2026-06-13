@@ -24,6 +24,14 @@ import { Eyebrow, SECTION_SPRING, SectionCorners } from "./_shared";
 // The five polaroid stages consolidate the six anatomy lifecycle stages:
 //   Fibre, Yarn, Fabric (= Fabric + Dyeing), Assembly, Finished (= Transport).
 // Dyeing is the water-heavy stage so its volume is folded into Fabric here.
+//
+// Split into Desktop + Mobile components, each with its own useScroll +
+// useSpring chain. Mirrors ScatterToOrderSection and AnatomyOfLcaSection
+// (the v3 scroll-pinned sections that never showed the mini-jitter that
+// previously affected this section). Each viewport runs in its own
+// display-toggled subtree, so the hidden one's target has no layout box,
+// useScroll reports a parked 0 and the spring never ticks. Only the
+// visible tree drives per-frame style writes.
 
 type Polaroid = {
   index: string;
@@ -119,6 +127,22 @@ const TICKER_CO2 = [0, ...POLAROIDS.map((p) => p.cumCo2Kg), POLAROIDS[POLAROIDS.
 const TICKER_WATER = [0, ...POLAROIDS.map((p) => p.cumWaterL), POLAROIDS[POLAROIDS.length - 1].cumWaterL] as const;
 
 export function PolaroidStackSection() {
+  return (
+    <section
+      className="relative bg-envrt-brand-vista"
+      style={{ overflowX: "clip" }}
+    >
+      <SectionCorners left="ENVRT/LAB" right="Hoodie 0509-1882" />
+
+      <DesktopPolaroidStack />
+      <MobilePolaroidStack />
+    </section>
+  );
+}
+
+// ─── Desktop ──────────────────────────────────────────────────────────────
+
+function DesktopPolaroidStack() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress: rawProgress } = useScroll({
@@ -126,36 +150,114 @@ export function PolaroidStackSection() {
     offset: ["start start", "end end"],
   });
 
-  // Spring-smoothed scroll progress. Restoring this fixes the jitter
-  // I'd previously caused by removing it. Raw scrollYProgress from
-  // useScroll has sub-frame noise (Lenis updates many times per
-  // frame, browsers have sub-pixel scroll quirks). useSpring filters
-  // that noise before it reaches the per-card x/y/rotate transforms,
-  // which is why the other v3 scroll-pinned sections (Scatter,
-  // Anatomy) — which never lost their spring — stayed smooth while
-  // these two visibly oscillated.
+  // Spring-smoothed scroll progress. Raw scrollYProgress has sub-frame
+  // noise (Lenis updates many times per frame, browsers have sub-pixel
+  // scroll quirks). useSpring filters that noise before it reaches the
+  // per-card transforms.
   const progress = useSpring(rawProgress, SECTION_SPRING);
 
-  // Cumulative ticker values — interpolate between stage arrival points.
   const co2 = useTransform(progress, [...TICKER_INPUT], [...TICKER_CO2]);
   const water = useTransform(progress, [...TICKER_INPUT], [...TICKER_WATER]);
 
   return (
-    <section
+    <div
       ref={sectionRef}
-      className="scroll-pinned relative bg-envrt-brand-vista"
-      style={{ height: "360vh", overflowX: "clip" }}
+      className="scroll-pinned relative hidden lg:block"
+      style={{ height: "360vh" }}
     >
-      <SectionCorners left="ENVRT/LAB" right="Hoodie 0509-1882" />
-
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-start px-5 pt-16 pb-6 sm:px-8 sm:justify-center sm:pt-8 lg:px-16 lg:py-8">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-16 py-8">
         <div className="mx-auto w-full max-w-[1200px]">
           <div className="mx-auto max-w-2xl text-center">
             <FadeUp>
               <Eyebrow>Our LCA engine</Eyebrow>
             </FadeUp>
             <FadeUp delay={0.08}>
-              <h2 className="mt-3 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl lg:text-[2.5rem]">
+              <h2 className="mt-3 font-display text-[2.5rem] font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black">
+                We wrote the engine.{" "}
+                <span className="text-envrt-brand-black/40">
+                  Every kilo, every litre, calculated in-house.
+                </span>
+              </h2>
+            </FadeUp>
+            <FadeUp delay={0.16}>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-envrt-brand-black/65">
+                EU PEF, ISO 14040 and AWARE water scarcity, all in code we
+                own. Below is the live cradle-to-gate calculation for
+                Hoodie 0509-1882.
+              </p>
+            </FadeUp>
+          </div>
+
+          <div className="mt-8 grid grid-cols-[1fr_300px] items-center gap-10">
+            <div className="relative mx-auto h-[420px] w-full max-w-[520px]">
+              {POLAROIDS.map((p, i) => (
+                <PolaroidCard
+                  key={p.index}
+                  polaroid={p}
+                  progress={progress}
+                  start={i * ENTRY_STAGGER}
+                  end={i * ENTRY_STAGGER + ENTRY_WINDOW}
+                  zIndex={i + 1}
+                />
+              ))}
+            </div>
+
+            <Ticker co2={co2} water={water} />
+          </div>
+
+          <FadeUp delay={0.24}>
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/lab"
+                className="group inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine"
+              >
+                See the methodology
+                <span
+                  aria-hidden
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
+              </Link>
+            </div>
+          </FadeUp>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────
+
+function MobilePolaroidStack() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress: rawProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Same spring config as desktop. Touch scroll is momentum-driven on
+  // mobile so the smoothing matters even more here.
+  const progress = useSpring(rawProgress, SECTION_SPRING);
+
+  const co2 = useTransform(progress, [...TICKER_INPUT], [...TICKER_CO2]);
+  const water = useTransform(progress, [...TICKER_INPUT], [...TICKER_WATER]);
+
+  return (
+    <div
+      ref={sectionRef}
+      className="scroll-pinned relative lg:hidden"
+      style={{ height: "360vh" }}
+    >
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-start px-5 pt-16 pb-6 sm:px-8 sm:justify-center sm:pt-8">
+        <div className="mx-auto w-full max-w-[1200px]">
+          <div className="mx-auto max-w-2xl text-center">
+            <FadeUp>
+              <Eyebrow>Our LCA engine</Eyebrow>
+            </FadeUp>
+            <FadeUp delay={0.08}>
+              <h2 className="mt-3 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl">
                 We wrote the engine.{" "}
                 <span className="text-envrt-brand-black/40">
                   Every kilo, every litre, calculated in-house.
@@ -171,11 +273,8 @@ export function PolaroidStackSection() {
             </FadeUp>
           </div>
 
-          {/* Two-column on lg: stack on left, ticker on right. Stacks on
-              mobile + tablet with the ticker dropping below the polaroids. */}
-          <div className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-[1fr_300px] lg:items-center lg:gap-10">
-            {/* Stack stage */}
-            <div className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px] lg:h-[420px]">
+          <div className="mt-6 grid gap-6 sm:mt-8">
+            <div className="relative mx-auto h-[260px] w-full max-w-[520px] sm:h-[360px]">
               {POLAROIDS.map((p, i) => (
                 <PolaroidCard
                   key={p.index}
@@ -188,11 +287,9 @@ export function PolaroidStackSection() {
               ))}
             </div>
 
-            {/* Ticker */}
             <Ticker co2={co2} water={water} />
           </div>
 
-          {/* Footer — single methodology link, no factor chips. */}
           <FadeUp delay={0.24}>
             <div className="mt-6 flex justify-center sm:mt-8">
               <Link
@@ -211,9 +308,11 @@ export function PolaroidStackSection() {
           </FadeUp>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
+
+// ─── Polaroid card ────────────────────────────────────────────────────────
 
 function PolaroidCard({
   polaroid,
