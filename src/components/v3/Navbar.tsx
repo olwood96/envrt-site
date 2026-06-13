@@ -151,18 +151,35 @@ export function Navbar() {
   const [compact, setCompact] = useState(false);
 
   useEffect(() => {
+    // Compact-pill behaviour is mobile-only by design. On desktop the
+    // bar carries nav items and a CTA — it must NOT scale. Bailing
+    // out here means:
+    //   - no scroll listener attached on desktop at all
+    //   - compact stays at its initial false value
+    //   - the motion.div's scale animate prop reads (false ? 0.82 : 1)
+    //     so it stays at 1 — pill never shrinks on desktop
+    // Also resets compact back to false if the viewport crosses from
+    // mobile to desktop mid-session.
+    const mobileQuery = window.matchMedia("(max-width: 1023px)");
+
     let lastY = window.scrollY;
-    let rafId: number | null = null;
+    let lastUpdateAt = 0;
+    let timeoutId: number | null = null;
     const THRESHOLD = 10; // px of movement before flipping direction
     const TOP_GUARD = 100; // always expanded near top of page
+    // Throttle to 10Hz. The compact toggle doesn't need to react at
+    // 60Hz — visually you cannot perceive a delay shorter than ~80ms,
+    // and dropping the scroll listener from per-frame to per-100ms
+    // means the listener no longer competes with the scroll-pinned
+    // sections (Polaroid, ScrollTour) for the same frame budget.
+    // The "mini up-and-down jitter" reported on those sections came
+    // from the listener firing on every frame in lockstep with the
+    // sections' own useScroll/useTransform chains.
+    const THROTTLE_MS = 100;
 
-    // rAF-batch the handler so state updates happen at most once per
-    // frame. Without this, scroll-pinned sections (ScrollTour pan,
-    // Anatomy pipeline, Polaroid stack) get jittery on mobile
-    // because the navbar's compact spring animations fight the same
-    // main-thread budget as their own scroll-driven transforms.
     const update = () => {
-      rafId = null;
+      timeoutId = null;
+      lastUpdateAt = performance.now();
       const y = window.scrollY;
 
       if (y < TOP_GUARD) {
@@ -176,14 +193,44 @@ export function Navbar() {
     };
 
     const onScroll = () => {
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(update);
+      if (timeoutId !== null) return;
+      const now = performance.now();
+      const elapsed = now - lastUpdateAt;
+      const wait = Math.max(0, THROTTLE_MS - elapsed);
+      timeoutId = window.setTimeout(update, wait);
     };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      if (rafId !== null) cancelAnimationFrame(rafId);
+
+    const attach = () => {
+      if (!mobileQuery.matches) {
+        setCompact(false);
+        return;
+      }
+      lastY = window.scrollY;
+      update();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    };
+
+    const detach = () => {
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+        timeoutId = null;
+      }
       window.removeEventListener("scroll", onScroll);
+    };
+
+    attach();
+
+    // Resize handler: if user rotates / resizes across the breakpoint,
+    // attach or detach the listener accordingly.
+    const onBreakpointChange = () => {
+      detach();
+      attach();
+    };
+    mobileQuery.addEventListener("change", onBreakpointChange);
+
+    return () => {
+      detach();
+      mobileQuery.removeEventListener("change", onBreakpointChange);
     };
   }, []);
 
