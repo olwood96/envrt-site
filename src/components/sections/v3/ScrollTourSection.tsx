@@ -236,7 +236,7 @@ function MobileScrollTour() {
           <div className="relative min-w-0">
             <FadeUp>
               <Eyebrow>Tour · the passport</Eyebrow>
-              <h2 className="mt-3 max-w-xl font-display text-[1.05rem] font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl">
+              <h2 className="mt-3 max-w-xl font-display text-xl font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl">
                 Scroll through a live passport.
               </h2>
               <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
@@ -373,7 +373,7 @@ function ScrollStop({
         <h3 className="font-display text-sm font-semibold leading-tight tracking-tight text-envrt-brand-black sm:text-base lg:text-xl">
           {stop.title}
         </h3>
-        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-envrt-brand-black/65 sm:mt-1.5 sm:text-xs lg:text-sm">
+        <p className="mt-1 max-w-md text-xs leading-relaxed text-envrt-brand-black/65 sm:mt-1.5 sm:text-sm">
           {stop.body}
         </p>
       </div>

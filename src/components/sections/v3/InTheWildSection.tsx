@@ -217,7 +217,7 @@ function CollectiveMosaic({ cards }: { cards: CollectiveCardData[] }) {
           />
           {/* Bottom-left brand chip on each tile so the strip still reads
               as "real brands" at a glance. */}
-          <span className="pointer-events-none absolute bottom-1.5 left-1.5 max-w-[88%] truncate rounded-md bg-envrt-brand-black/65 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.16em] text-white sm:text-[9px]">
+          <span className="pointer-events-none absolute bottom-1.5 left-1.5 max-w-[88%] truncate rounded-md bg-envrt-brand-black/65 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
             {card.brand.name}
           </span>
         </div>

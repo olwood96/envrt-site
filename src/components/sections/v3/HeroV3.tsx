@@ -24,7 +24,7 @@ export function HeroV3() {
             <Eyebrow>DPPs in minutes, not months</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h1 className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
               Supply chain, LCA and DPP.{" "}
               <span className="text-envrt-brand-black/45">
                 Built by us, end to end.

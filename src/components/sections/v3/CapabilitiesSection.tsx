@@ -143,7 +143,7 @@ export function CapabilitiesSection() {
               <Eyebrow>What we do, all by us</Eyebrow>
               <span aria-hidden className="h-px w-12 bg-envrt-brand-ultramarine/40 sm:w-16" />
             </div>
-            <h2 className="mt-5 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
+            <h2 className="mt-5 font-display text-3xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
               Nine capabilities.<br />
               <span className="text-envrt-brand-black/35">One platform.</span>
             </h2>
@@ -277,14 +277,14 @@ function CapabilityRow({
                 ↗
               </span>
             </div>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-envrt-brand-black/65">
+            <p className="mt-1.5 text-sm leading-relaxed text-envrt-brand-black/65">
               {cap.desc}
             </p>
             <div className="mt-2.5 inline-flex items-baseline gap-1.5">
               <span className="font-display text-xs font-semibold text-envrt-brand-black">
                 {cap.stat.value}
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-envrt-brand-black/55">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/55">
                 {cap.stat.label}
               </span>
             </div>

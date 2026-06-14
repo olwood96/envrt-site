@@ -45,7 +45,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
                 className="group flex h-full flex-col rounded-3xl border border-envrt-brand-black/8 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-envrt-brand-ultramarine/30 hover:shadow-[0_18px_40px_-18px_rgba(14,14,14,0.12)] sm:p-7"
               >
                 {/* Meta row */}
-                <div className="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.16em] text-envrt-brand-black/55 sm:text-[11px]">
+                <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-envrt-brand-black/55">
                   <span>{formatDate(post.date)}</span>
                   <span aria-hidden className="h-1 w-1 rounded-full bg-envrt-brand-black/30" />
                   <span>{post.readingTime} min read</span>
@@ -57,13 +57,13 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
                 </h3>
 
                 {/* Description */}
-                <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-[15px]">
+                <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
                   {post.description}
                 </p>
 
                 {/* Tags + arrow */}
                 <div className="mt-5 flex items-center justify-between gap-3 border-t border-envrt-brand-black/6 pt-4">
-                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-envrt-brand-ultramarine">
+                  <span className="truncate text-xs font-semibold uppercase tracking-[0.14em] text-envrt-brand-ultramarine">
                     {post.tags[0] ?? "Insight"}
                   </span>
                   <span

@@ -416,7 +416,7 @@ function CardChrome({
       {card.pill && (
         <motion.span
           style={decorationOpacity ? { opacity: decorationOpacity } : undefined}
-          className={`absolute right-2.5 top-2.5 rounded-full px-2 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.16em] ${PILL_STYLE[card.pill.tone]}`}
+          className={`absolute right-2.5 top-2.5 rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] ${PILL_STYLE[card.pill.tone]}`}
         >
           {card.pill.label}
         </motion.span>
@@ -434,7 +434,7 @@ function CardChrome({
         style={decorationOpacity ? { opacity: decorationOpacity } : undefined}
         className={`flex items-center gap-2 px-3 py-2 ${TONE_FOOT[card.tone]}`}
       >
-        <span className="rounded px-1.5 py-0.5 font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em]">
+        <span className="rounded px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em]">
           {card.typeLabel}
         </span>
         <span className="truncate font-mono text-[10px] text-envrt-brand-black/70">

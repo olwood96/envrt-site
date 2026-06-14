@@ -218,7 +218,7 @@ export function NumbersSection({
 
       <div className="relative mx-auto max-w-[1320px] px-6 sm:px-10 lg:px-16">
         <FadeUp>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-lilac">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-lilac">
             By the numbers
           </p>
           <h2 className="mt-5 max-w-3xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl lg:text-[2.75rem]">

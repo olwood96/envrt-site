@@ -80,7 +80,7 @@ export function ProblemSection() {
             <Eyebrow>The problem</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h2 className="mt-4 font-display text-2xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-3xl lg:text-[2.5rem]">
+            <h2 className="mt-4 font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:text-4xl lg:text-[2.75rem]">
               Mandatory DPPs phase in from 2027.{" "}
               <span className="text-envrt-brand-black/40">
                 The data work to get there is already the problem.
