@@ -33,8 +33,8 @@ export function AlignedWithCarouselV3() {
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">
             EU Product Environmental Footprint, ISO 14040 lifecycle assessment
-            standards and the AWARE water scarcity model. Written into our own
-            code, cited on every passport.
+            standards and the AWARE water scarcity model. Built into our own
+            platform, cited on every passport.
           </p>
         </FadeUp>
 

@@ -25,7 +25,7 @@ const BRANDS: Brand[] = [
   { name: "Vaela", logo: "/brand/logos/vaela.png" },
 ];
 
-const ROTATE_MS = 3200;
+const ROTATE_MS = 4500;
 
 function BrandRotator() {
   const [index, setIndex] = useState(0);
@@ -67,13 +67,13 @@ function BrandRotator() {
           mixBlendMode: "multiply",
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           <motion.div
             key={current.name}
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 3 }}
             animate={{ opacity: 0.55, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.5, ease: EASE_BRAND }}
+            exit={{ opacity: 0, y: -3 }}
+            transition={{ duration: 0.75, ease: EASE_BRAND }}
             className="absolute inset-0 flex items-center justify-center"
           >
             <Image

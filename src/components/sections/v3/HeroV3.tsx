@@ -7,11 +7,11 @@ import { DotGridBackground, Eyebrow } from "./_shared";
 import { BrandStripV3 } from "./BrandStripV3";
 
 // ─── Hero ────────────────────────────────────────────────────────────────
-// Positions ENVRT as a full-stack platform: supply chain mapping, LCA and
-// DPP all in code we own. Hero copy leads with that worldview plus the
-// speed hook (DPPs in minutes, not months). Garment photo carries no
-// labels. A compact brand proof strip closes the hero with one rotating
-// brand logo plus two trust stats.
+// Positions ENVRT as a small team running fashion's environmental work
+// end to end. Hero copy leads with that worldview plus the speed hook
+// (DPPs in minutes, not months). Garment photo carries no labels. A
+// compact brand proof strip closes the hero with one rotating brand
+// logo plus two trust stats.
 
 export function HeroV3() {
   return (
@@ -27,14 +27,16 @@ export function HeroV3() {
             <h1 className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.04] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
               Supply chain, LCA and DPP.{" "}
               <span className="text-envrt-brand-black/45">
-                All in our code.
+                Built by us, end to end.
               </span>
             </h1>
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
-              We map the suppliers, we wrote the LCA engine, we host the
-              passport. No partner APIs in the middle.
+              ENVRT is a small team helping fashion brands map their supply
+              chain, calculate every garment and publish a hosted Digital
+              Product Passport. Every layer ours, no outside partners in the
+              middle.
             </p>
           </FadeUp>
           <FadeUp delay={0.28}>
@@ -113,7 +115,7 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
             card pinned to the hoodie image. Slightly tilted so it reads as
             hand-pinned rather than chrome. */}
         <div
-          className={`absolute z-20 ${isDesktop ? "right-0 top-8 w-40 sm:w-44" : "right-2 top-4 w-28 sm:right-4 sm:w-32"} -rotate-[5deg]`}
+          className={`absolute z-20 ${isDesktop ? "right-0 top-8 w-52 sm:w-56" : "right-2 top-4 w-36 sm:right-4 sm:w-44"} rotate-[6deg]`}
         >
           <div
             className={`relative rounded-xl bg-white ${isDesktop ? "p-2 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)]" : "p-1.5 shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)]"} ring-1 ring-envrt-brand-black/8`}

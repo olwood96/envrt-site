@@ -50,8 +50,8 @@ function useStats(dataPointsServed: number): Stat[] {
     {
       number: 0,
       display: "0",
-      label: "partner APIs in the middle",
-      body: "Supply chain map, LCA engine, water scarcity, French Eco-Score, hosted DPP, evidence vault. Every component written by the ENVRT team. No licensed code passed through.",
+      label: "outside partners in the middle",
+      body: "Supply chain map, LCA engine, water scarcity, French Eco-Score, hosted DPP, evidence vault. Every component built by the ENVRT team. No licensed components passed through.",
     },
     {
       number: dataPointsServed,

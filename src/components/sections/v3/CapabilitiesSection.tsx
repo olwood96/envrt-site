@@ -140,7 +140,7 @@ export function CapabilitiesSection() {
         <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           <FadeUp>
             <div className="flex items-center gap-3">
-              <Eyebrow>What we do, all in our code</Eyebrow>
+              <Eyebrow>What we do, all by us</Eyebrow>
               <span aria-hidden className="h-px w-12 bg-envrt-brand-ultramarine/40 sm:w-16" />
             </div>
             <h2 className="mt-5 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-4xl lg:text-[3rem]">
