@@ -551,13 +551,14 @@ function DropdownCard({
 }) {
   return (
     <div
-      // Liquid glass: heavier than the pill's recipe because the
-      // dropdown is smaller — at the same blur radius (28px) it
-      // *felt* more transparent than the mobile drawer due to the
-      // smaller surface area. Bumped to blur-[36px] + bg-white/62
-      // so it reads as the same material as the drawer despite
-      // size difference.
-      className={`relative rounded-2xl bg-white/62 p-2 backdrop-blur-[36px] backdrop-saturate-[180%] ${
+      // Desktop-only surface (the dropdown's parent GroupTrigger is
+      // inside lg:flex). Recipe matches the desktop pill: bg-white/95
+      // + light backdrop blur + 1px border. On dark pages the old
+      // bg-white/62 + heavy blur let the page bleed through and made
+      // dark text on dark background unreadable — see commit history.
+      // We accept a slightly less "glassy" feel for guaranteed
+      // readability on every background.
+      className={`relative rounded-2xl border border-envrt-brand-black/15 bg-white/95 p-2 backdrop-blur ${
         columns === 2 ? "w-[580px]" : "w-[320px]"
       }`}
       style={{
@@ -567,18 +568,6 @@ function DropdownCard({
           "0 24px 50px -22px rgba(14,14,14,0.22), inset 0 -1px 0 0 rgba(255,255,255,0.15), inset 1px 0 0 0 rgba(255,255,255,0.35), inset -1px 0 0 0 rgba(255,255,255,0.35)",
       }}
     >
-      {/* Refraction overlay — diagonal gradient that mimics light
-          bending through curved glass. Same recipe as the navbar
-          pill, just sized for the dropdown's rounded-2xl corners. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-2xl"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.10) 100%)",
-        }}
-      />
-
       <ul
         className={`relative ${
           columns === 2 ? "grid grid-cols-2 gap-x-1 gap-y-0.5" : "space-y-0.5"
