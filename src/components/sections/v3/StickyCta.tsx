@@ -81,7 +81,7 @@ export function StickyCta() {
                 sessionStorage.setItem(DISMISS_KEY, "1");
                 setDismissed(true);
               }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-white/55 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-white/55 transition-colors duration-200 hover:bg-white/10 hover:text-white"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 3L13 13M13 3L3 13" strokeLinecap="round" />

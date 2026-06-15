@@ -239,7 +239,7 @@ function MobileScrollTour() {
               <h2 className="mt-3 max-w-xl font-display text-xl font-medium leading-[1.15] tracking-[-0.02em] text-envrt-brand-black sm:mt-4 sm:text-2xl">
                 Scroll through a live passport.
               </h2>
-              <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:block sm:text-sm">
+              <p className="mt-2 max-w-md text-xs leading-relaxed text-envrt-brand-black/60 sm:text-sm">
                 Five moments of a real DPP. The phone tracks your scroll.
               </p>
             </FadeUp>

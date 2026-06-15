@@ -97,7 +97,7 @@ export function ProblemSection() {
             <Link
               href="/dpp-timeline"
               aria-live="polite"
-              className="group inline-flex items-center gap-3 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 transition-colors duration-200 hover:border-envrt-brand-crimson/40 hover:text-envrt-brand-crimson sm:gap-4 sm:text-[11px]"
+              className="group inline-flex items-center gap-3 rounded-full border border-envrt-brand-black/12 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/65 transition-colors duration-200 hover:border-envrt-brand-crimson/40 hover:text-envrt-brand-crimson sm:gap-4"
             >
               <span className="flex items-center gap-1.5">
                 <span
@@ -138,7 +138,7 @@ export function ProblemSection() {
 
         {/* Bridge line into ScatterToOrder */}
         <FadeUp delay={0.5}>
-          <p className="mt-10 max-w-2xl text-sm leading-relaxed text-envrt-brand-black/65 sm:mt-12 sm:text-base">
+          <p className="mt-10 max-w-2xl text-base leading-relaxed text-envrt-brand-black/65 sm:mt-12 sm:text-lg">
             Most brands tackle this with inboxes and PDFs.{" "}
             <span className="font-semibold text-envrt-brand-black">
               Here&apos;s the alternative.
@@ -155,7 +155,7 @@ export function ProblemSection() {
 
 function PainRow({ pain }: { pain: Pain }) {
   return (
-    <li className="grid grid-cols-[40px_1fr] items-start gap-4 py-6 sm:grid-cols-[64px_1fr_auto] sm:gap-6 sm:py-7">
+    <li className="grid grid-cols-[28px_1fr] items-start gap-4 py-6 sm:grid-cols-[64px_1fr_auto] sm:gap-6 sm:py-7">
       <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine sm:text-[12px]">
         {pain.index}
       </span>

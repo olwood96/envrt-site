@@ -95,14 +95,14 @@ export function HowItWorksV3() {
 
 function StepCard({ step }: { step: Step }) {
   return (
-    <div className="flex h-full flex-col rounded-3xl border border-envrt-brand-black/10 bg-white p-6 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30 sm:p-7 lg:p-8">
+    <div className="flex h-full flex-col rounded-3xl border border-envrt-brand-black/10 bg-white p-6 transition-colors duration-300 hover:border-envrt-brand-ultramarine/30 sm:p-8">
       <div className="flex items-baseline gap-3">
-        <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-envrt-brand-ultramarine sm:text-5xl">
+        <span className="font-display text-4xl font-semibold leading-none tracking-[-0.04em] text-envrt-brand-ultramarine sm:text-5xl">
           {step.index}
         </span>
         <span className="h-px flex-1 bg-envrt-brand-black/10" />
       </div>
-      <h3 className="mt-5 font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl lg:text-[1.65rem]">
+      <h3 className="mt-5 font-display text-xl font-medium leading-tight tracking-[-0.01em] text-envrt-brand-black sm:text-2xl">
         {step.title}
       </h3>
       <p className="mt-3 flex-1 text-sm leading-relaxed text-envrt-brand-black/65 sm:text-base">

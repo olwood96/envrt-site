@@ -49,12 +49,12 @@ export function FinalCtaV3() {
           <Eyebrow>One last thing</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="mx-auto mt-6 max-w-3xl font-display text-[1.55rem] font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[2.85rem]">
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black sm:mt-8 sm:text-4xl lg:text-[3rem]">
             Try ENVRT on one garment. See if it earns the QR.
           </h2>
         </FadeUp>
         <FadeUp delay={0.18}>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-envrt-brand-black/70 sm:mt-6 sm:text-base lg:text-lg">
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-envrt-brand-black/70 sm:mt-6 sm:text-lg">
             Submit a single product. We&apos;ll return a regulation-ready
             Digital Product Passport within a day, no card required.
           </p>

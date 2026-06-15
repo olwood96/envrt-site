@@ -150,7 +150,7 @@ function StatColumn({ stat, index }: { stat: Stat; index: number }) {
         // letterforms read as "ENVRT-stamped" at display sizes and give the
         // page's most visible numbers their own voice (vs the generic display
         // font everywhere else).
-        className="font-n27 text-[4.5rem] font-bold leading-none tracking-[-0.02em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
+        className="font-n27 text-6xl font-bold leading-none tracking-[-0.02em] text-white sm:text-[5.5rem] lg:text-[6.5rem]"
       >
         <CountUp
           to={stat.number}

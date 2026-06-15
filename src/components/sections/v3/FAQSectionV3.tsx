@@ -32,7 +32,7 @@ export function FAQSectionV3() {
             <div className="mt-10 text-center">
               <Link
                 href="/faq"
-                className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black underline-offset-4 transition-colors hover:text-envrt-brand-ultramarine hover:underline sm:text-xs"
+                className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-envrt-brand-black underline-offset-4 transition-colors hover:text-envrt-brand-ultramarine hover:underline"
               >
                 See all FAQs
                 <span aria-hidden>→</span>

@@ -24,7 +24,7 @@ export function HeroV3() {
             <Eyebrow>DPPs in minutes, not months</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-5xl lg:text-[3.5rem]">
               Supply chain, LCA and DPP.{" "}
               <span className="text-envrt-brand-black/45">
                 Built by us, end to end.
@@ -32,7 +32,7 @@ export function HeroV3() {
             </h1>
           </FadeUp>
           <FadeUp delay={0.16}>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-envrt-brand-black/70 sm:text-base">
+            <p className="mt-5 max-w-md text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
               ENVRT is a small team helping fashion brands map their supply
               chain, calculate every garment and publish a hosted Digital
               Product Passport. Every layer ours, no outside partners in the
@@ -53,7 +53,7 @@ export function HeroV3() {
                 href="/contact"
                 variant="ghost"
                 size="md"
-                className="w-full sm:w-auto sm:px-3 sm:py-3 sm:text-base"
+                className="w-full sm:w-auto sm:px-7 sm:py-3 sm:text-base"
                 data-cta="hero-v3-book-demo"
               >
                 Book a demo<span className="ml-1.5">→</span>

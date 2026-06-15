@@ -42,7 +42,7 @@ export function InsightsTeaseSection({ posts }: { posts: InsightsPostMeta[] }) {
             <FadeUp key={post.slug} delay={0.08 + i * 0.06}>
               <Link
                 href={`/insights/${post.slug}`}
-                className="group flex h-full flex-col rounded-3xl border border-envrt-brand-black/8 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-envrt-brand-ultramarine/30 hover:shadow-[0_18px_40px_-18px_rgba(14,14,14,0.12)] sm:p-7"
+                className="group flex h-full flex-col rounded-3xl border border-envrt-brand-black/8 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-envrt-brand-ultramarine/30 hover:shadow-[0_18px_40px_-18px_rgba(14,14,14,0.12)] sm:p-8"
               >
                 {/* Meta row */}
                 <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-envrt-brand-black/55">

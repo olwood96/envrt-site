@@ -259,7 +259,7 @@ function MobilePolaroidStack() {
             <FadeUp delay={0.08}>
               <h2 className="mt-3 font-display text-2xl font-medium leading-[1.05] tracking-[-0.025em] text-envrt-brand-black sm:text-3xl">
                 We wrote the engine.{" "}
-                <span className="text-envrt-brand-black/40">
+                <span className="block text-envrt-brand-black/40 sm:inline">
                   Every kilo, every litre, calculated in-house.
                 </span>
               </h2>
@@ -340,7 +340,7 @@ function PolaroidCard({
       style={{ x, y, rotate, opacity, zIndex }}
       className="absolute left-1/2 top-1/2 -ml-[110px] -mt-[140px] sm:-ml-[130px] sm:-mt-[170px]"
     >
-      <div className="w-[220px] rounded-sm bg-white p-3 pb-5 shadow-[0_24px_50px_-18px_rgba(14,14,14,0.35)] ring-1 ring-envrt-brand-black/8 sm:w-[260px] sm:p-4 sm:pb-6">
+      <div className="w-[180px] rounded-sm bg-white p-3 pb-5 shadow-[0_24px_50px_-18px_rgba(14,14,14,0.35)] ring-1 ring-envrt-brand-black/8 sm:w-[240px] sm:p-4 sm:pb-6">
         <div className="relative aspect-square w-full overflow-hidden">
           <Image
             src={polaroid.src}
