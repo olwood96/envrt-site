@@ -32,7 +32,7 @@
   var CONFIG_ENDPOINT_BASE = "https://dpp.envrt.com/api/embed-config/";
 
   var DEFAULT_SETTINGS = {
-    drawerWidth: "40rem",
+    drawerWidth: "640px",
     drawerSide: "right",
     sheetHeight: "92svh",
     backdropDim: "50"
@@ -541,7 +541,7 @@
     // applySettings). Defaults below match DEFAULT_SETTINGS so the popup
     // renders sensibly during the brief window before settings arrive.
     ":host {",
-    "  --envrt-drawer-width: 40rem;",
+    "  --envrt-drawer-width: 640px;",
     "  --envrt-sheet-height: 92svh;",
     "  --envrt-backdrop-bg: rgba(0,0,0,0.5);",
     "  --envrt-backdrop-blur: 2px;",
@@ -587,7 +587,7 @@
     "  /* Default: right-anchored drawer. */",
     "  .sheet {",
     "    left: auto; right: 0; bottom: 0; top: 0;",
-    "    width: 100%; max-width: var(--envrt-drawer-width);",
+    "    width: 100%; max-width: min(var(--envrt-drawer-width), 90vw);",
     "    height: auto; max-height: none;",
     "    border-radius: 0;",
     "    transform: translateX(100%);",
