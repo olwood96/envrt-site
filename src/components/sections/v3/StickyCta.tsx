@@ -68,7 +68,7 @@ export function StickyCta() {
             {/* Golden button per brand pairing "Golden + Black" */}
             <Link
               href="/free-dpp"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-envrt-brand-golden px-3 py-2 text-xs font-semibold text-envrt-brand-black transition-colors duration-200 hover:bg-envrt-brand-golden/85 sm:px-4 sm:py-2.5 sm:text-sm"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-envrt-brand-golden px-4 py-2 text-xs font-semibold text-envrt-brand-black transition-colors duration-200 hover:bg-envrt-brand-golden/85 sm:px-4 sm:py-2.5 sm:text-sm"
               data-cta="sticky-v3-free-dpp"
             >
               Start
