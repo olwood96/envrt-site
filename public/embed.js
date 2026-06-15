@@ -125,6 +125,24 @@
     for (var i = 0; i < links.length; i++) injectAttributionInto(links[i]);
   }
 
+  // Warm the settings cache for every brand whose link appears on the
+  // page. Without this, the click handler races fetchSettings against the
+  // slide-in animation, so the drawer opens at CSS defaults then visibly
+  // snaps to the brand's saved width/height once the API responds.
+  function prefetchSettingsForLinksOnPage() {
+    var links = document.querySelectorAll(LINK_SELECTOR);
+    var seen = {};
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute("href");
+      if (!href) continue;
+      var brand = extractBrandFromHref(href);
+      if (brand && !seen[brand]) {
+        seen[brand] = true;
+        fetchSettings(brand);
+      }
+    }
+  }
+
   function startAttributionObserver() {
     if (typeof MutationObserver !== "function") return;
     var obs = new MutationObserver(function (mutations) {
@@ -152,10 +170,12 @@
     document.addEventListener("DOMContentLoaded", function () {
       injectAttributionEverywhere();
       startAttributionObserver();
+      prefetchSettingsForLinksOnPage();
     });
   } else {
     injectAttributionEverywhere();
     startAttributionObserver();
+    prefetchSettingsForLinksOnPage();
   }
 
   // ---- Click interception ----
@@ -176,11 +196,20 @@
     e.preventDefault();
     trackClick(href);
     var brand = extractBrandFromHref(href);
-    fetchSettings(brand).then(applySettings);
-    open({
+    var openOpts = {
       iframeUrl: iframeUrl,
       fallbackUrl: link.href,
       title: link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport"
+    };
+    // Apply brand settings BEFORE triggering the slide-in animation, so
+    // the drawer opens at the correct width/height instead of snapping
+    // mid-animation. Settings are typically cache-warm from the on-load
+    // prefetch, so this resolves on the next microtask (no perceptible
+    // delay). First-visit users with a cold cache wait ~50-200ms for the
+    // API, still much better than the previous mid-animation resize.
+    fetchSettings(brand).then(function (settings) {
+      applySettings(settings);
+      open(openOpts);
     });
   }, true);
 
