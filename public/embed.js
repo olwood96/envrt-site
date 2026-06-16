@@ -296,14 +296,18 @@
     host.style.setProperty("--envrt-drawer-width", settings.drawerWidth || DEFAULT_SETTINGS.drawerWidth);
     host.style.setProperty("--envrt-sheet-height", settings.sheetHeight || DEFAULT_SETTINGS.sheetHeight);
 
+    // backdropDim: a number (alpha percentage) sets the dim opacity. The
+    // legacy "blur" value is treated as a stronger dim, since the actual
+    // backdrop-filter blur has been removed from .overlay below (it was
+    // forcing whole-viewport re-blur on every parent-page paint and
+    // tanking compositor performance, including the close-cursor on
+    // mousemove).
     var dim = settings.backdropDim || DEFAULT_SETTINGS.backdropDim;
     if (dim === "blur") {
-      host.style.setProperty("--envrt-backdrop-bg", "rgba(0,0,0,0.15)");
-      host.style.setProperty("--envrt-backdrop-blur", "8px");
+      host.style.setProperty("--envrt-backdrop-bg", "rgba(0,0,0,0.6)");
     } else {
       var alpha = (parseInt(dim, 10) || 50) / 100;
       host.style.setProperty("--envrt-backdrop-bg", "rgba(0,0,0," + alpha + ")");
-      host.style.setProperty("--envrt-backdrop-blur", "2px");
     }
 
     // Drawer side toggles a class so CSS picks the correct base transform
@@ -574,13 +578,15 @@
     "  --envrt-drawer-width: 640px;",
     "  --envrt-sheet-height: 92svh;",
     "  --envrt-backdrop-bg: rgba(0,0,0,0.5);",
-    "  --envrt-backdrop-blur: 2px;",
     "}",
 
+    // backdrop-filter: blur() used to be applied here. It re-blurred the
+    // entire viewport on every parent-page paint, including every cursor
+    // move, which starved the compositor and caused the close-cursor to
+    // visibly lag. Solid dim only, much cheaper and visually almost
+    // indistinguishable.
     ".overlay {",
     "  position: fixed; inset: 0; background: var(--envrt-backdrop-bg);",
-    "  backdrop-filter: blur(var(--envrt-backdrop-blur));",
-    "  -webkit-backdrop-filter: blur(var(--envrt-backdrop-blur));",
     "  opacity: 0; transition: opacity 300ms; pointer-events: auto;",
     "}",
     ":host(.visible) .overlay { opacity: 1; }",
