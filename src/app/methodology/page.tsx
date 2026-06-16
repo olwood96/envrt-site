@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import {
   LegalShell,
   LegalP,
-  LegalH3,
   LegalUl,
   LegalLi,
   LegalStrong,
@@ -70,7 +69,7 @@ const SECTIONS: LegalSection[] = [
           <LegalLi>
             <LegalStrong>Item level</LegalStrong> uniquely identifies a single
             physical unit using a serialised code, supporting resale and repair
-            tracking through that unit's lifetime.
+            tracking through that unit&apos;s lifetime.
           </LegalLi>
         </LegalUl>
         <LegalP>
@@ -163,7 +162,7 @@ const SECTIONS: LegalSection[] = [
           <LegalLi>
             <LegalStrong>Brand attests</LegalStrong>: material composition, mass,
             supplier names, factory locations, certifications held, colourway
-            variants share the parent's materials and supply chain.
+            variants share the parent&apos;s materials and supply chain.
           </LegalLi>
           <LegalLi>
             <LegalStrong>ENVRT owns</LegalStrong>: LCA methodology and the
