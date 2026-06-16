@@ -62,38 +62,39 @@ export default function VariantPicker({
   };
 
   return (
-    <div className="mt-6 rounded-2xl border border-envrt-mist bg-white p-5">
-      <div className="flex flex-col sm:flex-row sm:items-start gap-5">
+    <div className="mt-8 rounded-3xl border border-envrt-brand-black/12 bg-white p-6 sm:p-8 shadow-[0_18px_40px_-18px_rgba(14,14,14,0.12)]">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-6">
         {selected.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={selected.imageUrl}
             alt={`${parentGarmentName}, ${selected.variantName}`}
-            className="h-48 w-48 rounded-xl object-cover border border-envrt-mist"
+            className="h-48 w-48 rounded-2xl object-cover border border-envrt-brand-black/12"
           />
         )}
 
         <div className="flex-1">
-          <div className="text-xs font-medium uppercase tracking-widest text-envrt-muted">
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-envrt-brand-ultramarine">
             Colourway
           </div>
-          <div className="mt-1 text-lg font-semibold text-envrt-charcoal">
+          <div className="mt-2 text-lg font-semibold leading-tight tracking-[-0.01em] text-envrt-brand-black">
             {selected.variantName}
           </div>
-          <div className="text-xs text-envrt-muted">
+          <div className="text-xs leading-snug text-envrt-brand-black/55">
             SKU {selected.variantSku}
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap gap-2">
             {variants.map((v) => {
               const isActive = v.variantSku === selected.variantSku;
               return (
                 <button
                   key={v.id}
                   onClick={() => handleSelect(v.variantSku)}
-                  className={`flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     isActive
-                      ? "border-envrt-charcoal bg-envrt-charcoal text-white"
-                      : "border-envrt-mist bg-white text-envrt-charcoal hover:border-envrt-charcoal"
+                      ? "border-envrt-brand-ultramarine bg-envrt-brand-ultramarine text-white"
+                      : "border-envrt-brand-black/12 bg-white text-envrt-brand-black hover:border-envrt-brand-ultramarine hover:text-envrt-brand-ultramarine"
                   }`}
                   aria-pressed={isActive}
                   title={v.variantName}
@@ -108,12 +109,12 @@ export default function VariantPicker({
             })}
           </div>
 
-          <p className="mt-4 text-xs text-envrt-muted">
+          <p className="mt-5 text-xs leading-snug text-envrt-brand-black/65">
             Footprint calculated at model level per the ESPR three-tier framework
             (Model, Batch, Item) and applies to all colourways of this garment.{" "}
             <a
               href="/methodology"
-              className="underline hover:text-envrt-charcoal"
+              className="text-envrt-brand-ultramarine hover:opacity-80 transition-opacity"
             >
               How we calculate
             </a>
