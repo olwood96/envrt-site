@@ -140,5 +140,147 @@ describe("public/embed.js — attribution injection", () => {
     loadEmbedScript();
     expect(link.querySelectorAll("[data-envrt-attribution]").length).toBe(1);
   });
+
+  it("sets font-weight:normal on the attribution span so it doesn't inherit bold from the anchor", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    loadEmbedScript();
+
+    const span = link.querySelector("[data-envrt-attribution]") as HTMLSpanElement | null;
+    expect(span).not.toBeNull();
+    expect(span!.style.fontWeight).toBe("normal");
+  });
+});
+
+describe("public/embed.js — link presentation override", () => {
+  type ApplyPresentationFn = (
+    link: HTMLAnchorElement,
+    settings: {
+      linkText?: string;
+      linkUnderline?: "inherit" | "always" | "never";
+      linkBold?: "default" | "bold";
+    }
+  ) => void;
+
+  function getApply(): ApplyPresentationFn {
+    const api = (
+      window as unknown as { envrtEmbed: { _applyPresentationToLink: ApplyPresentationFn } }
+    ).envrtEmbed;
+    return api._applyPresentationToLink;
+  }
+
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    loadEmbedScript();
+  });
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("replaces the CTA text node with the dashboard linkText", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View Digital Product Passport";
+    document.body.appendChild(link);
+
+    getApply()(link, { linkText: "Explore the DPP" });
+
+    expect(link.firstChild?.nodeType).toBe(3);
+    expect(link.firstChild?.nodeValue).toBe("Explore the DPP");
+  });
+
+  it("preserves a trailing attribution span when replacing the CTA", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.innerHTML =
+      'View DPP<br><span data-envrt-attribution>Powered by ENVRT</span>';
+    document.body.appendChild(link);
+
+    getApply()(link, { linkText: "Open Digital Product Passport" });
+
+    expect(link.firstChild?.nodeValue).toBe("Open Digital Product Passport");
+    expect(link.querySelector("[data-envrt-attribution]")).not.toBeNull();
+  });
+
+  it("forces text-decoration when linkUnderline is 'always' / 'never'", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    getApply()(link, { linkUnderline: "always" });
+    expect(link.style.textDecoration).toBe("underline");
+
+    getApply()(link, { linkUnderline: "never" });
+    expect(link.style.textDecoration).toBe("none");
+  });
+
+  it("clears any pre-existing inline text-decoration when linkUnderline is 'inherit'", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.style.textDecoration = "underline";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    getApply()(link, { linkUnderline: "inherit" });
+    expect(link.style.textDecoration).toBe("");
+  });
+
+  it("applies font-weight bold when linkBold is 'bold' and clears it otherwise", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    getApply()(link, { linkBold: "bold" });
+    expect(link.style.fontWeight).toBe("bold");
+
+    getApply()(link, { linkBold: "default" });
+    expect(link.style.fontWeight).toBe("");
+  });
+
+  it("stamps the anchor with data-envrt-styled for idempotency tracking", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.textContent = "View DPP";
+    document.body.appendChild(link);
+
+    getApply()(link, { linkText: "View DPP" });
+    expect(link.getAttribute("data-envrt-styled")).toBe("1");
+  });
+
+  // Live-site safety: an existing brand paste that already has the brand's
+  // chosen text + inline underline gets the same values applied at runtime
+  // because saved settings === paste-time settings. End result on screen
+  // is byte-identical to the original paste, so currently-shipping snippets
+  // do not change behaviour after the streamline.
+  it("produces an identical anchor for existing pastes whose saved settings match", () => {
+    const link = document.createElement("a");
+    link.className = "envrt-dpp-link";
+    link.href = "https://envrt.com/collective/acme/tee-01";
+    link.style.textDecoration = "underline";
+    link.textContent = "View Digital Product Passport";
+    document.body.appendChild(link);
+
+    getApply()(link, {
+      linkText: "View Digital Product Passport",
+      linkUnderline: "always",
+      linkBold: "default",
+    });
+
+    expect(link.firstChild?.nodeValue).toBe("View Digital Product Passport");
+    expect(link.style.textDecoration).toBe("underline");
+    expect(link.style.fontWeight).toBe("");
+  });
 });
 

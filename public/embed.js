@@ -53,7 +53,15 @@
     drawerWidth: "640px",
     drawerSide: "right",
     sheetHeight: "92svh",
-    backdropDim: "50"
+    backdropDim: "50",
+    // Link presentation settings. Used to override the pasted anchor's
+    // CTA text + typography at runtime so brands can tweak from the
+    // dashboard without re-pasting. Defaults match the snippet builder
+    // so visitors on a freshly-pasted brand site see no change before
+    // /api/embed-config resolves.
+    linkText: "View Digital Product Passport",
+    linkUnderline: "inherit",
+    linkBold: "default"
   };
 
   // ---- State ----
@@ -116,8 +124,12 @@
     // host site's anchor underline doesn't draw through this span. The
     // explicit text-decoration:none is belt-and-braces for hosts that
     // re-apply underlines via descendant selectors.
+    // font-weight:normal stops the attribution inheriting bold from the
+    // anchor when the brand picks "bold" for the CTA. text-decoration is
+    // already overridden here so the same isolation logic applies both
+    // ways: CTA-level typography never bleeds into the attribution.
     span.style.cssText =
-      "display:inline-block;text-decoration:none;font-size:0.85em;opacity:0.75;margin-top:2px;";
+      "display:inline-block;text-decoration:none;font-weight:normal;font-size:0.85em;opacity:0.75;margin-top:2px;";
     span.innerHTML =
       'Powered by <img src="https://envrt.com/brand/envrt-logo.png" ' +
       'alt="ENVRT" ' +
@@ -154,6 +166,10 @@
   // page. Without this, the click handler races fetchSettings against the
   // slide-in animation, so the drawer opens at CSS defaults then visibly
   // snaps to the brand's saved width/height once the API responds.
+  //
+  // The same fetch resolution drives applyPresentationToBrand, so the
+  // anchor's CTA text + typography update to current dashboard values
+  // shortly after page load with no re-paste required.
   function prefetchSettingsForLinksOnPage() {
     var links = document.querySelectorAll(LINK_SELECTOR);
     var seen = {};
@@ -163,9 +179,77 @@
       var brand = extractBrandFromHref(href);
       if (brand && !seen[brand]) {
         seen[brand] = true;
-        fetchSettings(brand);
+        (function (b) {
+          fetchSettings(b).then(function (settings) {
+            applyPresentationToBrand(b, settings);
+          });
+        })(brand);
       }
     }
+  }
+
+  // ---- Runtime link presentation ----
+  // CTA text + typography (linkText / linkUnderline / linkBold) used to
+  // be baked into the pasted snippet. Now they're applied at runtime from
+  // /api/embed-config so brands can adjust them in the dashboard without
+  // re-pasting. Existing live pastes are unaffected: JS overrides each
+  // anchor with the brand's saved values, which equal the values baked
+  // in at paste time, so the visible output is identical for any brand
+  // that hasn't changed its dashboard settings since.
+  function applyPresentationToLink(link, settings) {
+    if (!link) return;
+    var s = settings || DEFAULT_SETTINGS;
+    var linkText = s.linkText || DEFAULT_SETTINGS.linkText;
+    var linkUnderline = s.linkUnderline || DEFAULT_SETTINGS.linkUnderline;
+    var linkBold = s.linkBold || DEFAULT_SETTINGS.linkBold;
+
+    // Replace just the first text node (the CTA) so any trailing
+    // attribution span survives. If the first child isn't text (rare,
+    // e.g. an icon img was prepended), insert one before it.
+    var first = link.firstChild;
+    if (first && first.nodeType === 3) {
+      first.nodeValue = linkText;
+    } else {
+      link.insertBefore(document.createTextNode(linkText), first || null);
+    }
+
+    // "inherit" / "default" clear the inline override so the host site's
+    // link CSS wins, matching the pre-streamline "no inline style" path.
+    if (linkUnderline === "always") {
+      link.style.textDecoration = "underline";
+    } else if (linkUnderline === "never") {
+      link.style.textDecoration = "none";
+    } else {
+      link.style.textDecoration = "";
+    }
+    if (linkBold === "bold") {
+      link.style.fontWeight = "bold";
+    } else {
+      link.style.fontWeight = "";
+    }
+
+    link.setAttribute("data-envrt-styled", "1");
+  }
+
+  function applyPresentationToBrand(brand, settings) {
+    if (!brand) return;
+    var links = document.querySelectorAll(LINK_SELECTOR);
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      var href = link.getAttribute("href") || "";
+      if (extractBrandFromHref(href) === brand) {
+        applyPresentationToLink(link, settings);
+      }
+    }
+  }
+
+  function handleLateLink(link) {
+    injectAttributionInto(link);
+    var brand = extractBrandFromHref(link.getAttribute("href") || "");
+    if (!brand) return;
+    fetchSettings(brand).then(function (settings) {
+      applyPresentationToLink(link, settings);
+    });
   }
 
   function startAttributionObserver() {
@@ -177,11 +261,11 @@
           var node = added[j];
           if (node.nodeType !== 1) continue; // element only
           if (node.matches && node.matches(LINK_SELECTOR)) {
-            injectAttributionInto(node);
+            handleLateLink(node);
           }
           if (node.querySelectorAll) {
             var nested = node.querySelectorAll(LINK_SELECTOR);
-            for (var k = 0; k < nested.length; k++) injectAttributionInto(nested[k]);
+            for (var k = 0; k < nested.length; k++) handleLateLink(nested[k]);
           }
         }
       }
@@ -265,7 +349,8 @@
     openTest: openTest,
     close: function () { close(); },
     // Exposed for unit tests; not part of the supported API surface.
-    _buildIframeUrl: buildIframeUrl
+    _buildIframeUrl: buildIframeUrl,
+    _applyPresentationToLink: applyPresentationToLink
   };
 
   // ---- Settings fetch + apply ----
