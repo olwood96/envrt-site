@@ -13,8 +13,10 @@
  *
  * Graceful degradation:
  *  - No JS / script blocked → the anchor still works as a normal link
- *  - iframe blocked by CSP frame-ancestors → falls back to new-tab nav
  *  - Mod-click (cmd/ctrl/middle) → opens in new tab as normal
+ *  - Parent domain not approved → the iframe loads dpp.envrt.com which
+ *    renders a branded "embedding pending approval" placeholder inside
+ *    the popup; the popup stays open.
  */
 (function () {
   "use strict";
@@ -43,8 +45,6 @@
   var popup = null;
   /** Scroll position saved when body is locked, restored on close. */
   var savedScrollY = 0;
-  /** Most recent mod-state so the postMessage handler can fall back correctly. */
-  var pendingFallbackUrl = null;
   /** Per-brand settings cache. Key is brand slug, value is a Promise that
    *  resolves with the settings object. Fetched on first popup open per
    *  brand, then reused. */
@@ -198,7 +198,6 @@
     var brand = extractBrandFromHref(href);
     var openOpts = {
       iframeUrl: iframeUrl,
-      fallbackUrl: link.href,
       title: link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport"
     };
     // Apply brand settings BEFORE triggering the slide-in animation, so
@@ -232,8 +231,6 @@
     applySettings(opts.settings || DEFAULT_SETTINGS);
     open({
       iframeUrl: iframeUrl,
-      fallbackUrl: "https://envrt.com/collective/" +
-        encodeURIComponent(opts.brand) + "/" + encodeURIComponent(opts.sku),
       title: opts.title || "Digital Product Passport"
     });
     return true;
@@ -479,7 +476,6 @@
   // ---- Lifecycle ----
   function open(opts) {
     var p = ensurePopup();
-    pendingFallbackUrl = opts.fallbackUrl;
 
     var src = opts.iframeUrl;
     src += (src.indexOf("?") === -1 ? "?" : "&") + "src=embed-popup";
@@ -488,7 +484,6 @@
     p.host.style.display = "block";
     p.host.classList.add("loading");
     document.addEventListener("keydown", onKeyDown);
-    window.addEventListener("message", onMessage);
     lockBodyScroll();
 
     // Double RAF so the browser paints the off-screen state before we
@@ -504,8 +499,6 @@
     if (!popup) return;
     popup.host.classList.remove("visible");
     document.removeEventListener("keydown", onKeyDown);
-    window.removeEventListener("message", onMessage);
-    pendingFallbackUrl = null;
     window.setTimeout(function () {
       if (!popup) return;
       popup.host.style.display = "none";
@@ -522,14 +515,6 @@
 
   function onKeyDown(e) {
     if (e.key === "Escape") close();
-  }
-
-  function onMessage(e) {
-    var data = e && e.data;
-    if (!data || data.type !== "envrt-dpp-blocked") return;
-    var fallback = pendingFallbackUrl;
-    close();
-    if (fallback) window.open(fallback, "_blank", "noopener");
   }
 
   // ---- Body scroll lock (iOS-proof, restores instantly via behavior:'instant') ----
