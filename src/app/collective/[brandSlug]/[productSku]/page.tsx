@@ -6,7 +6,6 @@ import { Container } from "@/components/ui/Container";
 import { getFeaturedDpp } from "@/lib/collective/fetch";
 import { CollectiveDppEmbed } from "@/components/collective/CollectiveDppEmbed";
 import { CollectiveProductJsonLd } from "@/components/collective/CollectiveProductJsonLd";
-import VariantPicker from "@/components/collective/VariantPicker";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 
 /** Hostnames that count as "internal" — visits referred from these
@@ -182,13 +181,6 @@ export default async function CollectiveDetailPage({ params }: PageProps) {
               )}
             </div>
           </div>
-
-          {/* Variant picker (renders only when the garment has approved variants) */}
-          <VariantPicker
-            brandSlug={brandSlug}
-            productSku={productSku}
-            parentGarmentName={dpp.garment_name}
-          />
 
           {/* Iframe embed */}
           <div className="mt-8">
