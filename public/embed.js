@@ -65,6 +65,15 @@
    *  resolves with the settings object. Fetched on first popup open per
    *  brand, then reused. */
   var settingsCache = {};
+  /** The element that had focus immediately before the popup opened.
+   *  Used to restore focus when the popup closes so keyboard users land
+   *  back on the trigger link. Null when no popup is open. */
+  var previouslyFocusedElement = null;
+  /** Body-level siblings of the popup host that we marked `inert` while
+   *  the popup is open. Each entry is { element, hadInert } so we can
+   *  restore the pre-existing inert state on close without trampling
+   *  any host-page intent. */
+  var inertedSiblings = [];
 
   // ---- URL transform ----
   /**
@@ -398,7 +407,7 @@
       "<style>" + STYLES + "</style>" +
       "<div class='overlay' data-overlay></div>" +
       "<div class='cursor-x' data-cursor aria-hidden='true'>" + X_ICON + "</div>" +
-      "<div class='sheet' data-sheet>" +
+      "<div class='sheet' data-sheet role='dialog' aria-modal='true' aria-label='Digital Product Passport'>" +
       "  <div class='drag-strip' data-drag-strip aria-label='Drag to dismiss'>" +
       "    <div class='drag-handle'></div>" +
       "  </div>" +
@@ -496,6 +505,7 @@
   // ---- Lifecycle ----
   function open(opts) {
     var p = ensurePopup();
+    var alreadyOpen = p.host.classList.contains("visible");
 
     var src = opts.iframeUrl;
     src += (src.indexOf("?") === -1 ? "?" : "&") + "src=embed-popup";
@@ -506,6 +516,19 @@
     document.addEventListener("keydown", onKeyDown);
     lockBodyScroll();
 
+    // Save the element that had focus so we can restore it on close, and
+    // mark every other body-level element as `inert` so keyboard / screen-
+    // reader users can't tab or read past the popup. Skip on re-entrant
+    // opens (popup already visible) so we don't overwrite the original
+    // trigger with the close button we focused last time.
+    if (!alreadyOpen) {
+      previouslyFocusedElement =
+        document && document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      applyInertToSiblings(p.host);
+    }
+
     // Double RAF so the browser paints the off-screen state before we
     // flip to .visible, otherwise the slide-in transition won't fire.
     requestAnimationFrame(function () {
@@ -513,12 +536,27 @@
         p.host.classList.add("visible");
       });
     });
+
+    // Move keyboard focus into the popup once the slide-in completes, so
+    // screen readers announce the dialog after it's visible and the user's
+    // first Tab keeps them inside the popup chrome.
+    window.setTimeout(function () {
+      if (!popup || !popup.host.classList.contains("visible")) return;
+      var closeBtn = popup.root.querySelector("[data-close]");
+      if (closeBtn) {
+        try { closeBtn.focus(); } catch (_e) { /* focus can throw in detached docs */ }
+      }
+    }, ANIMATION_MS);
   }
 
   function close() {
     if (!popup) return;
     popup.host.classList.remove("visible");
     document.removeEventListener("keydown", onKeyDown);
+    // Restore inert state on siblings immediately so the page is usable
+    // again as soon as close() is called, without waiting for the slide
+    // animation to finish.
+    restoreInertOnSiblings();
     window.setTimeout(function () {
       if (!popup) return;
       popup.host.style.display = "none";
@@ -530,11 +568,64 @@
       popup.sheet.style.transform = "";
       popup.sheet.style.transition = "";
       unlockBodyScroll();
+      // Restore keyboard focus to the element that triggered the popup,
+      // matching the WAI-ARIA dialog pattern. Guard against the element
+      // being gone (SPA navigation removed it) or not focusable any more.
+      var prev = previouslyFocusedElement;
+      previouslyFocusedElement = null;
+      if (prev && document.contains(prev) && typeof prev.focus === "function") {
+        try { prev.focus(); } catch (_e) { /* focus can throw */ }
+      }
     }, ANIMATION_MS);
   }
 
   function onKeyDown(e) {
-    if (e.key === "Escape") close();
+    if (e.key === "Escape") {
+      close();
+      return;
+    }
+    if (e.key !== "Tab" || !popup) return;
+
+    // Tab trap. Focusable elements inside the popup are the close button
+    // and the iframe. Sibling `inert` prevents Tab from escaping to the
+    // host page, but doesn't stop the browser from cycling through
+    // browser-chrome (address bar) on Shift+Tab from the close button,
+    // so we explicitly wrap focus to the iframe in that case. Tab in the
+    // other direction is left to the browser, which moves into the iframe
+    // and lets the iframe's own page handle focus from there.
+    var closeBtn = popup.root.querySelector("[data-close]");
+    var active = popup.root.activeElement;
+    if (e.shiftKey && active === closeBtn) {
+      e.preventDefault();
+      try { popup.iframe.focus(); } catch (_e) { /* focus can throw */ }
+    }
+  }
+
+  /** Mark every body-level sibling of `host` as `inert` so they can't be
+   *  reached by Tab or screen readers while the popup is open. Pre-existing
+   *  `inert` state is captured per element so close() can put it back
+   *  exactly as it was. Idempotent across re-entrant opens. */
+  function applyInertToSiblings(host) {
+    if (!document.body || typeof host.setAttribute !== "function") return;
+    inertedSiblings = [];
+    var children = document.body.children;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (child === host) continue;
+      inertedSiblings.push({
+        element: child,
+        hadInert: child.hasAttribute("inert")
+      });
+      child.setAttribute("inert", "");
+    }
+  }
+
+  function restoreInertOnSiblings() {
+    for (var i = 0; i < inertedSiblings.length; i++) {
+      var entry = inertedSiblings[i];
+      if (!entry.hadInert) entry.element.removeAttribute("inert");
+    }
+    inertedSiblings = [];
   }
 
   // ---- Body scroll lock (iOS-proof, restores instantly via behavior:'instant') ----
