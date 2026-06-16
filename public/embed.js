@@ -33,6 +33,22 @@
   var CLICK_ENDPOINT = "https://dpp.envrt.com/api/embed-click";
   var CONFIG_ENDPOINT_BASE = "https://dpp.envrt.com/api/embed-config/";
 
+  // Warm DNS + TLS to dpp.envrt.com immediately so the iframe load on
+  // first click skips the connection-setup penalty. Idempotent and cheap.
+  (function preconnectDashboard() {
+    try {
+      var head = document.head || document.getElementsByTagName("head")[0];
+      if (!head) return;
+      if (head.querySelector('link[data-envrt-preconnect]')) return;
+      var link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = DASHBOARD_ORIGIN;
+      link.crossOrigin = "anonymous";
+      link.setAttribute("data-envrt-preconnect", "");
+      head.appendChild(link);
+    } catch (_e) { /* non-critical */ }
+  })();
+
   var DEFAULT_SETTINGS = {
     drawerWidth: "640px",
     drawerSide: "right",
