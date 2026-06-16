@@ -193,7 +193,10 @@ export function DppPopup({
         onMouseEnter={() => setCursorOnBackdrop(true)}
         onMouseLeave={() => setCursorOnBackdrop(false)}
         style={{ touchAction: "none" }}
-        className={`fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm transition-opacity duration-300 sm:cursor-none ${
+        // backdrop-blur removed: re-blurring the whole viewport on every
+        // parent-page paint starved the compositor and made the close-
+        // cursor lag. Solid dim only. Matches the embed.js overlay.
+        className={`fixed inset-0 z-[9999] bg-black/50 transition-opacity duration-300 sm:cursor-none ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       />
