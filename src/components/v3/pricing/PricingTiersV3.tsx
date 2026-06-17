@@ -46,8 +46,8 @@ export function PricingTiersV3() {
 
       <FadeUp delay={0.4}>
         <p className="mt-10 text-center text-xs text-envrt-brand-black/55 sm:text-sm">
-          All plans run on a 6-month minimum term, then continue
-          month-to-month. Annual billing saves 15% on Starter and Growth.
+          All plans are annual. Annual upfront billing saves 15% on Starter
+          and Growth.
         </p>
       </FadeUp>
     </>

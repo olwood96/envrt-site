@@ -178,7 +178,7 @@ describe("POST /api/stripe/webhook", () => {
           currency: "gbp",
           status: "active",
           term_months: 12,
-          minimum_term_months: 6,
+          minimum_term_months: 12,
         })
       );
     });

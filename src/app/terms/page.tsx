@@ -412,8 +412,8 @@ const SECTIONS: LegalSection[] = [
             depending on the plan selected at checkout).
           </LegalLi>
           <LegalLi>
-            All subscriptions have a{" "}
-            <LegalStrong>minimum commitment of 6 months</LegalStrong>. You may
+            All subscriptions are annual plans with a{" "}
+            <LegalStrong>minimum commitment of 12 months</LegalStrong>. You may
             not cancel your subscription before the minimum commitment period
             has elapsed. After the minimum commitment, subscriptions continue
             on a rolling basis until cancelled.
@@ -564,10 +564,11 @@ const SECTIONS: LegalSection[] = [
         </LegalP>
         <LegalUl>
           <LegalLi>
-            Self-serve subscriptions are subject to a minimum commitment period
-            of 6 months from the date of purchase (see section 10).
-            Cancellation requests made before the minimum commitment period has
-            elapsed will take effect at the end of the commitment period.
+            Self-serve subscriptions are annual plans, subject to a minimum
+            commitment period of 12 months from the date of purchase (see
+            section 10). Cancellation requests made before the minimum
+            commitment period has elapsed will take effect at the end of the
+            commitment period.
           </LegalLi>
           <LegalLi>
             After the minimum commitment period, you may cancel your
@@ -688,7 +689,7 @@ export default function TermsV3Page() {
       cornerLabel="Terms"
       pageTitle="Terms of service"
       pageBody="The contract between ENVRT and anyone using the platform, dashboards, public DPP pages or hosted reports. Plain language, no fine-print games."
-      lastUpdated="Last updated 1 March 2026"
+      lastUpdated="Last updated 17 June 2026"
       sections={SECTIONS}
     />
   );

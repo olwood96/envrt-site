@@ -122,7 +122,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     currency,
     status: "active",
     term_months: termMonths,
-    minimum_term_months: 6,
+    minimum_term_months: 12,
     term_start: termStart.toISOString(),
     term_end: termEnd.toISOString(),
   });
