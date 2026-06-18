@@ -37,11 +37,13 @@ describe("stripe lib", () => {
     it("accepts valid currencies", () => {
       expect(isValidCurrency("gbp")).toBe(true);
       expect(isValidCurrency("eur")).toBe(true);
+      expect(isValidCurrency("usd")).toBe(true);
     });
 
     it("rejects invalid currencies", () => {
-      expect(isValidCurrency("usd")).toBe(false);
+      expect(isValidCurrency("jpy")).toBe(false);
       expect(isValidCurrency("GBP")).toBe(false);
+      expect(isValidCurrency("")).toBe(false);
     });
   });
 

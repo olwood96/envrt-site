@@ -1,27 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import Stripe from "stripe";
-import { verifyWebhookSignature, isValidPlan, isValidInterval, isValidCurrency } from "@/lib/stripe";
+import {
+  verifyWebhookSignature,
+  isValidPlan,
+  isValidInterval,
+  isValidCurrency,
+  resolvePlanFromSubscription,
+  TIER_FEATURES,
+  type PlanName,
+  type SubscriptionSource,
+} from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { escapeHtml } from "@/lib/form-security";
 
-// In-memory set of processed event IDs to prevent duplicate handling.
-// Stripe can retry webhooks, so we track which events we've already processed.
-const processedEvents = new Set<string>();
-const MAX_PROCESSED_EVENTS = 10_000;
-
-function markEventProcessed(eventId: string): boolean {
-  if (processedEvents.has(eventId)) return false; // already processed
-  if (processedEvents.size >= MAX_PROCESSED_EVENTS) {
-    // Evict oldest entries (Sets iterate in insertion order)
-    const first = processedEvents.values().next().value;
-    if (first) processedEvents.delete(first);
-  }
-  processedEvents.add(eventId);
-  return true; // first time processing
-}
-
-// Stripe sends the raw body; we must read it as text for signature verification
+// Stripe sends the raw body; read as text for signature verification
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
@@ -34,8 +27,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  // Idempotency: skip events we've already processed
-  if (!markEventProcessed(event.id)) {
+  // Durable idempotency: claim the event ID in Supabase. If another lambda
+  // already claimed it, exit early.
+  const claimed = await claimEvent(event.id, event.type);
+  if (!claimed) {
     return NextResponse.json({ received: true, deduplicated: true });
   }
 
@@ -53,12 +48,15 @@ export async function POST(request: NextRequest) {
         await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
         break;
 
+      case "invoice.payment_succeeded":
+        await handlePaymentSucceeded(event.data.object as Stripe.Invoice);
+        break;
+
       case "invoice.payment_failed":
         await handlePaymentFailed(event.data.object as Stripe.Invoice);
         break;
 
       default:
-        // Unhandled event type — acknowledge receipt
         break;
     }
 
@@ -72,7 +70,88 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ── Handlers ──────────────────────────────────────────────────────────────
+// ── Idempotency ──────────────────────────────────────────────────────────
+// Inserts the event ID into stripe_events. If the row already exists (Postgres
+// unique violation 23505), another lambda already claimed it — return false so
+// the caller exits early.
+
+async function claimEvent(eventId: string, eventType: string): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase
+    .from("stripe_events")
+    .insert({ event_id: eventId, event_type: eventType });
+
+  if (!error) return true;
+  if (error.code === "23505") return false;
+  throw error;
+}
+
+// ── Brand mirror helper ──────────────────────────────────────────────────
+// Lookups the brand linked to a Stripe subscription and patches it. Skips
+// brands marked subscription_source='manual' (admin-controlled, never auto-
+// overwrite). Silently no-ops if no brand is linked yet (e.g. webhook fires
+// before onboarding completes).
+
+interface BrandPatch {
+  plan?: PlanName;
+  subscription_status?: string;
+  subscription_source?: SubscriptionSource;
+  stripe_customer_id?: string;
+}
+
+async function mirrorToBrand(
+  stripeSubscriptionId: string,
+  patch: BrandPatch
+): Promise<void> {
+  const supabase = getSupabaseAdmin();
+
+  const { data: brand, error: lookupError } = await supabase
+    .from("brands")
+    .select("id, subscription_source")
+    .eq("stripe_subscription_id", stripeSubscriptionId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error("Brand lookup failed:", lookupError);
+    return;
+  }
+  if (!brand) return; // no brand linked yet, onboarding hasn't run
+
+  if (brand.subscription_source === "manual") {
+    console.warn(
+      `Skipping brand ${brand.id}: subscription_source=manual (admin-controlled)`
+    );
+    return;
+  }
+
+  const update: Record<string, unknown> = {};
+  if (patch.plan) {
+    update.tier = patch.plan;
+    update.features = TIER_FEATURES[patch.plan];
+  }
+  if (patch.subscription_status !== undefined) {
+    update.subscription_status = patch.subscription_status;
+  }
+  if (patch.subscription_source !== undefined) {
+    update.subscription_source = patch.subscription_source;
+  }
+  if (patch.stripe_customer_id !== undefined) {
+    update.stripe_customer_id = patch.stripe_customer_id;
+  }
+
+  if (Object.keys(update).length === 0) return;
+
+  const { error: updateError } = await supabase
+    .from("brands")
+    .update(update)
+    .eq("id", brand.id);
+
+  if (updateError) {
+    console.error(`Failed to mirror to brand ${brand.id}:`, updateError);
+  }
+}
+
+// ── Handlers ─────────────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const email = session.customer_email || session.customer_details?.email;
@@ -108,7 +187,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const supabase = getSupabaseAdmin();
 
-  // Write subscription to Supabase
   const termStart = new Date();
   const termEnd = new Date();
   termEnd.setMonth(termEnd.getMonth() + termMonths);
@@ -132,9 +210,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw insertError;
   }
 
-  // Generate Supabase Auth invite link for the dashboard
-  const dashboardUrl =
-    process.env.DASHBOARD_URL || "https://dashboard.envrt.com";
+  // Brand row does not exist yet at checkout time. It will be created during
+  // onboarding (envrt-dashboard) which reads the subscriptions row by email
+  // and links stripe_customer_id + stripe_subscription_id on the new brand.
+  // Subsequent customer.subscription.updated events will then find the brand
+  // by stripe_subscription_id and mirror state.
+
+  const dashboardUrl = process.env.DASHBOARD_URL || "https://dashboard.envrt.com";
 
   const { data: linkData, error: linkError } =
     await supabase.auth.admin.generateLink({
@@ -146,19 +228,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
 
   if (linkError) {
-    // User may already exist — that's OK, we'll notify admin
     console.error("Failed to generate invite link:", linkError.message);
     await sendAdminNotification(email, plan, interval, currency, false);
     return;
   }
 
-  // Send branded welcome email via Resend with the invite link
   const inviteUrl = linkData?.properties?.action_link;
   if (inviteUrl) {
     await sendWelcomeEmail(email, plan, inviteUrl);
   }
 
-  // Notify admin
   await sendAdminNotification(email, plan, interval, currency, true);
 }
 
@@ -166,37 +245,35 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const supabase = getSupabaseAdmin();
   const stripeSubId = subscription.id;
 
-  // Map Stripe status to our status
-  let status: string;
-  switch (subscription.status) {
-    case "active":
-      status = "active";
-      break;
-    case "past_due":
-      status = "past_due";
-      break;
-    case "canceled":
-      status = "cancelled";
-      break;
-    case "unpaid":
-      status = "unpaid";
-      break;
-    case "incomplete":
-    case "incomplete_expired":
-      status = "incomplete";
-      break;
-    default:
-      status = subscription.status;
-  }
+  const status = mapStripeStatus(subscription.status);
 
-  const { error } = await supabase
+  // Resolve plan from price (custom via metadata.tier, self-serve via env map)
+  const resolved = await resolvePlanFromSubscription(subscription);
+
+  // Update subscriptions table (status always, plan if resolved)
+  const subUpdate: Record<string, unknown> = { status };
+  if (resolved) subUpdate.plan = resolved.plan;
+
+  const { error: subError } = await supabase
     .from("subscriptions")
-    .update({ status })
+    .update(subUpdate)
     .eq("stripe_subscription_id", stripeSubId);
 
-  if (error) {
-    console.error("Failed to update subscription status:", error);
-    throw error;
+  if (subError) {
+    console.error("Failed to update subscription:", subError);
+    throw subError;
+  }
+
+  // Mirror to brand. If resolver failed, still update status but leave tier.
+  if (resolved) {
+    await mirrorToBrand(stripeSubId, {
+      plan: resolved.plan,
+      subscription_status: status,
+      subscription_source: resolved.source,
+    });
+  } else {
+    await mirrorToBrand(stripeSubId, { subscription_status: status });
+    await alertUnresolvedPrice(subscription);
   }
 }
 
@@ -212,20 +289,46 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     console.error("Failed to mark subscription as cancelled:", error);
     throw error;
   }
+
+  await mirrorToBrand(subscription.id, { subscription_status: "cancelled" });
+}
+
+async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
+  const stripeSubId = extractSubscriptionId(invoice);
+  if (!stripeSubId) return;
+
+  // Recover from past_due: if Supabase shows past_due, clear it back to active
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase
+    .from("subscriptions")
+    .update({ status: "active" })
+    .eq("stripe_subscription_id", stripeSubId)
+    .eq("status", "past_due");
+
+  if (error) console.error("Failed to mark subscription recovered:", error);
+
+  await mirrorToBrand(stripeSubId, { subscription_status: "active" });
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  const email =
-    typeof invoice.customer_email === "string"
-      ? invoice.customer_email
-      : null;
+  const stripeSubId = extractSubscriptionId(invoice);
+  if (stripeSubId) {
+    const supabase = getSupabaseAdmin();
+    await supabase
+      .from("subscriptions")
+      .update({ status: "past_due" })
+      .eq("stripe_subscription_id", stripeSubId);
 
-  // Notify admin about the failed payment
+    await mirrorToBrand(stripeSubId, { subscription_status: "past_due" });
+  }
+
+  // Notify admin
+  const email =
+    typeof invoice.customer_email === "string" ? invoice.customer_email : null;
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
   const resend = new Resend(apiKey);
-
   const { error: sendError } = await resend.emails.send({
     from: "ENVRT Payments <info@envrt.com>",
     to: "info@envrt.com",
@@ -246,7 +349,60 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   }
 }
 
-// ── Email helpers ─────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────
+
+function mapStripeStatus(stripeStatus: Stripe.Subscription.Status): string {
+  switch (stripeStatus) {
+    case "active":
+      return "active";
+    case "past_due":
+      return "past_due";
+    case "canceled":
+      return "cancelled";
+    case "unpaid":
+      return "unpaid";
+    case "incomplete":
+    case "incomplete_expired":
+      return "incomplete";
+    default:
+      return stripeStatus;
+  }
+}
+
+function extractSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const sub = (invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null })
+    .subscription;
+  if (!sub) return null;
+  return typeof sub === "string" ? sub : sub.id;
+}
+
+async function alertUnresolvedPrice(subscription: Stripe.Subscription) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  const priceId = subscription.items.data[0]?.price.id || "(unknown)";
+  const resend = new Resend(apiKey);
+
+  await resend.emails.send({
+    from: "ENVRT Payments <info@envrt.com>",
+    to: "info@envrt.com",
+    bcc: ["oliver@envrt.com"],
+    subject: `Unresolved Stripe price ID: ${priceId}`,
+    html: `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
+        <h2 style="color:#1b3a2d;">Unresolved Stripe price</h2>
+        <p>A subscription event fired with a price ID that does not match any
+        self-serve env var and the Stripe product has no <code>metadata.tier</code>.</p>
+        <p>Subscription: <code>${escapeHtml(subscription.id)}</code></p>
+        <p>Price ID: <code>${escapeHtml(priceId)}</code></p>
+        <p>The brand was not touched. Action: either add the price ID to env, or
+        set <code>metadata.tier</code> on the Stripe product, then trigger a sync.</p>
+      </div>
+    `,
+  });
+}
+
+// ── Email helpers (unchanged from prior version) ─────────────────────────
 
 const PLAN_LABELS: Record<string, string> = {
   starter: "Starter",
@@ -261,7 +417,7 @@ async function sendWelcomeEmail(
 ) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error("RESEND_API_KEY not set — skipping welcome email");
+    console.error("RESEND_API_KEY not set, skipping welcome email");
     return;
   }
 
@@ -271,7 +427,7 @@ async function sendWelcomeEmail(
   const { error: sendError } = await resend.emails.send({
     from: "ENVRT <info@envrt.com>",
     to: email,
-    subject: `Welcome to ENVRT — your ${planLabel} plan is active`,
+    subject: `Welcome to ENVRT, your ${planLabel} plan is active`,
     html: buildWelcomeHtml(email, planLabel, inviteUrl),
   });
 
@@ -298,7 +454,7 @@ async function sendAdminNotification(
     from: "ENVRT Payments <info@envrt.com>",
     to: "info@envrt.com",
     bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-    subject: `New subscription: ${escapeHtml(email)} — ${planLabel}`,
+    subject: `New subscription: ${escapeHtml(email)} ${planLabel}`,
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
         <h2 style="color:#1b3a2d;">New Subscription</h2>
@@ -306,7 +462,7 @@ async function sendAdminNotification(
           <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(email)}</td></tr>
           <tr><td style="padding:6px 12px;color:#666;">Plan</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(planLabel)} (${escapeHtml(interval)})</td></tr>
           <tr><td style="padding:6px 12px;color:#666;">Currency</td><td style="padding:6px 12px;font-weight:600;">${currency.toUpperCase()}</td></tr>
-          <tr><td style="padding:6px 12px;color:#666;">Invite sent</td><td style="padding:6px 12px;font-weight:600;">${inviteSent ? "Yes" : "No — user may already exist"}</td></tr>
+          <tr><td style="padding:6px 12px;color:#666;">Invite sent</td><td style="padding:6px 12px;font-weight:600;">${inviteSent ? "Yes" : "No, user may already exist"}</td></tr>
         </table>
         ${!inviteSent ? '<p style="color:#c00;">The user may already have a Supabase account. You may need to manually link them to a brand or resend the invite from the dashboard.</p>' : ""}
       </div>

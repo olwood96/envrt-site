@@ -9,10 +9,22 @@ vi.mock("resend", () => ({
 }));
 
 // Mock Supabase admin
-const mockInsert = vi.fn().mockResolvedValue({ error: null });
-const mockUpdate = vi.fn().mockReturnValue({
+const mockSubscriptionsInsert = vi.fn().mockResolvedValue({ error: null });
+const mockSubscriptionsUpdate = vi.fn().mockReturnValue({
+  eq: vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  }),
+});
+const mockStripeEventsInsert = vi.fn().mockResolvedValue({ error: null });
+const mockBrandsSelect = vi.fn().mockReturnValue({
+  eq: vi.fn().mockReturnValue({
+    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+  }),
+});
+const mockBrandsUpdate = vi.fn().mockReturnValue({
   eq: vi.fn().mockResolvedValue({ error: null }),
 });
+
 const mockGenerateLink = vi.fn().mockResolvedValue({
   data: {
     properties: {
@@ -27,11 +39,23 @@ vi.mock("@/lib/supabase-admin", () => ({
     from: (table: string) => {
       if (table === "subscriptions") {
         return {
-          insert: mockInsert,
-          update: () => mockUpdate(),
+          insert: mockSubscriptionsInsert,
+          update: (..._args: unknown[]) => {
+            const chain = mockSubscriptionsUpdate(..._args);
+            return chain;
+          },
         };
       }
-      return { insert: mockInsert };
+      if (table === "stripe_events") {
+        return { insert: mockStripeEventsInsert };
+      }
+      if (table === "brands") {
+        return {
+          select: (..._args: unknown[]) => mockBrandsSelect(..._args),
+          update: (..._args: unknown[]) => mockBrandsUpdate(..._args),
+        };
+      }
+      return { insert: vi.fn().mockResolvedValue({ error: null }) };
     },
     auth: {
       admin: {
@@ -41,7 +65,7 @@ vi.mock("@/lib/supabase-admin", () => ({
   }),
 }));
 
-// Mock Stripe webhook verification + validation functions
+// Mock Stripe lib (verification, validators, resolver, TIER_FEATURES)
 vi.mock("@/lib/stripe", () => ({
   verifyWebhookSignature: (body: string, signature: string) => {
     if (signature === "valid-sig") {
@@ -51,7 +75,16 @@ vi.mock("@/lib/stripe", () => ({
   },
   isValidPlan: (p: string) => ["starter", "growth", "pro"].includes(p),
   isValidInterval: (i: string) => ["monthly", "annual"].includes(i),
-  isValidCurrency: (c: string) => ["gbp", "eur"].includes(c),
+  isValidCurrency: (c: string) => ["gbp", "eur", "usd"].includes(c),
+  resolvePlanFromSubscription: vi.fn().mockResolvedValue({
+    plan: "growth",
+    source: "self_serve",
+  }),
+  TIER_FEATURES: {
+    starter: { show_overview: true },
+    growth: { show_overview: true, show_metrics: true },
+    pro: { show_overview: true, show_metrics: true, show_reports: true },
+  },
 }));
 
 import { POST } from "@/app/api/stripe/webhook/route";
@@ -71,7 +104,6 @@ function makeWebhookRequest(
   });
 }
 
-// Each event factory returns a fresh object with a unique ID for idempotency
 let eventCounter = 0;
 function uniqueId() {
   return `evt_test_${++eventCounter}`;
@@ -106,6 +138,16 @@ function makeSubscriptionUpdatedEvent() {
       object: {
         id: "sub_xyz789",
         status: "past_due",
+        items: {
+          data: [
+            {
+              price: {
+                id: "price_growth_monthly_gbp",
+                product: "prod_growth",
+              },
+            },
+          ],
+        },
       },
     },
   };
@@ -132,6 +174,7 @@ function makePaymentFailedEvent() {
       object: {
         id: "in_test_456",
         customer_email: "brand@example.com",
+        subscription: "sub_xyz789",
       },
     },
   };
@@ -141,6 +184,14 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.RESEND_API_KEY = "test-key";
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
+  // Default: claimEvent succeeds (new event)
+  mockStripeEventsInsert.mockResolvedValue({ error: null });
+  // Default: no brand linked
+  mockBrandsSelect.mockReturnValue({
+    eq: vi.fn().mockReturnValue({
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    }),
+  });
 });
 
 describe("POST /api/stripe/webhook", () => {
@@ -163,12 +214,27 @@ describe("POST /api/stripe/webhook", () => {
     expect(res.status).toBe(400);
   });
 
+  describe("idempotency", () => {
+    it("skips events already claimed in stripe_events", async () => {
+      // Simulate unique-violation: row already exists
+      mockStripeEventsInsert.mockResolvedValueOnce({
+        error: { code: "23505", message: "duplicate key" },
+      });
+
+      const res = await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.deduplicated).toBe(true);
+      expect(mockSubscriptionsInsert).not.toHaveBeenCalled();
+    });
+  });
+
   describe("checkout.session.completed", () => {
     it("writes subscription to Supabase", async () => {
       const res = await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
       expect(res.status).toBe(200);
 
-      expect(mockInsert).toHaveBeenCalledWith(
+      expect(mockSubscriptionsInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           email: "brand@example.com",
           stripe_customer_id: "cus_abc123",
@@ -195,16 +261,13 @@ describe("POST /api/stripe/webhook", () => {
 
     it("sends welcome email via Resend", async () => {
       await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
-      // Welcome email + admin notification = 2 emails
       expect(mockSendEmail).toHaveBeenCalledTimes(2);
-      // First call is welcome email
       expect(mockSendEmail.mock.calls[0][0].to).toBe("brand@example.com");
       expect(mockSendEmail.mock.calls[0][0].subject).toContain("Growth");
     });
 
     it("sends admin notification email", async () => {
       await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
-      // Second call is admin notification
       const adminCall = mockSendEmail.mock.calls[1][0];
       expect(adminCall.to).toBe("info@envrt.com");
       expect(adminCall.subject).toContain("brand@example.com");
@@ -213,29 +276,30 @@ describe("POST /api/stripe/webhook", () => {
   });
 
   describe("customer.subscription.updated", () => {
-    it("updates subscription status in Supabase", async () => {
+    it("updates subscription in Supabase and looks up the brand", async () => {
       const res = await POST(makeWebhookRequest(makeSubscriptionUpdatedEvent()));
       expect(res.status).toBe(200);
-      expect(mockUpdate).toHaveBeenCalled();
+      expect(mockSubscriptionsUpdate).toHaveBeenCalled();
+      expect(mockBrandsSelect).toHaveBeenCalled();
     });
   });
 
   describe("customer.subscription.deleted", () => {
-    it("marks subscription as cancelled", async () => {
+    it("marks subscription as cancelled and looks up the brand", async () => {
       const res = await POST(makeWebhookRequest(makeSubscriptionDeletedEvent()));
       expect(res.status).toBe(200);
-      expect(mockUpdate).toHaveBeenCalled();
+      expect(mockSubscriptionsUpdate).toHaveBeenCalled();
+      expect(mockBrandsSelect).toHaveBeenCalled();
     });
   });
 
   describe("invoice.payment_failed", () => {
-    it("sends admin notification", async () => {
+    it("marks subscription past_due and sends admin notification", async () => {
       const res = await POST(makeWebhookRequest(makePaymentFailedEvent()));
       expect(res.status).toBe(200);
+      expect(mockSubscriptionsUpdate).toHaveBeenCalled();
       expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail.mock.calls[0][0].subject).toContain(
-        "Payment failed"
-      );
+      expect(mockSendEmail.mock.calls[0][0].subject).toContain("Payment failed");
     });
   });
 
