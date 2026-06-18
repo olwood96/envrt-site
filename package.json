@@ -7,7 +7,8 @@
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "stripe:sync": "tsx scripts/stripe-sync.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.57.0",
@@ -41,12 +42,14 @@
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "^5.1.4",
+    "dotenv": "^17.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "jsdom": "^28.1.0",
     "playwright": "^1.60.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.22.4",
     "typescript": "^5",
     "vitest": "^4.0.18"
   }
