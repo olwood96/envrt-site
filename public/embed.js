@@ -508,6 +508,18 @@
       "    </div>" +
       "    <p class='qr-caption'>Scanning...</p>" +
       "  </div>" +
+      // Sandbox rationale, do not remove flags without testing.
+      //  - allow-scripts: the DPP page is a React app that needs JS.
+      //  - allow-same-origin: required so the DPP page can read its own
+      //    Supabase auth cookies (set on dpp.envrt.com). Without this
+      //    flag the iframe origin is "null" and Supabase auth breaks.
+      //  - allow-popups + allow-popups-to-escape-sandbox: the DPP has
+      //    outbound "Shop this product" links that open in new tabs and
+      //    must not inherit the sandbox or they're crippled.
+      // The MDN warning that `allow-scripts + allow-same-origin` lets an
+      // iframe remove its own sandbox does NOT apply here: the iframe
+      // loads cross-origin (dpp.envrt.com vs the brand's domain), so
+      // `parent.document` is blocked by the same-origin policy.
       "  <iframe data-iframe sandbox='allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox' title='Digital Product Passport'></iframe>" +
       "</div>";
 
@@ -616,6 +628,9 @@
 
     // Double RAF so the browser paints the off-screen state before we
     // flip to .visible, otherwise the slide-in transition won't fire.
+    // For visitors with reduced-motion enabled the transitions are
+    // overridden to none, so we still flip `.visible` the same way and
+    // the popup appears instantly rather than sliding in.
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         p.host.classList.add("visible");
@@ -624,14 +639,19 @@
 
     // Move keyboard focus into the popup once the slide-in completes, so
     // screen readers announce the dialog after it's visible and the user's
-    // first Tab keeps them inside the popup chrome.
+    // first Tab keeps them inside the popup chrome. Reduced-motion users
+    // see the popup instantly, so focus moves immediately instead of
+    // waiting for an animation that isn't running.
+    var prefersReducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.setTimeout(function () {
       if (!popup || !popup.host.classList.contains("visible")) return;
       var closeBtn = popup.root.querySelector("[data-close]");
       if (closeBtn) {
         try { closeBtn.focus(); } catch (_e) { /* focus can throw in detached docs */ }
       }
-    }, ANIMATION_MS);
+    }, prefersReducedMotion ? 0 : ANIMATION_MS);
   }
 
   function close() {
@@ -884,6 +904,15 @@
     "@keyframes qr-scan { 0%, 100% { top: 0; } 50% { top: 100%; } }",
     "@keyframes qr-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }",
 
-    "iframe { width: 100%; height: 100%; border: 0; display: block; }"
+    "iframe { width: 100%; height: 100%; border: 0; display: block; }",
+
+    // Respect the visitor's OS-level reduced-motion preference. Cuts the
+    // slide and fade transitions to near-zero so the popup snaps in
+    // instead of animating. Used by visitors with vestibular sensitivity
+    // and anyone who's asked their system to dial motion down.
+    "@media (prefers-reduced-motion: reduce) {",
+    "  .sheet, .overlay, .close, .loading { transition: none !important; }",
+    "  .qr-line, .qr-caption { animation: none !important; }",
+    "}"
   ].join("\n");
 })();
