@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { Card, ButtonV3 } from "@/components/v3";
 import { Eyebrow } from "@/components/sections/v3/_shared";
 import { FadeUp } from "@/components/ui/Motion";
@@ -58,6 +60,35 @@ function TierCard({ plan }: { plan: PricingPlan }) {
   const isHighlighted = plan.highlighted;
   const { currency, billing } = usePricing();
   const price = planPrice(plan, currency, billing);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleCheckout() {
+    if (isLoading) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: plan.slug,
+          interval: billing,
+          currency: currency.toLowerCase(),
+        }),
+      });
+      const data: { url?: string; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Couldn't start checkout. Try again.");
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Card
@@ -122,15 +153,42 @@ function TierCard({ plan }: { plan: PricingPlan }) {
         ))}
       </ul>
 
-      <div className="mt-8 pt-2">
-        <ButtonV3
-          href={plan.customPricing ? "/contact" : "/free-dpp"}
-          variant={isHighlighted ? "primary" : "secondary"}
-          className="w-full"
-        >
-          {plan.customPricing ? "Contact sales" : "Start with " + plan.name}
-          <span>→</span>
-        </ButtonV3>
+      <div className="mt-auto pt-8">
+        {plan.customPricing ? (
+          <ButtonV3
+            href="/contact"
+            variant={isHighlighted ? "primary" : "secondary"}
+            className="w-full"
+            data-cta={`pricing-${plan.slug}-contact`}
+          >
+            Contact sales<span>→</span>
+          </ButtonV3>
+        ) : (
+          <ButtonV3
+            onClick={handleCheckout}
+            disabled={isLoading}
+            variant={isHighlighted ? "primary" : "secondary"}
+            className="w-full"
+            data-cta={`pricing-${plan.slug}-checkout`}
+          >
+            {isLoading ? "Loading…" : `Start with ${plan.name}`}
+            {!isLoading && <span>→</span>}
+          </ButtonV3>
+        )}
+        {error && (
+          <p className="mt-2 text-center text-xs text-red-600">{error}</p>
+        )}
+        {!plan.customPricing && (
+          <p className="mt-3 text-center text-xs text-envrt-brand-black/55">
+            Want to try first?{" "}
+            <Link
+              href="/free-dpp"
+              className="text-envrt-brand-ultramarine hover:underline"
+            >
+              Run one garment free
+            </Link>
+          </p>
+        )}
       </div>
     </Card>
   );
