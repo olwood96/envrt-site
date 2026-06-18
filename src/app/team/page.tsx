@@ -55,7 +55,7 @@ export default function TeamV3Page() {
           <>
             The people behind ENVRT.{" "}
             <span className="text-envrt-brand-black/40">
-              Small team, deep stack.
+              Specialist team, deep stack.
             </span>
           </>
         }

@@ -7,11 +7,11 @@ import { DotGridBackground, Eyebrow } from "./_shared";
 import { BrandStripV3 } from "./BrandStripV3";
 
 // ─── Hero ────────────────────────────────────────────────────────────────
-// Positions ENVRT as a small team running fashion's environmental work
-// end to end. Hero copy leads with that worldview plus the speed hook
-// (DPPs in minutes, not months). Garment photo carries no labels. A
-// compact brand proof strip closes the hero with one rotating brand
-// logo plus two trust stats.
+// Positions ENVRT as running fashion's environmental work end to end.
+// Hero copy leads with that worldview plus the speed hook (DPPs in
+// minutes, not months). Garment photo carries no labels. A compact
+// brand proof strip closes the hero with one rotating brand logo plus
+// two trust stats.
 
 export function HeroV3() {
   return (
@@ -33,10 +33,9 @@ export function HeroV3() {
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="mt-5 max-w-md text-base leading-relaxed text-envrt-brand-black/70 sm:text-lg">
-              ENVRT is a small team helping fashion brands map their supply
-              chain, calculate every garment and publish a hosted Digital
-              Product Passport. Every layer ours, no outside partners in the
-              middle.
+              ENVRT helps fashion brands map their supply chain, calculate
+              every garment and publish a hosted Digital Product Passport.
+              Every layer ours, no outside partners in the middle.
             </p>
           </FadeUp>
           <FadeUp delay={0.28}>
