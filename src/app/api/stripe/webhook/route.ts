@@ -106,9 +106,11 @@ async function mirrorToBrand(
 ): Promise<void> {
   const supabase = getSupabaseAdmin();
 
+  // Pull tier alongside source so the new tier-feature decoupling logic
+  // (ADR-2026-008) can decide whether features are admin-owned.
   const { data: brand, error: lookupError } = await supabase
     .from("brands")
-    .select("id, subscription_source")
+    .select("id, tier, subscription_source")
     .eq("stripe_subscription_id", stripeSubscriptionId)
     .maybeSingle();
 
@@ -118,6 +120,8 @@ async function mirrorToBrand(
   }
   if (!brand) return; // no brand linked yet, onboarding hasn't run
 
+  // 'manual' source means admin owns everything (internal brands, demos,
+  // pre-Stripe legacy). Webhook never touches these.
   if (brand.subscription_source === "manual") {
     console.warn(
       `Skipping brand ${brand.id}: subscription_source=manual (admin-controlled)`
@@ -125,8 +129,14 @@ async function mirrorToBrand(
     return;
   }
 
+  // tier === 'custom' means admin has customised the feature mix
+  // (goodwill unlocks, bespoke deals). Webhook still mirrors operational
+  // state (status, customer/sub IDs, source) but leaves tier + features
+  // alone so admin's customisation persists across renewals and events.
+  const customTier = brand.tier === "custom";
+
   const update: Record<string, unknown> = {};
-  if (patch.plan) {
+  if (patch.plan && !customTier) {
     update.tier = patch.plan;
     update.features = TIER_FEATURES[patch.plan];
   }
@@ -299,18 +309,38 @@ async function autoLinkBrandFromMetadata(opts: {
 
   const metaTier = product.metadata?.tier?.toLowerCase();
   const tier = metaTier && isValidPlan(metaTier) ? (metaTier as PlanName) : null;
+  const metaTierIsCustom = metaTier === "custom";
+
+  // Check whether admin pre-set tier='custom' on the brand row before the
+  // deal was paid (e.g. they set up bespoke features in advance). If so,
+  // respect that and don't overwrite tier/features with the product
+  // metadata. Same skip applies when the product metadata itself declares
+  // tier='custom'.
+  const { data: existingBrand } = await supabase
+    .from("brands")
+    .select("tier")
+    .eq("id", brandId)
+    .maybeSingle();
+  const existingTierIsCustom = existingBrand?.tier === "custom";
+  const skipTierAndFeatures = existingTierIsCustom || metaTierIsCustom;
 
   // Mirror to brand. Use subscription_source = 'custom' so the standard
-  // mirrorToBrand guards don't kick in on subsequent events.
+  // mirrorToBrand guards on the source field don't kick in on subsequent
+  // events. Tier + features only get written when neither side has
+  // declared the deal 'custom'.
   const update: Record<string, unknown> = {
     stripe_customer_id: stripeCustomerId,
     stripe_subscription_id: stripeSubscriptionId,
     subscription_status: "active",
     subscription_source: "custom",
   };
-  if (tier) {
+  if (tier && !skipTierAndFeatures) {
     update.tier = tier;
     update.features = TIER_FEATURES[tier];
+  } else if (metaTierIsCustom && !existingTierIsCustom) {
+    // Tag the brand as custom-tier so future events respect it, but leave
+    // features alone for admin to set.
+    update.tier = "custom";
   }
 
   const { error: brandUpdateError } = await supabase
