@@ -65,8 +65,21 @@ vi.mock("@/lib/supabase-admin", () => ({
   }),
 }));
 
-// Mock Stripe lib (verification, validators, resolver, TIER_FEATURES)
+// Stripe SDK call mock used by autoLinkBrandFromMetadata
+const mockSubscriptionsRetrieve = vi.fn().mockResolvedValue({
+  items: { data: [{ price: { id: "price_test", product: "prod_test" } }] },
+});
+const mockProductsRetrieve = vi.fn().mockResolvedValue({
+  id: "prod_test",
+  metadata: {}, // no brand_id by default → falls back to self-serve invite path
+});
+
+// Mock Stripe lib (verification, validators, resolver, TIER_FEATURES, getStripe)
 vi.mock("@/lib/stripe", () => ({
+  getStripe: () => ({
+    subscriptions: { retrieve: mockSubscriptionsRetrieve },
+    products: { retrieve: mockProductsRetrieve },
+  }),
   verifyWebhookSignature: (body: string, signature: string) => {
     if (signature === "valid-sig") {
       return JSON.parse(body);

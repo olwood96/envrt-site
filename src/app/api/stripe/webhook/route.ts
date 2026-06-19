@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import Stripe from "stripe";
 import {
+  getStripe,
   verifyWebhookSignature,
   isValidPlan,
   isValidInterval,
@@ -210,35 +211,144 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw insertError;
   }
 
-  // Brand row does not exist yet at checkout time. It will be created during
-  // onboarding (envrt-dashboard) which reads the subscriptions row by email
-  // and links stripe_customer_id + stripe_subscription_id on the new brand.
-  // Subsequent customer.subscription.updated events will then find the brand
-  // by stripe_subscription_id and mirror state.
+  // Try to auto-link a brand via the Stripe Product's metadata.brand_id.
+  // This path is used for custom deals created via /admin/billing/deals/new,
+  // where admin attached the brand_id when creating the Stripe product.
+  // For self-serve subs (no brand_id metadata), the existing onboarding
+  // flow handles brand creation + linking via approveOnboardingRequest.
+  const autoLinkedBrandId = await autoLinkBrandFromMetadata({
+    session,
+    stripeCustomerId,
+    stripeSubscriptionId,
+  });
 
-  const dashboardUrl = process.env.DASHBOARD_URL || "https://dashboard.envrt.com";
+  // Self-serve only: send the invite + welcome email. For auto-linked
+  // custom deals, the brand already exists with brand_users in place so
+  // there is no invite path. Admin handles customer comms out-of-band.
+  if (!autoLinkedBrandId) {
+    const dashboardUrl = process.env.DASHBOARD_URL || "https://dashboard.envrt.com";
 
-  const { data: linkData, error: linkError } =
-    await supabase.auth.admin.generateLink({
-      type: "invite",
-      email: email.toLowerCase(),
-      options: {
-        redirectTo: `${dashboardUrl}/auth/callback?next=/auth/set-password`,
-      },
+    const { data: linkData, error: linkError } =
+      await supabase.auth.admin.generateLink({
+        type: "invite",
+        email: email.toLowerCase(),
+        options: {
+          redirectTo: `${dashboardUrl}/auth/callback?next=/auth/set-password`,
+        },
+      });
+
+    if (linkError) {
+      console.error("Failed to generate invite link:", linkError.message);
+      await sendAdminNotification(email, plan, interval, currency, false);
+      return;
+    }
+
+    const inviteUrl = linkData?.properties?.action_link;
+    if (inviteUrl) {
+      await sendWelcomeEmail(email, plan, inviteUrl);
+    }
+  }
+
+  await sendAdminNotification(
+    email,
+    plan,
+    interval,
+    currency,
+    /* inviteSent */ !autoLinkedBrandId
+  );
+}
+
+// ── Auto-link helpers ────────────────────────────────────────────────────
+
+/**
+ * If the checkout session's Stripe Product carries metadata.brand_id,
+ * link that brand to the new subscription and flip its brand_agreements
+ * row from 'pending' to 'paid'. Returns the brand_id on success, null
+ * otherwise (self-serve flow falls back to invite-based onboarding).
+ */
+async function autoLinkBrandFromMetadata(opts: {
+  session: Stripe.Checkout.Session;
+  stripeCustomerId: string;
+  stripeSubscriptionId: string;
+}): Promise<string | null> {
+  const { session, stripeCustomerId, stripeSubscriptionId } = opts;
+  const stripe = getStripe();
+  const supabase = getSupabaseAdmin();
+
+  // Look up the subscription's product to read metadata
+  let product: Stripe.Product | null = null;
+  try {
+    const sub = await stripe.subscriptions.retrieve(stripeSubscriptionId, {
+      expand: ["items.data.price.product"],
     });
-
-  if (linkError) {
-    console.error("Failed to generate invite link:", linkError.message);
-    await sendAdminNotification(email, plan, interval, currency, false);
-    return;
+    const item = sub.items.data[0];
+    const priceProduct = item?.price?.product;
+    if (typeof priceProduct === "string") {
+      product = await stripe.products.retrieve(priceProduct);
+    } else if (priceProduct && !priceProduct.deleted) {
+      product = priceProduct;
+    }
+  } catch (err) {
+    console.error("Failed to retrieve subscription/product for auto-link:", err);
+    return null;
   }
 
-  const inviteUrl = linkData?.properties?.action_link;
-  if (inviteUrl) {
-    await sendWelcomeEmail(email, plan, inviteUrl);
+  if (!product) return null;
+  const brandId = product.metadata?.brand_id;
+  if (!brandId) return null;
+
+  const metaTier = product.metadata?.tier?.toLowerCase();
+  const tier = metaTier && isValidPlan(metaTier) ? (metaTier as PlanName) : null;
+
+  // Mirror to brand. Use subscription_source = 'custom' so the standard
+  // mirrorToBrand guards don't kick in on subsequent events.
+  const update: Record<string, unknown> = {
+    stripe_customer_id: stripeCustomerId,
+    stripe_subscription_id: stripeSubscriptionId,
+    subscription_status: "active",
+    subscription_source: "custom",
+  };
+  if (tier) {
+    update.tier = tier;
+    update.features = TIER_FEATURES[tier];
   }
 
-  await sendAdminNotification(email, plan, interval, currency, true);
+  const { error: brandUpdateError } = await supabase
+    .from("brands")
+    .update(update)
+    .eq("id", brandId);
+
+  if (brandUpdateError) {
+    console.error(
+      `Auto-link failed for brand ${brandId}:`,
+      brandUpdateError
+    );
+    return null;
+  }
+
+  // Flip the matching brand_agreements row to 'paid'. Filter to pending
+  // status so a stray duplicate event doesn't trash already-active deals.
+  // Use the most recent pending deal for this brand if multiple exist.
+  const { data: pendingDeals } = await supabase
+    .from("brand_agreements")
+    .select("id")
+    .eq("brand_id", brandId)
+    .in("status", ["pending", "sent"])
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const dealId = pendingDeals?.[0]?.id;
+  if (dealId) {
+    await supabase
+      .from("brand_agreements")
+      .update({ status: "paid", paid_at: new Date().toISOString() })
+      .eq("id", dealId);
+  }
+
+  console.log(
+    `Auto-linked brand ${brandId} to subscription ${stripeSubscriptionId} via session ${session.id}`
+  );
+  return brandId;
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
