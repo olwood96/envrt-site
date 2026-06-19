@@ -148,18 +148,45 @@ export const outcomeCards = [
   },
 ];
 
+import { PRICING_CONFIG, type PlanName as ConfigPlanName, type Currency as ConfigCurrency } from "../../config/pricing";
+
 export type PlanSlug = "starter" | "growth" | "pro";
 
 export type Currency = "EUR" | "GBP" | "USD";
 export type BillingPeriod = "monthly" | "annual";
 
-// Per-currency monthly and "annual billing \u2014 per month equivalent"
-// prices. Annual = 15% off monthly. EUR set as authored values rather
-// than auto-converted so the marketing tiers stay clean numbers.
+// Per-currency monthly and "annual billing \u2014 per month equivalent" prices.
+// Annual is the per-month-when-billed-annually figure, so the displayed
+// amount on the pricing page card is consistent regardless of the toggle.
 export type PriceMatrix = Record<
   Currency,
   { monthly: number; annual: number }
 >;
+
+/**
+ * Build a display PriceMatrix for a plan by deriving from the canonical
+ * Stripe amounts in config/pricing.ts. This guarantees the pricing page
+ * shows exactly what Stripe will charge \u2014 no drift between marketing
+ * copy and checkout.
+ *
+ * Stripe stores integer minor units (pence/cents), divide by 100 for
+ * whole units. Annual rounds the per-month-when-billing-annually figure.
+ */
+function displayPricesFor(plan: ConfigPlanName): PriceMatrix {
+  const cfg = PRICING_CONFIG.prices[plan];
+  const map: { display: Currency; cfg: ConfigCurrency }[] = [
+    { display: "EUR", cfg: "eur" },
+    { display: "GBP", cfg: "gbp" },
+    { display: "USD", cfg: "usd" },
+  ];
+  return map.reduce((acc, { display, cfg: c }) => {
+    acc[display] = {
+      monthly: Math.round(cfg.monthly[c] / 100),
+      annual: Math.round(cfg.annual[c] / 100 / 12),
+    };
+    return acc;
+  }, {} as PriceMatrix);
+}
 
 export interface PricingPlan {
   slug: PlanSlug;
@@ -187,21 +214,15 @@ export const CURRENCY_SYMBOL: Record<Currency, string> = {
 export const DEFAULT_CURRENCY: Currency = "EUR";
 export const DEFAULT_BILLING: BillingPeriod = "monthly";
 
-// Approximate exchange rates this set was authored around. Useful as a
-// reference for marketing when refreshing the price matrix.
-//   1 GBP \u2248 1.17 EUR \u2248 1.27 USD
-// Prices below are rounded for clean marketing display, not strict
-// conversions.
+// Pricing matrix derived from config/pricing.ts (single source of truth).
+// To change a price, edit config/pricing.ts and run npm run stripe:sync.
+// The pricing page below picks up the new values automatically.
 export const pricingPlans: PricingPlan[] = [
   {
     slug: "starter",
     name: "Starter",
     subheading: "Your DPP Hub",
-    prices: {
-      EUR: { monthly: 175, annual: 149 },
-      GBP: { monthly: 149, annual: 127 },
-      USD: { monthly: 189, annual: 161 },
-    },
+    prices: displayPricesFor("starter"),
     priceGBP: 149,
     description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
     features: [
@@ -223,11 +244,7 @@ export const pricingPlans: PricingPlan[] = [
     slug: "growth",
     name: "Growth",
     subheading: "Your Impact Analyst",
-    prices: {
-      EUR: { monthly: 579, annual: 492 },
-      GBP: { monthly: 495, annual: 421 },
-      USD: { monthly: 629, annual: 535 },
-    },
+    prices: displayPricesFor("growth"),
     priceGBP: 495,
     description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
     features: [
