@@ -83,8 +83,9 @@ export function HeroV3() {
 }
 
 // ─── Garment photo ───────────────────────────────────────────────────────
-// Clean photo, no annotation system. The product is the product; the
-// platform breadth lives in the capability strip below.
+// Hoodie floats on the section background with no stone box behind it.
+// A hang tag stack (ecoscore label + dotted connector + QR card) sits to
+// the right, angled like physical product tags.
 
 function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
   const isDesktop = variant === "desktop";
@@ -93,46 +94,78 @@ function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
       className={`relative mx-auto w-full ${isDesktop ? "max-w-[460px]" : "max-w-[380px]"}`}
     >
       <div className="relative aspect-[4/5] w-full">
-        <div
-          aria-hidden
-          className={`absolute ${isDesktop ? "inset-x-6 bottom-2 top-10 rounded-[2.4rem]" : "inset-x-4 bottom-2 top-8 rounded-[2.2rem]"} bg-envrt-stone`}
-        />
         <div className="absolute inset-0 z-10">
           <Image
             src="/jacket.png"
             alt="ENVRT-equipped hoodie"
             fill
             sizes={isDesktop ? "(min-width: 1024px) 560px, 100vw" : "(max-width: 1024px) 100vw, 440px"}
-            className={`object-contain ${isDesktop ? "drop-shadow-[0_30px_60px_rgba(14,14,14,0.16)]" : "drop-shadow-[0_20px_40px_rgba(14,14,14,0.16)]"}`}
+            className={`object-contain ${isDesktop ? "drop-shadow-[0_40px_80px_rgba(14,14,14,0.22)]" : "drop-shadow-[0_28px_56px_rgba(14,14,14,0.20)]"}`}
             priority
           />
         </div>
 
-        {/* Official French Coût Environnemental label for the hoodie. The
-            SVG is the calculated score from Ecobalyse; per their policy the
-            label cannot be redrawn or restyled, so it sits inside a white
-            card pinned to the hoodie image. Slightly tilted so it reads as
-            hand-pinned rather than chrome. */}
+        {/* Hang tag stack: ecoscore label + dotted connector + QR card.
+            The SVG label has no built-in background so it sits in a minimal
+            white card; per Ecobalyse policy it cannot be redrawn or restyled.
+            The QR links to the live DPP for this garment. */}
         <div
-          className={`absolute z-20 ${isDesktop ? "right-0 top-8 w-52 sm:w-56" : "right-2 top-4 w-36 sm:right-4 sm:w-44"} rotate-[6deg]`}
+          className={`absolute z-20 flex flex-col items-center ${
+            isDesktop
+              ? "right-0 top-6 w-52 sm:w-56"
+              : "right-1 top-4 w-32 sm:right-3 sm:w-40"
+          }`}
         >
-          <div
-            className={`relative rounded-xl bg-white ${isDesktop ? "p-2 shadow-[0_18px_40px_-12px_rgba(14,14,14,0.25)]" : "p-1.5 shadow-[0_14px_30px_-10px_rgba(14,14,14,0.22)]"} ring-1 ring-envrt-brand-black/8`}
-          >
-            <Image
-              src="/v3-assets/angry-pablo-ecoscore.svg"
-              alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
-              width={180}
-              height={90}
-              className="block h-auto w-full"
-              unoptimized
-            />
+          {/* Ecoscore label */}
+          <div className={`rotate-[6deg] ${isDesktop ? "w-44 sm:w-48" : "w-28 sm:w-36"}`}>
+            <div
+              className={`rounded-xl bg-white ${
+                isDesktop
+                  ? "p-2 shadow-[0_20px_48px_-10px_rgba(14,14,14,0.20)]"
+                  : "p-1.5 shadow-[0_14px_34px_-8px_rgba(14,14,14,0.18)]"
+              }`}
+            >
+              <Image
+                src="/v3-assets/angry-pablo-ecoscore.svg"
+                alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
+                width={180}
+                height={90}
+                className="block h-auto w-full"
+                unoptimized
+              />
+            </div>
           </div>
-          {isDesktop && (
-            <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
-              Coût Environnemental
-            </p>
-          )}
+
+          {/* Dotted connector */}
+          <div
+            className={`w-0 border-l-[1.5px] border-dashed border-envrt-brand-black/25 ${
+              isDesktop ? "my-2 h-7" : "my-1.5 h-5"
+            }`}
+          />
+
+          {/* QR code card */}
+          <div className="-rotate-[3deg]">
+            <div
+              className={`rounded-xl bg-white ${
+                isDesktop
+                  ? "p-2.5 shadow-[0_14px_32px_-8px_rgba(14,14,14,0.20)] w-[76px]"
+                  : "p-2 shadow-[0_10px_24px_-6px_rgba(14,14,14,0.18)] w-[54px]"
+              }`}
+            >
+              <Image
+                src="/qr-code.png"
+                alt="Scan to view Digital Product Passport"
+                width={76}
+                height={76}
+                className="block h-auto w-full"
+              />
+            </div>
+            {isDesktop && (
+              <p className="mt-1.5 text-center font-mono text-[8px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
+                Scan → DPP
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
