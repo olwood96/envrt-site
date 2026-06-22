@@ -83,88 +83,91 @@ export function HeroV3() {
 }
 
 // ─── Garment photo ───────────────────────────────────────────────────────
-// Hoodie floats on the section background with no stone box behind it.
-// A hang tag stack (ecoscore label + dotted connector + QR card) sits to
-// the right, angled like physical product tags.
+// Hoodie floats on the section background, grounded by a soft radial
+// shadow. Labels are split across the garment: ecoscore lower-left at
+// -5deg (pocket area), QR mid-right at +4deg (sleeve level). Diagonal
+// tension, no stacking.
 
 function GarmentPhoto({ variant }: { variant: "desktop" | "mobile" }) {
   const isDesktop = variant === "desktop";
   return (
     <div
-      className={`relative mx-auto w-full ${isDesktop ? "max-w-[460px]" : "max-w-[380px]"}`}
+      className={`relative mx-auto w-full ${isDesktop ? "max-w-[520px]" : "max-w-[400px]"}`}
     >
       <div className="relative aspect-[4/5] w-full">
+        {/* Soft ground shadow — anchors without boxing */}
+        <div
+          aria-hidden
+          className="absolute bottom-[4%] left-1/2 h-10 w-[55%] -translate-x-1/2 rounded-full bg-envrt-brand-black/[0.07] blur-3xl"
+        />
+
+        {/* Hoodie */}
         <div className="absolute inset-0 z-10">
           <Image
             src="/jacket.png"
             alt="ENVRT-equipped hoodie"
             fill
-            sizes={isDesktop ? "(min-width: 1024px) 560px, 100vw" : "(max-width: 1024px) 100vw, 440px"}
-            className={`object-contain ${isDesktop ? "drop-shadow-[0_40px_80px_rgba(14,14,14,0.22)]" : "drop-shadow-[0_28px_56px_rgba(14,14,14,0.20)]"}`}
+            sizes={isDesktop ? "(min-width: 1024px) 620px, 100vw" : "(max-width: 1024px) 480px, 100vw"}
+            className={`object-contain ${isDesktop ? "drop-shadow-[0_40px_80px_rgba(14,14,14,0.18)]" : "drop-shadow-[0_28px_56px_rgba(14,14,14,0.16)]"}`}
             priority
           />
         </div>
 
-        {/* Hang tag stack: ecoscore label + dotted connector + QR card.
-            The SVG label has no built-in background so it sits in a minimal
-            white card; per Ecobalyse policy it cannot be redrawn or restyled.
-            The QR links to the live DPP for this garment. */}
+        {/* Ecoscore — lower-left, angled like a swing tag at the pocket.
+            SVG has no built-in background; per Ecobalyse policy it cannot
+            be redrawn or restyled, so it sits in a minimal white card. */}
         <div
-          className={`absolute z-20 flex flex-col items-center ${
+          className={`absolute z-20 -rotate-[5deg] ${
             isDesktop
-              ? "right-0 top-6 w-52 sm:w-56"
-              : "right-1 top-4 w-32 sm:right-3 sm:w-40"
+              ? "bottom-[22%] left-2 w-44 sm:w-48"
+              : "bottom-[20%] left-1 w-28 sm:w-32"
           }`}
         >
-          {/* Ecoscore label */}
-          <div className={`rotate-[6deg] ${isDesktop ? "w-44 sm:w-48" : "w-28 sm:w-36"}`}>
-            <div
-              className={`rounded-xl bg-white ${
-                isDesktop
-                  ? "p-2 shadow-[0_20px_48px_-10px_rgba(14,14,14,0.20)]"
-                  : "p-1.5 shadow-[0_14px_34px_-8px_rgba(14,14,14,0.18)]"
-              }`}
-            >
-              <Image
-                src="/v3-assets/angry-pablo-ecoscore.svg"
-                alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
-                width={180}
-                height={90}
-                className="block h-auto w-full"
-                unoptimized
-              />
-            </div>
-          </div>
-
-          {/* Dotted connector */}
           <div
-            className={`w-0 border-l-[1.5px] border-dashed border-envrt-brand-black/25 ${
-              isDesktop ? "my-2 h-7" : "my-1.5 h-5"
+            className={`rounded-xl bg-white ${
+              isDesktop
+                ? "p-2 shadow-[0_20px_48px_-10px_rgba(14,14,14,0.22)]"
+                : "p-1.5 shadow-[0_14px_34px_-8px_rgba(14,14,14,0.18)]"
             }`}
-          />
+          >
+            <Image
+              src="/v3-assets/angry-pablo-ecoscore.svg"
+              alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
+              width={180}
+              height={90}
+              className="block h-auto w-full"
+              unoptimized
+            />
+          </div>
+        </div>
 
-          {/* QR code card */}
-          <div className="-rotate-[3deg]">
-            <div
-              className={`rounded-xl bg-white ${
-                isDesktop
-                  ? "p-2.5 shadow-[0_14px_32px_-8px_rgba(14,14,14,0.20)] w-[76px]"
-                  : "p-2 shadow-[0_10px_24px_-6px_rgba(14,14,14,0.18)] w-[54px]"
-              }`}
-            >
-              <Image
-                src="/qr-code.png"
-                alt="Scan to view Digital Product Passport"
-                width={76}
-                height={76}
-                className="block h-auto w-full"
-              />
-            </div>
-            {isDesktop && (
-              <p className="mt-1.5 text-center font-mono text-[8px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
-                Scan → DPP
-              </p>
-            )}
+        {/* QR — mid-right at sleeve height, opposite angle to ecoscore */}
+        <div
+          className={`absolute z-20 rotate-[4deg] ${
+            isDesktop
+              ? "right-2 top-[35%] w-[112px]"
+              : "right-1 top-[37%] w-[76px]"
+          }`}
+        >
+          {isDesktop && (
+            <p className="mb-1.5 text-center font-mono text-[8px] uppercase tracking-[0.16em] text-envrt-brand-black/45">
+              Digital Product Passport
+            </p>
+          )}
+          <div
+            className={`rounded-xl bg-white ${
+              isDesktop
+                ? "p-2.5 shadow-[0_16px_36px_-8px_rgba(14,14,14,0.22)]"
+                : "p-2 shadow-[0_10px_24px_-6px_rgba(14,14,14,0.18)]"
+            }`}
+          >
+            <Image
+              src="/qr-code.png"
+              alt="Scan to view Digital Product Passport"
+              width={112}
+              height={112}
+              className="block h-auto w-full"
+            />
           </div>
         </div>
       </div>
