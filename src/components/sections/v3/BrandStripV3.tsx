@@ -1,105 +1,17 @@
-"use client";
+// Trust strip rendered inline at the bottom of HeroV3. Three stat columns,
+// hairline divided. Brand logo rotator removed — replaced with a time-to-DPP
+// stat to lead with the speed hook.
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { EASE_BRAND } from "./_shared";
-
-// Trust strip rendered inline at the bottom of HeroV3. Three columns,
-// hairline divided. Left column rotates through the brand logos we have
-// rights to display. Right two columns carry one supporting stat each.
-// Visual treatment matches AlignedWithCarouselV3 (grayscale + 55%
-// opacity, mix-blend-multiply to lift backgrounds against the vista
-// cream). No section wrapper or SectionCorners — the parent Hero
-// already provides those.
-
-type Brand = {
-  name: string;
-  logo: string;
-};
-
-const BRANDS: Brand[] = [
-  { name: "FAE House", logo: "/brand/logos/fae-house.png" },
-  { name: "Angry Pablo", logo: "/brand/logos/angry-pablo.png" },
-  { name: "Rene Bassett", logo: "/brand/logos/rene-bassett.png" },
-  { name: "Vaela", logo: "/brand/logos/vaela.png" },
-];
-
-const ROTATE_MS = 4500;
-
-function BrandRotator() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setIndex((i) => (i + 1) % BRANDS.length);
-    }, ROTATE_MS);
-    return () => clearInterval(t);
-  }, []);
-
-  const current = BRANDS[index];
-
-  return (
-    <div className="flex flex-col items-center">
-      {/* All logos eagerly preloaded into the browser cache off-screen so
-          rotating into them is instant. Without this, each new logo
-          briefly renders in colour before the grayscale filter applies. */}
-      <div aria-hidden className="hidden">
-        {BRANDS.map((b) => (
-          <Image
-            key={b.logo}
-            src={b.logo}
-            alt=""
-            width={1}
-            height={1}
-            priority
-          />
-        ))}
-      </div>
-
-      <div
-        className="relative flex h-10 w-full items-center justify-center sm:h-12"
-        style={{
-          // Apply the grayscale + multiply blend on the parent so the
-          // filter is present in initial HTML paint, before children
-          // render. Avoids the brief colour flash on rotation.
-          filter: "grayscale(100%)",
-          mixBlendMode: "multiply",
-        }}
-      >
-        <AnimatePresence mode="sync">
-          <motion.div
-            key={current.name}
-            initial={{ opacity: 0, y: 3 }}
-            animate={{ opacity: 0.55, y: 0 }}
-            exit={{ opacity: 0, y: -3 }}
-            transition={{ duration: 0.75, ease: EASE_BRAND }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <Image
-              src={current.logo}
-              alt={current.name}
-              width={160}
-              height={48}
-              className="max-h-full w-auto object-contain"
-              priority
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <span className="mt-3 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[10px]">
-        {current.name}
-      </span>
-    </div>
-  );
-}
-
-function StatCell({ value, label }: { value: string; label: string }) {
+function StatCell({ value, unit, label }: { value: string; unit?: string; label: string }) {
   return (
     <div className="flex flex-col items-center text-center">
       <p className="font-display text-[2rem] font-medium leading-none tracking-[-0.025em] text-envrt-brand-black sm:text-[2.5rem]">
         {value}
+        {unit && (
+          <span className="ml-1 text-[1.1rem] font-medium tracking-[-0.01em] text-envrt-brand-black/55 sm:text-[1.3rem]">
+            {unit}
+          </span>
+        )}
       </p>
       <p className="mt-3 max-w-[14rem] font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-envrt-brand-black/55 sm:text-[10px]">
         {label}
@@ -112,7 +24,7 @@ export function BrandStripV3() {
   return (
     <div className="grid grid-cols-1 items-center gap-y-8 border-t border-envrt-brand-black/10 pt-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-0 sm:divide-x sm:divide-envrt-brand-black/10 sm:pt-8">
       <div className="sm:px-6 sm:first:pl-0">
-        <BrandRotator />
+        <StatCell value="30" unit="min" label="Time to your first live DPP" />
       </div>
       <div className="sm:px-6">
         <StatCell value="75+" label="Network of apparel brands and partners" />
