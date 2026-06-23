@@ -79,7 +79,7 @@ export function HeroV3() {
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
               {/* Connector from garment hem to supply chain panel — negative margin pulls into the transparent bottom of the hoodie PNG */}
-              <div className="-mt-[72px] flex flex-col items-center">
+              <div className="-mt-[88px] flex flex-col items-center">
                 <div className="h-1.5 w-1.5 rounded-full border border-envrt-brand-black/[0.2] bg-white" />
                 <div className="h-4 w-px bg-envrt-brand-black/[0.12]" />
               </div>
@@ -126,7 +126,7 @@ function StatItem({ value, unit, label }: { value: string; unit?: string; label:
 
 function GarmentPhotoDesktop() {
   return (
-    <div className="relative mx-auto w-full max-w-[520px]">
+    <div className="relative mx-auto w-full max-w-[580px]">
       <div className="relative aspect-square w-full">
         {/* Hoodie */}
         <div className="absolute inset-0 z-10">
@@ -148,7 +148,7 @@ function GarmentPhotoDesktop() {
             Coût Environnemental
           </p>
           <div className="flex items-center">
-            <div className="w-[144px] flex-shrink-0 rounded-xl bg-white p-2 shadow-[0_20px_48px_-10px_rgba(14,14,14,0.22)]">
+            <div className="w-[164px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
               <Image
                 src="/v3-assets/angry-pablo-ecoscore.svg"
                 alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
@@ -173,12 +173,12 @@ function GarmentPhotoDesktop() {
           <div className="flex items-center">
             <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
             <div className="h-px w-10 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
-            <div className="w-[88px] flex-shrink-0 rounded-xl bg-white p-2 shadow-[0_16px_36px_-8px_rgba(14,14,14,0.22)]">
+            <div className="w-[112px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
               <Image
                 src="/qr-code.png"
                 alt="Scan to view Digital Product Passport"
-                width={88}
-                height={88}
+                width={112}
+                height={112}
                 className="block h-auto w-full"
               />
             </div>

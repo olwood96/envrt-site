@@ -41,10 +41,10 @@ export function HeroSupplyChainPreview() {
     return () => { cancelled = true; };
   }, []);
 
-  // Zoomed tight on Europe + western Asia so the supplier dots dominate the frame.
+  // Framing Europe + western Asia: wide enough to see country shapes clearly.
   const projection = geoMercator()
-    .scale(1380)
-    .center([16, 41])
+    .scale(920)
+    .center([13, 40])
     .translate([MAP_W / 2, MAP_H / 2]);
   const pathGenerator = geoPath().projection(projection);
 
