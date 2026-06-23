@@ -361,24 +361,107 @@ async function autoLinkBrandFromMetadata(opts: {
   // Use the most recent pending deal for this brand if multiple exist.
   const { data: pendingDeals } = await supabase
     .from("brand_agreements")
-    .select("id")
+    .select("id, deal_name, amount_minor, currency, tier, interval, client_name, client_registered_office, client_contact_email, client_primary_contact")
     .eq("brand_id", brandId)
     .in("status", ["pending", "sent"])
     .order("created_at", { ascending: false })
     .limit(1);
 
-  const dealId = pendingDeals?.[0]?.id;
-  if (dealId) {
+  const deal = pendingDeals?.[0] ?? null;
+  if (deal) {
     await supabase
       .from("brand_agreements")
       .update({ status: "paid", paid_at: new Date().toISOString() })
-      .eq("id", dealId);
+      .eq("id", deal.id);
+
+    await createInvoiceDraftFromDeal(supabase, brandId, deal, session.id);
   }
 
   console.log(
     `Auto-linked brand ${brandId} to subscription ${stripeSubscriptionId} via session ${session.id}`
   );
   return brandId;
+}
+
+// ── Invoice auto-creation ────────────────────────────────────────────────
+
+type DealForInvoice = {
+  id: string;
+  deal_name: string;
+  amount_minor: number;
+  currency: string;
+  tier: string;
+  interval: string;
+  client_name: string | null;
+  client_registered_office: string | null;
+  client_contact_email: string | null;
+  client_primary_contact: string | null;
+};
+
+async function createInvoiceDraftFromDeal(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  brandId: string,
+  deal: DealForInvoice,
+  checkoutSessionId: string
+): Promise<void> {
+  const now = new Date();
+  const tier = deal.tier.charAt(0).toUpperCase() + deal.tier.slice(1);
+  let lineDescription: string;
+  if (deal.interval === "monthly") {
+    const period = now.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+    lineDescription = `ENVRT Platform Services — ${tier} Plan — ${period}`;
+  } else if (deal.interval === "annual") {
+    const year = now.getFullYear();
+    lineDescription = `ENVRT Annual Platform Services — ${tier} Plan — ${year}/${year + 1}`;
+  } else {
+    lineDescription = `ENVRT Platform Services — ${tier} Plan`;
+  }
+
+  const placeholder = `DRAFT-${Date.now()}`;
+
+  const { data: created, error: createErr } = await supabase
+    .from("invoices")
+    .insert({
+      invoice_number: placeholder,
+      brand_id: brandId,
+      brand_agreement_id: deal.id,
+      status: "draft",
+      client_name: deal.client_name?.trim() || "",
+      client_address: deal.client_registered_office?.trim() || "",
+      client_email: deal.client_contact_email?.trim() || null,
+      client_contact_name: deal.client_primary_contact?.trim() || null,
+      internal_notes: `Auto-created on deal payment · Stripe session ${checkoutSessionId}`,
+      payment_terms_days: 14,
+      include_bank_transfer: true,
+      include_stripe_link: false,
+      subtotal_minor: deal.amount_minor,
+      total_minor: deal.amount_minor,
+      currency: deal.currency.toUpperCase(),
+    })
+    .select("id")
+    .single();
+
+  if (createErr || !created) {
+    console.error("Failed to create invoice draft from deal:", createErr?.message);
+    return;
+  }
+
+  const { error: lineErr } = await supabase.from("invoice_lines").insert({
+    invoice_id: created.id,
+    description: lineDescription,
+    quantity: 1,
+    unit_price_minor: deal.amount_minor,
+    amount_minor: deal.amount_minor,
+    sort_order: 0,
+  });
+
+  if (lineErr) {
+    console.error("Failed to insert invoice line:", lineErr.message);
+    await supabase.from("invoices").delete().eq("id", created.id);
+    return;
+  }
+
+  console.log(`Draft invoice ${created.id} created for deal ${deal.id}`);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
