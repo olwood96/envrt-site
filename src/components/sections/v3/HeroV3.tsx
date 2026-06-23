@@ -78,21 +78,14 @@ export function HeroV3() {
         {/* ── Right column ── */}
         <FadeUp delay={0.2}>
           <div className="mt-8 lg:mt-0">
-            {/* Desktop: annotation diagram + supply chain map */}
-            <div className="hidden lg:block">
-              <GarmentPhotoDesktop />
-              {/* Connector — negative margin pulls up through transparent PNG bottom to sit at the visual hem */}
-              <div className="relative z-10 -mt-[150px] flex flex-col items-center">
-                <div className="h-2.5 w-2.5 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
-                <div className="h-10 w-px bg-envrt-brand-black/[0.16]" />
-              </div>
-              <div className="mx-auto max-w-[400px]">
-                <HeroSupplyChainPreview />
-              </div>
+            <GarmentPhotoDesktop />
+            {/* Connector — responsive negative margin accounts for hoodie transparent bottom at each size */}
+            <div className="relative z-10 -mt-[60px] flex flex-col items-center sm:-mt-[100px] lg:-mt-[150px]">
+              <div className="h-2.5 w-2.5 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
+              <div className="h-10 w-px bg-envrt-brand-black/[0.16]" />
             </div>
-            {/* Mobile: same annotated garment, sizes scale down */}
-            <div className="lg:hidden">
-              <GarmentPhotoDesktop />
+            <div className="mx-auto max-w-[400px]">
+              <HeroSupplyChainPreview />
             </div>
           </div>
         </FadeUp>
