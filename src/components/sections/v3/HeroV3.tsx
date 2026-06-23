@@ -67,9 +67,9 @@ export function HeroV3() {
           <div className="hidden lg:block">
             <FadeUp delay={0.38}>
               <div className="divide-y divide-envrt-brand-black/[0.08] border-t border-envrt-brand-black/[0.08]">
-                <StatItem value="<30" unit="min" label="First live DPP" />
-                <StatItem value="75+" label="Brands & partners" />
-                <StatItem value="27" label="EU markets" />
+                <div className="py-4"><StatItem value="<30" unit="min" label="First live DPP" /></div>
+                <div className="py-4"><StatItem value="75+" label="Brands & partners" /></div>
+                <div className="py-4"><StatItem value="27" label="EU markets" /></div>
               </div>
             </FadeUp>
           </div>
@@ -90,10 +90,10 @@ export function HeroV3() {
           </div>
         </FadeUp>
 
-        {/* Stats — mobile only, sits below the garment image */}
+        {/* Stats — mobile only, horizontal row below the garment */}
         <div className="mt-2 lg:hidden">
           <FadeUp delay={0.44}>
-            <div className="divide-y divide-envrt-brand-black/[0.08] border-t border-envrt-brand-black/[0.08]">
+            <div className="flex items-start gap-8 border-t border-envrt-brand-black/[0.08] pt-6">
               <StatItem value="<30" unit="min" label="First live DPP" />
               <StatItem value="75+" label="Brands & partners" />
               <StatItem value="27" label="EU markets" />
@@ -109,7 +109,7 @@ export function HeroV3() {
 
 function StatItem({ value, unit, label }: { value: string; unit?: string; label: string }) {
   return (
-    <div className="py-4">
+    <div>
       <p className="font-display text-[1.65rem] font-medium leading-none tracking-[-0.025em] text-envrt-brand-black">
         {value}
         {unit && (
