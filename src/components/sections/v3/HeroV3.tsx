@@ -78,8 +78,8 @@ export function HeroV3() {
             {/* Desktop: annotation diagram + supply chain map */}
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
-              {/* Connector from garment hem to supply chain panel */}
-              <div className="flex flex-col items-center">
+              {/* Connector from garment hem to supply chain panel — negative margin pulls into the transparent bottom of the hoodie PNG */}
+              <div className="-mt-[72px] flex flex-col items-center">
                 <div className="h-1.5 w-1.5 rounded-full border border-envrt-brand-black/[0.2] bg-white" />
                 <div className="h-4 w-px bg-envrt-brand-black/[0.12]" />
               </div>
@@ -144,6 +144,9 @@ function GarmentPhotoDesktop() {
             Card flush to left edge. Line + dot land at ~37% from left,
             ~58% from top — pocket / lower-chest area of the hoodie. */}
         <div className="absolute left-0 top-[58%] z-20 -translate-y-1/2">
+          <p className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/38">
+            Coût Environnemental
+          </p>
           <div className="flex items-center">
             <div className="w-[144px] flex-shrink-0 rounded-xl bg-white p-2 shadow-[0_20px_48px_-10px_rgba(14,14,14,0.22)]">
               <Image
@@ -158,9 +161,6 @@ function GarmentPhotoDesktop() {
             <div className="h-px w-10 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
             <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
           </div>
-          <p className="mt-1.5 font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/38">
-            Coût Environnemental
-          </p>
         </div>
 
         {/* RIGHT annotation: Digital Product Passport / QR
