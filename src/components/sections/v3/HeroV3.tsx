@@ -40,7 +40,7 @@ export function HeroV3() {
             </FadeUp>
           </div>
 
-          {/* CTAs — centred vertically between heading and stats on desktop */}
+          {/* CTAs */}
           <FadeUp delay={0.28}>
             <div className="mt-7 flex flex-col gap-3 lg:mt-0 sm:flex-row sm:items-center">
               <Button
@@ -63,8 +63,8 @@ export function HeroV3() {
             </div>
           </FadeUp>
 
-          {/* Stats — vertical list, pinned to bottom of column */}
-          <div className="mt-10 lg:mt-0">
+          {/* Stats — desktop only, vertical list pinned to bottom */}
+          <div className="hidden lg:block">
             <FadeUp delay={0.38}>
               <div className="divide-y divide-envrt-brand-black/[0.08] border-t border-envrt-brand-black/[0.08]">
                 <StatItem value="<30" unit="min" label="First live DPP" />
@@ -77,7 +77,7 @@ export function HeroV3() {
 
         {/* ── Right column ── */}
         <FadeUp delay={0.2}>
-          <div className="mt-12 lg:mt-0">
+          <div className="mt-8 lg:mt-0">
             {/* Desktop: annotation diagram + supply chain map */}
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
@@ -90,12 +90,23 @@ export function HeroV3() {
                 <HeroSupplyChainPreview />
               </div>
             </div>
-            {/* Mobile: floating cards, no annotation lines */}
+            {/* Mobile: garment with floating cards */}
             <div className="lg:hidden">
               <GarmentPhotoMobile />
             </div>
           </div>
         </FadeUp>
+
+        {/* Stats — mobile only, sits below the garment image */}
+        <div className="mt-2 lg:hidden">
+          <FadeUp delay={0.44}>
+            <div className="divide-y divide-envrt-brand-black/[0.08] border-t border-envrt-brand-black/[0.08]">
+              <StatItem value="<30" unit="min" label="First live DPP" />
+              <StatItem value="75+" label="Brands & partners" />
+              <StatItem value="27" label="EU markets" />
+            </div>
+          </FadeUp>
+        </div>
       </div>
     </section>
   );
