@@ -15,7 +15,7 @@ export function HeroV3() {
     <section className="relative overflow-hidden bg-envrt-brand-vista">
       <DotGridBackground opacity={0.04} size={22} />
 
-      <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-12 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1.4fr] lg:gap-8 lg:pt-24 lg:pb-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-12 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-16">
         {/* ── Left column ── */}
         <div className="max-w-xl lg:flex lg:flex-col lg:py-8">
           <div>
@@ -79,11 +79,11 @@ export function HeroV3() {
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
               {/* Connector from garment hem to supply chain panel — negative margin pulls into the transparent bottom of the hoodie PNG */}
-              <div className="-mt-[100px] flex flex-col items-center">
+              <div className="-mt-[84px] flex flex-col items-center">
                 <div className="h-1.5 w-1.5 rounded-full border border-envrt-brand-black/[0.2] bg-white" />
                 <div className="h-4 w-px bg-envrt-brand-black/[0.12]" />
               </div>
-              <div className="mx-auto max-w-[480px]">
+              <div className="mx-auto max-w-[320px]">
                 <HeroSupplyChainPreview />
               </div>
             </div>
@@ -126,7 +126,7 @@ function StatItem({ value, unit, label }: { value: string; unit?: string; label:
 
 function GarmentPhotoDesktop() {
   return (
-    <div className="relative w-full">
+    <div className="relative mx-auto w-full max-w-[560px]">
       <div className="relative aspect-square w-full">
         {/* Hoodie */}
         <div className="absolute inset-0 z-10">
