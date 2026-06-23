@@ -90,9 +90,9 @@ export function HeroV3() {
                 <HeroSupplyChainPreview />
               </div>
             </div>
-            {/* Mobile: garment with floating cards */}
+            {/* Mobile: same annotated garment, sizes scale down */}
             <div className="lg:hidden">
-              <GarmentPhotoMobile />
+              <GarmentPhotoDesktop />
             </div>
           </div>
         </FadeUp>
@@ -140,7 +140,7 @@ function StatItem({ value, unit, label }: { value: string; unit?: string; label:
 
 function GarmentPhotoDesktop() {
   return (
-    <div className="relative mx-auto w-full max-w-[560px]">
+    <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[420px] lg:max-w-[560px]">
       <div className="relative aspect-square w-full">
         {/* Hoodie */}
         <div className="absolute inset-0 z-10">
@@ -148,21 +148,19 @@ function GarmentPhotoDesktop() {
             src="/jacket.png"
             alt="ENVRT-equipped hoodie"
             fill
-            sizes="(min-width: 1024px) 740px, 100vw"
+            sizes="(min-width: 1024px) 740px, (min-width: 640px) 420px, 300px"
             className="object-contain drop-shadow-[0_40px_80px_rgba(14,14,14,0.18)]"
             priority
           />
         </div>
 
-        {/* LEFT annotation: Coût Environnemental / Ecoscore
-            Card flush to left edge. Line + dot land at ~37% from left,
-            ~58% from top — pocket / lower-chest area of the hoodie. */}
+        {/* LEFT annotation: Coût Environnemental */}
         <div className="absolute left-0 top-[58%] z-20 -translate-y-1/2">
-          <p className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/38">
+          <p className="mb-1 font-mono text-[6px] uppercase tracking-[0.14em] text-envrt-brand-black/38 sm:mb-1.5 sm:text-[7px] lg:text-[8px]">
             Coût Environnemental
           </p>
           <div className="flex items-center">
-            <div className="w-[210px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
+            <div className="w-[100px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[155px] sm:rounded-xl sm:p-2 lg:w-[210px] lg:p-3">
               <Image
                 src="/v3-assets/angry-pablo-ecoscore.svg"
                 alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
@@ -172,22 +170,20 @@ function GarmentPhotoDesktop() {
                 unoptimized
               />
             </div>
-            <div className="h-px w-16 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
-            <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
+            <div className="h-px w-6 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
+            <div className="h-2 w-2 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm sm:h-2.5 sm:w-2.5" />
           </div>
         </div>
 
-        {/* RIGHT annotation: Digital Product Passport / QR
-            Label sits above. Dot + line from right shoulder (~75% left,
-            ~28% top) out to the QR card flush right. */}
+        {/* RIGHT annotation: Digital Product Passport */}
         <div className="absolute right-0 top-[22%] z-20">
-          <p className="mb-1.5 text-right font-mono text-[8px] uppercase tracking-[0.14em] text-envrt-brand-black/38">
+          <p className="mb-1 text-right font-mono text-[6px] uppercase tracking-[0.14em] text-envrt-brand-black/38 sm:mb-1.5 sm:text-[7px] lg:text-[8px]">
             Digital Product Passport
           </p>
           <div className="flex items-center">
-            <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
-            <div className="h-px w-16 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
-            <div className="w-[148px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
+            <div className="h-2 w-2 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm sm:h-2.5 sm:w-2.5" />
+            <div className="h-px w-6 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
+            <div className="w-[72px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[110px] sm:rounded-xl sm:p-2 lg:w-[148px] lg:p-3">
               <Image
                 src="/qr-code.png"
                 alt="Scan to view Digital Product Passport"
@@ -203,46 +199,3 @@ function GarmentPhotoDesktop() {
   );
 }
 
-// ─── Mobile garment photo ─────────────────────────────────────────────────
-
-function GarmentPhotoMobile() {
-  return (
-    <div className="relative mx-auto w-full max-w-[400px]">
-      <div className="relative aspect-[4/5] w-full">
-        <div className="absolute inset-0 z-10">
-          <Image
-            src="/jacket.png"
-            alt="ENVRT-equipped hoodie"
-            fill
-            sizes="(max-width: 1024px) 480px, 100vw"
-            className="object-contain drop-shadow-[0_28px_56px_rgba(14,14,14,0.16)]"
-            priority
-          />
-        </div>
-        <div className="absolute bottom-[24%] left-1 z-20 w-28 -rotate-[3deg] sm:w-32">
-          <div className="rounded-xl bg-white p-1.5 shadow-[0_14px_34px_-8px_rgba(14,14,14,0.18)]">
-            <Image
-              src="/v3-assets/angry-pablo-ecoscore.svg"
-              alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
-              width={180}
-              height={90}
-              className="block h-auto w-full"
-              unoptimized
-            />
-          </div>
-        </div>
-        <div className="absolute right-1 top-[36%] z-20 w-[70px] rotate-[3deg]">
-          <div className="rounded-xl bg-white p-2 shadow-[0_10px_24px_-6px_rgba(14,14,14,0.18)]">
-            <Image
-              src="/qr-code.png"
-              alt="Scan to view Digital Product Passport"
-              width={70}
-              height={70}
-              className="block h-auto w-full"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
