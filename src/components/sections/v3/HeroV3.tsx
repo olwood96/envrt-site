@@ -63,10 +63,10 @@ export function HeroV3() {
             </div>
           </FadeUp>
 
-          {/* Stats — pinned to bottom of column */}
+          {/* Stats — vertical list, pinned to bottom of column */}
           <div className="mt-10 lg:mt-0">
             <FadeUp delay={0.38}>
-              <div className="flex items-start gap-8 border-t border-envrt-brand-black/[0.08] pt-6">
+              <div className="divide-y divide-envrt-brand-black/[0.08] border-t border-envrt-brand-black/[0.08]">
                 <StatItem value="<30" unit="min" label="First live DPP" />
                 <StatItem value="75+" label="Brands & partners" />
                 <StatItem value="27" label="EU markets" />
@@ -105,7 +105,7 @@ export function HeroV3() {
 
 function StatItem({ value, unit, label }: { value: string; unit?: string; label: string }) {
   return (
-    <div>
+    <div className="py-4">
       <p className="font-display text-[1.65rem] font-medium leading-none tracking-[-0.025em] text-envrt-brand-black">
         {value}
         {unit && (
