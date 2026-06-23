@@ -41,9 +41,9 @@ export function HeroSupplyChainPreview() {
     return () => { cancelled = true; };
   }, []);
 
-  // Framing Europe + western Asia: wide enough to see country shapes clearly.
+  // Scale 750 gives ~200px margin around the outermost supplier dots (Portugal, Adana).
   const projection = geoMercator()
-    .scale(920)
+    .scale(750)
     .center([13, 40])
     .translate([MAP_W / 2, MAP_H / 2]);
   const pathGenerator = geoPath().projection(projection);

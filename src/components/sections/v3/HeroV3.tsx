@@ -15,7 +15,7 @@ export function HeroV3() {
     <section className="relative overflow-hidden bg-envrt-brand-vista">
       <DotGridBackground opacity={0.04} size={22} />
 
-      <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-12 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-16">
+      <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-12 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1.4fr] lg:gap-8 lg:pt-24 lg:pb-16">
         {/* ── Left column ── */}
         <div className="max-w-xl lg:flex lg:flex-col lg:py-8">
           <div>
@@ -79,11 +79,11 @@ export function HeroV3() {
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
               {/* Connector from garment hem to supply chain panel — negative margin pulls into the transparent bottom of the hoodie PNG */}
-              <div className="-mt-[88px] flex flex-col items-center">
+              <div className="-mt-[100px] flex flex-col items-center">
                 <div className="h-1.5 w-1.5 rounded-full border border-envrt-brand-black/[0.2] bg-white" />
                 <div className="h-4 w-px bg-envrt-brand-black/[0.12]" />
               </div>
-              <div className="mx-auto max-w-[340px]">
+              <div className="mx-auto max-w-[480px]">
                 <HeroSupplyChainPreview />
               </div>
             </div>
@@ -126,7 +126,7 @@ function StatItem({ value, unit, label }: { value: string; unit?: string; label:
 
 function GarmentPhotoDesktop() {
   return (
-    <div className="relative mx-auto w-full max-w-[580px]">
+    <div className="relative w-full">
       <div className="relative aspect-square w-full">
         {/* Hoodie */}
         <div className="absolute inset-0 z-10">
@@ -134,7 +134,7 @@ function GarmentPhotoDesktop() {
             src="/jacket.png"
             alt="ENVRT-equipped hoodie"
             fill
-            sizes="(min-width: 1024px) 620px, 100vw"
+            sizes="(min-width: 1024px) 740px, 100vw"
             className="object-contain drop-shadow-[0_40px_80px_rgba(14,14,14,0.18)]"
             priority
           />
@@ -148,17 +148,17 @@ function GarmentPhotoDesktop() {
             Coût Environnemental
           </p>
           <div className="flex items-center">
-            <div className="w-[164px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
+            <div className="w-[210px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
               <Image
                 src="/v3-assets/angry-pablo-ecoscore.svg"
                 alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
-                width={180}
-                height={90}
+                width={240}
+                height={120}
                 className="block h-auto w-full"
                 unoptimized
               />
             </div>
-            <div className="h-px w-10 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
+            <div className="h-px w-16 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
             <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
           </div>
         </div>
@@ -172,13 +172,13 @@ function GarmentPhotoDesktop() {
           </p>
           <div className="flex items-center">
             <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
-            <div className="h-px w-10 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
-            <div className="w-[112px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
+            <div className="h-px w-16 flex-shrink-0 bg-envrt-brand-black/[0.16]" />
+            <div className="w-[148px] flex-shrink-0 rounded-xl bg-white p-3 ring-1 ring-black/[0.07] shadow-[0_16px_40px_-10px_rgba(14,14,14,0.18)]">
               <Image
                 src="/qr-code.png"
                 alt="Scan to view Digital Product Passport"
-                width={112}
-                height={112}
+                width={148}
+                height={148}
                 className="block h-auto w-full"
               />
             </div>
