@@ -17,7 +17,8 @@ export function HeroV3() {
 
       <div className="relative mx-auto max-w-[1320px] px-5 pt-20 pb-12 sm:px-8 sm:pt-24 lg:px-12 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-12 lg:pt-24 lg:pb-16">
         {/* ── Left column ── */}
-        <div className="max-w-xl lg:flex lg:flex-col lg:py-8">
+        <div className="max-w-xl lg:flex lg:flex-col lg:justify-between lg:py-8">
+          {/* Heading + body */}
           <div>
             <FadeUp>
               <Eyebrow>DPPs in minutes, not months</Eyebrow>
@@ -37,31 +38,33 @@ export function HeroV3() {
                 Every layer ours, no outside partners in the middle.
               </p>
             </FadeUp>
-            <FadeUp delay={0.28}>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button
-                  href="/free-dpp"
-                  size="md"
-                  className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-7 sm:py-3 sm:text-base"
-                  data-cta="hero-v3-try-one-garment"
-                >
-                  Try ENVRT on one garment<span className="ml-2">→</span>
-                </Button>
-                <Button
-                  href="/contact"
-                  variant="ghost"
-                  size="md"
-                  className="w-full sm:w-auto sm:px-7 sm:py-3 sm:text-base"
-                  data-cta="hero-v3-book-demo"
-                >
-                  Book a demo<span className="ml-1.5">→</span>
-                </Button>
-              </div>
-            </FadeUp>
           </div>
 
-          {/* Inline stats — hairline top, left-aligned, compact. On desktop pushes to bottom of column. */}
-          <div className="mt-10 lg:mt-auto">
+          {/* CTAs — centred vertically between heading and stats on desktop */}
+          <FadeUp delay={0.28}>
+            <div className="mt-7 flex flex-col gap-3 lg:mt-0 sm:flex-row sm:items-center">
+              <Button
+                href="/free-dpp"
+                size="md"
+                className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-7 sm:py-3 sm:text-base"
+                data-cta="hero-v3-try-one-garment"
+              >
+                Try ENVRT on one garment<span className="ml-2">→</span>
+              </Button>
+              <Button
+                href="/contact"
+                variant="ghost"
+                size="md"
+                className="w-full sm:w-auto sm:px-7 sm:py-3 sm:text-base"
+                data-cta="hero-v3-book-demo"
+              >
+                Book a demo<span className="ml-1.5">→</span>
+              </Button>
+            </div>
+          </FadeUp>
+
+          {/* Stats — pinned to bottom of column */}
+          <div className="mt-10 lg:mt-0">
             <FadeUp delay={0.38}>
               <div className="flex items-start gap-8 border-t border-envrt-brand-black/[0.08] pt-6">
                 <StatItem value="<30" unit="min" label="First live DPP" />
