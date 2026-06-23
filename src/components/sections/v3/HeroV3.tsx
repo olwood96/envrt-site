@@ -78,12 +78,12 @@ export function HeroV3() {
             {/* Desktop: annotation diagram + supply chain map */}
             <div className="hidden lg:block">
               <GarmentPhotoDesktop />
-              {/* Connector from garment hem to supply chain panel — negative margin pulls into the transparent bottom of the hoodie PNG */}
-              <div className="-mt-[84px] flex flex-col items-center">
-                <div className="h-1.5 w-1.5 rounded-full border border-envrt-brand-black/[0.2] bg-white" />
-                <div className="h-4 w-px bg-envrt-brand-black/[0.12]" />
+              {/* Connector — negative margin pulls up through transparent PNG bottom to sit at the visual hem */}
+              <div className="relative z-10 -mt-[150px] flex flex-col items-center">
+                <div className="h-2.5 w-2.5 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
+                <div className="h-4 w-px bg-envrt-brand-black/[0.16]" />
               </div>
-              <div className="mx-auto max-w-[320px]">
+              <div className="mx-auto max-w-[400px]">
                 <HeroSupplyChainPreview />
               </div>
             </div>
