@@ -79,13 +79,15 @@ export function HeroV3() {
         <FadeUp delay={0.2}>
           <div className="mt-8 lg:mt-0">
             <GarmentPhotoDesktop />
-            {/* Connector — responsive negative margin accounts for hoodie transparent bottom at each size */}
-            <div className="relative z-10 -mt-[60px] flex flex-col items-center sm:-mt-[100px] lg:-mt-[150px]">
-              <div className="h-2.5 w-2.5 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
-              <div className="h-10 w-px bg-envrt-brand-black/[0.16]" />
-            </div>
-            <div className="mx-auto max-w-[400px]">
-              <HeroSupplyChainPreview />
+            {/* Connector + map — desktop only */}
+            <div className="hidden lg:block">
+              <div className="relative z-10 -mt-[150px] flex flex-col items-center">
+                <div className="h-2.5 w-2.5 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm" />
+                <div className="h-10 w-px bg-envrt-brand-black/[0.16]" />
+              </div>
+              <div className="mx-auto max-w-[400px]">
+                <HeroSupplyChainPreview />
+              </div>
             </div>
           </div>
         </FadeUp>
@@ -153,7 +155,7 @@ function GarmentPhotoDesktop() {
             Coût Environnemental
           </p>
           <div className="flex items-center">
-            <div className="w-[100px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[155px] sm:rounded-xl sm:p-2 lg:w-[210px] lg:p-3">
+            <div className="w-[130px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[155px] sm:rounded-xl sm:p-2 lg:w-[210px] lg:p-3">
               <Image
                 src="/v3-assets/angry-pablo-ecoscore.svg"
                 alt="Coût environnemental: 1573 points d'impact, 449 pour 100g"
@@ -163,7 +165,7 @@ function GarmentPhotoDesktop() {
                 unoptimized
               />
             </div>
-            <div className="h-px w-6 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
+            <div className="h-px w-8 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
             <div className="h-2 w-2 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm sm:h-2.5 sm:w-2.5" />
           </div>
         </div>
@@ -175,8 +177,8 @@ function GarmentPhotoDesktop() {
           </p>
           <div className="flex items-center">
             <div className="h-2 w-2 flex-shrink-0 rounded-full border border-envrt-brand-black/30 bg-white shadow-sm sm:h-2.5 sm:w-2.5" />
-            <div className="h-px w-6 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
-            <div className="w-[72px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[110px] sm:rounded-xl sm:p-2 lg:w-[148px] lg:p-3">
+            <div className="h-px w-8 flex-shrink-0 bg-envrt-brand-black/[0.16] sm:w-10 lg:w-16" />
+            <div className="w-[92px] flex-shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-black/[0.07] shadow-[0_12px_28px_-8px_rgba(14,14,14,0.18)] sm:w-[110px] sm:rounded-xl sm:p-2 lg:w-[148px] lg:p-3">
               <Image
                 src="/qr-code.png"
                 alt="Scan to view Digital Product Passport"
