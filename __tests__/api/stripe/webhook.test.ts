@@ -295,6 +295,42 @@ describe("POST /api/stripe/webhook", () => {
       expect(mockSubscriptionsUpdate).toHaveBeenCalled();
       expect(mockBrandsSelect).toHaveBeenCalled();
     });
+
+    it("flips pilot brand to standard when subscription becomes active", async () => {
+      mockBrandsSelect.mockReturnValueOnce({
+        eq: vi.fn().mockReturnValue({
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: {
+              id: "brand-pilot-123",
+              tier: "growth",
+              subscription_source: "self_serve",
+              brand_type: "pilot",
+            },
+            error: null,
+          }),
+        }),
+      });
+
+      const activeEvent = {
+        id: uniqueId(),
+        type: "customer.subscription.updated",
+        data: {
+          object: {
+            id: "sub_xyz789",
+            status: "active",
+            items: {
+              data: [{ price: { id: "price_growth_monthly_gbp", product: "prod_growth" } }],
+            },
+          },
+        },
+      };
+
+      const res = await POST(makeWebhookRequest(activeEvent));
+      expect(res.status).toBe(200);
+      expect(mockBrandsUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ brand_type: "standard" })
+      );
+    });
   });
 
   describe("customer.subscription.deleted", () => {

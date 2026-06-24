@@ -110,7 +110,7 @@ async function mirrorToBrand(
   // (ADR-2026-008) can decide whether features are admin-owned.
   const { data: brand, error: lookupError } = await supabase
     .from("brands")
-    .select("id, tier, subscription_source")
+    .select("id, tier, subscription_source, brand_type")
     .eq("stripe_subscription_id", stripeSubscriptionId)
     .maybeSingle();
 
@@ -142,6 +142,9 @@ async function mirrorToBrand(
   }
   if (patch.subscription_status !== undefined) {
     update.subscription_status = patch.subscription_status;
+    if (patch.subscription_status === "active" && brand.brand_type === "pilot") {
+      update.brand_type = "standard";
+    }
   }
   if (patch.subscription_source !== undefined) {
     update.subscription_source = patch.subscription_source;
