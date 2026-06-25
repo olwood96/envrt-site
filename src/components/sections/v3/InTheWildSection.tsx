@@ -27,15 +27,15 @@ export function InTheWildSection({
 
         {/* Spotlight card */}
         <FadeUp delay={0.1}>
-          <div className="mt-12 grid gap-8 sm:mt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          <div className="mt-12 grid gap-8 sm:mt-16 lg:grid-cols-[0.85fr_1fr] lg:gap-16">
             {/* Visual */}
             <div className="relative">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-envrt-stone">
+              <div className="relative aspect-[5/6] w-full overflow-hidden rounded-3xl bg-envrt-stone">
                 <Image
                   src="/v3-assets/angry-pablo-tag.jpg"
                   alt="Angry Pablo Short Sleeve Cycling Jersey 001 with ENVRT-issued DPP hangtag"
                   fill
-                  sizes="(min-width: 1024px) 580px, 100vw"
+                  sizes="(min-width: 1024px) 480px, 100vw"
                   className="object-cover"
                 />
               </div>
