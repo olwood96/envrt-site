@@ -30,7 +30,7 @@ export function InTheWildSection({
           <div className="mt-12 grid gap-8 sm:mt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
             {/* Visual */}
             <div className="relative">
-              <div className="relative aspect-[5/6] w-full overflow-hidden rounded-3xl bg-envrt-stone">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-envrt-stone">
                 <Image
                   src="/v3-assets/angry-pablo-tag.jpg"
                   alt="Angry Pablo Short Sleeve Cycling Jersey 001 with ENVRT-issued DPP hangtag"
@@ -60,7 +60,7 @@ export function InTheWildSection({
                   Short Sleeve Cycling Jersey 001
                 </p>
                 <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-envrt-brand-black/45">
-                  SKU 40-01-06-03
+                  40-01-06-03
                 </p>
               </div>
 
@@ -73,29 +73,41 @@ export function InTheWildSection({
                   <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
                     5.6 <span className="text-base text-envrt-brand-black/45">kg</span>
                   </dd>
+                  <dd className="mt-1 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-emerald-600">
+                    −30% vs industry avg
+                  </dd>
                 </div>
                 <div>
                   <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
-                    Water
+                    Water Scarcity
                   </dt>
                   <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
                     95 <span className="text-base text-envrt-brand-black/45">L</span>
                   </dd>
-                </div>
-                <div>
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
-                    Origin
-                  </dt>
-                  <dd className="mt-1 text-sm text-envrt-brand-black">
-                    China
+                  <dd className="mt-1 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-emerald-600">
+                    −86% vs industry avg
                   </dd>
                 </div>
                 <div>
                   <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
-                    Composition
+                    Countries
                   </dt>
-                  <dd className="mt-1 text-sm text-envrt-brand-black">
-                    70.8% recycled nylon, 29.2% elastane
+                  <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
+                    6
+                  </dd>
+                  <dd className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-envrt-brand-black/40">
+                    Italy · Turkey · Spain · UK · Hungary · China
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-envrt-brand-black/55">
+                    Transparency
+                  </dt>
+                  <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
+                    80<span className="text-base text-envrt-brand-black/45">%</span>
+                  </dd>
+                  <dd className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-envrt-brand-black/40">
+                    70.8% Recycled Nylon · 29.2% Elastane
                   </dd>
                 </div>
               </dl>
