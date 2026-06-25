@@ -71,7 +71,7 @@ export function InTheWildSection({
                     CO₂e
                   </dt>
                   <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
-                    8.4 <span className="text-base text-envrt-brand-black/45">kg</span>
+                    5.6 <span className="text-base text-envrt-brand-black/45">kg</span>
                   </dd>
                 </div>
                 <div>
@@ -79,7 +79,7 @@ export function InTheWildSection({
                     Water
                   </dt>
                   <dd className="mt-1 font-display text-2xl font-semibold tracking-tight text-envrt-brand-black">
-                    14.8k <span className="text-base text-envrt-brand-black/45">L</span>
+                    95 <span className="text-base text-envrt-brand-black/45">L</span>
                   </dd>
                 </div>
                 <div>
@@ -87,7 +87,7 @@ export function InTheWildSection({
                     Origin
                   </dt>
                   <dd className="mt-1 text-sm text-envrt-brand-black">
-                    Portugal
+                    China
                   </dd>
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export function InTheWildSection({
                     Composition
                   </dt>
                   <dd className="mt-1 text-sm text-envrt-brand-black">
-                    100% recycled polyester
+                    70.8% recycled nylon, 29.2% elastane
                   </dd>
                 </div>
               </dl>
@@ -103,7 +103,7 @@ export function InTheWildSection({
               {/* Live passport CTA — given real weight as a button-style link,
                   not a tiny mono caption. */}
               <a
-                href="https://dpp.envrt.com/envrt/demo-garments/hoodie-0509-1882"
+                href="https://dpp.envrt.com/angry-pablo/2026-core-collection/40-01-06-03"
                 target="_blank"
                 rel="noreferrer"
                 className="group mt-10 inline-flex items-center gap-2 self-start rounded-xl bg-envrt-brand-ultramarine px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(62,0,255,0.6)] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
