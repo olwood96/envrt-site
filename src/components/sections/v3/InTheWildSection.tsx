@@ -60,7 +60,7 @@ export function InTheWildSection({
                   Short Sleeve Cycling Jersey 001
                 </p>
                 <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-envrt-brand-black/45">
-                  DPP-FA-2026-00742
+                  SKU 40-01-06-03
                 </p>
               </div>
 
