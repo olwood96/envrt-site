@@ -89,20 +89,66 @@
    * the iframe src on the dashboard (dpp.envrt.com/embed/{brand}/{sku}).
    * The dashboard then resolves the collection and redirects to the
    * canonical /embed page. Returns null if the href doesn't match.
+   *
+   * If the brand has stored colourway page URLs for their variants, and the
+   * current page URL matches one of them, appends ?variant={sku} so the DPP
+   * popup opens directly on the right colourway. Falls back to the default
+   * DPP if no match is found or anything errors.
    */
-  function buildIframeUrl(href) {
+  function buildIframeUrl(href, variantMappings) {
     try {
       var u = new URL(href, window.location.href);
       var parts = u.pathname.split("/").filter(Boolean);
       if (parts[0] !== "collective" || parts.length < 3) return null;
       var brand = parts[1];
       var sku = parts[2];
-      return (
-        DASHBOARD_ORIGIN + "/embed/" + encodeURIComponent(brand) + "/" + encodeURIComponent(sku)
-      );
+      var base = DASHBOARD_ORIGIN + "/embed/" + encodeURIComponent(brand) + "/" + encodeURIComponent(sku);
+      var variantSku = resolveVariantSku(variantMappings, sku);
+      if (variantSku) {
+        base += "?variant=" + encodeURIComponent(variantSku);
+      }
+      return base;
     } catch (_e) {
       return null;
     }
+  }
+
+  /**
+   * Check the current page URL against stored variant page URLs for the given
+   * product SKU. Returns the matching ENVRT variant SKU, or null if no match.
+   * All errors are swallowed — a bad stored URL must never block the popup.
+   */
+  function resolveVariantSku(mappings, productSku) {
+    if (!mappings || !mappings.length) return null;
+    try {
+      var current = window.location.href;
+      for (var i = 0; i < mappings.length; i++) {
+        var m = mappings[i];
+        if (m.productSku !== productSku || !m.pageUrl || !m.variantSku) continue;
+        try {
+          if (variantUrlMatches(current, m.pageUrl)) return m.variantSku;
+        } catch (_e) { /* malformed stored URL — skip */ }
+      }
+    } catch (_e) { /* swallow */ }
+    return null;
+  }
+
+  /**
+   * Returns true when the current page URL matches the stored variant page URL.
+   * Matching rules:
+   *   - Compare pathnames normalised (lowercase, trailing slash stripped).
+   *   - If the stored URL includes search params, the current search must also
+   *     match (covers Shopify ?variant= style URLs).
+   *   - Hostname is ignored so http/https and www differences don't break it.
+   */
+  function variantUrlMatches(current, stored) {
+    var a = new URL(current);
+    var b = new URL(stored);
+    var aN = a.pathname.toLowerCase().replace(/\/+$/, "");
+    var bN = b.pathname.toLowerCase().replace(/\/+$/, "");
+    if (aN !== bN) return false;
+    if (b.search) return a.search === b.search;
+    return true;
   }
 
   // ---- Attribution injection ----
@@ -180,8 +226,8 @@
       if (brand && !seen[brand]) {
         seen[brand] = true;
         (function (b) {
-          fetchSettings(b).then(function (settings) {
-            applyPresentationToBrand(b, settings);
+          fetchSettings(b).then(function (cached) {
+            applyPresentationToBrand(b, cached.settings);
           });
         })(brand);
       }
@@ -247,8 +293,8 @@
     injectAttributionInto(link);
     var brand = extractBrandFromHref(link.getAttribute("href") || "");
     if (!brand) return;
-    fetchSettings(brand).then(function (settings) {
-      applyPresentationToLink(link, settings);
+    fetchSettings(brand).then(function (cached) {
+      applyPresentationToLink(link, cached.settings);
     });
   }
 
@@ -299,25 +345,25 @@
 
     var href = link.getAttribute("href");
     if (!href) return;
-    var iframeUrl = buildIframeUrl(href);
-    if (!iframeUrl) return;
+    // Basic validity check before preventDefault — full URL resolution
+    // (including variant injection) happens after settings are warm.
+    if (!buildIframeUrl(href, [])) return;
 
     e.preventDefault();
     trackClick(href);
     var brand = extractBrandFromHref(href);
-    var openOpts = {
-      iframeUrl: iframeUrl,
-      title: link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport"
-    };
+    var title = link.getAttribute("data-envrt-title") || link.textContent.trim() || "Digital Product Passport";
     // Apply brand settings BEFORE triggering the slide-in animation, so
     // the drawer opens at the correct width/height instead of snapping
     // mid-animation. Settings are typically cache-warm from the on-load
     // prefetch, so this resolves on the next microtask (no perceptible
     // delay). First-visit users with a cold cache wait ~50-200ms for the
     // API, still much better than the previous mid-animation resize.
-    fetchSettings(brand).then(function (settings) {
-      applySettings(settings);
-      open(openOpts);
+    fetchSettings(brand).then(function (cached) {
+      var resolvedUrl = buildIframeUrl(href, cached.variantMappings);
+      if (!resolvedUrl) return;
+      applySettings(cached.settings);
+      open({ iframeUrl: resolvedUrl, title: title });
     });
   }, true);
 
@@ -366,7 +412,7 @@
   }
 
   function fetchSettings(brand) {
-    if (!brand) return Promise.resolve(DEFAULT_SETTINGS);
+    if (!brand) return Promise.resolve({ settings: DEFAULT_SETTINGS, variantMappings: [] });
     if (settingsCache[brand]) return settingsCache[brand];
     settingsCache[brand] = fetch(CONFIG_ENDPOINT_BASE + encodeURIComponent(brand), {
       method: "GET",
@@ -375,9 +421,12 @@
     })
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
-        return (data && data.settings) ? data.settings : DEFAULT_SETTINGS;
+        return {
+          settings: (data && data.settings) ? data.settings : DEFAULT_SETTINGS,
+          variantMappings: (data && Array.isArray(data.variantMappings)) ? data.variantMappings : [],
+        };
       })
-      .catch(function () { return DEFAULT_SETTINGS; });
+      .catch(function () { return { settings: DEFAULT_SETTINGS, variantMappings: [] }; });
     return settingsCache[brand];
   }
 
