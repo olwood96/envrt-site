@@ -73,6 +73,22 @@
    *  resolves with the settings object. Fetched on first popup open per
    *  brand, then reused. */
   var settingsCache = {};
+
+  // ---- localStorage presentation cache ----
+  // Stores the last-fetched presentation settings (linkText/linkBold/linkUnderline)
+  // per brand so they can be applied synchronously on the next page load, before
+  // the /api/embed-config fetch resolves. Eliminates the flash on all return visits.
+  // First-ever visit still has a flash — nothing to read yet. Storage failures
+  // (private mode, quota exceeded) are silently swallowed.
+  var LS_PREFIX = "envrt_es_";
+  function readLocalSettings(brand) {
+    try { return JSON.parse(localStorage.getItem(LS_PREFIX + brand) || "null"); }
+    catch (_e) { return null; }
+  }
+  function writeLocalSettings(brand, settings) {
+    try { localStorage.setItem(LS_PREFIX + brand, JSON.stringify(settings)); }
+    catch (_e) { /* storage full or unavailable */ }
+  }
   /** The element that had focus immediately before the popup opened.
    *  Used to restore focus when the popup closes so keyboard users land
    *  back on the trigger link. Null when no popup is open. */
@@ -226,8 +242,15 @@
       if (brand && !seen[brand]) {
         seen[brand] = true;
         (function (b) {
+          // Apply cached settings synchronously so the link renders correctly
+          // before the API responds. On first visit the cache is empty so this
+          // is a no-op; the API response below fills it for next time.
+          var local = readLocalSettings(b);
+          if (local) applyPresentationToBrand(b, local);
+
           fetchSettings(b).then(function (cached) {
             applyPresentationToBrand(b, cached.settings);
+            writeLocalSettings(b, cached.settings);
           });
         })(brand);
       }
