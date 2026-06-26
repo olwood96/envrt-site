@@ -248,7 +248,6 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
   for (const baseCard of baseCards) {
     cards.push(baseCard);
 
-    const brandSlug = baseCard.brand.slug || slugify(baseCard.brand.name);
     const variantsForCard = allVariants.filter(
       (v) => v.parentSku === baseCard.dpp.product_sku
     );
