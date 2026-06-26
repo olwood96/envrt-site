@@ -11,6 +11,7 @@ import type {
 } from "./types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const DASHBOARD_URL = "https://dashboard.envrt.com";
 
 const STAGE_CONFIG = [
   { key: "fibre", label: "Fibre Production" },
@@ -173,8 +174,8 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
     brandMap.set(b.id, parseBrand(b));
   }
 
-  // Build card data
-  const cards: CollectiveCardData[] = uniqueDpps.map((dpp) => {
+  // Build base card data
+  const baseCards: CollectiveCardData[] = uniqueDpps.map((dpp) => {
     const brand = brandMap.get(dpp.brand_id) ?? {
       id: dpp.brand_id,
       name: "Unknown",
@@ -196,6 +197,77 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
       detailUrl: `/collective/${brandSlug}/${dpp.product_sku}`,
     };
   });
+
+  // Expand with variant cards: one card per approved colourway variant.
+  // Fetch in parallel per brand, silently skip if the endpoint is unavailable.
+  const brandSlugsWithSkus = new Map<string, { brand: CollectiveBrand; skus: string[] }>();
+  for (const card of baseCards) {
+    const brandSlug = card.brand.slug || slugify(card.brand.name);
+    const existing = brandSlugsWithSkus.get(brandSlug);
+    if (existing) {
+      existing.skus.push(card.dpp.product_sku);
+    } else {
+      brandSlugsWithSkus.set(brandSlug, { brand: card.brand, skus: [card.dpp.product_sku] });
+    }
+  }
+
+  const variantFetches = Array.from(brandSlugsWithSkus.entries()).map(
+    async ([brandSlug, { skus }]) => {
+      try {
+        const url = `${DASHBOARD_URL}/api/collective-variants?brand=${encodeURIComponent(brandSlug)}&skus=${encodeURIComponent(skus.join(","))}`;
+        const res = await fetch(url, { next: { revalidate: 60 } });
+        if (!res.ok) return [];
+        const json = await res.json();
+        return (json.variants ?? []) as Array<{
+          garmentId: string;
+          parentSku: string;
+          variantSku: string;
+          variantName: string;
+          colourName: string | null;
+          colourHex: string | null;
+          imageUrl: string;
+          isDefault: boolean;
+        }>;
+      } catch {
+        return [];
+      }
+    }
+  );
+
+  const variantResults = await Promise.all(variantFetches);
+  const allVariants = variantResults.flat();
+
+  // Build a lookup from parentSku to its base card
+  const cardByParentSku = new Map<string, CollectiveCardData>();
+  for (const card of baseCards) {
+    cardByParentSku.set(card.dpp.product_sku, card);
+  }
+
+  // Expand: for each base card, append its variant cards immediately after.
+  const cards: CollectiveCardData[] = [];
+  for (const baseCard of baseCards) {
+    cards.push(baseCard);
+
+    const brandSlug = baseCard.brand.slug || slugify(baseCard.brand.name);
+    const variantsForCard = allVariants.filter(
+      (v) => v.parentSku === baseCard.dpp.product_sku
+    );
+
+    for (const v of variantsForCard) {
+      cards.push({
+        dpp: {
+          ...baseCard.dpp,
+          garment_name: v.variantName,
+          product_sku: v.parentSku,
+        },
+        brand: baseCard.brand,
+        productImageUrl: v.imageUrl,
+        brandLogoUrl: baseCard.brandLogoUrl,
+        embedUrl: `${baseCard.embedUrl}?variant=${encodeURIComponent(v.variantSku)}`,
+        detailUrl: `${baseCard.detailUrl}?variant=${encodeURIComponent(v.variantSku)}`,
+      });
+    }
+  }
 
   const filters = deriveFilters(cards);
   return { cards, filters };
