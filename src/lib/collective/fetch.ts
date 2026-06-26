@@ -237,12 +237,6 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
   const variantResults = await Promise.all(variantFetches);
   const allVariants = variantResults.flat();
 
-  // Build a lookup from parentSku to its base card
-  const cardByParentSku = new Map<string, CollectiveCardData>();
-  for (const card of baseCards) {
-    cardByParentSku.set(card.dpp.product_sku, card);
-  }
-
   // Expand: for each base card, append its variant cards immediately after.
   const cards: CollectiveCardData[] = [];
   for (const baseCard of baseCards) {
@@ -256,6 +250,9 @@ export async function getFeaturedDpps(): Promise<CollectivePageData> {
       cards.push({
         dpp: {
           ...baseCard.dpp,
+          // Synthetic ID prevents the variant card sharing a dpp.id with its
+          // parent, which would break the compare-basket deduplication logic.
+          id: `${baseCard.dpp.id}::${v.variantSku}`,
           garment_name: v.variantName,
           product_sku: v.parentSku,
         },
