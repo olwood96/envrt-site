@@ -248,8 +248,10 @@ const SECTIONS: LegalSection[] = [
           approximate location (from server-side request headers), scroll
           depth, and time on page. Sessions are grouped using a sessionStorage
           identifier that is automatically cleared when the browser tab is
-          closed. We do not use cookies, localStorage fingerprinting, or any
-          form of cross-site tracking on the marketing site.
+          closed. Our first-party beacon does not use cookies, localStorage
+          fingerprinting or cross-site tracking. If you accept optional
+          analytics via the cookie banner, we also load Google Analytics 4
+          (GA4) with IP anonymisation enabled.
         </LegalP>
 
         <LegalH3>Dashboard</LegalH3>
@@ -266,18 +268,20 @@ const SECTIONS: LegalSection[] = [
         <LegalH3>What we do not do</LegalH3>
         <LegalUl>
           <LegalLi>
-            We do not use third-party tracking scripts, advertising pixels, or
-            retargeting tools anywhere on the platform.
+            We do not use advertising pixels, retargeting tools or cross-site
+            tracking anywhere on the platform. The only third-party analytics
+            script we load is Google Analytics 4 on envrt.com, and only with
+            your explicit consent via the cookie banner.
           </LegalLi>
           <LegalLi>We do not store IP addresses in our analytics data.</LegalLi>
           <LegalLi>
-            We do not use cookies or localStorage for analytics purposes.
+            Our first-party analytics do not use cookies or localStorage.
             Session grouping relies solely on sessionStorage, which is cleared
             when the browser tab is closed.
           </LegalLi>
           <LegalLi>
             We do not perform cross-site tracking or share analytics data with
-            third parties.
+            third parties for advertising purposes.
           </LegalLi>
           <LegalLi>
             Approximate geographic location is derived from server-side request

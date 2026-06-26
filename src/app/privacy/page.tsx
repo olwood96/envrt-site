@@ -92,9 +92,10 @@ const SECTIONS: LegalSection[] = [
           </LegalLi>
         </LegalUl>
         <LegalP>
-          We do not store IP addresses, use cookies, use localStorage
-          fingerprinting, or perform any cross-site tracking on the marketing
-          site.
+          Our first-party analytics do not use cookies, localStorage
+          fingerprinting or cross-site tracking, and we do not store IP
+          addresses. If you accept optional analytics via the cookie banner, we
+          also load Google Analytics 4 (GA4) with IP anonymisation enabled.
         </LegalP>
 
         <LegalH3>Dashboard users (dashboard.envrt.com)</LegalH3>
@@ -355,22 +356,25 @@ const SECTIONS: LegalSection[] = [
           functionality.
         </LegalP>
 
-        <LegalH3>Analytics</LegalH3>
+        <LegalH3>Analytics cookies</LegalH3>
         <LegalP>
-          We do not use analytics cookies anywhere on the platform. Our
-          analytics are entirely cookie-free and do not use localStorage or any
-          form of browser fingerprinting. Where session grouping is needed, we
-          use a sessionStorage identifier that is automatically cleared when
-          the browser tab is closed and cannot be used to track users across
-          sessions or sites.
+          On envrt.com we offer optional Google Analytics 4 (GA4), loaded only
+          after you accept via the cookie banner. When accepted, GA4 places
+          cookies to measure aggregate traffic: pages visited, referrer, device
+          type and approximate location, with IP anonymisation enabled. If you
+          decline or dismiss the banner, GA4 is not loaded and no analytics
+          cookies are set. We do not use analytics cookies on the dashboard or
+          DPP pages. Our own first-party analytics remain entirely cookie-free
+          across all surfaces and use a sessionStorage identifier that is
+          cleared when the browser tab is closed.
         </LegalP>
 
         <LegalH3>Third-party tracking</LegalH3>
         <LegalP>
-          We do not use third-party tracking scripts, advertising pixels,
-          retargeting tools, or any form of cross-site tracking. We do not
-          share analytics data with third parties. All analytics are
-          first-party and collected solely for platform improvement.
+          We do not use advertising pixels, retargeting tools or any form of
+          cross-site tracking. The only third-party analytics script we load is
+          Google Analytics 4 on envrt.com, and only with your consent. We do
+          not share data with third parties for advertising purposes.
         </LegalP>
 
         <LegalH3>Geographic data</LegalH3>
