@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionCard } from "@/components/ui/SectionCard";
-import { Button } from "@/components/ui/Button";
+import { ButtonV3 } from "@/components/v3/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FadeUp } from "@/components/ui/Motion";
 import { HiddenTurnstile } from "@/components/ui/TurnstileWidget";
@@ -1134,7 +1134,7 @@ export default function AssessmentTool() {
                 25 questions across five sections. Around 10 minutes. Your results are emailed straight to you.
               </p>
               <div className="mt-10">
-                <Button
+                <ButtonV3
                   size="lg"
                   onClick={() => {
                     setScreen("assessment");
@@ -1147,7 +1147,7 @@ export default function AssessmentTool() {
                   }}
                 >
                   Begin assessment <span className="ml-2">&rarr;</span>
-                </Button>
+                </ButtonV3>
               </div>
             </div>
           </FadeUp>
@@ -1217,18 +1217,18 @@ export default function AssessmentTool() {
 
                 <div className="mt-10 flex items-center justify-between border-t border-envrt-brand-black/5 pt-6">
                   {currentSection > 0 ? (
-                    <Button variant="ghost" onClick={goBack}>
+                    <ButtonV3 variant="ghost" onClick={goBack}>
                       &larr; Back
-                    </Button>
+                    </ButtonV3>
                   ) : (
                     <span />
                   )}
-                  <Button onClick={goNext} className={sectionComplete ? "" : "pointer-events-none opacity-40"}>
+                  <ButtonV3 onClick={goNext} className={sectionComplete ? "" : "pointer-events-none opacity-40"}>
                     {currentSection === sections.length - 1
                       ? "View Your Results"
                       : "Continue"}{" "}
                     <span className="ml-2">&rarr;</span>
-                  </Button>
+                  </ButtonV3>
                 </div>
               </div>
             </Container>
@@ -1357,9 +1357,9 @@ export default function AssessmentTool() {
                       {emailError}
                     </div>
                   )}
-                  <Button type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
+                  <ButtonV3 type="submit" className={`w-full ${emailSending ? "pointer-events-none opacity-60" : ""}`} size="lg">
                     {emailSending ? "Sending your report..." : <>View My Report <span className="ml-2">&rarr;</span></>}
-                  </Button>
+                  </ButtonV3>
                   <p className="text-center text-xs leading-relaxed text-envrt-brand-black/70">
                     Your results will be emailed to you. See our{" "}
                     <Link href="/privacy" className="underline hover:text-envrt-brand-ultramarine">
@@ -1402,9 +1402,9 @@ export default function AssessmentTool() {
                 </p>
                 {!shareView && (
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
-                    <Button variant="ghost" onClick={copyShareLink}>
+                    <ButtonV3 variant="ghost" onClick={copyShareLink}>
                       {shareCopied ? "Link copied" : "Share these results"}
-                    </Button>
+                    </ButtonV3>
                   </div>
                 )}
               </div>
@@ -1593,9 +1593,9 @@ export default function AssessmentTool() {
             </FadeUp>
 
             <div className="mt-8 text-center">
-              <Button variant="ghost" onClick={retake}>
+              <ButtonV3 variant="ghost" onClick={retake}>
                 {shareView ? "Take the assessment yourself" : "Retake Assessment"}
-              </Button>
+              </ButtonV3>
             </div>
           </Container>
         </div>

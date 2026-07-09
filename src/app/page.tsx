@@ -70,8 +70,6 @@ const StickyCta = dynamic(() =>
 import { getAllPostsMeta } from "@/lib/insights";
 import { getFeaturedDpps } from "@/lib/collective/fetch";
 import { fetchImpactStats } from "@/lib/impact-stats";
-import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
-import { WebSiteJsonLd } from "@/components/seo/WebSiteJsonLd";
 import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
 import { AlignedWithJsonLd } from "@/components/seo/AlignedWithJsonLd";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
@@ -111,8 +109,6 @@ export default async function V3HomePage() {
 
   return (
     <>
-      <OrganizationJsonLd />
-      <WebSiteJsonLd />
       <SoftwareApplicationJsonLd />
       <AlignedWithJsonLd />
       <FAQJsonLd items={faqItems} />

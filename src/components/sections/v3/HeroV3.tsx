@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
+import { ButtonV3 } from "@/components/v3/Button";
 import { FadeUp } from "@/components/ui/Motion";
 import { DotGridBackground, Eyebrow } from "./_shared";
 import { HeroSupplyChainPreview } from "./HeroSupplyChainPreview";
@@ -43,23 +43,23 @@ export function HeroV3() {
           {/* CTAs */}
           <FadeUp delay={0.28}>
             <div className="mt-7 flex flex-col gap-3 lg:mt-0 sm:flex-row sm:items-center">
-              <Button
+              <ButtonV3
                 href="/free-dpp"
                 size="md"
-                className="w-full !bg-envrt-brand-ultramarine !text-white shadow-[0_12px_28px_-14px_rgba(62,0,255,0.7)] hover:!bg-envrt-brand-ultramarine/90 sm:w-auto sm:px-7 sm:py-3 sm:text-base"
+                className="w-full sm:w-auto sm:!px-7 sm:!py-3 sm:!text-base"
                 data-cta="hero-v3-try-one-garment"
               >
                 Try ENVRT on one garment<span className="ml-2">→</span>
-              </Button>
-              <Button
+              </ButtonV3>
+              <ButtonV3
                 href="/contact"
                 variant="ghost"
                 size="md"
-                className="w-full sm:w-auto sm:px-7 sm:py-3 sm:text-base"
+                className="w-full sm:w-auto sm:!px-7 sm:!py-3 sm:!text-base"
                 data-cta="hero-v3-book-demo"
               >
                 Book a demo<span className="ml-1.5">→</span>
-              </Button>
+              </ButtonV3>
             </div>
           </FadeUp>
 

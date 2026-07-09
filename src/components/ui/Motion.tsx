@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ReactNode } from "react";
 
 const fadeUp: Variants = {
@@ -20,13 +20,14 @@ interface MotionProps {
 }
 
 export function FadeUp({ children, className = "", delay = 0 }: MotionProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={reduced ? { duration: 0, delay: 0 } : { duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
       className={className}
     >
       {children}
@@ -35,13 +36,14 @@ export function FadeUp({ children, className = "", delay = 0 }: MotionProps) {
 }
 
 export function FadeIn({ children, className = "", delay = 0 }: MotionProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       variants={fadeIn}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      transition={reduced ? { duration: 0, delay: 0 } : { duration: 0.5, delay, ease: "easeOut" }}
       className={className}
     >
       {children}

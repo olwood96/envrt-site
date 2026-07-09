@@ -94,20 +94,38 @@ const stops: Stop[] = [
 // from cache. Worth re-measuring if this turns out to cost a lot.
 
 export function ScrollTourSection() {
+  // Only load the iframe for the visible viewport. Both wrappers remain
+  // in the DOM (SSR needs both for scroll-height / layout), but the src
+  // is withheld from the hidden one until the viewport is known.
+  const [desktopSrc, setDesktopSrc] = useState("");
+  const [mobileSrc, setMobileSrc] = useState("");
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = (isLg: boolean) => {
+      setDesktopSrc(isLg ? DPP_URL : "");
+      setMobileSrc(isLg ? "" : DPP_URL);
+    };
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
     <section
       className="relative bg-envrt-brand-vista text-envrt-brand-black"
       style={{ overflowX: "clip" }}
     >
-      <DesktopScrollTour />
-      <MobileScrollTour />
+      <DesktopScrollTour iframeSrc={desktopSrc} />
+      <MobileScrollTour iframeSrc={mobileSrc} />
     </section>
   );
 }
 
 // ─── Desktop ──────────────────────────────────────────────────────────────
 
-function DesktopScrollTour() {
+function DesktopScrollTour({ iframeSrc }: { iframeSrc: string }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
@@ -168,7 +186,7 @@ function DesktopScrollTour() {
                 >
                   <motion.div style={{ y: dppY, willChange: "transform" }}>
                     <iframe
-                      src={DPP_URL}
+                      src={iframeSrc || undefined}
                       title="Live ENVRT Digital Product Passport"
                       style={{ width: "414px", height: `${IFRAME_HEIGHT}px` }}
                       className={`pointer-events-none block border-0 transition-opacity duration-500 ${
@@ -212,7 +230,7 @@ function DesktopScrollTour() {
 
 // ─── Mobile ───────────────────────────────────────────────────────────────
 
-function MobileScrollTour() {
+function MobileScrollTour({ iframeSrc }: { iframeSrc: string }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
@@ -271,7 +289,7 @@ function MobileScrollTour() {
                 >
                   <motion.div style={{ y: dppY, willChange: "transform" }}>
                     <iframe
-                      src={DPP_URL}
+                      src={iframeSrc || undefined}
                       title="Live ENVRT Digital Product Passport"
                       style={{ width: "414px", height: `${IFRAME_HEIGHT}px` }}
                       className={`pointer-events-none block border-0 transition-opacity duration-500 ${

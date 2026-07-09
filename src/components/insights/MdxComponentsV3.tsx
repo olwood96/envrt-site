@@ -29,13 +29,13 @@ function headingId(children: ReactNode) {
 
 export const mdxComponentsV3 = {
   h1: ({ children, ...rest }: MdxProps) => (
-    <h2
+    <h1
       {...rest}
       id={headingId(children)}
       className="scroll-mt-28 mt-14 mb-5 font-display text-3xl font-medium leading-[1.1] tracking-[-0.02em] text-envrt-brand-black first:mt-0 sm:text-[2rem]"
     >
       {children}
-    </h2>
+    </h1>
   ),
 
   h2: ({ children, ...rest }: MdxProps) => (

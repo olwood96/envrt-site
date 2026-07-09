@@ -203,7 +203,6 @@ h1, h2, h3, h4, h5, h6 {
     0 8px 32px -4px rgba(0, 0, 0, 0.1),
     0 2px 6px 0 rgba(0, 0, 0, 0.04);
 
-  animation: glass-shimmer 6s ease-in-out infinite;
 }
 
 /* Fallback: browsers that don't support url() in backdrop-filter */
@@ -231,40 +230,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow:
     0 8px 32px -4px rgba(0, 0, 0, 0.1),
     0 2px 6px 0 rgba(0, 0, 0, 0.04);
-}
-
-/* Prismatic shimmer keyframes */
-@keyframes glass-shimmer {
-  0%, 100% {
-    box-shadow:
-      0 1.5px 0 0 rgba(255, 255, 255, 0.7) inset,
-      0 -1px 0 0 rgba(0, 0, 0, 0.04) inset,
-      0 0 20px -4px rgba(42, 161, 152, 0.15),
-      0 0 40px -8px rgba(120, 100, 255, 0.08),
-      0 8px 32px -4px rgba(0, 0, 0, 0.1),
-      0 2px 6px 0 rgba(0, 0, 0, 0.04);
-    border-top-color: rgba(255, 255, 255, 0.85);
-  }
-  33% {
-    box-shadow:
-      0 1.5px 0 0 rgba(255, 255, 255, 0.8) inset,
-      0 -1px 0 0 rgba(0, 0, 0, 0.04) inset,
-      0 0 24px -4px rgba(120, 100, 255, 0.18),
-      0 0 44px -8px rgba(42, 161, 152, 0.1),
-      0 8px 32px -4px rgba(0, 0, 0, 0.1),
-      0 2px 6px 0 rgba(0, 0, 0, 0.04);
-    border-top-color: rgba(220, 230, 255, 0.9);
-  }
-  66% {
-    box-shadow:
-      0 1.5px 0 0 rgba(255, 255, 255, 0.75) inset,
-      0 -1px 0 0 rgba(0, 0, 0, 0.04) inset,
-      0 0 22px -4px rgba(180, 120, 255, 0.14),
-      0 0 42px -8px rgba(100, 200, 180, 0.09),
-      0 8px 32px -4px rgba(0, 0, 0, 0.1),
-      0 2px 6px 0 rgba(0, 0, 0, 0.04);
-    border-top-color: rgba(240, 235, 255, 0.88);
-  }
 }
 
 /* Trusted-by logo carousel */

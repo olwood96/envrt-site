@@ -499,7 +499,7 @@ function GroupTrigger({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         className="flex items-center gap-1.5 px-4 py-2.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-envrt-brand-black/70 transition-colors duration-200 hover:text-envrt-brand-ultramarine sm:text-[11px]"
       >
         {group.label}

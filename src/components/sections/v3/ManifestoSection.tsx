@@ -32,6 +32,7 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
     countryCount: stats?.countryCount ?? 0,
     co2Kg: stats?.co2Kg ?? 0,
   };
+  const hasStats = safe.dppScans > 0 || safe.countryCount > 0 || safe.co2Kg > 0;
 
   return (
     <section ref={ref} className="relative overflow-hidden bg-white py-20 sm:py-28 lg:py-36">
@@ -82,16 +83,28 @@ export function ManifestoSection({ stats }: { stats?: ManifestoStats }) {
           </p>
         </FadeUp>
 
-        <FadeUp delay={0.32}>
-          <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-brand-black/8 pt-6 sm:mt-14 sm:gap-x-7">
-            <LivePill />
-            <Stat value={`${formatCompact(safe.dppScans)}+`} label="passports served" />
-            <Sep />
-            <Stat value={`${safe.countryCount}`} label="countries" />
-            <Sep />
-            <Stat value={`${formatCompact(safe.co2Kg)}`} unit="kg" label="CO₂e tracked" />
-          </div>
-        </FadeUp>
+        {hasStats && (
+          <FadeUp delay={0.32}>
+            <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-envrt-brand-black/8 pt-6 sm:mt-14 sm:gap-x-7">
+              <LivePill />
+              {safe.dppScans > 0 && (
+                <>
+                  <Stat value={`${formatCompact(safe.dppScans)}+`} label="passports served" />
+                  <Sep />
+                </>
+              )}
+              {safe.countryCount > 0 && (
+                <>
+                  <Stat value={`${safe.countryCount}`} label="countries" />
+                  <Sep />
+                </>
+              )}
+              {safe.co2Kg > 0 && (
+                <Stat value={`${formatCompact(safe.co2Kg)}`} unit="kg" label="CO₂e tracked" />
+              )}
+            </div>
+          </FadeUp>
+        )}
       </div>
     </section>
   );

@@ -28,7 +28,7 @@ export function Card({
   ...rest
 }: CardProps) {
   const base =
-    "rounded-3xl border border-envrt-brand-black/12 bg-white p-6 sm:p-8";
+    "rounded-2xl border border-envrt-brand-black/12 bg-white p-6 sm:p-8";
   const hover = interactive
     ? "transition-all duration-300 hover:-translate-y-1 hover:border-envrt-brand-ultramarine/30 hover:shadow-[0_24px_50px_-22px_rgba(14,14,14,0.18)]"
     : "";
