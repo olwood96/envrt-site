@@ -64,7 +64,7 @@ describe("email source drift guard", () => {
     for (const sender of senders) {
       expect(
         REGISTERED_EMAIL_SOURCES,
-        `${sender} sends email but is not registered in src/lib/email/previews.ts — add its templates to the catalogue`,
+        `${sender} sends email but is not registered in src/lib/email/previews.ts, add its templates to the catalogue`,
       ).toContain(sender);
     }
   });

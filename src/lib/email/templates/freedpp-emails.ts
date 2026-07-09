@@ -1,5 +1,5 @@
 // src/lib/email/templates/freedpp-emails.ts
-// Free DPP (trial request) emails. Registered in src/lib/email/previews.ts —
+// Free DPP (trial request) emails. Registered in src/lib/email/previews.ts,
 // any new email here must add a preview fixture (see the email conventions rule).
 
 import { internalAlertHtml, textLink } from "@/lib/email/layout";

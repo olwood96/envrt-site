@@ -1,5 +1,5 @@
 // src/lib/email/templates/contact-emails.ts
-// Contact form emails. Registered in src/lib/email/previews.ts — any new
+// Contact form emails. Registered in src/lib/email/previews.ts, any new
 // email here must add a preview fixture (see the email conventions rule).
 
 import {

@@ -4,7 +4,7 @@
 // Tokens follow the 2022 brand book (see docs/ui-styleguide-v3.md) and must
 // stay in sync with tailwind.config.ts here and with
 // envrt-dashboard/lib/email/templates/_layout.ts. Emails hardcode hex
-// because mail clients cannot read CSS variables — change tokens here only.
+// because mail clients cannot read CSS variables, change tokens here only.
 //
 // Every email: preheader → wordmark → content → footer, plus an automatic
 // plain-text part via buildEmail(). Inline styles only (mail clients strip

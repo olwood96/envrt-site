@@ -1,6 +1,6 @@
 // src/lib/email/templates/stripe-emails.ts
 // Stripe webhook emails (welcome + billing alerts). Registered in
-// src/lib/email/previews.ts — any new email here must add a preview fixture.
+// src/lib/email/previews.ts, any new email here must add a preview fixture.
 
 import {
   renderEmail,
