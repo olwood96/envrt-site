@@ -58,7 +58,7 @@ export default function AboutV3Page() {
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10">
           <Image
             src="/v3-assets/folded-clothes.jpg"
-            alt="Folded knitwear, editorial"
+            alt="Stacked fabrics in a tailor's workshop, editorial"
             fill
             sizes="(min-width: 1024px) 1200px, 100vw"
             className="object-cover"

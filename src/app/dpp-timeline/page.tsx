@@ -242,20 +242,21 @@ function Timeline() {
     <section className="relative bg-envrt-brand-vista py-20 sm:py-24 lg:py-32">
       <SectionCorners left="ENVRT/02" right="Milestones" />
       <div className="mx-auto max-w-[900px] px-5 sm:px-8 lg:px-16">
-        {/* Authority anchor — the Berlaymont in Brussels (Commission HQ).
-            Sets the regulatory mood before the milestone list. */}
+        {/* Authority anchor — a real ENVRT-issued Digital Product Passport
+            hangtag. Grounds the regulatory mood in the artifact the law
+            actually produces, before the milestone list. */}
         <FadeUp>
           <div className="relative aspect-[21/8] w-full overflow-hidden rounded-2xl ring-1 ring-envrt-brand-black/10">
             <Image
-              src="/v3-assets/regulatory-eu-building.jpg"
-              alt="Berlaymont, European Commission, Brussels"
+              src="/v3-assets/angry-pablo-tag.jpg"
+              alt="ENVRT-issued Digital Product Passport hangtag on the Angry Pablo cycling jersey"
               fill
               sizes="(min-width: 1024px) 900px, 100vw"
               className="object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-envrt-brand-black/55 via-envrt-brand-black/15 to-transparent p-4 sm:p-5">
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85 sm:text-[11px]">
-                Berlaymont · Brussels · the regulators who write the law
+                The Digital Product Passport · what the law will put on every garment
               </p>
             </div>
           </div>

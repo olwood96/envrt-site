@@ -204,7 +204,7 @@ function CollectiveMosaic({ cards }: { cards: CollectiveCardData[] }) {
       <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-auto">
         <Image
           src="/v3-assets/folded-clothes.jpg"
-          alt="Folded apparel, more garments with live ENVRT passports"
+          alt="Folded fabrics, more garments with live ENVRT passports"
           fill
           sizes="(min-width: 1024px) 420px, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
