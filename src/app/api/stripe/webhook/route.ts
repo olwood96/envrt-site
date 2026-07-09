@@ -15,18 +15,16 @@ import {
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { escapeHtml } from "@/lib/form-security";
 import {
-  renderEmail,
-  heading,
-  paragraph,
-  mutedParagraph,
-  primaryButton,
-  textLink,
-  internalAlertHtml,
-  alertCallout,
   buildEmail,
   INTERNAL_ALERT_TO,
   INTERNAL_ALERT_BCC,
 } from "@/lib/email/layout";
+import {
+  buildStripeWelcomeHtml,
+  buildPaymentFailedHtml,
+  buildUnresolvedPriceHtml,
+  buildNewSubscriptionHtml,
+} from "@/lib/email/templates/stripe-emails";
 
 // Stripe sends the raw body; read as text for signature verification
 export async function POST(request: NextRequest) {
@@ -574,17 +572,9 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       to: INTERNAL_ALERT_TO,
       bcc: INTERNAL_ALERT_BCC,
       subject: `Payment failed: ${email || "unknown customer"}`,
-      html: internalAlertHtml({
-        title: "Payment failed",
-        rows: [
-          ["Customer", email || "unknown"],
-          ["Invoice ID", invoice.id],
-        ],
-        bodyHtml: alertCallout(
-          "Stripe will retry automatically. Check the Stripe dashboard for details."
-        ),
-        ctaHref: "https://dashboard.stripe.com/payments",
-        ctaLabel: "Open Stripe",
+      html: buildPaymentFailedHtml({
+        email: email || "unknown",
+        invoiceId: invoice.id ?? "unknown",
       }),
     })
   );
@@ -634,16 +624,7 @@ async function alertUnresolvedPrice(subscription: Stripe.Subscription) {
       to: INTERNAL_ALERT_TO,
       bcc: INTERNAL_ALERT_BCC,
       subject: `Unresolved Stripe price ID: ${priceId}`,
-      html: internalAlertHtml({
-        title: "Unresolved Stripe price",
-        rows: [
-          ["Subscription", subscription.id],
-          ["Price ID", priceId],
-        ],
-        bodyHtml: alertCallout(
-          "A subscription event fired with a price ID that does not match any self-serve env var and the Stripe product has no <code>metadata.tier</code>. The brand was not touched. Either add the price ID to env, or set <code>metadata.tier</code> on the Stripe product, then trigger a sync."
-        ),
-      }),
+      html: buildUnresolvedPriceHtml({ subscriptionId: subscription.id, priceId }),
     })
   );
 }
@@ -675,7 +656,7 @@ async function sendWelcomeEmail(
       from: "ENVRT <info@envrt.com>",
       to: email,
       subject: `Welcome to ENVRT, your ${planLabel} plan is active`,
-      html: buildWelcomeHtml(planLabel, inviteUrl),
+      html: buildStripeWelcomeHtml(planLabel, inviteUrl),
     })
   );
 
@@ -704,20 +685,7 @@ async function sendAdminNotification(
       to: INTERNAL_ALERT_TO,
       bcc: INTERNAL_ALERT_BCC,
       subject: `New subscription: ${email} ${planLabel}`,
-      html: internalAlertHtml({
-        title: "New subscription",
-        rows: [
-          ["Email", email],
-          ["Plan", `${planLabel} (${interval})`],
-          ["Currency", currency.toUpperCase()],
-          ["Invite sent", inviteSent ? "Yes" : "No, user may already exist"],
-        ],
-        bodyHtml: !inviteSent
-          ? alertCallout(
-              "The user may already have a Supabase account. You may need to manually link them to a brand or resend the invite from the dashboard."
-            )
-          : "",
-      }),
+      html: buildNewSubscriptionHtml({ email, planLabel, interval, currency, inviteSent }),
     })
   );
 
@@ -726,22 +694,3 @@ async function sendAdminNotification(
   }
 }
 
-function buildWelcomeHtml(
-  planLabel: string,
-  inviteUrl: string
-): string {
-  return renderEmail({
-    preheader: `Your ${planLabel} plan is active. Set up your dashboard account.`,
-    contentHtml: [
-      heading("Welcome to ENVRT"),
-      paragraph(
-        `Your <strong>${escapeHtml(planLabel)}</strong> plan is now active. Click the button below to set up your dashboard account and get started.`
-      ),
-      primaryButton(inviteUrl, "Set up your account"),
-      mutedParagraph(
-        `This link will expire in 24 hours. If it expires, you can request a new one at ${textLink("https://envrt.com", "envrt.com")}.`
-      ),
-    ].join(""),
-    footerNote: "You're receiving this because you subscribed to an ENVRT plan.",
-  });
-}

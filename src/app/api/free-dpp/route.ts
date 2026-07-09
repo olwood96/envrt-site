@@ -8,12 +8,11 @@ import {
   verifyTurnstile,
 } from "@/lib/form-security";
 import {
-  internalAlertHtml,
   buildEmail,
-  textLink,
   INTERNAL_ALERT_TO,
   INTERNAL_ALERT_BCC,
 } from "@/lib/email/layout";
+import { buildTrialRequestInternalHtml } from "@/lib/email/templates/freedpp-emails";
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -174,20 +173,16 @@ export async function POST(req: NextRequest) {
             bcc: INTERNAL_ALERT_BCC,
             subject: `New trial DPP request: ${body.brand_name}`,
             replyTo: body.contact_email,
-            html: internalAlertHtml({
-              title: "New trial DPP request",
-              rows: [
-                ["Contact", body.contact_name],
-                ["Brand", body.brand_name],
-                ["Email", body.contact_email],
-                ["Product", body.garment_name || ""],
-                ["Type", body.garment_type],
-                ["Materials", materialsSummary],
-                ["Weight", `${body.weight_g}g`],
-                ["Assembly", body.country_assembly || ""],
-                ["URL", body.product_url ? body.product_url.slice(0, 80) : ""],
-              ],
-              bodyHtml: `<p style="font-size:13px;">Process this in the ${textLink("https://dashboard.envrt.com/admin/trial-requests", "trial requests queue")}.</p>`,
+            html: buildTrialRequestInternalHtml({
+              contactName: body.contact_name,
+              brandName: body.brand_name,
+              contactEmail: body.contact_email,
+              garmentName: body.garment_name || "",
+              garmentType: body.garment_type,
+              materialsSummary,
+              weightG: body.weight_g,
+              countryAssembly: body.country_assembly || "",
+              productUrl: body.product_url || "",
             }),
           })
         );
