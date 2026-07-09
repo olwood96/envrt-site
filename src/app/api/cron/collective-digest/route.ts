@@ -5,6 +5,7 @@ import {
   buildDigestEmail,
   type DigestProduct,
 } from "@/lib/collective/email-templates";
+import { buildEmail } from "@/lib/email/layout";
 
 const STORAGE_BASE = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 const FROM_ADDRESS = "ENVRT Collective <collective@envrt.com>";
@@ -103,7 +104,7 @@ export async function GET(request: NextRequest) {
 
     const emails = batch.map((sub) => {
       const unsubscribeUrl = `https://envrt.com/api/collective/unsubscribe?token=${sub.token}`;
-      return {
+      return buildEmail({
         from: FROM_ADDRESS,
         to: sub.email,
         subject: `${products.length} new product${products.length === 1 ? "" : "s"} on The Collective`,
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
         },
-      };
+      });
     });
 
     try {

@@ -9,6 +9,19 @@ import {
   getClientIp,
   verifyTurnstile,
 } from "@/lib/form-security";
+import {
+  renderEmail,
+  subheading,
+  paragraph,
+  mutedParagraph,
+  primaryButton,
+  warningCallout,
+  internalAlertHtml,
+  buildEmail,
+  INTERNAL_ALERT_TO,
+  INTERNAL_ALERT_BCC,
+  EMAIL_COLORS,
+} from "@/lib/email/layout";
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
@@ -34,150 +47,86 @@ interface AssessmentPayload {
   turnstileToken?: string;
 }
 
+function clampScore(n: number): number {
+  return Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
+}
+
 function buildEmailHtml(data: AssessmentPayload): string {
+  const overall = clampScore(data.overall);
+
   const dimensionRows = data.dimensions
-    .map(
-      (d) => `
+    .map((d) => {
+      const score = clampScore(d.score);
+      return `
       <tr>
-        <td style="padding:12px 16px;font-size:14px;color:#1b3a2d;border-bottom:1px solid #e8e8e8;">${d.label}</td>
-        <td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;">
-          <div style="background:#f0f0f0;border-radius:8px;height:8px;width:100%;">
-            <div style="background:#1a7a6d;border-radius:8px;height:8px;width:${d.score}%;"></div>
+        <td style="padding:12px 16px 12px 0;font-size:14px;color:${EMAIL_COLORS.black};border-bottom:1px solid ${EMAIL_COLORS.border};">${escapeHtml(d.label)}</td>
+        <td style="padding:12px 0;border-bottom:1px solid ${EMAIL_COLORS.border};width:45%;">
+          <div style="background:${EMAIL_COLORS.vista};border-radius:8px;height:8px;width:100%;">
+            <div style="background:${EMAIL_COLORS.ultramarine};border-radius:8px;height:8px;width:${score}%;"></div>
           </div>
         </td>
-        <td style="padding:12px 16px;font-size:14px;font-weight:600;color:#1b3a2d;border-bottom:1px solid #e8e8e8;text-align:right;">${d.score}/100</td>
-      </tr>`
-    )
+        <td style="padding:12px 0 12px 16px;font-size:14px;font-weight:700;color:${EMAIL_COLORS.black};text-align:right;white-space:nowrap;border-bottom:1px solid ${EMAIL_COLORS.border};">${score}/100</td>
+      </tr>`;
+    })
     .join("");
 
   const actionItems = data.actions
     .map(
       (a, i) => `
       <tr>
-        <td style="padding:10px 16px;vertical-align:top;width:28px;">
-          <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:#1a7a6d;color:#fff;font-size:12px;font-weight:600;text-align:center;line-height:22px;">${i + 1}</span>
+        <td style="padding:10px 14px 10px 0;vertical-align:top;width:28px;">
+          <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${EMAIL_COLORS.ultramarine};color:#ffffff;font-size:12px;font-weight:700;text-align:center;line-height:22px;">${i + 1}</span>
         </td>
-        <td style="padding:10px 16px;font-size:14px;color:#1b3a2d;line-height:1.6;">${a}</td>
+        <td style="padding:10px 0;font-size:14px;color:${EMAIL_COLORS.black};line-height:1.6;">${escapeHtml(a)}</td>
       </tr>`
     )
     .join("");
 
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;">
-    <tr><td align="center" style="padding:40px 16px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  const scoreHeader = `
+    <div style="background:${EMAIL_COLORS.black};border-radius:12px;padding:30px 24px;text-align:center;margin:0 0 24px;">
+      <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#B9A6FF;font-weight:700;">Your DPP Readiness Score</p>
+      <p style="margin:0;font-size:54px;font-weight:700;color:#ffffff;line-height:1.1;">${overall}<span style="font-size:24px;color:#8A8A8A">/100</span></p>
+      <p style="margin:12px 0 0;display:inline-block;padding:4px 14px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:0.5px;background:rgba(62,0,255,0.25);color:#CBB8FF;">${escapeHtml(data.band)}</p>
+    </div>`;
 
-        <!-- Logo -->
-        <tr><td style="padding:0 0 32px;">
-          <img src="https://envrt.com/brand/envrt-logo.png" alt="ENVRT" height="32" style="height:32px;width:auto;">
-        </td></tr>
-
-        <!-- Score card -->
-        <tr><td style="background:#ffffff;border-radius:16px;overflow:hidden;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <!-- Header -->
-            <tr><td style="background:#1b3a2d;padding:32px 32px 28px;" align="center">
-              <p style="margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:#1a7a6d;font-weight:600;">Your DPP Readiness Score</p>
-              <p style="margin:0;font-size:56px;font-weight:700;color:#ffffff;line-height:1.1;">${data.overall}<span style="font-size:24px;color:#a0a0a0">/100</span></p>
-              <p style="margin:12px 0 0;display:inline-block;padding:4px 14px;border-radius:99px;font-size:12px;font-weight:600;letter-spacing:0.5px;background:rgba(26,122,109,0.15);color:#1a7a6d;">${data.band}</p>
-            </td></tr>
-
-            <!-- Headline and summary -->
-            <tr><td style="padding:28px 32px 0;">
-              <p style="margin:0;font-size:18px;font-weight:600;color:#1b3a2d;line-height:1.4;">${data.headline}</p>
-              <p style="margin:12px 0 0;font-size:14px;color:#555;line-height:1.7;">${data.summary}</p>
-            </td></tr>
-
-            <!-- Dimension scores -->
-            <tr><td style="padding:28px 32px 0;">
-              <p style="margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#1a7a6d;font-weight:600;">Dimension Scores</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                ${dimensionRows}
-              </table>
-            </td></tr>
-
-            ${
-              data.greenClaimsFlag
-                ? `<!-- Green claims flag -->
-            <tr><td style="padding:24px 32px 0;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr><td style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;padding:16px 20px;">
-                  <p style="margin:0;font-size:13px;font-weight:600;color:#92400e;">Green Claims Risk Flag</p>
-                  <p style="margin:6px 0 0;font-size:13px;color:#92400e;line-height:1.6;">You indicated that your brand makes sustainability claims publicly but may lack the verified data to substantiate them. Under the EU Green Claims Directive, unsubstantiated claims carry real legal risk from 2026.</p>
-                </td></tr>
-              </table>
-            </td></tr>`
-                : ""
-            }
-
-            <!-- Timeline context -->
-            <tr><td style="padding:24px 32px 0;">
-              <p style="margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#1a7a6d;font-weight:600;">Your Timeline Context</p>
-              <p style="margin:0;font-size:14px;color:#555;line-height:1.7;">${data.timelineRisk}</p>
-            </td></tr>
-
-            <!-- Recommended actions -->
-            <tr><td style="padding:28px 32px 0;">
-              <p style="margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#1a7a6d;font-weight:600;">Recommended Actions</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                ${actionItems}
-              </table>
-            </td></tr>
-
-            <!-- CTA -->
-            <tr><td style="padding:32px 32px 36px;" align="center">
-              <a href="https://envrt.com/contact" style="display:inline-block;background:#1a7a6d;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">Get in touch</a>
-              <p style="margin:16px 0 0;font-size:13px;color:#888;">We can walk you through your results and discuss next steps.</p>
-            </td></tr>
-          </table>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="padding:32px 0 0;" align="center">
-          <p style="margin:0;font-size:12px;color:#999;">
-            <a href="https://envrt.com" style="color:#1a7a6d;text-decoration:none;">envrt.com</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/insights" style="color:#1a7a6d;text-decoration:none;">Insights</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/privacy" style="color:#1a7a6d;text-decoration:none;">Privacy</a>
-          </p>
-          <p style="margin:8px 0 0;font-size:11px;color:#bbb;">This email was sent because you completed the ENVRT DPP Readiness Assessment.</p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return renderEmail({
+    preheader: `Your DPP readiness score: ${overall}/100`,
+    contentHtml: [
+      scoreHeader,
+      paragraph(`<strong>${escapeHtml(data.headline)}</strong>`),
+      mutedParagraph(escapeHtml(data.summary)),
+      subheading("Dimension scores"),
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px;">${dimensionRows}</table>`,
+      data.greenClaimsFlag
+        ? warningCallout(
+            "Green Claims Risk Flag &mdash; you indicated that your brand makes sustainability claims publicly but may lack the verified data to substantiate them. Under the EU Green Claims Directive, unsubstantiated claims carry real legal risk from 2026."
+          )
+        : "",
+      subheading("Your timeline context"),
+      mutedParagraph(escapeHtml(data.timelineRisk)),
+      subheading("Recommended actions"),
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 8px;">${actionItems}</table>`,
+      `<div style="text-align:center;">${primaryButton("https://envrt.com/contact", "Get in touch")}</div>`,
+      mutedParagraph("We can walk you through your results and discuss next steps."),
+    ].join(""),
+    footerNote: "This email was sent because you completed the ENVRT DPP Readiness Assessment.",
+  });
 }
 
-const INTERNAL_NOTIFY_EMAIL = "info@envrt.com";
-
 function buildInternalNotifyHtml(data: AssessmentPayload): string {
-  const dimensionRows = data.dimensions
-    .map((d) => `<tr><td style="padding:6px 12px;font-size:14px;">${d.label}</td><td style="padding:6px 12px;font-size:14px;font-weight:600;">${d.score}/100</td></tr>`)
-    .join("");
-
-  return `
-<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
-  <h2 style="color:#1b3a2d;margin:0 0 16px;">New Assessment Lead</h2>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
-    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.firstName)}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Brand</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.brandName)}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Marketing consent</td><td style="padding:6px 12px;font-weight:600;">${data.marketingConsent ? "Yes" : "No"}</td></tr>
-  </table>
-  <h3 style="color:#1b3a2d;margin:0 0 8px;">Score: ${data.overall}/100 (${data.band})</h3>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
-    ${dimensionRows}
-  </table>
-  ${data.greenClaimsFlag ? '<p style="color:#92400e;font-weight:600;">Green Claims Risk Flag triggered</p>' : ""}
-  <p style="font-size:13px;color:#888;margin-top:24px;">Sent from the DPP Readiness Assessment at envrt.com/assessment</p>
-</div>`;
+  const overall = clampScore(data.overall);
+  return internalAlertHtml({
+    title: "New assessment lead",
+    rows: [
+      ["Name", data.firstName],
+      ["Brand", data.brandName],
+      ["Email", data.email],
+      ["Score", `${overall}/100 (${data.band})`],
+      ["Marketing consent", data.marketingConsent ? "Yes" : "No"],
+      ["Green claims flag", data.greenClaimsFlag ? "Triggered" : ""],
+      ...data.dimensions.map((d): [string, string] => [d.label, `${clampScore(d.score)}/100`]),
+    ],
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -239,23 +188,28 @@ export async function POST(request: NextRequest) {
     const safeBand = sanitizeForSubject(String(data.band));
     const safeOverall = Math.max(0, Math.min(100, Math.round(Number(data.overall) || 0)));
 
-    await resend.emails.send({
-      from: "ENVRT Assessment <results@envrt.com>",
-      to: data.email,
-      subject: `Your DPP Readiness Score: ${safeOverall}/100 - ${safeBand}`,
-      html: buildEmailHtml(data),
-    });
+    await resend.emails.send(
+      buildEmail({
+        from: "ENVRT <results@envrt.com>",
+        to: data.email,
+        subject: `Your DPP Readiness Score: ${safeOverall}/100 - ${safeBand}`,
+        html: buildEmailHtml(data),
+      })
+    );
 
     const safeName = sanitizeForSubject(data.firstName);
     const safeBrand = sanitizeForSubject(data.brandName);
 
-    await resend.emails.send({
-      from: "ENVRT Assessment <results@envrt.com>",
-      to: INTERNAL_NOTIFY_EMAIL,
-      bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-      subject: `Assessment Lead: ${safeName} @ ${safeBrand} (${safeOverall}/100)`,
-      html: buildInternalNotifyHtml(data),
-    });
+    await resend.emails.send(
+      buildEmail({
+        from: "ENVRT System <results@envrt.com>",
+        to: INTERNAL_ALERT_TO,
+        bcc: INTERNAL_ALERT_BCC,
+        subject: `Assessment Lead: ${safeName} @ ${safeBrand} (${safeOverall}/100)`,
+        html: buildInternalNotifyHtml(data),
+        replyTo: data.email,
+      })
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {

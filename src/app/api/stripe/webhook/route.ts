@@ -14,6 +14,19 @@ import {
 } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { escapeHtml } from "@/lib/form-security";
+import {
+  renderEmail,
+  heading,
+  paragraph,
+  mutedParagraph,
+  primaryButton,
+  textLink,
+  internalAlertHtml,
+  alertCallout,
+  buildEmail,
+  INTERNAL_ALERT_TO,
+  INTERNAL_ALERT_BCC,
+} from "@/lib/email/layout";
 
 // Stripe sends the raw body; read as text for signature verification
 export async function POST(request: NextRequest) {
@@ -555,20 +568,26 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   if (!apiKey) return;
 
   const resend = new Resend(apiKey);
-  const { error: sendError } = await resend.emails.send({
-    from: "ENVRT Payments <info@envrt.com>",
-    to: "info@envrt.com",
-    bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-    subject: `Payment failed: ${email || "unknown customer"}`,
-    html: `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
-        <h2 style="color:#1b3a2d;">Payment Failed</h2>
-        <p>A payment has failed for customer <strong>${escapeHtml(email || "unknown")}</strong>.</p>
-        <p>Invoice ID: ${escapeHtml(invoice.id)}</p>
-        <p>Stripe will retry automatically. Check the Stripe dashboard for details.</p>
-      </div>
-    `,
-  });
+  const { error: sendError } = await resend.emails.send(
+    buildEmail({
+      from: "ENVRT System <info@envrt.com>",
+      to: INTERNAL_ALERT_TO,
+      bcc: INTERNAL_ALERT_BCC,
+      subject: `Payment failed: ${email || "unknown customer"}`,
+      html: internalAlertHtml({
+        title: "Payment failed",
+        rows: [
+          ["Customer", email || "unknown"],
+          ["Invoice ID", invoice.id],
+        ],
+        bodyHtml: alertCallout(
+          "Stripe will retry automatically. Check the Stripe dashboard for details."
+        ),
+        ctaHref: "https://dashboard.stripe.com/payments",
+        ctaLabel: "Open Stripe",
+      }),
+    })
+  );
 
   if (sendError) {
     console.error("Failed to send payment failure notification:", sendError);
@@ -609,23 +628,24 @@ async function alertUnresolvedPrice(subscription: Stripe.Subscription) {
   const priceId = subscription.items.data[0]?.price.id || "(unknown)";
   const resend = new Resend(apiKey);
 
-  await resend.emails.send({
-    from: "ENVRT Payments <info@envrt.com>",
-    to: "info@envrt.com",
-    bcc: ["oliver@envrt.com"],
-    subject: `Unresolved Stripe price ID: ${priceId}`,
-    html: `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
-        <h2 style="color:#1b3a2d;">Unresolved Stripe price</h2>
-        <p>A subscription event fired with a price ID that does not match any
-        self-serve env var and the Stripe product has no <code>metadata.tier</code>.</p>
-        <p>Subscription: <code>${escapeHtml(subscription.id)}</code></p>
-        <p>Price ID: <code>${escapeHtml(priceId)}</code></p>
-        <p>The brand was not touched. Action: either add the price ID to env, or
-        set <code>metadata.tier</code> on the Stripe product, then trigger a sync.</p>
-      </div>
-    `,
-  });
+  await resend.emails.send(
+    buildEmail({
+      from: "ENVRT System <info@envrt.com>",
+      to: INTERNAL_ALERT_TO,
+      bcc: INTERNAL_ALERT_BCC,
+      subject: `Unresolved Stripe price ID: ${priceId}`,
+      html: internalAlertHtml({
+        title: "Unresolved Stripe price",
+        rows: [
+          ["Subscription", subscription.id],
+          ["Price ID", priceId],
+        ],
+        bodyHtml: alertCallout(
+          "A subscription event fired with a price ID that does not match any self-serve env var and the Stripe product has no <code>metadata.tier</code>. The brand was not touched. Either add the price ID to env, or set <code>metadata.tier</code> on the Stripe product, then trigger a sync."
+        ),
+      }),
+    })
+  );
 }
 
 // ── Email helpers (unchanged from prior version) ─────────────────────────
@@ -650,12 +670,14 @@ async function sendWelcomeEmail(
   const resend = new Resend(apiKey);
   const planLabel = PLAN_LABELS[plan] || plan;
 
-  const { error: sendError } = await resend.emails.send({
-    from: "ENVRT <info@envrt.com>",
-    to: email,
-    subject: `Welcome to ENVRT, your ${planLabel} plan is active`,
-    html: buildWelcomeHtml(email, planLabel, inviteUrl),
-  });
+  const { error: sendError } = await resend.emails.send(
+    buildEmail({
+      from: "ENVRT <info@envrt.com>",
+      to: email,
+      subject: `Welcome to ENVRT, your ${planLabel} plan is active`,
+      html: buildWelcomeHtml(planLabel, inviteUrl),
+    })
+  );
 
   if (sendError) {
     console.error("Failed to send welcome email:", sendError);
@@ -676,24 +698,28 @@ async function sendAdminNotification(
   const resend = new Resend(apiKey);
   const planLabel = PLAN_LABELS[plan] || plan;
 
-  const { error: sendError } = await resend.emails.send({
-    from: "ENVRT Payments <info@envrt.com>",
-    to: "info@envrt.com",
-    bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-    subject: `New subscription: ${escapeHtml(email)} ${planLabel}`,
-    html: `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
-        <h2 style="color:#1b3a2d;">New Subscription</h2>
-        <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
-          <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(email)}</td></tr>
-          <tr><td style="padding:6px 12px;color:#666;">Plan</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(planLabel)} (${escapeHtml(interval)})</td></tr>
-          <tr><td style="padding:6px 12px;color:#666;">Currency</td><td style="padding:6px 12px;font-weight:600;">${currency.toUpperCase()}</td></tr>
-          <tr><td style="padding:6px 12px;color:#666;">Invite sent</td><td style="padding:6px 12px;font-weight:600;">${inviteSent ? "Yes" : "No, user may already exist"}</td></tr>
-        </table>
-        ${!inviteSent ? '<p style="color:#c00;">The user may already have a Supabase account. You may need to manually link them to a brand or resend the invite from the dashboard.</p>' : ""}
-      </div>
-    `,
-  });
+  const { error: sendError } = await resend.emails.send(
+    buildEmail({
+      from: "ENVRT System <info@envrt.com>",
+      to: INTERNAL_ALERT_TO,
+      bcc: INTERNAL_ALERT_BCC,
+      subject: `New subscription: ${email} ${planLabel}`,
+      html: internalAlertHtml({
+        title: "New subscription",
+        rows: [
+          ["Email", email],
+          ["Plan", `${planLabel} (${interval})`],
+          ["Currency", currency.toUpperCase()],
+          ["Invite sent", inviteSent ? "Yes" : "No, user may already exist"],
+        ],
+        bodyHtml: !inviteSent
+          ? alertCallout(
+              "The user may already have a Supabase account. You may need to manually link them to a brand or resend the invite from the dashboard."
+            )
+          : "",
+      }),
+    })
+  );
 
   if (sendError) {
     console.error("Failed to send admin notification:", sendError);
@@ -701,46 +727,21 @@ async function sendAdminNotification(
 }
 
 function buildWelcomeHtml(
-  email: string,
   planLabel: string,
   inviteUrl: string
 ): string {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;">
-    <tr><td align="center" style="padding:40px 16px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-        <tr><td style="padding:0 0 32px;">
-          <img src="https://envrt.com/brand/envrt-logo.png" alt="ENVRT" height="32" style="height:32px;width:auto;">
-        </td></tr>
-        <tr><td style="background:#ffffff;border-radius:16px;padding:32px;">
-          <h2 style="margin:0 0 16px;color:#1b3a2d;font-size:20px;">Welcome to ENVRT</h2>
-          <p style="margin:0 0 16px;font-size:14px;color:#555;line-height:1.7;">
-            Your <strong>${escapeHtml(planLabel)}</strong> plan is now active. Click the button below to set up your dashboard account and get started.
-          </p>
-          <a href="${escapeHtml(inviteUrl)}" style="display:inline-block;background:#1a7a6d;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 24px;border-radius:12px;">
-            Set up your account
-          </a>
-          <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.6;">
-            This link will expire in 24 hours. If it expires, you can request a new one at
-            <a href="https://envrt.com" style="color:#1a7a6d;text-decoration:none;">envrt.com</a>.
-          </p>
-        </td></tr>
-        <tr><td style="padding:32px 0 0;" align="center">
-          <p style="margin:0;font-size:12px;color:#999;">
-            <a href="https://envrt.com" style="color:#1a7a6d;text-decoration:none;">envrt.com</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/privacy" style="color:#1a7a6d;text-decoration:none;">Privacy</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/terms" style="color:#1a7a6d;text-decoration:none;">Terms</a>
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return renderEmail({
+    preheader: `Your ${planLabel} plan is active. Set up your dashboard account.`,
+    contentHtml: [
+      heading("Welcome to ENVRT"),
+      paragraph(
+        `Your <strong>${escapeHtml(planLabel)}</strong> plan is now active. Click the button below to set up your dashboard account and get started.`
+      ),
+      primaryButton(inviteUrl, "Set up your account"),
+      mutedParagraph(
+        `This link will expire in 24 hours. If it expires, you can request a new one at ${textLink("https://envrt.com", "envrt.com")}.`
+      ),
+    ].join(""),
+    footerNote: "You're receiving this because you subscribed to an ENVRT plan.",
+  });
 }

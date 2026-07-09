@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
-  escapeHtml,
   isValidEmail,
   rateLimit,
   getClientIp,
   verifyTurnstile,
 } from "@/lib/form-security";
+import {
+  internalAlertHtml,
+  buildEmail,
+  textLink,
+  INTERNAL_ALERT_TO,
+  INTERNAL_ALERT_BCC,
+} from "@/lib/email/layout";
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -158,29 +164,33 @@ export async function POST(req: NextRequest) {
       if (resendKey) {
         const resend = new Resend(resendKey);
         const materialsSummary = body.materials
-          .map((m) => `${escapeHtml(m.name)} (${m.share}%)`)
+          .map((m) => `${m.name} (${m.share}%)`)
           .join(", ");
 
-        await resend.emails.send({
-          from: "ENVRT System <noreply@envrt.com>",
-          to: ["oliver@envrt.com", "charlie@envrt.com"],
-          subject: `New trial DPP request: ${body.brand_name}`,
-          html: `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px 16px;">
-              <p style="font-size: 14px; color: #374151;"><strong>${escapeHtml(body.contact_name)}</strong> from <strong>${escapeHtml(body.brand_name)}</strong> has submitted a free DPP request.</p>
-              <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;">
-                <tr><td style="padding: 6px 0; color: #6b7280;">Email</td><td style="padding: 6px 0;">${escapeHtml(body.contact_email)}</td></tr>
-                ${body.garment_name ? `<tr><td style="padding: 6px 0; color: #6b7280;">Product</td><td style="padding: 6px 0;">${escapeHtml(body.garment_name)}</td></tr>` : ""}
-                <tr><td style="padding: 6px 0; color: #6b7280;">Type</td><td style="padding: 6px 0;">${escapeHtml(body.garment_type)}</td></tr>
-                <tr><td style="padding: 6px 0; color: #6b7280;">Materials</td><td style="padding: 6px 0;">${materialsSummary}</td></tr>
-                <tr><td style="padding: 6px 0; color: #6b7280;">Weight</td><td style="padding: 6px 0;">${body.weight_g}g</td></tr>
-                ${body.country_assembly ? `<tr><td style="padding: 6px 0; color: #6b7280;">Assembly</td><td style="padding: 6px 0;">${escapeHtml(body.country_assembly)}</td></tr>` : ""}
-                ${body.product_url ? `<tr><td style="padding: 6px 0; color: #6b7280;">URL</td><td style="padding: 6px 0;"><a href="${escapeHtml(body.product_url)}" style="color: #0d9488;">${escapeHtml(body.product_url.slice(0, 60))}</a></td></tr>` : ""}
-              </table>
-              <p style="font-size: 13px; color: #9ca3af;">Process this in the <a href="https://dashboard.envrt.com/admin/trial-requests" style="color: #0d9488;">dashboard</a>.</p>
-            </div>
-          `,
-        });
+        await resend.emails.send(
+          buildEmail({
+            from: "ENVRT System <noreply@envrt.com>",
+            to: INTERNAL_ALERT_TO,
+            bcc: INTERNAL_ALERT_BCC,
+            subject: `New trial DPP request: ${body.brand_name}`,
+            replyTo: body.contact_email,
+            html: internalAlertHtml({
+              title: "New trial DPP request",
+              rows: [
+                ["Contact", body.contact_name],
+                ["Brand", body.brand_name],
+                ["Email", body.contact_email],
+                ["Product", body.garment_name || ""],
+                ["Type", body.garment_type],
+                ["Materials", materialsSummary],
+                ["Weight", `${body.weight_g}g`],
+                ["Assembly", body.country_assembly || ""],
+                ["URL", body.product_url ? body.product_url.slice(0, 80) : ""],
+              ],
+              bodyHtml: `<p style="font-size:13px;">Process this in the ${textLink("https://dashboard.envrt.com/admin/trial-requests", "trial requests queue")}.</p>`,
+            }),
+          })
+        );
       }
     } catch (e) {
       console.error("Failed to send internal notification (non-fatal):", e);

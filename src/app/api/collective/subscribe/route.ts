@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { buildConfirmationEmail } from "@/lib/collective/email-templates";
+import { buildEmail } from "@/lib/email/layout";
 import { verifyTurnstile, rateLimit, getClientIp } from "@/lib/form-security";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -85,12 +86,14 @@ export async function POST(request: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
-    await resend.emails.send({
-      from: FROM_ADDRESS,
-      to: email,
-      subject: "Confirm your Collective subscription",
-      html: buildConfirmationEmail(confirmUrl),
-    });
+    await resend.emails.send(
+      buildEmail({
+        from: FROM_ADDRESS,
+        to: email,
+        subject: "Confirm your Collective subscription",
+        html: buildConfirmationEmail(confirmUrl),
+      })
+    );
   } catch (err) {
     console.error("Resend error:", err);
     return NextResponse.json({ error: "Failed to send confirmation email" }, { status: 500 });

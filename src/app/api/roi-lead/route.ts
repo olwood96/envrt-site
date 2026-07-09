@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
-  escapeHtml,
   sanitizeForSubject,
   isValidEmail,
   rateLimit,
   getClientIp,
   verifyTurnstile,
 } from "@/lib/form-security";
+import {
+  renderEmail,
+  subheading,
+  mutedParagraph,
+  primaryButton,
+  internalAlertHtml,
+  buildEmail,
+  INTERNAL_ALERT_TO,
+  INTERNAL_ALERT_BCC,
+  escapeHtml as esc,
+  EMAIL_COLORS,
+} from "@/lib/email/layout";
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
@@ -42,141 +53,74 @@ function formatCurrency(n: number): string {
 
 function buildEmailHtml(data: ROIPayload): string {
   const maxCost = Math.max(data.envrtCost, data.consultantCost, data.inhouseCost);
-  const envrtPct = maxCost > 0 ? Math.max(5, (data.envrtCost / maxCost) * 100) : 5;
-  const consultPct = maxCost > 0 ? Math.max(5, (data.consultantCost / maxCost) * 100) : 5;
-  const inhousePct = maxCost > 0 ? Math.max(5, (data.inhouseCost / maxCost) * 100) : 5;
+  const pct = (cost: number) => (maxCost > 0 ? Math.max(5, (cost / maxCost) * 100) : 5);
 
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;">
-    <tr><td align="center" style="padding:40px 16px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  const costRow = (label: string, cost: number, barColor: string) => `
+    <tr>
+      <td style="padding:8px 0;font-size:14px;color:${EMAIL_COLORS.black};width:100px;">${esc(label)}</td>
+      <td style="padding:8px 0;">
+        <div style="background:${EMAIL_COLORS.vista};border-radius:8px;height:12px;width:100%;">
+          <div style="background:${barColor};border-radius:8px;height:12px;width:${pct(cost)}%;"></div>
+        </div>
+      </td>
+      <td style="padding:8px 0 8px 12px;font-size:14px;font-weight:700;color:${EMAIL_COLORS.black};text-align:right;white-space:nowrap;">${formatCurrency(cost)}/yr</td>
+    </tr>`;
 
-        <!-- Logo -->
-        <tr><td style="padding:0 0 32px;">
-          <img src="https://envrt.com/brand/envrt-logo.png" alt="ENVRT" height="32" style="height:32px;width:auto;">
-        </td></tr>
+  const savingHeader = `
+    <div style="background:${EMAIL_COLORS.black};border-radius:12px;padding:30px 24px;text-align:center;margin:0 0 24px;">
+      <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#B9A6FF;font-weight:700;">Your Estimated Annual Saving</p>
+      <p style="margin:0;font-size:54px;font-weight:700;color:#ffffff;line-height:1.1;">${formatCurrency(data.maxSaving)}</p>
+      <p style="margin:12px 0 0;font-size:14px;color:#8A8A8A;">by switching to ENVRT</p>
+    </div>`;
 
-        <!-- Main card -->
-        <tr><td style="background:#ffffff;border-radius:16px;overflow:hidden;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <!-- Header -->
-            <tr><td style="background:#1b3a2d;padding:32px 32px 28px;" align="center">
-              <p style="margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:#1a7a6d;font-weight:600;">Your Estimated Annual Saving</p>
-              <p style="margin:0;font-size:56px;font-weight:700;color:#ffffff;line-height:1.1;">${formatCurrency(data.maxSaving)}</p>
-              <p style="margin:12px 0 0;font-size:14px;color:#a0a0a0;">by switching to ENVRT</p>
-            </td></tr>
+  const statCards = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 0;">
+      <tr>
+        <td style="background:${EMAIL_COLORS.vista};border-radius:12px;padding:20px;width:50%;" align="center">
+          <p style="margin:0;font-size:26px;font-weight:700;color:${EMAIL_COLORS.ultramarine};">${data.hoursSaved.toLocaleString("en-GB")}h</p>
+          <p style="margin:4px 0 0;font-size:13px;color:${EMAIL_COLORS.muted};">saved per year</p>
+        </td>
+        <td style="width:12px;"></td>
+        <td style="background:${EMAIL_COLORS.vista};border-radius:12px;padding:20px;width:50%;" align="center">
+          <p style="margin:0;font-size:26px;font-weight:700;color:${EMAIL_COLORS.ultramarine};">${esc(data.envrtPlan)}</p>
+          <p style="margin:4px 0 0;font-size:13px;color:${EMAIL_COLORS.muted};">${esc(data.envrtPlanPrice)}</p>
+        </td>
+      </tr>
+    </table>`;
 
-            <!-- Cost comparison -->
-            <tr><td style="padding:28px 32px 0;">
-              <p style="margin:0 0 16px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#1a7a6d;font-weight:600;">Annual Cost Comparison</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="padding:8px 0;font-size:14px;color:#1b3a2d;width:100px;">ENVRT</td>
-                  <td style="padding:8px 0;">
-                    <div style="background:#f0f0f0;border-radius:8px;height:12px;width:100%;">
-                      <div style="background:#1a7a6d;border-radius:8px;height:12px;width:${envrtPct}%;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:8px 0 8px 12px;font-size:14px;font-weight:600;color:#1b3a2d;text-align:right;white-space:nowrap;">${formatCurrency(data.envrtCost)}/yr</td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 0;font-size:14px;color:#1b3a2d;width:100px;">Consultant</td>
-                  <td style="padding:8px 0;">
-                    <div style="background:#f0f0f0;border-radius:8px;height:12px;width:100%;">
-                      <div style="background:#999;border-radius:8px;height:12px;width:${consultPct}%;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:8px 0 8px 12px;font-size:14px;font-weight:600;color:#1b3a2d;text-align:right;white-space:nowrap;">${formatCurrency(data.consultantCost)}/yr</td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 0;font-size:14px;color:#1b3a2d;width:100px;">In-house</td>
-                  <td style="padding:8px 0;">
-                    <div style="background:#f0f0f0;border-radius:8px;height:12px;width:100%;">
-                      <div style="background:#555;border-radius:8px;height:12px;width:${inhousePct}%;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:8px 0 8px 12px;font-size:14px;font-weight:600;color:#1b3a2d;text-align:right;white-space:nowrap;">${formatCurrency(data.inhouseCost)}/yr</td>
-                </tr>
-              </table>
-            </td></tr>
-
-            <!-- Time savings -->
-            <tr><td style="padding:24px 32px 0;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="background:#f5f5f0;border-radius:12px;padding:20px;width:50%;" align="center">
-                    <p style="margin:0;font-size:28px;font-weight:700;color:#1a7a6d;">${data.hoursSaved.toLocaleString("en-GB")}h</p>
-                    <p style="margin:4px 0 0;font-size:13px;color:#666;">saved per year</p>
-                  </td>
-                  <td style="width:12px;"></td>
-                  <td style="background:#f5f5f0;border-radius:12px;padding:20px;width:50%;" align="center">
-                    <p style="margin:0;font-size:28px;font-weight:700;color:#1a7a6d;">${data.envrtPlan}</p>
-                    <p style="margin:4px 0 0;font-size:13px;color:#666;">${data.envrtPlanPrice}</p>
-                  </td>
-                </tr>
-              </table>
-            </td></tr>
-
-            <!-- CTA -->
-            <tr><td style="padding:32px 32px 36px;" align="center">
-              <a href="https://envrt.com/contact" style="display:inline-block;background:#1a7a6d;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:12px;">Get in touch</a>
-              <p style="margin:16px 0 0;font-size:13px;color:#888;">We can walk you through your results and discuss next steps.</p>
-            </td></tr>
-          </table>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="padding:32px 0 0;" align="center">
-          <p style="margin:0;font-size:12px;color:#999;">
-            <a href="https://envrt.com" style="color:#1a7a6d;text-decoration:none;">envrt.com</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/pricing" style="color:#1a7a6d;text-decoration:none;">Pricing</a>
-            &nbsp;&middot;&nbsp;
-            <a href="https://envrt.com/privacy" style="color:#1a7a6d;text-decoration:none;">Privacy</a>
-          </p>
-          <p style="margin:8px 0 0;font-size:11px;color:#bbb;">This email was sent because you completed the ENVRT ROI Calculator.</p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return renderEmail({
+    preheader: `Estimated annual saving: ${formatCurrency(data.maxSaving)} with ENVRT`,
+    contentHtml: [
+      savingHeader,
+      subheading("Annual cost comparison"),
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${costRow("ENVRT", data.envrtCost, EMAIL_COLORS.ultramarine)}${costRow("Consultant", data.consultantCost, "#9A9891")}${costRow("In-house", data.inhouseCost, "#63635E")}</table>`,
+      statCards,
+      `<div style="text-align:center;">${primaryButton("https://envrt.com/contact", "Get in touch")}</div>`,
+      mutedParagraph("We can walk you through your results and discuss next steps."),
+    ].join(""),
+    footerNote: "This email was sent because you completed the ENVRT ROI Calculator.",
+  });
 }
 
-const INTERNAL_NOTIFY_EMAIL = "info@envrt.com";
-
 function buildInternalNotifyHtml(data: ROIPayload): string {
-  return `
-<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;">
-  <h2 style="color:#1b3a2d;margin:0 0 16px;">New ROI Calculator Lead</h2>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
-    <tr><td style="padding:6px 12px;color:#666;">Name</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.firstName)}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Brand</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(data.brandName)}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Email</td><td style="padding:6px 12px;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Marketing consent</td><td style="padding:6px 12px;font-weight:600;">${data.marketingConsent ? "Yes" : "No"}</td></tr>
-  </table>
-  <h3 style="color:#1b3a2d;margin:0 0 8px;">Calculator Inputs</h3>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
-    <tr><td style="padding:6px 12px;color:#666;">Products</td><td style="padding:6px 12px;font-weight:600;">${data.skuCount}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Data maturity</td><td style="padding:6px 12px;font-weight:600;">${data.dataMaturity} (~${data.hoursPerProduct}h/product)</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Markets</td><td style="padding:6px 12px;font-weight:600;">${data.market}</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Current approach</td><td style="padding:6px 12px;font-weight:600;">${data.approach}</td></tr>
-  </table>
-  <h3 style="color:#1b3a2d;margin:0 0 8px;">Results</h3>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
-    <tr><td style="padding:6px 12px;color:#666;">ENVRT cost</td><td style="padding:6px 12px;font-weight:600;">${formatCurrency(data.envrtCost)}/yr (${data.envrtPlan})</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Consultant cost</td><td style="padding:6px 12px;font-weight:600;">${formatCurrency(data.consultantCost)}/yr</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">In-house cost</td><td style="padding:6px 12px;font-weight:600;">${formatCurrency(data.inhouseCost)}/yr</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Max saving</td><td style="padding:6px 12px;font-weight:600;color:#1a7a6d;">${formatCurrency(data.maxSaving)}/yr</td></tr>
-    <tr><td style="padding:6px 12px;color:#666;">Time saved</td><td style="padding:6px 12px;font-weight:600;">${data.hoursSaved}h (${data.daysSaved} days)</td></tr>
-  </table>
-  <p style="font-size:13px;color:#888;margin-top:24px;">Sent from the ROI Calculator at envrt.com/roi</p>
-</div>`;
+  return internalAlertHtml({
+    title: "New ROI calculator lead",
+    rows: [
+      ["Name", data.firstName],
+      ["Brand", data.brandName],
+      ["Email", data.email],
+      ["Marketing consent", data.marketingConsent ? "Yes" : "No"],
+      ["Products", data.skuCount],
+      ["Data maturity", `${data.dataMaturity} (~${data.hoursPerProduct}h/product)`],
+      ["Markets", data.market],
+      ["Current approach", data.approach],
+      ["ENVRT cost", `${formatCurrency(data.envrtCost)}/yr (${data.envrtPlan})`],
+      ["Consultant cost", `${formatCurrency(data.consultantCost)}/yr`],
+      ["In-house cost", `${formatCurrency(data.inhouseCost)}/yr`],
+      ["Max saving", `${formatCurrency(data.maxSaving)}/yr`],
+      ["Time saved", `${data.hoursSaved}h (${data.daysSaved} days)`],
+    ],
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -241,23 +185,28 @@ export async function POST(request: NextRequest) {
   try {
     const safeSaving = formatCurrency(Math.max(0, Math.round(Number(data.maxSaving) || 0)));
 
-    await resend.emails.send({
-      from: "ENVRT Calculator <results@envrt.com>",
-      to: data.email,
-      subject: `Your DPP Compliance Savings: ${safeSaving}/yr with ENVRT`,
-      html: buildEmailHtml(data),
-    });
+    await resend.emails.send(
+      buildEmail({
+        from: "ENVRT <results@envrt.com>",
+        to: data.email,
+        subject: `Your DPP Compliance Savings: ${safeSaving}/yr with ENVRT`,
+        html: buildEmailHtml(data),
+      })
+    );
 
     const safeName = sanitizeForSubject(data.firstName);
     const safeBrand = sanitizeForSubject(data.brandName);
 
-    await resend.emails.send({
-      from: "ENVRT Calculator <results@envrt.com>",
-      to: INTERNAL_NOTIFY_EMAIL,
-      bcc: ["charlie@envrt.com", "oliver@envrt.com"],
-      subject: `ROI Lead: ${safeName} @ ${safeBrand} (${safeSaving} saving)`,
-      html: buildInternalNotifyHtml(data),
-    });
+    await resend.emails.send(
+      buildEmail({
+        from: "ENVRT System <results@envrt.com>",
+        to: INTERNAL_ALERT_TO,
+        bcc: INTERNAL_ALERT_BCC,
+        subject: `ROI Lead: ${safeName} @ ${safeBrand} (${safeSaving} saving)`,
+        html: buildInternalNotifyHtml(data),
+        replyTo: data.email,
+      })
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {
