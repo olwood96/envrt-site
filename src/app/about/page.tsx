@@ -108,14 +108,15 @@ function ManifestoSection() {
                 </p>
               </FadeUp>
             </div>
-            {/* The work-before-the-report visualised. Small ambient loom
-                loop, desktop only — sits to the right of the manifesto
-                statement at a deliberately modest size so it grounds the
-                claim without competing with the copy. */}
+            {/* The work-before-the-report visualised. Ambient clip of a
+                real Angry Pablo jersey with its ENVRT DPP tag, desktop
+                only — sits to the right of the manifesto statement at a
+                deliberately modest size so it grounds the claim without
+                competing with the copy. */}
             <FadeUp delay={0.24}>
               <div className="relative hidden aspect-[4/5] w-full overflow-hidden rounded-xl ring-1 ring-envrt-brand-black/12 shadow-[0_18px_36px_-22px_rgba(14,14,14,0.35)] lg:block">
                 <video
-                  src="/v3-assets/videos/loom-loop.mp4"
+                  src="/v3-assets/videos/angry-pablo-jersey.mp4"
                   autoPlay
                   loop
                   muted

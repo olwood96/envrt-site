@@ -9,16 +9,14 @@ import {
   verifyTurnstile,
 } from "@/lib/form-security";
 import {
-  renderEmail,
-  heading,
-  paragraph,
-  primaryButton,
-  detailTable,
-  internalAlertHtml,
   buildEmail,
   INTERNAL_ALERT_TO,
   INTERNAL_ALERT_BCC,
 } from "@/lib/email/layout";
+import {
+  buildContactConfirmationHtml,
+  buildContactInternalHtml,
+} from "@/lib/email/templates/contact-emails";
 
 interface ContactPayload {
   firstName: string;
@@ -33,35 +31,6 @@ interface ContactPayload {
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-
-function buildConfirmationHtml(firstName: string): string {
-  return renderEmail({
-    preheader: "We've received your message and will get back to you shortly.",
-    contentHtml: [
-      heading(`Thanks for getting in touch, ${firstName}!`),
-      paragraph(
-        "We&rsquo;ve received your message and will get back to you shortly. In the meantime, feel free to explore our platform.",
-      ),
-      primaryButton("https://envrt.com", "Visit envrt.com"),
-    ].join(""),
-    footerNote: "You're receiving this because you contacted ENVRT via envrt.com/contact.",
-  });
-}
-
-function buildInternalNotifyHtml(data: ContactPayload): string {
-  return internalAlertHtml({
-    title: "New contact form submission",
-    rows: [
-      ["Name", `${data.firstName} ${data.lastName}`],
-      ["Email", data.email],
-      ["Company", data.company],
-      ["Interest", data.interest],
-    ],
-    bodyHtml: data.message
-      ? detailTable([["Message", data.message]])
-      : "",
-  });
-}
 
 export async function POST(request: NextRequest) {
   // Rate limit by IP
@@ -126,7 +95,7 @@ export async function POST(request: NextRequest) {
         from: "ENVRT <info@envrt.com>",
         to: data.email,
         subject: "Thanks for contacting ENVRT",
-        html: buildConfirmationHtml(data.firstName),
+        html: buildContactConfirmationHtml(data.firstName),
       })
     );
 
@@ -139,7 +108,7 @@ export async function POST(request: NextRequest) {
         to: INTERNAL_ALERT_TO,
         bcc: INTERNAL_ALERT_BCC,
         subject: `Contact: ${safeName}${safeCompany ? ` @ ${safeCompany}` : ""}`,
-        html: buildInternalNotifyHtml(data),
+        html: buildContactInternalHtml(data),
         replyTo: data.email,
       })
     );
