@@ -13,7 +13,6 @@ import {
   type SubscriptionSource,
 } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { escapeHtml } from "@/lib/form-security";
 import {
   buildEmail,
   INTERNAL_ALERT_TO,
