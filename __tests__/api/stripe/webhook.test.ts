@@ -34,6 +34,15 @@ const mockGenerateLink = vi.fn().mockResolvedValue({
   error: null,
 });
 
+const mockInvitesInsert = vi.fn().mockReturnValue({
+  select: vi.fn().mockReturnValue({
+    single: vi.fn().mockResolvedValue({
+      data: { token: "invite-token-123" },
+      error: null,
+    }),
+  }),
+});
+
 vi.mock("@/lib/supabase-admin", () => ({
   getSupabaseAdmin: () => ({
     from: (table: string) => {
@@ -54,6 +63,9 @@ vi.mock("@/lib/supabase-admin", () => ({
           select: (..._args: unknown[]) => mockBrandsSelect(..._args),
           update: (..._args: unknown[]) => mockBrandsUpdate(..._args),
         };
+      }
+      if (table === "brand_invites") {
+        return { insert: mockInvitesInsert };
       }
       return { insert: vi.fn().mockResolvedValue({ error: null }) };
     },
@@ -262,14 +274,17 @@ describe("POST /api/stripe/webhook", () => {
       );
     });
 
-    it("generates invite link via Supabase Auth", async () => {
+    it("creates a stateful invite and links the accept page in the welcome email", async () => {
       await POST(makeWebhookRequest(makeCheckoutCompletedEvent()));
-      expect(mockGenerateLink).toHaveBeenCalledWith(
+      expect(mockInvitesInsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: "invite",
           email: "brand@example.com",
+          status: "pending",
         })
       );
+      // No Supabase OTP is minted at send time (the accept page does that)
+      expect(mockGenerateLink).not.toHaveBeenCalled();
+      expect(mockSendEmail.mock.calls[0][0].html).toContain("/invite/invite-token-123");
     });
 
     it("sends welcome email via Resend", async () => {

@@ -24,7 +24,7 @@ export function buildStripeWelcomeHtml(planLabel: string, inviteUrl: string): st
       ),
       primaryButton(inviteUrl, "Set up your account"),
       mutedParagraph(
-        `This link will expire in 24 hours. If it expires, you can request a new one at ${textLink("https://envrt.com", "envrt.com")}.`
+        `This link expires in 14 days. If it expires, contact us at ${textLink("https://envrt.com/contact", "envrt.com/contact")} and we'll send a fresh one.`
       ),
     ].join(""),
     footerNote: "You're receiving this because you subscribed to an ENVRT plan.",

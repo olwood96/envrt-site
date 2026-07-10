@@ -251,25 +251,30 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!autoLinkedBrandId) {
     const dashboardUrl = process.env.DASHBOARD_URL || "https://dashboard.envrt.com";
 
-    const { data: linkData, error: linkError } =
-      await supabase.auth.admin.generateLink({
-        type: "invite",
+    // Stateful invite: a brand_invites row with our own 14 day token. The
+    // welcome email links the dashboard's /invite/{token} accept page; the
+    // single-use Supabase OTP is only minted there when the person clicks
+    // Accept, so scanners and expiry cannot kill this link in transit.
+    const { data: inviteRow, error: inviteError } = await supabase
+      .from("brand_invites")
+      .insert({
+        brand_id: null,
         email: email.toLowerCase(),
-        options: {
-          redirectTo: `${dashboardUrl}/auth/callback?next=/auth/set-password`,
-        },
-      });
+        role: "brand_admin",
+        status: "pending",
+        invited_by_email: "stripe-webhook@envrt.com",
+        expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+      })
+      .select("token")
+      .single();
 
-    if (linkError) {
-      console.error("Failed to generate invite link:", linkError.message);
+    if (inviteError || !inviteRow?.token) {
+      console.error("Failed to create invite:", inviteError?.message);
       await sendAdminNotification(email, plan, interval, currency, false);
       return;
     }
 
-    const inviteUrl = linkData?.properties?.action_link;
-    if (inviteUrl) {
-      await sendWelcomeEmail(email, plan, inviteUrl);
-    }
+    await sendWelcomeEmail(email, plan, `${dashboardUrl}/invite/${inviteRow.token}`);
   }
 
   await sendAdminNotification(
