@@ -172,8 +172,10 @@ const SECTIONS: LegalSection[] = [
         <LegalLi>
           <LegalStrong>Communications</LegalStrong>, sending service-related
           messages such as account notifications, updates, or responses to
-          enquiries. We will only send marketing communications where we have
-          appropriate consent or a lawful basis to do so
+          enquiries. Dashboard users can manage non-essential email
+          notifications from their account settings at any time. We will only
+          send marketing communications where we have appropriate consent or a
+          lawful basis to do so
         </LegalLi>
       </LegalUl>
     ),
