@@ -7,7 +7,7 @@
 // `npm run sync:plans` in envrt-dashboard, then commit both repos.
 // CI drift checks fail when the copies diverge.
 //
-// content-hash: 4f310b6ff5ee2894
+// content-hash: bed1d02bf56e7fa1
 
 // lib/plans/plans.ts
 //
@@ -145,6 +145,14 @@ export const FEATURES = {
   show_sustainability_report: {
     label: "Metrics and analytics exports",
     description: "Export LCA metrics, scan analytics and sustainability performance data as branded reports.",
+    category: "depth",
+    unlockedAt: "growth",
+  },
+  show_ai_ingestion: {
+    label: "AI data ingestion",
+    // Each extraction run has a real per-action cost (Claude API), so this
+    // is enforced at Growth+, decided 18 July 2026. Admin callers bypass.
+    description: "AI-powered autofill: extract garment data from product URLs and uploaded files in the collection form.",
     category: "depth",
     unlockedAt: "growth",
   },
@@ -410,7 +418,7 @@ export const SITE_COMPARISON: { categories: SiteComparisonCategory[] } = {
         { name: "Multi-language DPP pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
         { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
-        { name: "AI-powered data ingestion", starter: false, growth: true, pro: true },
+        { name: "AI-powered data ingestion", starter: false, growth: true, pro: true, flag: "show_ai_ingestion" },
       ],
     },
     {
