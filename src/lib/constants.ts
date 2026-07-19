@@ -8,9 +8,10 @@ export const RESIZE_DEBOUNCE_MS = 150;
 export const IMPACT_POLL_INTERVAL_MS = 30_000;
 export const IMPACT_MAX_CONSECUTIVE_ERRORS = 5;
 
-// Pricing
-export const GBP_TO_EUR = 1.18;
-export const ANNUAL_DISCOUNT = 0.15;
+// Pricing — canonical values live in plans.generated.ts (synced from
+// envrt-dashboard/lib/plans/plans.ts); re-exported here so existing
+// imports keep working.
+export { GBP_TO_EUR, ANNUAL_DISCOUNT } from "./plans.generated";
 export const NUDGE_INTERVAL_MS = 3_500;
 
 // Hero section proportions (relative to phone mockup height)

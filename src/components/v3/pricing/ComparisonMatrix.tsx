@@ -101,9 +101,9 @@ function PlanFeatureList({ plan }: { plan: PlanSlug }) {
             {cat.name}
           </div>
           {cat.features.map((feat, fi) => {
-            const value = (
-              feat as Record<string, boolean | string | undefined>
-            )[plan];
+            // Rows are typed SiteComparisonRow (plans.generated.ts), so the
+            // plan slug indexes the tier columns directly, no cast needed.
+            const value = feat[plan];
             return (
               <div
                 key={feat.name}

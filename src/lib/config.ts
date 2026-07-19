@@ -149,6 +149,7 @@ export const outcomeCards = [
 ];
 
 import { PRICING_CONFIG, type PlanName as ConfigPlanName, type Currency as ConfigCurrency } from "../../config/pricing";
+import { PLAN_PRICES, SITE_COMPARISON, SITE_PLAN_CARDS } from "./plans.generated";
 
 export type PlanSlug = "starter" | "growth" | "pro";
 
@@ -214,166 +215,34 @@ export const CURRENCY_SYMBOL: Record<Currency, string> = {
 export const DEFAULT_CURRENCY: Currency = "EUR";
 export const DEFAULT_BILLING: BillingPeriod = "monthly";
 
-// Pricing matrix derived from config/pricing.ts (single source of truth).
-// To change a price, edit config/pricing.ts and run npm run stripe:sync.
-// The pricing page below picks up the new values automatically.
+// Pricing content derived from the canonical plans source of truth
+// (envrt-dashboard/lib/plans/plans.ts, synced here as plans.generated.ts).
+// To change prices or card content, edit the canonical file and run
+// `npm run sync:plans` in envrt-dashboard. Price changes also need
+// `npm run stripe:sync` here afterwards.
 export const pricingPlans: PricingPlan[] = [
   {
     slug: "starter",
     name: "Starter",
-    subheading: "Your DPP Hub",
     prices: displayPricesFor("starter"),
-    priceGBP: 149,
-    description: "Regulation-ready Digital Product Passports. Perfect for getting started with trusted product disclosure.",
-    features: [
-      "Up to 50 products/SKUs",
-      "1 team seat",
-      "QR-ready passport pages",
-      "Transparency score per product",
-      "Evidence uploads and product documentation",
-      "Auto-generated disclosures and templates",
-      "CO\u2082e and AWARE water scarcity indicators",
-      "French Eco-Score rating",
-      "Fibre-to-assembly supply chain reconstruction",
-      "Regulatory compliance exports",
-      "Email support with onboarding call",
-    ],
-    highlighted: false,
+    priceGBP: PLAN_PRICES.starter.monthly.gbp / 100,
+    ...SITE_PLAN_CARDS.starter,
   },
   {
     slug: "growth",
     name: "Growth",
-    subheading: "Your Impact Analyst",
     prices: displayPricesFor("growth"),
-    priceGBP: 495,
-    description: "Sustainability metrics and insights. Built for brands that need credible lifecycle outputs.",
-    features: [
-      "Up to 250 products/SKUs",
-      "5 team seats",
-      "Everything in Starter, plus:",
-      "Expanded product data in DPP",
-      "Core LCA metrics beyond indicators",
-      "Process-level supply chain reconstruction",
-      "Hotspot detection across lifecycle stages",
-      "Product comparisons",
-      "AI-powered data ingestion",
-      "Entry-level decarbonisation guidance",
-      "Stage-linked evidence library",
-      "Hotspot insights with reduction opportunities",
-      "DPP scan and engagement analytics",
-      "Metrics and analytics report exports",
-      "Priority support",
-    ],
-    highlighted: true,
+    priceGBP: PLAN_PRICES.growth.monthly.gbp / 100,
+    ...SITE_PLAN_CARDS.growth,
   },
   {
     slug: "pro",
     name: "Pro",
-    subheading: "Your Sustainability Team",
-    customPricing: true,
-    customSubline: "Tailored to your SKU count, supplier complexity and support needs",
-    description:
-      "A hands-on plan that replaces the need for an internal sustainability team. Built for scale and supplier complexity.",
-    features: [
-      "Custom product/SKU allocation",
-      "Unlimited team seats",
-      "Everything in Growth, plus:",
-      "Complete PEF-aligned metrics",
-      "Advanced modelling and optimisation frameworks",
-      "Seasonal product-line impact reports",
-      "Eco-design strategy and claims support",
-      "Dedicated account specialist",
-      "Supplier follow-up and data-chasing assistance",
-      "Fast-response SLA with weekly reviews",
-    ],
-    highlighted: false,
+    ...SITE_PLAN_CARDS.pro,
   },
 ];
 
-export const pricingComparison = {
-  categories: [
-    {
-      name: "Team and Access",
-      features: [
-        { name: "Team seats", starter: "1", growth: "5", pro: "Unlimited" },
-      ],
-    },
-    {
-      name: "DPP Creation",
-      features: [
-        { name: "Product/SKU allocation", starter: "Up to 50", growth: "Up to 250", pro: "Custom" },
-        { name: "QR-ready passport pages", starter: true, growth: true, pro: true },
-        { name: "Multi-language DPP pages", starter: true, growth: true, pro: true },
-        { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
-        { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
-        { name: "AI-powered data ingestion", starter: false, growth: true, pro: true },
-      ],
-    },
-    {
-      name: "Transparency and Evidence",
-      features: [
-        { name: "Transparency score per product", starter: true, growth: true, pro: true },
-        { name: "Evidence uploads and product documentation", starter: true, growth: true, pro: true },
-        { name: "Multi-level supply chain verification", starter: true, growth: true, pro: true },
-        { name: "Stage-linked evidence library", starter: false, growth: true, pro: true },
-      ],
-    },
-    {
-      name: "Supply Chain Modelling",
-      features: [
-        { name: "Fibre-to-assembly supply chain reconstruction", starter: true, growth: true, pro: true },
-        { name: "Process-level supply chain reconstruction", starter: false, growth: true, pro: true },
-        { name: "Advanced modelling and optimisation frameworks", starter: false, growth: false, pro: true },
-      ],
-    },
-    {
-      name: "Metrics",
-      features: [
-        { name: "CO\u2082e indicators", starter: true, growth: true, pro: true },
-        { name: "AWARE water scarcity indicators", starter: true, growth: true, pro: true },
-        { name: "French Eco-Score (co\u00fbt environnemental)", starter: true, growth: true, pro: true },
-        { name: "Core LCA metrics beyond indicators", starter: false, growth: true, pro: true },
-        { name: "Complete PEF-aligned metrics", starter: false, growth: false, pro: true },
-      ],
-    },
-    {
-      name: "Dashboard and Insights",
-      features: [
-        { name: "DPP scan and engagement analytics", starter: false, growth: true, pro: true },
-        { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true },
-        { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true },
-        { name: "Product comparisons", starter: false, growth: true, pro: true },
-        { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true },
-      ],
-    },
-    {
-      name: "Exports and Reporting",
-      features: [
-        { name: "Regulatory compliance exports", starter: true, growth: true, pro: true },
-        { name: "Metrics and analytics exports", starter: false, growth: true, pro: true },
-      ],
-    },
-    {
-      name: "Strategy and Decarbonisation",
-      features: [
-        { name: "Entry-level decarbonisation guidance", starter: false, growth: true, pro: true },
-        { name: "Eco-design strategy and claims support", starter: false, growth: false, pro: true },
-      ],
-    },
-    {
-      name: "Support",
-      features: [
-        { name: "Email support", starter: true, growth: true, pro: true },
-        { name: "Onboarding call", starter: true, growth: true, pro: true },
-        { name: "Priority support", starter: false, growth: true, pro: true },
-        { name: "Supplier follow-up and data-chasing assistance", starter: false, growth: false, pro: true },
-        { name: "Dedicated account specialist", starter: false, growth: false, pro: true },
-        { name: "Weekly reviews", starter: false, growth: false, pro: true },
-        { name: "Fast-response SLA", starter: false, growth: false, pro: true },
-      ],
-    },
-  ],
-} as const;
+export const pricingComparison = SITE_COMPARISON;
 
 export const faqItems = [
   {
