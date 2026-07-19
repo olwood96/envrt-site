@@ -74,11 +74,13 @@ describe("pricingComparison", () => {
     expect(scanRow!.pro).toBe(true);
   });
 
-  it("export rows are split into Regulatory (all tiers) and Metrics (Growth+ only)", () => {
+  it("export rows are split into the disclosure pack (all tiers) and Metrics (Growth+ only)", () => {
     const allRows = pricingComparison.categories.flatMap((c) => c.features);
-    const regRow = allRows.find((f) => /regulatory.*export|compliance.*export/i.test(f.name));
+    // "Disclosure pack", never "full ESPR compliance" — the marketing
+    // language rule from the compliance roadmap.
+    const regRow = allRows.find((f) => /disclosure pack/i.test(f.name));
     const metricsRow = allRows.find((f) => /metrics.*export|analytics.*export/i.test(f.name));
-    expect(regRow, "expected a Regulatory compliance exports row").toBeDefined();
+    expect(regRow, "expected a DPP disclosure pack export row").toBeDefined();
     expect(metricsRow, "expected a Metrics and analytics exports row").toBeDefined();
     expect(regRow!.starter).toBe(true);
     expect(regRow!.growth).toBe(true);

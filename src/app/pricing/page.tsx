@@ -10,11 +10,12 @@ import { PricingTiersV3 } from "@/components/v3/pricing/PricingTiersV3";
 import { FAQJsonLd } from "@/components/seo/FAQJsonLd";
 import { SoftwareApplicationJsonLd } from "@/components/seo/SoftwareApplicationJsonLd";
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { SITE_PLAN_FLEXIBILITY_NOTE } from "@/lib/plans.generated";
 
 export const metadata: Metadata = {
   title: "Pricing | ENVRT for fashion brands",
   description:
-    "Three tiers built for fashion. Per-garment LCA, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier. EUR, GBP and USD pricing.",
+    "Three tiers built for fashion. Per-garment LCA indicators, fibre-to-assembly supply chain reconstruction, embeddable widgets and regulation-ready DPPs on every tier. EUR, GBP and USD pricing.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -39,7 +40,7 @@ export default function PricingV3Page() {
             </span>
           </>
         }
-        body="Per-garment lifecycle assessment, fibre-to-assembly supply chain reconstruction, French Eco-Score and ESPR-ready DPPs included on every tier. Switch currency or billing period below."
+        body="Per-garment lifecycle indicators, fibre-to-assembly supply chain reconstruction, embeddable widgets and regulation-ready DPPs on every tier. Switch currency or billing period below."
         actions={
           <>
             <ButtonV3 href="/free-dpp" variant="primary">
@@ -127,6 +128,13 @@ function ComparisonTable() {
           <div className="mt-12 sm:mt-16">
             <ComparisonMatrix />
           </div>
+        </FadeUp>
+
+        {/* Custom-plans note: canonical copy from the plans source of truth. */}
+        <FadeUp delay={0.2}>
+          <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-relaxed text-envrt-brand-black/60">
+            {SITE_PLAN_FLEXIBILITY_NOTE}
+          </p>
         </FadeUp>
       </div>
     </section>

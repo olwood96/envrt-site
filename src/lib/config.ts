@@ -258,7 +258,7 @@ export const faqItems = [
   {
     question: "Can I embed DPPs on my own website?",
     answer:
-      "Yes. On Growth and Pro plans, you get embeddable widgets that display sustainability metrics directly on your product pages, styled to match your brand.",
+      "Yes, on every plan. Embeddable widgets display sustainability metrics directly on your product pages, styled to match your brand.",
   },
   {
     question: "How are the environmental metrics calculated?",
@@ -281,7 +281,7 @@ export const pricingFaqItems = [
   {
     question: "What's included in each ENVRT plan?",
     answer:
-      "Starter includes 1 team seat, DPP creation, QR-ready passport pages, transparency scores, CO\u2082e and AWARE water indicators, French Eco-Score ratings and compliance exports. Growth adds 5 team seats, expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, product comparisons, DPP scan and engagement analytics and metrics exports. Pro includes unlimited team seats, complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
+      "Starter includes 1 team seat, DPP creation, QR-ready passport pages, embeddable widgets, transparency scores, CO\u2082e and AWARE water indicators and the DPP disclosure pack. Growth adds 5 team seats, expanded product data, core LCA metrics, AI-powered data ingestion, hotspot detection, impact comparisons, French Eco-Score display, DPP scan and engagement analytics, customer feedback and metrics exports. Pro includes unlimited team seats, complete PEF-aligned metrics, advanced modelling, seasonal reports, eco-design strategy and a dedicated account specialist.",
   },
   {
     question: "Can I switch plans?",
@@ -301,7 +301,7 @@ export const pricingFaqItems = [
   {
     question: "Do you support the French Eco-Score (affichage environnemental)?",
     answer:
-      "Yes. All plans include French Eco-Score ratings calculated following the official co\u00fbt environnemental methodology. You can calculate scores for your garments and display them on your DPPs.",
+      "Yes. Growth and Pro plans include French Eco-Score display, calculated following the official co\u00fbt environnemental methodology. Brands selling into France can arrange it on any plan, including Starter, get in touch and we will set it up.",
   },
 ];
 

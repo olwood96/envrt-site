@@ -7,7 +7,7 @@
 // `npm run sync:plans` in envrt-dashboard, then commit both repos.
 // CI drift checks fail when the copies diverge.
 //
-// content-hash: bed1d02bf56e7fa1
+// content-hash: ff3c1e5e8ef10342
 
 // lib/plans/plans.ts
 //
@@ -35,7 +35,7 @@
 // Human-readable mirror: Notion → 📐 Engineering Conventions →
 // 🎚️ Feature × Tier source of truth.
 
-export const PLANS_VERSION = "2026-07-18";
+export const PLANS_VERSION = "2026-07-19";
 
 // ── Tiers ─────────────────────────────────────────────────────────────────
 
@@ -332,13 +332,13 @@ export const SITE_PLAN_CARDS: Record<"starter" | "growth" | "pro", SitePlanCard>
       "Up to 50 products/SKUs",
       "1 team seat",
       "QR-ready passport pages",
+      "Embeddable DPP widgets",
       "Transparency score per product",
       "Evidence uploads and product documentation",
       "Auto-generated disclosures and templates",
       "CO₂e and AWARE water scarcity indicators",
-      "French Eco-Score rating",
       "Fibre-to-assembly supply chain reconstruction",
-      "Regulatory compliance exports",
+      "DPP disclosure pack export",
       "Email support with onboarding call",
     ],
     highlighted: false,
@@ -355,12 +355,14 @@ export const SITE_PLAN_CARDS: Record<"starter" | "growth" | "pro", SitePlanCard>
       "Core LCA metrics beyond indicators",
       "Process-level supply chain reconstruction",
       "Hotspot detection across lifecycle stages",
-      "Product comparisons",
+      "Impact comparisons across your products",
       "AI-powered data ingestion",
+      "French Eco-Score display",
       "Entry-level decarbonisation guidance",
       "Stage-linked evidence library",
       "Hotspot insights with reduction opportunities",
       "DPP scan and engagement analytics",
+      "Customer feedback from DPP scans",
       "Metrics and analytics report exports",
       "Priority support",
     ],
@@ -387,6 +389,14 @@ export const SITE_PLAN_CARDS: Record<"starter" | "growth" | "pro", SitePlanCard>
     highlighted: false,
   },
 };
+
+/**
+ * Rendered on the pricing page near the comparison matrix. Carries the
+ * custom-plans message (tier-agnostic, descriptive language): plans flex,
+ * and France-legal brands can arrange Eco-Score display on any plan.
+ */
+export const SITE_PLAN_FLEXIBILITY_NOTE =
+  "Every plan is a starting point. Individual features, SKU allowances and seats can be arranged on any plan, including French Eco-Score display for brands selling into France. Get in touch and we will shape it around you.";
 
 export interface SiteComparisonRow {
   name: string;
@@ -415,6 +425,7 @@ export const SITE_COMPARISON: { categories: SiteComparisonCategory[] } = {
       features: [
         { name: "Product/SKU allocation", starter: "Up to 50", growth: "Up to 250", pro: "Custom" },
         { name: "QR-ready passport pages", starter: true, growth: true, pro: true, flag: "show_dpps" },
+        { name: "Embeddable DPP widgets", starter: true, growth: true, pro: true },
         { name: "Multi-language DPP pages", starter: true, growth: true, pro: true },
         { name: "Expanded product data in DPP", starter: false, growth: true, pro: true },
         { name: "Auto-generated disclosures and templates", starter: true, growth: true, pro: true },
@@ -443,7 +454,9 @@ export const SITE_COMPARISON: { categories: SiteComparisonCategory[] } = {
       features: [
         { name: "CO₂e indicators", starter: true, growth: true, pro: true },
         { name: "AWARE water scarcity indicators", starter: true, growth: true, pro: true },
-        { name: "French Eco-Score (coût environnemental)", starter: true, growth: true, pro: true },
+        // Growth+ by default; brands selling into France can arrange it on
+        // any plan (see the flexibility note rendered on the pricing page).
+        { name: "French Eco-Score (coût environnemental)", starter: false, growth: true, pro: true },
         { name: "Core LCA metrics beyond indicators", starter: false, growth: true, pro: true, flag: "show_metrics" },
         { name: "Complete PEF-aligned metrics", starter: false, growth: false, pro: true },
       ],
@@ -454,14 +467,17 @@ export const SITE_COMPARISON: { categories: SiteComparisonCategory[] } = {
         { name: "DPP scan and engagement analytics", starter: false, growth: true, pro: true, flag: "show_analytics" },
         { name: "Hotspot detection across lifecycle stages", starter: false, growth: true, pro: true, flag: "show_metrics_lifecycle" },
         { name: "Hotspot insights with reduction opportunities", starter: false, growth: true, pro: true, flag: "show_metrics_lifecycle" },
-        { name: "Product comparisons", starter: false, growth: true, pro: true },
+        { name: "Impact comparisons in your dashboard", starter: false, growth: true, pro: true, flag: "show_metrics" },
+        { name: "Customer feedback from DPP scans", starter: false, growth: true, pro: true, flag: "show_feedback" },
         { name: "Seasonal product-line impact reports", starter: false, growth: false, pro: true, flag: "show_reports" },
       ],
     },
     {
       name: "Exports and Reporting",
       features: [
-        { name: "Regulatory compliance exports", starter: true, growth: true, pro: true },
+        // "Disclosure pack", never "full ESPR compliance", until the ESPR
+        // capture fields exist (see Compliance generation roadmap in Notion).
+        { name: "DPP disclosure pack export", starter: true, growth: true, pro: true },
         { name: "Metrics and analytics exports", starter: false, growth: true, pro: true, flag: "show_sustainability_report" },
       ],
     },
