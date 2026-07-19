@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import {
+  STARTER_MONTHLY_GBP,
+  GROWTH_MONTHLY_GBP,
+  STARTER_SKU_LIMIT,
+  GROWTH_SKU_LIMIT,
+  STARTER_PRICE_LABEL,
+  GROWTH_PRICE_LABEL,
+} from "@/lib/plan-prices";
+import {
   PageHero,
   FaqSnippet,
   ButtonV3,
@@ -76,14 +84,14 @@ function calculateROI(
   let envrtMonthly: number;
   let envrtPlan: string;
   let envrtPlanPrice: string;
-  if (skuCount <= 50) {
-    envrtMonthly = 149;
+  if (skuCount <= STARTER_SKU_LIMIT) {
+    envrtMonthly = STARTER_MONTHLY_GBP;
     envrtPlan = "Starter";
-    envrtPlanPrice = "£149/mo";
-  } else if (skuCount <= 250) {
-    envrtMonthly = 495;
+    envrtPlanPrice = `${STARTER_PRICE_LABEL}/mo`;
+  } else if (skuCount <= GROWTH_SKU_LIMIT) {
+    envrtMonthly = GROWTH_MONTHLY_GBP;
     envrtPlan = "Growth";
-    envrtPlanPrice = "£495/mo";
+    envrtPlanPrice = `${GROWTH_PRICE_LABEL}/mo`;
   } else {
     envrtMonthly = 1295;
     envrtPlan = "Pro";
@@ -143,7 +151,7 @@ const faqs = [
   {
     question: "How does the calculator decide which ENVRT plan I need?",
     answer:
-      "By your SKU count. Up to 50 SKUs is Starter (£149 a month). Up to 250 is Growth (£495 a month). Above that is Pro, which is custom-priced. The annual cost shown is monthly fee times twelve.",
+      `By your SKU count. Up to ${STARTER_SKU_LIMIT} SKUs is Starter (${STARTER_PRICE_LABEL} a month). Up to ${GROWTH_SKU_LIMIT} is Growth (${GROWTH_PRICE_LABEL} a month). Above that is Pro, which is custom-priced. The annual cost shown is monthly fee times twelve.`,
   },
   {
     question: "Are the consultant and in-house figures realistic?",

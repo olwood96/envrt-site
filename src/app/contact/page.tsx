@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { STARTER_PRICE_LABEL, GROWTH_PRICE_LABEL, STARTER_SKU_LIMIT, GROWTH_SKU_LIMIT } from "@/lib/plan-prices";
 import {
   PageHero,
   FaqSnippet,
@@ -44,7 +45,7 @@ const faqs = [
   {
     question: "What is the difference between Starter, Growth and Pro?",
     answer:
-      "Starter at £149 a month covers up to 50 SKUs with regulation-ready DPPs. Growth at £495 a month adds lifecycle metrics, hotspot detection and analytics, up to 250 SKUs. Pro is custom-priced for high SKU counts and dedicated support.",
+      `Starter at ${STARTER_PRICE_LABEL} a month covers up to ${STARTER_SKU_LIMIT} SKUs with regulation-ready DPPs. Growth at ${GROWTH_PRICE_LABEL} a month adds lifecycle metrics, hotspot detection and analytics, up to ${GROWTH_SKU_LIMIT} SKUs. Pro is custom-priced for high SKU counts and dedicated support.`,
   },
   {
     question: "Can I just email instead?",

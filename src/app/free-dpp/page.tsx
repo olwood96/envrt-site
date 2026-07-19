@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { STARTER_PRICE_LABEL } from "@/lib/plan-prices";
 import {
   PageHero,
   FaqSnippet,
@@ -124,7 +125,7 @@ const faqs = [
   {
     question: "What if I want full DPPs for my whole collection?",
     answer:
-      "Get in touch after receiving your trial DPP. We offer full lifecycle DPPs with supply chain mapping, emissions data and water impact. Paid plans start from £149 a month.",
+      `Get in touch after receiving your trial DPP. We offer full lifecycle DPPs with supply chain mapping, emissions data and water impact. Paid plans start from ${STARTER_PRICE_LABEL} a month.`,
   },
 ];
 

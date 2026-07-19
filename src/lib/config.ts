@@ -149,6 +149,7 @@ export const outcomeCards = [
 ];
 
 import { PRICING_CONFIG, type PlanName as ConfigPlanName, type Currency as ConfigCurrency } from "../../config/pricing";
+import { STARTER_PRICE_LABEL, GROWTH_PRICE_LABEL, STARTER_SKU_LIMIT, GROWTH_SKU_LIMIT } from "./plan-prices";
 import { PLAN_PRICES, SITE_COMPARISON, SITE_PLAN_CARDS } from "./plans.generated";
 
 export type PlanSlug = "starter" | "growth" | "pro";
@@ -276,7 +277,7 @@ export const pricingFaqItems = [
   {
     question: "How much does a Digital Product Passport cost?",
     answer:
-      "ENVRT offers three plans: Starter at £149/month for up to 50 products/SKUs, Growth at £495/month for up to 250 products/SKUs with LCA metrics, and Pro on custom pricing for brands needing more than 250 SKUs, advanced PEF-aligned metrics or dedicated support. Contact sales for a Pro quote.",
+      `ENVRT offers three plans: Starter at ${STARTER_PRICE_LABEL}/month for up to ${STARTER_SKU_LIMIT} products/SKUs, Growth at ${GROWTH_PRICE_LABEL}/month for up to ${GROWTH_SKU_LIMIT} products/SKUs with LCA metrics, and Pro on custom pricing for brands needing more than ${GROWTH_SKU_LIMIT} SKUs, advanced PEF-aligned metrics or dedicated support. Contact sales for a Pro quote.`,
   },
   {
     question: "What's included in each ENVRT plan?",
@@ -309,7 +310,7 @@ export const roiFaqItems = [
   {
     question: "How much does DPP compliance cost?",
     answer:
-      "The cost depends on your approach. Hiring a sustainability consultant typically starts from £30,000 per year. Building an in-house team starts from £80,000 annually. ENVRT provides DPP creation, lifecycle metrics and sustainability analytics from £149 per month.",
+      `The cost depends on your approach. Hiring a sustainability consultant typically starts from £30,000 per year. Building an in-house team starts from £80,000 annually. ENVRT provides DPP creation, lifecycle metrics and sustainability analytics from ${STARTER_PRICE_LABEL} per month.`,
   },
   {
     question: "How long does it take to see ROI with ENVRT?",

@@ -7,7 +7,7 @@
 // `npm run sync:plans` in envrt-dashboard, then commit both repos.
 // CI drift checks fail when the copies diverge.
 //
-// content-hash: ff3c1e5e8ef10342
+// content-hash: c8922a607ce7b8a7
 
 // lib/plans/plans.ts
 //
@@ -239,6 +239,10 @@ export function effectiveLimit(
 }
 
 // ── Pricing (canonical Stripe amounts, integer minor units) ───────────────
+//
+// CHANGING A PRICE? Follow docs/pricing-change-runbook.md, one edit here,
+// then sync:plans, stripe:sync and the Vercel env block. Every price claim
+// on the site derives from these numbers, nothing is hardcoded elsewhere.
 //
 // Pro is NOT priced here. Pro is a custom-only tier handled via
 // metadata.tier on bespoke Stripe products, not the self-serve price map.

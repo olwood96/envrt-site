@@ -1,6 +1,7 @@
 "use client";
 
 import { ButtonV3 } from "@/components/v3";
+import { STARTER_ANNUAL_STICKER_GBP } from "@/lib/plan-prices";
 import {
   Eyebrow,
   SectionCorners,
@@ -31,7 +32,7 @@ export function PlatformComparison() {
   // numbers, kept in round thousands when displayed.
   const consultantGBP = 30000;
   const inhouseGBP = 80000;
-  const envrtGBP = 1788; // Starter annual: £149 × 12
+  const envrtGBP = STARTER_ANNUAL_STICKER_GBP; // Starter monthly x 12, derived from the plans source of truth
 
   const fmt = (gbp: number) => `From ${formatFromGBP(gbp, currency)}`;
 
