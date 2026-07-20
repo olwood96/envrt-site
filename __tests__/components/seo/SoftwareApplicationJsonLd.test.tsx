@@ -25,7 +25,8 @@ describe("SoftwareApplicationJsonLd", () => {
 
     expect(jsonLd.offers).toHaveLength(2);
     expect(jsonLd.offers[0].name).toBe("Starter");
-    expect(jsonLd.offers[0].price).toBe("149");
+    // Derived from the plans source of truth (Starter EUR-anchored, £211 GBP).
+    expect(jsonLd.offers[0].price).toBe("211");
     expect(jsonLd.offers[0].priceCurrency).toBe("GBP");
     expect(jsonLd.offers[1].name).toBe("Growth");
     expect(jsonLd.offers[1].price).toBe("495");

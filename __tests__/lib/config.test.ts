@@ -9,7 +9,8 @@ describe("pricingPlans config", () => {
   it("Starter and Growth have fixed GBP prices", () => {
     const starter = pricingPlans.find((p) => p.slug === "starter")!;
     const growth = pricingPlans.find((p) => p.slug === "growth")!;
-    expect(starter.priceGBP).toBe(149);
+    // Starter is EUR-anchored at €249; £211 is its house-conversion GBP.
+    expect(starter.priceGBP).toBe(211);
     expect(starter.customPricing).toBeFalsy();
     expect(growth.priceGBP).toBe(495);
     expect(growth.customPricing).toBeFalsy();

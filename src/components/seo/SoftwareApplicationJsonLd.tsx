@@ -1,3 +1,5 @@
+import { STARTER_MONTHLY_GBP, GROWTH_MONTHLY_GBP } from "@/lib/plan-prices";
+
 export function SoftwareApplicationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -12,7 +14,7 @@ export function SoftwareApplicationJsonLd() {
       {
         "@type": "Offer",
         name: "Starter",
-        price: "149",
+        price: String(STARTER_MONTHLY_GBP),
         priceCurrency: "GBP",
         priceValidUntil: new Date(
           new Date().getFullYear() + 1,
@@ -25,7 +27,7 @@ export function SoftwareApplicationJsonLd() {
       {
         "@type": "Offer",
         name: "Growth",
-        price: "495",
+        price: String(GROWTH_MONTHLY_GBP),
         priceCurrency: "GBP",
         priceValidUntil: new Date(
           new Date().getFullYear() + 1,

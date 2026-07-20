@@ -7,7 +7,7 @@
 // `npm run sync:plans` in envrt-dashboard, then commit both repos.
 // CI drift checks fail when the copies diverge.
 //
-// content-hash: c8922a607ce7b8a7
+// content-hash: 0c2aea02fe12ac07
 
 // lib/plans/plans.ts
 //
@@ -285,15 +285,17 @@ export const STRIPE_PRODUCTS: Record<PlanName, StripeProductConfig> = {
 
 export const PLAN_PRICES: Record<PlanName, Record<BillingInterval, Record<PriceCurrency, number>>> = {
   starter: {
+    // EUR-anchored at €249; GBP/USD hold the house conversion exactly
+    // (EUR = GBP × 1.18 → 211 × 1.18 = 248.98 → 249; USD = GBP × 1.27 → 268).
     monthly: {
-      gbp: 14900, // £149.00
-      eur: 17500, // €175.00
-      usd: 18900, // $189.00
+      gbp: 21100, // £211.00
+      eur: 24900, // €249.00 (anchor)
+      usd: 26800, // $268.00
     },
     annual: {
-      gbp: 151980, // £1,519.80
-      eur: 178500, // €1,785.00
-      usd: 192780, // $1,927.80
+      gbp: 215220, // £2,152.20
+      eur: 253980, // €2,539.80
+      usd: 273360, // $2,733.60
     },
   },
   growth: {

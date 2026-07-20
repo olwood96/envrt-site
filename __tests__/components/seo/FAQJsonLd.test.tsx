@@ -31,7 +31,7 @@ describe("FAQJsonLd", () => {
 
     expect(jsonLd.mainEntity).toHaveLength(pricingFaqItems.length);
     expect(jsonLd.mainEntity[0].name).toContain("Digital Product Passport cost");
-    expect(jsonLd.mainEntity[0].acceptedAnswer.text).toContain("£149");
+    expect(jsonLd.mainEntity[0].acceptedAnswer.text).toContain("£211");
   });
 
   it("renders correct ROI FAQ items", () => {

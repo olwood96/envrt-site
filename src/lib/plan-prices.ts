@@ -10,7 +10,7 @@
 
 import { PLAN_PRICES, TIER_PRODUCT_LIMITS } from "./plans.generated";
 
-/** Whole-pound monthly prices (e.g. 149). */
+/** Whole-pound monthly prices (e.g. 211). */
 export const STARTER_MONTHLY_GBP = Math.round(PLAN_PRICES.starter.monthly.gbp / 100);
 export const GROWTH_MONTHLY_GBP = Math.round(PLAN_PRICES.growth.monthly.gbp / 100);
 
@@ -22,6 +22,6 @@ export const STARTER_ANNUAL_STICKER_GBP = STARTER_MONTHLY_GBP * 12;
 export const STARTER_SKU_LIMIT = TIER_PRODUCT_LIMITS.starter ?? 50;
 export const GROWTH_SKU_LIMIT = TIER_PRODUCT_LIMITS.growth ?? 250;
 
-/** Ready-made labels for prose ("£149"). */
+/** Ready-made labels for prose ("£211"). */
 export const STARTER_PRICE_LABEL = `£${STARTER_MONTHLY_GBP}`;
 export const GROWTH_PRICE_LABEL = `£${GROWTH_MONTHLY_GBP}`;
