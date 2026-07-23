@@ -7,6 +7,7 @@ import {
   CURRENCY_SYMBOL,
   pricingPlans,
 } from "@/lib/config";
+import { STARTER_MONTHLY_GBP } from "@/lib/plan-prices";
 import { usePricing } from "@/components/v3/pricing/PricingContext";
 import { DotGridBackground, SectionCorners } from "./_shared";
 
@@ -43,7 +44,7 @@ function formatBig(n: number): string {
 
 function useStats(dataPointsServed: number): Stat[] {
   const { currency, billing } = usePricing();
-  const starterPrice = STARTER_PLAN?.prices?.[currency][billing] ?? 149;
+  const starterPrice = STARTER_PLAN?.prices?.[currency][billing] ?? STARTER_MONTHLY_GBP;
   const sym = CURRENCY_SYMBOL[currency];
 
   return [
@@ -75,7 +76,7 @@ function useStats(dataPointsServed: number): Stat[] {
 // Drives a motion value from 0 to the target with an expo ease-out so the
 // final approach is gentle. The wrapper element also rises from below for a
 // "flip up" feel. Once the animation completes the formatted display string
-// takes over (so "68,431" reads with the comma, "£149" gets its currency
+// takes over (so "68,431" reads with the comma, "£211" gets its currency
 // glyph).
 
 function CountUp({
