@@ -46,7 +46,7 @@ const CAPABILITIES: Capability[] = [
     icon: "supply-chain",
     name: "Supply chain mapping",
     tagline: "Every tier from fibre to factory, verified at source.",
-    body: "We reconstruct your supply chain across all four tiers. Tier 1 (final assembly), Tier 2 (fabric production), Tier 3 (yarn spinning) and Tier 4 (raw fibre extraction). Each node is geotagged, named and tied to evidence. Supplier follow-up is built into the platform on Growth and Pro, so the data-chasing is not yours alone.",
+    body: "We reconstruct your supply chain across all four tiers. Tier 1 (final assembly), Tier 2 (fabric production), Tier 3 (yarn spinning) and Tier 4 (raw fibre extraction), following the Textile Exchange and Apparel Alliance supply chain taxonomy. Each node is geotagged, named and tied to evidence. Supplier follow-up is built into the platform on Growth and Pro, so the data-chasing is not yours alone.",
     detail: [
       { label: "Tier coverage", value: "Tier 1 to Tier 4" },
       { label: "Verification", value: "Document upload + dated" },

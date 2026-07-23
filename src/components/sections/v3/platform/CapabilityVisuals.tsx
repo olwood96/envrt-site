@@ -51,6 +51,8 @@ const SUPPLIERS = [
   { name: "Viana do Castelo · Assembly", tier: "T1", lng: -8.83, lat: 41.70, color: "#3E00FF", count: 1 },
   { name: "Prato · Fabric mill", tier: "T2", lng: 11.10, lat: 43.88, color: "#00DAFF", count: 1 },
   { name: "Bursa · Fabric", tier: "T2", lng: 29.06, lat: 40.18, color: "#00DAFF", count: 2 },
+  // Dyeing / wet processing is a Tier 2 finishing step, not its own tier.
+  { name: "Denizli · Dyehouse", tier: "T2", lng: 29.09, lat: 37.77, color: "#DF5FFF", count: 1 },
   { name: "Adana · Yarn spinning", tier: "T3", lng: 35.32, lat: 37.00, color: "#00B92C", count: 1 },
   { name: "Aydın · Fibre", tier: "T4", lng: 27.84, lat: 37.85, color: "#FFBF00", count: 1 },
 ];

@@ -26,7 +26,7 @@ const CAPABILITIES: Capability[] = [
     id: "supply-chain",
     name: "Supply chain mapping",
     desc: "Reconstruct every tier from fibre to factory, verified at the source.",
-    stat: { value: "3", label: "tiers mapped" },
+    stat: { value: "4", label: "tiers mapped" },
     theme: "calculate",
   },
   {
