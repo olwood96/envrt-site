@@ -135,7 +135,15 @@ export async function resolvePlanFromSubscription(
     }
   }
 
-  // Path 2: self-serve — env-configured price ID
+  // Path 2: self-serve via subscription metadata. Set at checkout
+  // (subscription_data.metadata.plan), this is how inline-priced self-serve
+  // subs resolve, since their ad-hoc price is not in any env map.
+  const metaPlan = subscription.metadata?.plan?.toLowerCase();
+  if (metaPlan && isValidPlan(metaPlan)) {
+    return { plan: metaPlan as PlanName, source: "self_serve" };
+  }
+
+  // Path 3: legacy self-serve — env-configured price ID (pre-inline subs).
   const priceToPlan = buildPriceToPlanMap();
   if (priceToPlan[price.id]) {
     return { plan: priceToPlan[price.id], source: "self_serve" };

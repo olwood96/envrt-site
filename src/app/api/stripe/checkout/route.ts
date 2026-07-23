@@ -3,11 +3,11 @@ import Stripe from "stripe";
 import { rateLimit, getClientIp, isValidEmail } from "@/lib/form-security";
 import {
   getStripe,
-  getStripePriceId,
   isValidPlan,
   isValidInterval,
   isValidCurrency,
 } from "@/lib/stripe";
+import { PLAN_PRICES, STRIPE_PRODUCTS } from "@/lib/plans.generated";
 
 interface CheckoutPayload {
   plan: string;
@@ -49,24 +49,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   }
 
-  // Get the Stripe Price ID — fall back to GBP if selected currency isn't configured
-  let priceId = getStripePriceId(data.plan, data.interval, data.currency);
-  let effectiveCurrency = data.currency;
+  // Price is built INLINE from the canonical plans source of truth
+  // (plans.generated.ts, synced from the dashboard). No pre-created Stripe
+  // Price IDs, no STRIPE_PRICE_* env vars, no stripe:sync: a price change in
+  // the plans file flows straight into checkout. Pro is custom-only and has
+  // no self-serve amount, so it is rejected here (its CTA goes to /contact).
+  const planPrices =
+    data.plan === "starter" || data.plan === "growth"
+      ? PLAN_PRICES[data.plan]
+      : null;
+  const unitAmount = planPrices?.[data.interval]?.[data.currency];
 
-  if (!priceId && data.currency !== "gbp") {
-    priceId = getStripePriceId(data.plan, data.interval, "gbp");
-    effectiveCurrency = "gbp";
-  }
-
-  if (!priceId) {
-    console.error(
-      `Missing Stripe price ID for ${data.plan}/${data.interval}/${data.currency} (and GBP fallback)`
-    );
+  if (!unitAmount) {
     return NextResponse.json(
       { error: "Payment not available for this plan configuration" },
       { status: 500 }
     );
   }
+
+  const effectiveCurrency = data.currency;
+  const productName =
+    data.plan === "starter" || data.plan === "growth"
+      ? STRIPE_PRODUCTS[data.plan].name
+      : `ENVRT ${data.plan}`;
 
   try {
     const stripe = getStripe();
@@ -74,7 +79,17 @@ export async function POST(request: NextRequest) {
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [
+        {
+          price_data: {
+            currency: effectiveCurrency,
+            unit_amount: unitAmount,
+            recurring: { interval: data.interval === "annual" ? "year" : "month" },
+            product_data: { name: productName },
+          },
+          quantity: 1,
+        },
+      ],
       metadata: {
         plan: data.plan,
         interval: data.interval,

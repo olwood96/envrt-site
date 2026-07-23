@@ -9,15 +9,6 @@ vi.mock("@/lib/stripe", () => ({
   getStripe: () => ({
     checkout: { sessions: { create: mockCreate } },
   }),
-  getStripePriceId: (plan: string, interval: string, currency: string) => {
-    if (plan === "starter" && interval === "monthly" && currency === "gbp") {
-      return "price_starter_monthly_gbp";
-    }
-    if (plan === "growth" && interval === "annual" && currency === "eur") {
-      return "price_growth_annual_eur";
-    }
-    return null;
-  },
   isValidPlan: (p: string) => ["starter", "growth", "pro"].includes(p),
   isValidInterval: (i: string) => ["monthly", "annual"].includes(i),
   isValidCurrency: (c: string) => ["gbp", "eur"].includes(c),
@@ -56,20 +47,37 @@ describe("POST /api/stripe/checkout", () => {
     expect(mockCreate).toHaveBeenCalledOnce();
   });
 
-  it("passes correct price ID and metadata to Stripe", async () => {
+  it("builds the price inline from the plans source of truth (no pre-created price ID)", async () => {
     await POST(
       makeRequest(
-        { plan: "starter", interval: "monthly", currency: "gbp" },
+        { plan: "starter", interval: "monthly", currency: "eur" },
         "10.0.0.2"
       )
     );
     const createArgs = mockCreate.mock.calls[0][0];
-    expect(createArgs.line_items[0].price).toBe("price_starter_monthly_gbp");
-    expect(createArgs.metadata.plan).toBe("starter");
-    expect(createArgs.metadata.interval).toBe("monthly");
-    expect(createArgs.metadata.currency).toBe("gbp");
+    const li = createArgs.line_items[0];
+    // No pre-created Stripe Price ID; the amount comes straight from PLAN_PRICES.
+    expect(li.price).toBeUndefined();
+    expect(li.price_data.currency).toBe("eur");
+    expect(li.price_data.unit_amount).toBe(24900); // €249.00, the canonical Starter EUR price
+    expect(li.price_data.recurring.interval).toBe("month");
+    expect(li.price_data.product_data.name).toBe("ENVRT Starter");
+    // Metadata is what the webhook resolves the plan from.
+    expect(createArgs.subscription_data.metadata.plan).toBe("starter");
     expect(createArgs.metadata.term_months).toBe("12");
     expect(createArgs.mode).toBe("subscription");
+  });
+
+  it("uses the annual amount with a yearly recurring interval", async () => {
+    await POST(
+      makeRequest(
+        { plan: "growth", interval: "annual", currency: "eur" },
+        "10.0.0.22"
+      )
+    );
+    const li = mockCreate.mock.calls[0][0].line_items[0];
+    expect(li.price_data.unit_amount).toBe(596700); // €5,967.00 Growth annual
+    expect(li.price_data.recurring.interval).toBe("year");
   });
 
   it("pre-fills customer email when provided", async () => {
