@@ -10,4 +10,3 @@ Host: https://envrt.com
 
 # Sitemaps
 Sitemap: https://envrt.com/sitemap.xml
-Sitemap: https://envrt.com/insights/rss.xml
