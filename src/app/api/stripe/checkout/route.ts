@@ -73,6 +73,17 @@ export async function POST(request: NextRequest) {
       ? STRIPE_PRODUCTS[data.plan].name
       : `ENVRT ${data.plan}`;
 
+  // Clean catalogue: reference a STABLE Stripe Product by ID when configured
+  // (STRIPE_PRODUCT_STARTER / STRIPE_PRODUCT_GROWTH, set once from the existing
+  // products), so paid subscriptions attach to one product instead of creating
+  // a fresh ad-hoc one each time. The price stays inline from the plans file,
+  // so it still auto-updates. Falls back to product_data by name when the env
+  // var is absent, so checkout keeps working with zero config.
+  const stableProductId =
+    process.env[`STRIPE_PRODUCT_${data.plan.toUpperCase()}`]?.trim() || null;
+  const productField: Pick<Stripe.Checkout.SessionCreateParams.LineItem.PriceData, "product" | "product_data"> =
+    stableProductId ? { product: stableProductId } : { product_data: { name: productName } };
+
   try {
     const stripe = getStripe();
 
@@ -85,7 +96,7 @@ export async function POST(request: NextRequest) {
             currency: effectiveCurrency,
             unit_amount: unitAmount,
             recurring: { interval: data.interval === "annual" ? "year" : "month" },
-            product_data: { name: productName },
+            ...productField,
           },
           quantity: 1,
         },
